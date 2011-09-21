@@ -39,7 +39,7 @@ StringField::StringField(const string* nome,const string* valore) : Field(nome){
   type = Field::STRING;
   this->setValue( valore);
 }
-StringField::~StringField(){}
+StringField::~StringField() {}
 
 Field* StringField::createNewInstance(const char* aName) {
     string myName = aName==0 ? this->name : aName;
@@ -52,7 +52,4 @@ void StringField::setValue(const string* valore){
         nullo = false;
 }
 const string* StringField::getValue(){ return this->stringValue; }
-
-string StringField::toString() {
-    return string( this->getValue()->c_str() );
-}
+string StringField::toString() { return string( this->getValue()->c_str() ); }

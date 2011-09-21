@@ -72,8 +72,8 @@ namespace DBLayer {
         /** Class name */
         virtual string name();
         /**	valuesAsAttributes:
-                                se true, i valori vengono rappresentati come attributi
-                                se false, i valori vengono rappresentati come nodi
+            se true, i valori vengono rappresentati come attributi
+            se false, i valori vengono rappresentati come nodi
         */
         virtual string toString(string prefix="", bool valuesAsAttributes=false);
 
@@ -129,13 +129,8 @@ namespace DBLayer {
         virtual void _before_copy(DBMgr* dbmgr=0);
         virtual void _after_copy(DBMgr* dbmgr=0);
 
-        static string *integer2string(long longValue);
-
       protected:
-// 		DBFieldVector fields;
         string tableName;
-
-// 20091014: utile pubblica e statica -	string *integer2string(long longValue);
 
       private:
         string toString_nodes(string prefix);

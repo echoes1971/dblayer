@@ -65,7 +65,6 @@ bool XmlrpcConnection::connect() {
 	}
 	
 	// Voglio che result sia del tipo [ stringa, [] ], altrimenti errore
-	
 	if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
 		this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
 			+ " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
@@ -97,22 +96,15 @@ bool XmlrpcConnection::connect() {
 	
 	return true;
 }
-bool XmlrpcConnection::disconnect() {
-	return true;
-}
-bool XmlrpcConnection::reconnect() {
-// 	if( this->disconnect() )
-		return this->connect();
-// 	else
-// 		return false;
-}
+bool XmlrpcConnection::disconnect() { return true; }
+bool XmlrpcConnection::reconnect() { return this->connect(); }
 
 bool debugXmlrpcExec = false;
 
 ResultSet* XmlrpcConnection::exec(const string s) {
 	XmlrpcResultSet* rs = new XmlrpcResultSet();
 	xmlrpc_c::value result;
-	cout << "XmlrpcConnection::exec: s=" << this->connectionString << endl;
+    //cout << "XmlrpcConnection::exec: s=" << this->connectionString << endl;
 	this->errorMessage.clear();
 	try {
 		this->_client.call(this->connectionString, "selectAsArray", "ss", &result, "nometabella", s.c_str());
@@ -125,7 +117,6 @@ ResultSet* XmlrpcConnection::exec(const string s) {
 	}
 	
 	// Voglio che result sia del tipo [ stringa, [] ], altrimenti errore
-	
 	if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
 		this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
 			+ " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
@@ -217,160 +208,41 @@ ResultSet* XmlrpcConnection::exec(const string s) {
 		}
 	}
 	
-/*
-	int errorCode;
-	const char* query = s.c_str();
-	if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: query = " << query << endl;
-
-	cout << "XmlrpcConnection::exec: rs = " << rs << endl;
-	this->errorMessage.clear();
-
-	// Preparo i metadati
-	if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: Preparo i metadati " << endl;
-// 	int nColonne = sqlite3_column_count(pStmt);
-	if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: nColonne=" << DBLayer::integer2string((long)nColonne) << endl;
-	for( int i=0; i<nColonne; i++) {
-// 		const char* nomeColonna = sqlite3_column_name(pStmt,i);
-		cout << "XmlrpcConnection::exec: nomeColonna = " << nomeColonna << endl;
-		rs->columnName.push_back( string(nomeColonna) );
-//		delete nomeColonna;
-		const char* nomeTipo = 0;//sqlite3_column_decltype(pStmt,i);
-		if(nomeTipo!=0) {
-			if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: nomeTipo=\'" << nomeTipo << "\'" << endl;
-			if( strcmp(nomeTipo,"int")==0 || strcmp(nomeTipo,"integer")==0) {
-				rs->columnType.push_back( DBLayer::type_integer );
-			} else if( strcmp(nomeTipo,"text"  )==0 ) {
-				rs->columnType.push_back( DBLayer::type_string );
-			} else if( strcmp(nomeTipo,"float"  )==0 ) {
-				rs->columnType.push_back( DBLayer::type_double );
-			} else if( strcmp(nomeTipo,"blob"  )==0 ) {
-				rs->columnType.push_back( DBLayer::type_blob );
-			} else {
-				cout << "XmlrpcConnection::exec: codiceTipo \'" << nomeTipo
-					 << "\' NON riconosciuto!" << endl;
-				rs->columnType.push_back( DBLayer::type_blob );
-			}
-		} else {
-			cout << "XmlrpcConnection::exec: nomeTipo VUOTO" << endl;
-			rs->columnType.push_back( DBLayer::type_blob );
-		}
-//		delete nomeTipo;
-	}
-
-	// Leggo la prima riga
-	errorCode = 0;//sqlite3_step(pStmt);
-	if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: Leggo la prima riga " << endl;
-
-	// Leggo tutte le righe
-	if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: Leggo tutte le righe " << endl;
-	while( errorCode==SQLITE_ROW ) {
-		for(unsigned int c=0; c<rs->columnName.size(); c++) {
-			int sizeDato = sqlite3_column_bytes(pStmt,c);
-			// SE il tipo e' blob, allora probabilmente non e' stato identificato
-			// inizialmente, quindi lo aggiorniamo mentre leggiamo la riga
-			if( rs->columnType[c]==DBLayer::type_blob ) {
-				int tipoDiDato = sqlite3_column_type(pStmt,c);
-				switch( tipoDiDato ) {
-					case SQLITE_INTEGER:
-						rs->columnType[c]=DBLayer::type_integer;
-						break;
-					case SQLITE_FLOAT:
-						rs->columnType[c]=DBLayer::type_double;
-						break;
-					case SQLITE_TEXT:
-						rs->columnType[c]=DBLayer::type_string;
-						break;
-				}
-			}
-
-			if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: sizeDato=\'" << DBLayer::integer2string((long)sizeDato) << "\'" << endl;
-			if(sizeDato>0) {
-				char* tmpValore = new char[ sqlite3_column_bytes(pStmt,c) * 2 ];
-				const unsigned char* tmpSorgente = sqlite3_column_text(pStmt,c);
-				sprintf( tmpValore, "%s", tmpSorgente );
-				if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: tmpValore=\'" << tmpValore << "\'" << endl;
-				string valore = string( tmpValore );
-				rs->righe.push_back( valore );
-				delete tmpValore;
-				//delete tmpSorgente;
-			} else {
-				rs->righe.push_back( string("\\N") );
-			}
-		}
-		errorCode = sqlite3_step(pStmt);
-	}
-	if( errorCode!=SQLITE_DONE ) {
-		cout << "XmlrpcConnection::exec: errorCode = " << errorCode << endl;
-		this->errorMessage.append(
-			"errorCode: "+ DBLayer::integer2string((long)errorCode) +
-			"; msg: " + sqlite3_errmsg(this->db)
-		);
-		cout << "XmlrpcConnection::exec: errorMessage = " << this->errorMessage << endl;
-	}
-	if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: Leggo tutte le righe... OK! " << endl;
-
-
-	if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: finalizzo..." << endl;
-// 	errorCode = sqlite3_finalize( pStmt );
-	if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: finalizzo... OK" << endl;
-	if( errorCode!=SQLITE_OK ) {
-		cout << "XmlrpcConnection::exec: errorCode = " << errorCode << endl;
-		this->errorMessage.append(
-			"errorCode: "+ DBLayer::integer2string((long)errorCode) +
-			"; msg: " + sqlite3_errmsg(this->db)
-		);
-		cout << "XmlrpcConnection::exec: errorMessage = " << this->errorMessage << endl;
-	} else {
-		if(debugXmlrpcExec)	cout << "XmlrpcConnection::exec: errorCode==SQLITE_OK" << endl;
-	}
-	cout << "XmlrpcConnection::exec: query = " << query << endl;
-//	delete query;
-
-	cout << "XmlrpcConnection::exec: rs=" << rs->toString() << endl;
-	cout << "XmlrpcConnection::exec: fine." << endl;
-*/
 	return rs;
 }
 
 string XmlrpcConnection::escapeString(string s) {
-	static string fromQuote("\'");
-	static string   toQuote("\'\'");
-	return DBLayer::replaceAll(s, fromQuote, toQuote);
+    return DBLayer::replaceAll(s, "\'", "\'\'");
+//	static string fromQuote("\'");
+//	static string   toQuote("\'\'");
+//	return DBLayer::replaceAll(s, fromQuote, toQuote);
 }
 
-int XmlrpcConnection::getColumnSize(string* relname) {
-    return -1;
-}
-string XmlrpcConnection::getColumnName(string* relname, int column) {
-	string ret="";
-	return ret;
-}
+int XmlrpcConnection::getColumnSize(string* relname) { return -1; }
+string XmlrpcConnection::getColumnName(string* relname, int column) { return ""; }
 IntegerVector XmlrpcConnection::getKeys(string* relname) {
 	IntegerVector ret;
-    cout << "XmlrpcConnection::getKeys: UNSUPPORTED; relname=" << relname << endl;
+    this->errorMessage.append("XmlrpcConnection::getKeys: UNSUPPORTED; relname=" + string(relname->c_str()) );
+    //cout << "XmlrpcConnection::getKeys: UNSUPPORTED; relname=" << relname << endl;
 	return ret;
 }
 IntegerVector XmlrpcConnection::getForeignKeys(string* relname) {
 	IntegerVector ret;
-    cout << "XmlrpcConnection::getForeignKeys: UNSUPPORTED; relname=" << relname << endl;
+    this->errorMessage.append("XmlrpcConnection::getForeignKeys: UNSUPPORTED; relname=" + string(relname->c_str()) );
+    //cout << "XmlrpcConnection::getForeignKeys: UNSUPPORTED; relname=" << relname << endl;
 	return ret;
 }
 //********************* XmlrpcConnection: fine.
 
 
-
 //********************* XmlrpcResultSet: inizio.
-
 #ifdef WIN32
 XmlrpcResultSet::XmlrpcResultSet() : ResultSet() {
 #else
 XmlrpcResultSet::XmlrpcResultSet() : ResultSet::ResultSet() {
 #endif
 }
-XmlrpcResultSet::~XmlrpcResultSet() {
-//	cout << "XmlrpcResultSet::~XmlrpcResultSet: inizio." << endl;
-//	cout << "XmlrpcResultSet::~XmlrpcResultSet: fine." << endl;
-}
+XmlrpcResultSet::~XmlrpcResultSet() {}
 
 //int XmlrpcResultSet::getNumColumns() {
 //	return this->columnName.size();
@@ -391,7 +263,6 @@ XmlrpcResultSet::~XmlrpcResultSet() {
 int XmlrpcResultSet::getColumnSize(int i) {
 	// Non significativo per Xmlrpc
     return -i;
-//	return -1;
 }
 //int XmlrpcResultSet::getColumnIndex(string* columnName ) {
 //	int ret = -1;
@@ -570,7 +441,6 @@ void XmlrpcResultSet::valueToString(xmlrpc_c::value* v, std::string* out_string)
 	}
 }
 //********************* XmlrpcResultSet: fine.
-
 
 
 #endif

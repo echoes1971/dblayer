@@ -37,8 +37,4 @@ ForeignKey::ForeignKey(string colonna_fk, string tabella_riferita, string colonn
 	this->colonna_riferita = colonna_riferita;
 }
 
-ForeignKey::~ForeignKey() {
-//	delete this->colonna_fk;
-//	delete this->tabella_riferita;
-//	delete this->colonna_riferita;
-}
+ForeignKey::~ForeignKey() {}

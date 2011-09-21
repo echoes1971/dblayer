@@ -44,8 +44,6 @@ int Field::fieldDistrutti = 0;
 Field::Field() {
   this->nullo = true;
   this->stringValue=0;
-  
-//  if(debugField) printf("Field::Field: creato field senza nome.\n");
   fieldCreati++;
 }
 Field::Field(const string* nome) {
@@ -53,14 +51,10 @@ Field::Field(const string* nome) {
     //this->name.append(nome->c_str());
     this->nullo = true;
     this->stringValue=0;
-
-//    if(debugField) printf("Field::Field: creato field \'%s\'.\n", nome->c_str() );
     fieldCreati++;
 }
 Field::~Field() {
-//    if(debugField) printf( "Field::~Field(): name = %s\n", this->getName().c_str() );
     if( this->stringValue!=0 ) delete this->stringValue;
-
     fieldDistrutti++;
 }
 
@@ -332,9 +326,7 @@ long Field::getDaysFor(long y, long m) {
     }
     return ret;
 }
-long Field::getDaysFor(long y) {
-    return (Field::getDaysFor(y,2)==29) ? 366 : 365;
-}
+long Field::getDaysFor(long y) { return (Field::getDaysFor(y,2)==29) ? 366 : 365; }
 long Field::to_days(long year, long month, long day) {
     long ret = 0;
     // Date

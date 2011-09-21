@@ -70,8 +70,6 @@ Connection* DBLayer::createConnection(string s) {
         myDBType = prefix;
         myConnString = connString;
     }
-//cout << "DBLayer::createConnection: myDBType=" << myDBType << endl;
-//cout << "DBLayer::createConnection: myConnString=" << myConnString << endl;
 //    printf("DBLayer::createConnection: myDBType=%s\n",myDBType.c_str());
 //    printf("DBLayer::createConnection: myConnString=%s\n",myConnString.c_str());
     if (myDBType == db_mysql) {
@@ -95,7 +93,6 @@ Connection* DBLayer::createConnection(string s) {
         return new XmlrpcConnection(myConnString);
 #endif
     };
-// 20090811: inizio.
     //printf("DBLayer::createConnection: connectionBuilders=%x\n",&DBLayer::connectionBuilders);
     //printf("DBLayer::createConnection: connectionBuilders.count=%d\n",DBLayer::connectionBuilders.size());
     ConnectionBuildersMap::iterator it;
@@ -105,13 +102,11 @@ Connection* DBLayer::createConnection(string s) {
     else {
         //printf("DBLayer::createConnection: NOT FOUND\n");
     }
-// 20090811: fine.
     cout << "DBLayer::createConnection: type '" << myDBType << "' not found." << endl;
     return new Connection(s);
 }
 void DBLayer::registerConnectionType(string prefix, Connection* (*myBuilder)(string s)) {
     //printf("DBLayer::registerConnectionType: prefix=%s\n", prefix.c_str());
-    //DBLayer::connectionBuilders.insert(ConnectionBuildersMap::value_type(prefix,myBuilder));
     DBLayer::connectionBuilders[prefix] = myBuilder;
     //printf("DBLayer::registerConnectionType: connectionBuilders=%x\n", &DBLayer::connectionBuilders );
     //printf("DBLayer::registerConnectionType: connectionBuilders.size=%d\n", DBLayer::connectionBuilders.size());
@@ -137,24 +132,14 @@ bool Connection::disconnect() {
     return true;
 }
 
-bool Connection::isConnected() {
-    return this->connected;
-}
+bool Connection::isConnected() { return this->connected; }
 
-ResultSet* Connection::login(string user, string pwd) {
-    return new ResultSet();
-}
+ResultSet* Connection::login(string user, string pwd) { return new ResultSet(); }
 
-string Connection::getFormSchema(string language) {
-    return "Connection::getFormSchema: NOT SUPPORTED - " + language;
-}
+string Connection::getFormSchema(string language) { return "Connection::getFormSchema: NOT SUPPORTED - " + language; }
+string Connection::getDBSchema(string language) { return "Connection::getDBSchema: NOT SUPPORTED - " + language; }
+string Connection::getSchemaName() { return "Connection::getSchemaName: NOT SUPPORTED"; }
 
-string Connection::getDBSchema(string language) {
-    return "Connection::getDBSchema: NOT SUPPORTED - " + language;
-}
-string Connection::getSchemaName() {
-    return "Connection::getSchemaName: NOT SUPPORTED";
-}
 ResultSet* Connection::exec(const string s) { return new ResultSet(); }
 
 string Connection::getErrorMessage() { return this->errorMessage; }
@@ -350,15 +335,11 @@ IntegerVector PGConnection::getKeys(string* relname) {
         while( (indice=tmp.find(',') ) != string::npos ) {
             string mysubstr = tmp.substr(0,indice);
             valore = atoi(mysubstr.c_str() );
-// 			cout << "mysubstr='" << mysubstr << "'" << endl;
-// 			cout << "atoi='" << valore << "'" << endl;
             ret.push_back( valore );
             tmp = tmp.substr( indice+1 );
-// 			cout << "tmp='" << tmp << "'" << endl;
         }
         valore = atoi(tmp.c_str() );
         ret.push_back( valore );
-// 		cout << "atoi='" << valore << "'" << endl;
     } else {
 // 		cout << "Errori: " << this->getErrorMessage() << endl;
     }
@@ -396,7 +377,6 @@ string ResultSet::getValue(int row, string* columnName) {
 }
 string ResultSet::getColumnName(int i) { return this->columnName[i]; }
 string ResultSet::getColumnType(int i) { return this->columnType[i]; }
-
 int ResultSet::getColumnSize(int i) { return this->columnSize[i]; }
 
 int ResultSet::getLength(int row, int column) { return (int) this->righe.at( row * this->columnName.size() + column ).size(); }
@@ -467,27 +447,17 @@ string ResultSet::toString(string prefix) {
 #ifdef USE_LIBPQ
 
 PGResultSet::PGResultSet() : ResultSet::ResultSet() {}
-PGResultSet::PGResultSet(PGresult* res) : ResultSet::ResultSet() {
-    this->res = res;
-}
-PGResultSet::~PGResultSet() {
-    PQclear(this->res);
-}
-int PGResultSet::getNumColumns() {
-    return PQnfields( this->res );
-}
-int PGResultSet::getNumRows() {
-    return PQntuples( this->res );
-}
+PGResultSet::PGResultSet(PGresult* res) : ResultSet::ResultSet() { this->res = res; }
+PGResultSet::~PGResultSet() { PQclear(this->res); }
+int PGResultSet::getNumColumns() { return PQnfields( this->res ); }
+int PGResultSet::getNumRows() { return PQntuples( this->res ); }
 string PGResultSet::getValue(int row, int column) {
     string ret;
     char* tmp = PQgetvalue( this->res, row, column );
     if(tmp!=0) ret.append(tmp);
     return ret;
 }
-string PGResultSet::getColumnName(int i) {
-    return string( PQfname(this->res, i) );
-}
+string PGResultSet::getColumnName(int i) { return string( PQfname(this->res, i) ); }
 /*	I tipi di postgres si vedono con la query: select oid,typname from pg_type	*/
 string PGResultSet::getColumnType(int i) {
     int mytype = (int) PQftype( this->res, i );
@@ -529,28 +499,11 @@ string PGResultSet::getColumnType(int i) {
     }
 }
 
-int PGResultSet::getColumnSize(int i) {
-    return PQfsize(this->res, i);
-}
-
-int PGResultSet::getLength(int row, int column) {
-    return PQgetlength(this->res, row, column);
-}
-
-bool PGResultSet::isNull(int row, int column) {
-    return PQgetisnull(this->res, row, column)>0 ? true : false;
-}
-
-string PGResultSet::getErrorMessage() {
-    return string( PQresultErrorMessage(this->res) );
-}
-
-string PGResultSet::getStatus() {
-    return string( PQresStatus( PQresultStatus( (this->res) ) ) );
-}
-
-int PGResultSet::getColumnIndex(string* columnName ) {
-    return PQfnumber( this->res, columnName->c_str() );
-}
+int PGResultSet::getColumnSize(int i) { return PQfsize(this->res, i); }
+int PGResultSet::getLength(int row, int column) { return PQgetlength(this->res, row, column); }
+bool PGResultSet::isNull(int row, int column) { return PQgetisnull(this->res, row, column)>0 ? true : false; }
+string PGResultSet::getErrorMessage() { return string( PQresultErrorMessage(this->res) ); }
+string PGResultSet::getStatus() { return string( PQresStatus( PQresultStatus( (this->res) ) ) ); }
+int PGResultSet::getColumnIndex(string* columnName ) { return PQfnumber( this->res, columnName->c_str() ); }
 
 #endif

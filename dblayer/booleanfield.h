@@ -34,13 +34,7 @@
 #include "importedPackages.h"
 #include "dbfield.h"
 
-
-/**
- *@author Roberto Rocco Angeloni
- */
-
 namespace DBLayer {
-
 	class DLLEXPORT BooleanField : public DBField {
 	  public:
         BooleanField();
@@ -52,7 +46,6 @@ namespace DBLayer {
 
 		string toString();
 	};
-
 }
 
 #endif

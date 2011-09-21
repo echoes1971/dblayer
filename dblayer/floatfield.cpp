@@ -37,19 +37,13 @@ DBLayer::FloatField::FloatField(const string* nome, float valore) : DBField(nome
 //  this->setPK(isPK);
 //  this->setValue(valore);
 //}
-DBLayer::FloatField::~FloatField(){
-//	cout << "FloatField::~FloatField: " << this->name << " deleted." << endl;
-}
-/** No descriptions */
-float DBLayer::FloatField::getValue(){
-  return floatValue;
-}
-/** No descriptions */
+DBLayer::FloatField::~FloatField() {}
+
+float DBLayer::FloatField::getValue(){ return floatValue; }
 void DBLayer::FloatField::setValue(float valore){
   floatValue = valore;
   nullo = false;
 }
-
 
 string DBLayer::FloatField::toString() {
 	char tmp[50];

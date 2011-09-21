@@ -69,9 +69,6 @@ namespace DBLayer {
 		
 	  private:
 		xmlrpc_c::clientSimple _client;
-// 		sqlite3* db;
-// 		static int sqliteCallback(void *NotUsed, int argc, char **argv, char **azColName);
-
 	};
 
 

@@ -92,7 +92,6 @@ void DateField::setValue(const string* valore) {
 }
 
 void DateField::setValue(long seconds) {
-	// TODO Testare!!!!
 	this->year = 0;	this->month = 0;	this->day = 0;
 	this->hour = 0;	this->minute = 0;	this->seconds = 0;
 	this->millis = 0;
@@ -141,7 +140,6 @@ bool DateField::isValidHour(long h, long m, long s, long millis) {
 }
 
 long DateField::getDaysFor(long y, long m) {
-//	printf("DateField::getDaysFor(%d, %d)\n",y,m);
     long ret = -1;
     switch (m) {
     case 1:
@@ -192,14 +190,11 @@ long DateField::to_seconds() {
 	const static long GIORNO = 24L * 60L * 60L;
 	long ret = 0;
 	// Time
-//	ret += this->millis;
 	ret += this->seconds;
 	ret += this->minute * 60;
 	ret += this->hour * 60 * 60;
 	// Date
 	long giorni = this->to_days();
-//	printf("DateField::to_seconds: %d * %d = %d\n",
-//			giorni, GIORNO, giorni*GIORNO);
 	ret += (giorni*GIORNO);
 	return ret;
 }

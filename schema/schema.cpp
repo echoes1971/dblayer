@@ -167,9 +167,7 @@ Schema* Schema::clone(Schema* newSchema) {
     int fieldSize = this->getFieldSize();
     for(int i=0; i<fieldSize; i++) {
         Field* myfield = this->getField(i);
-        // 20091106: start.
-        ret->addField( myfield->clone() );
-        // 20091106: end.
+        ret->addField( myfield->clone() ); // 20091106
     }
     return ret;
 }
@@ -450,7 +448,6 @@ string SchemaNS::float2string(float f) {
 #endif
     return string( (char*)&tmp );
 }
-
 
 
 int SchemaNS::getSchemiCreati() { return Schema::getSchemiCreati(); }

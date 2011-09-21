@@ -48,11 +48,7 @@ SQLiteConnection::SQLiteConnection(string s) : Connection::Connection(s) {
 #endif
 	this->db = 0;
 }
-SQLiteConnection::~SQLiteConnection() {
-//	cout << "SQLiteConnection::~SQLiteConnection: inizio." << endl;
-	this->disconnect();
-//	cout << "SQLiteConnection::~SQLiteConnection: fine." << endl;
-}
+SQLiteConnection::~SQLiteConnection() { this->disconnect(); }
 
 bool SQLiteConnection::connect() {
 	int rc;
@@ -74,12 +70,12 @@ bool SQLiteConnection::disconnect() {
 		errorCode = sqlite3_close(this->db);
 
 		if( errorCode!=SQLITE_OK ) {
-			cout << "SQLiteConnection::disconnect: errorCode = " << errorCode << endl;
+            //cout << "SQLiteConnection::disconnect: errorCode = " << errorCode << endl;
 			this->errorMessage.append(
 				"errorCode: "+ DBLayer::integer2string((long)errorCode) +
 				"; msg: " + sqlite3_errmsg(this->db)
 			);
-			cout << "SQLiteConnection::disconnect: errorMessage = " << this->errorMessage << endl;
+            //cout << "SQLiteConnection::disconnect: errorMessage = " << this->errorMessage << endl;
 			return false;
 		}
 
@@ -88,12 +84,7 @@ bool SQLiteConnection::disconnect() {
 //	cout << "SQLiteConnection::disconnect: fine." << endl;
 	return true;
 }
-bool SQLiteConnection::reconnect() {
-	if( this->disconnect() )
-		return this->connect();
-	else
-		return false;
-}
+bool SQLiteConnection::reconnect() { return this->disconnect() ? this->connect() : false; }
 int SQLiteConnection::sqliteCallback(void *NotUsed, int argc, char **argv, char **azColName) {
   int i;
   SQLiteResultSet* rs = (SQLiteResultSet*) NotUsed;
@@ -102,7 +93,6 @@ int SQLiteConnection::sqliteCallback(void *NotUsed, int argc, char **argv, char 
   for(i=0; i<argc; i++){
     printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
 //    rs->columnName.push_back( azColName[i] );
-
   }
   printf("\n");
 
@@ -138,13 +128,13 @@ ResultSet* SQLiteConnection::exec(const string s) {
                 );
 
     if( errorCode!=SQLITE_OK ) {
-        cout << "SQLiteConnection::exec: errorCode = " << errorCode << endl;
+        //cout << "SQLiteConnection::exec: errorCode = " << errorCode << endl;
         this->errorMessage.append(
                     "errorCode: "+ DBLayer::integer2string((long)errorCode) +
                     "; msg: " + sqlite3_errmsg(this->db)
                     );
-        cout << "SQLiteConnection::exec: errorMessage = " << this->errorMessage << endl;
-        cout << "SQLiteConnection::exec: error query = " << query << endl;
+        //cout << "SQLiteConnection::exec: errorMessage = " << this->errorMessage << endl;
+        //cout << "SQLiteConnection::exec: error query = " << query << endl;
         return rs;
     }
 
@@ -184,12 +174,12 @@ ResultSet* SQLiteConnection::exec(const string s) {
     errorCode = sqlite3_step(pStmt);
     if(debugExec) cout << "SQLiteConnection::exec: Leggo la prima riga " << endl;
     if( errorCode!=SQLITE_ROW && errorCode!=SQLITE_DONE ) {
-        cout << "SQLiteConnection::exec: errorCode = " << errorCode << endl;
+        //cout << "SQLiteConnection::exec: errorCode = " << errorCode << endl;
         this->errorMessage.append(
                     "errorCode: "+ DBLayer::integer2string((long)errorCode) +
                     "; msg: " + sqlite3_errmsg(this->db)
                     );
-        cout << "SQLiteConnection::exec: errorMessage = " << this->errorMessage << endl;
+        //cout << "SQLiteConnection::exec: errorMessage = " << this->errorMessage << endl;
     }
 
     // Leggo tutte le righe
@@ -209,7 +199,7 @@ ResultSet* SQLiteConnection::exec(const string s) {
                     rs->columnType[c]=DBLayer::type_double;
                     break;
                 case SQLITE_TEXT:
-                    //					case SQLITE3_TEXT:
+                //case SQLITE3_TEXT:
                     rs->columnType[c]=DBLayer::type_string;
                     break;
                 }
@@ -232,26 +222,25 @@ ResultSet* SQLiteConnection::exec(const string s) {
         errorCode = sqlite3_step(pStmt);
     }
     if( errorCode!=SQLITE_DONE ) {
-        cout << "SQLiteConnection::exec: errorCode = " << errorCode << endl;
+        //cout << "SQLiteConnection::exec: errorCode = " << errorCode << endl;
         this->errorMessage.append(
                     "errorCode: "+ DBLayer::integer2string((long)errorCode) +
                     "; msg: " + sqlite3_errmsg(this->db)
                     );
-        cout << "SQLiteConnection::exec: errorMessage = " << this->errorMessage << endl;
+        //cout << "SQLiteConnection::exec: errorMessage = " << this->errorMessage << endl;
     }
     if(debugExec) cout << "SQLiteConnection::exec: Leggo tutte le righe... OK! " << endl;
-
 
     if(debugExec) cout << "SQLiteConnection::exec: finalizzo..." << endl;
     errorCode = sqlite3_finalize( pStmt );
     if(debugExec) cout << "SQLiteConnection::exec: finalizzo... OK" << endl;
     if( errorCode!=SQLITE_OK ) {
-        cout << "SQLiteConnection::exec: errorCode = " << errorCode << endl;
+        //cout << "SQLiteConnection::exec: errorCode = " << errorCode << endl;
         this->errorMessage.append(
                     "errorCode: "+ DBLayer::integer2string((long)errorCode) +
                     "; msg: " + sqlite3_errmsg(this->db)
                     );
-        cout << "SQLiteConnection::exec: errorMessage = " << this->errorMessage << endl;
+        //cout << "SQLiteConnection::exec: errorMessage = " << this->errorMessage << endl;
     } else {
         if(debugExec)	cout << "SQLiteConnection::exec: errorCode==SQLITE_OK" << endl;
     }
@@ -260,11 +249,7 @@ ResultSet* SQLiteConnection::exec(const string s) {
     return rs;
 }
 
-string SQLiteConnection::escapeString(string s) {
-//    static string fromQuote("\'");
-//    static string   toQuote("\'\'");
-    return DBLayer::replaceAll(s, "\'", "\'\'");
-}
+string SQLiteConnection::escapeString(string s) { return DBLayer::replaceAll(s, "\'", "\'\'"); }
 
 int SQLiteConnection::getColumnSize(string* relname) {
 	int ret=-1;
@@ -291,13 +276,13 @@ int SQLiteConnection::getColumnSize(string* relname) {
 	);
 	
 	if( errorCode!=SQLITE_OK ) {
-		cout << "SQLiteConnection::getColumnSize: errorCode = " << errorCode << endl;
+        //cout << "SQLiteConnection::getColumnSize: errorCode = " << errorCode << endl;
 		this->errorMessage.append(
 			"errorCode: "+ DBLayer::integer2string((long)errorCode) +
 			"; msg: " + sqlite3_errmsg(this->db)
 		);
-		cout << "SQLiteConnection::getColumnSize: errorMessage = " << this->errorMessage << endl;
-		cout << "SQLiteConnection::getColumnSize: error query = " << query << endl;
+        //cout << "SQLiteConnection::getColumnSize: errorMessage = " << this->errorMessage << endl;
+        //cout << "SQLiteConnection::getColumnSize: error query = " << query << endl;
 		return ret;
 	}
 	
@@ -309,12 +294,12 @@ int SQLiteConnection::getColumnSize(string* relname) {
 	errorCode = sqlite3_finalize( pStmt );
 // 	cout << "SQLiteConnection::getColumnSize: finalizzo... OK" << endl;
 	if( errorCode!=SQLITE_OK ) {
-		cout << "SQLiteConnection::getColumnSize: errorCode = " << errorCode << endl;
+        //cout << "SQLiteConnection::getColumnSize: errorCode = " << errorCode << endl;
 		this->errorMessage.append(
 			"errorCode: "+ DBLayer::integer2string((long)errorCode) +
 			"; msg: " + sqlite3_errmsg(this->db)
 		);
-		cout << "SQLiteConnection::getColumnSize: errorMessage = " << this->errorMessage << endl;
+        //cout << "SQLiteConnection::getColumnSize: errorMessage = " << this->errorMessage << endl;
 	}
 	return ret;
 }
@@ -343,13 +328,13 @@ string SQLiteConnection::getColumnName(string* relname, int column) {
 	);
 	
 	if( errorCode!=SQLITE_OK ) {
-		cout << "SQLiteConnection::getColumnName: errorCode = " << errorCode << endl;
+        //cout << "SQLiteConnection::getColumnName: errorCode = " << errorCode << endl;
 		this->errorMessage.append(
 			"errorCode: "+ DBLayer::integer2string((long)errorCode) +
 			"; msg: " + sqlite3_errmsg(this->db)
 		);
-		cout << "SQLiteConnection::getColumnName: errorMessage = " << this->errorMessage << endl;
-		cout << "SQLiteConnection::getColumnName: error query = " << query << endl;
+        //cout << "SQLiteConnection::getColumnName: errorMessage = " << this->errorMessage << endl;
+        //cout << "SQLiteConnection::getColumnName: error query = " << query << endl;
 		return ret;
 	}
 	
@@ -365,27 +350,28 @@ string SQLiteConnection::getColumnName(string* relname, int column) {
 	errorCode = sqlite3_finalize( pStmt );
 // 	cout << "SQLiteConnection::getColumnName: finalizzo... OK" << endl;
 	if( errorCode!=SQLITE_OK ) {
-		cout << "SQLiteConnection::getColumnName: errorCode = " << errorCode << endl;
+        //cout << "SQLiteConnection::getColumnName: errorCode = " << errorCode << endl;
 		this->errorMessage.append(
 			"errorCode: "+ DBLayer::integer2string((long)errorCode) +
 			"; msg: " + sqlite3_errmsg(this->db)
 		);
-		cout << "SQLiteConnection::getColumnName: errorMessage = " << this->errorMessage << endl;
+        //cout << "SQLiteConnection::getColumnName: errorMessage = " << this->errorMessage << endl;
 	}
 	return ret;
 }
 IntegerVector SQLiteConnection::getKeys(string* relname) {
 	IntegerVector ret;
-    cout << "SQLiteConnection::getKeys: UNSUPPORTED; relname=" << relname << endl;
+    this->errorMessage.append("SQLiteConnection::getKeys: UNSUPPORTED; relname=" + string(relname->c_str()) );
+    //cout << "SQLiteConnection::getKeys: UNSUPPORTED; relname=" << relname << endl;
 	return ret;
 }
 IntegerVector SQLiteConnection::getForeignKeys(string* relname) {
 	IntegerVector ret;
-    cout << "SQLiteConnection::getForeignKeys: UNSUPPORTED; relname=" << relname << endl;
+    this->errorMessage.append("SQLiteConnection::getForeignKeys: UNSUPPORTED; relname=" + string(relname->c_str()));
+    //cout << "SQLiteConnection::getForeignKeys: UNSUPPORTED; relname=" << relname << endl;
 	return ret;
 }
 //********************* SQLiteConnection: fine.
-
 
 
 //********************* SQLiteResultSet: inizio.
@@ -396,15 +382,11 @@ SQLiteResultSet::SQLiteResultSet() : ResultSet() {
 SQLiteResultSet::SQLiteResultSet() : ResultSet::ResultSet() {
 #endif
 }
-SQLiteResultSet::~SQLiteResultSet() {
-//	cout << "SQLiteResultSet::~SQLiteResultSet: inizio." << endl;
-//	cout << "SQLiteResultSet::~SQLiteResultSet: fine." << endl;
-}
+SQLiteResultSet::~SQLiteResultSet() {}
 
 int SQLiteResultSet::getColumnSize(int i) {
 	// Non significativo per SQLite
     return -i;
-//    return -1;
 }
 
 string SQLiteResultSet::toString(string prefix) {

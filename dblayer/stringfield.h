@@ -29,10 +29,6 @@
 
 #include "dbfield.h"
 
-/**
-  *@author Roberto Rocco Angeloni
-  */
-
 namespace DBLayer {
 
     class DLLEXPORT StringField : public DBField  {
@@ -41,9 +37,7 @@ namespace DBLayer {
         StringField(const string* nome,const string* valore );
 //        StringField(bool isPK, const string* nome,const string* valore );
         virtual ~StringField();
-      /** No descriptions */
       void setValue(const string* valore);
-      /** No descriptions */
       const string* getValue();
       string toString();
       virtual Field* createNewInstance(const char* aName=0);

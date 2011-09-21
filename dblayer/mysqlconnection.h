@@ -38,63 +38,12 @@
 #include "dbconnection.h"
 using namespace DBLayer;
 
-/*
-SQLite Types:
-- NULL
-- INTEGER
-- FLOAT
-- TEXT
-- BLOB
-
-DROP TABLE test_dblayer;
-CREATE TABLE test_dblayer
-(
-  id int NOT NULL,
-  nome varchar(255),
-  descrizione text,
-  abilitato int,
-  data_creazione datetime,
-  prezzo float,
-  data_disponibilita datetime,
-  PRIMARY KEY (id)
-);
-create index test_dblayer_idx_1 on test_dblayer ( id );
-
-DROP TABLE societa;
-CREATE TABLE societa
-(
-  id integer NOT NULL,
-  data_creazione datetime,
-  ragione_sociale varchar(255),
-  indirizzo text,
-  cap integer,
-  nazione varchar(255),
-  telefono integer,
-  fax integer,
-  email varchar(255),
-  note text,
-  website varchar(255),
-  citta varchar(255),
-  provincia varchar(255),
-  partita_iva varchar(255),
-  tipo varchar(255),
-  PRIMARY KEY (id)
-);
-create index societa_idx_1 on societa ( id );
-
-
-*/
-
-
-
-
 namespace DBLayer {
 
 #ifdef USE_MYSQL
     class DLLEXPORT MySQLConnection : public Connection {
     public:
         MySQLConnection(string s);
-        //inline MySQLConnection(string s);
         virtual ~MySQLConnection();
 
         virtual bool connect();

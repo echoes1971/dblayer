@@ -32,18 +32,13 @@ StringField::StringField(const string* nome) : DBField(nome) {
 StringField::StringField(const string* nome,const string* valore) : DBField(nome) {
   type = DBField::STRING;
   this->setValue(valore);
-//  this->setPK(false);
 }
 //StringField::StringField(bool isPK, const string* nome,const string* valore) : DBField(isPK, nome){
 //  type = DBField::STRING;
 //  this->setValue(valore);
 //}
-StringField::~StringField() {
-//	cout << "StringField::~StringField: " << this->name << " deleted." << endl;
-//    if( this->stringValue!=0 ) { delete this->stringValue; this->stringValue=0; }
-}
+StringField::~StringField() {}
 
-/** No descriptions */
 void StringField::setValue(const string* valore) {
     if(this->stringValue!=0) { delete this->stringValue; this->stringValue=0; }
     const char* tmpValore = valore->c_str();
@@ -51,14 +46,10 @@ void StringField::setValue(const string* valore) {
     if ( ((long)valore!=0) && valore->size()>0 )
         nullo = false;
 }
-
-/** No descriptions */
-const string* DBLayer::StringField::getValue(){
-  return this->stringValue;
-}
+const string* DBLayer::StringField::getValue(){ return this->stringValue; }
 
 string DBLayer::StringField::toString() {
-    string ret( this->getValue()->c_str() );
+    string ret( this->getValue()->c_str() ); // TODO ???
     return ret;
 }
 

@@ -33,20 +33,16 @@
 
 #include "importedPackages.h"
 
-/**
-  *@author Roberto Rocco Angeloni
-  */
-
 namespace DBLayer {
 
     class DLLEXPORT ForeignKey {
-	public:
-            ForeignKey(string colonna_fk, string tabella_riferita, string colonna_riferita);
-            virtual ~ForeignKey();
+      public:
+        ForeignKey(string colonna_fk, string tabella_riferita, string colonna_riferita);
+        virtual ~ForeignKey();
 
-            string colonna_fk;
-            string tabella_riferita;
-            string colonna_riferita;
+        string colonna_fk;
+        string tabella_riferita;
+        string colonna_riferita;
     };
 
 }

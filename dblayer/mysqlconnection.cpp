@@ -44,11 +44,10 @@ using namespace DBLayer;
 MySQLConnection::MySQLConnection(string s) : Connection(s) {
 #else
 MySQLConnection::MySQLConnection(string s) : Connection::Connection(s) {
-// MySQLConnection::MySQLConnection(string s) : Connection(s) {
 #endif
     this->db = 0;
 
-// 	cout << "MySQLConnection::MySQLConnection: s=" << s << endl;
+    //cout << "MySQLConnection::MySQLConnection: s=" << s << endl;
     // Parsing connection string
 #if __i386__
     unsigned int indiceInizioStringa = s.find("host=", 0) + 5;
@@ -76,23 +75,17 @@ MySQLConnection::MySQLConnection(string s) : Connection::Connection(s) {
         this->password = s.substr(indiceInizioStringa, indiceFineStringa-indiceInizioStringa );
     //cout << "MySQLConnection::MySQLConnection: inizio="<<indiceInizioStringa<< " fine="<<indiceFineStringa<<" password=" << this->password << endl;
 }
-MySQLConnection::~MySQLConnection() {
-//	cout << "MySQLConnection::~MySQLConnection: inizio." << endl;
-    this->disconnect();
-//	cout << "MySQLConnection::~MySQLConnection: fine." << endl;
-}
+MySQLConnection::~MySQLConnection() { this->disconnect(); }
 
 bool MySQLConnection::connect() {
     if(this->db!=0)
         this->disconnect();
-        //return true;
     this->db = mysql_init(0); //this->db);
     this->errorMessage.clear();
     if(!this->db) {
         this->errorMessage.append( "MySQLConnection::connect: Unable to connect to "+this->dbname+"@"+this->host+" with user "+this->user+" ("+DBLayer::integer2string((long)this->db)+") "+ "!" );
         return false;
     }
-//    MYSQL* tmp = mysql_real_connect(
     this->db = mysql_real_connect(
                 this->db,
                 this->host.c_str(),
@@ -114,36 +107,28 @@ bool MySQLConnection::connect() {
     return true;
 }
 bool MySQLConnection::disconnect() {
-// 	cout << "MySQLConnection::disconnect: inizio." << endl;
-// 	cout << "MySQLConnection::disconnect: this->db=" + DBLayer::integer2string((long)this->db)<<endl;
     unsigned int errorCode;
     if( this->db!=0 ) {
         errorCode = mysql_errno(this->db);
         if( errorCode!=0 ) {
-            // 			cout << "MySQLConnection::disconnect: errorCode = " << errorCode << endl;
+            //cout << "MySQLConnection::disconnect: errorCode = " << errorCode << endl;
             this->errorMessage.append(
                         "errorCode: "+ DBLayer::integer2string((long)errorCode)
                         + "; msg: " + mysql_error(this->db)
                         );
-            // 			cout << "MySQLConnection::disconnect: errorMessage = " << this->errorMessage << endl;
+            //cout << "MySQLConnection::disconnect: errorMessage = " << this->errorMessage << endl;
             return false;
         }
         mysql_close(this->db);
         this->db = 0;
     }
-    // 	cout << "MySQLConnection::disconnect: fine." << endl;
+    //cout << "MySQLConnection::disconnect: fine." << endl;
     this->connected = false;
     return true;
 }
-bool MySQLConnection::reconnect() {
-    if( this->disconnect() )
-        return this->connect();
-    else
-        return false;
-}
+bool MySQLConnection::reconnect() { return this->disconnect() ? this->connect() : false; }
 
 bool myDebugExec = false;
-
 
 ResultSet* MySQLConnection::exec(const string s) {
     int errorCode;
@@ -175,14 +160,12 @@ ResultSet* MySQLConnection::exec(const string s) {
 
     MYSQL_FIELD *field;
     while((field = mysql_fetch_field(result))) {
-        // 	for( unsigned int i=0; i<nColonne; i++) {
         const char* nomeColonna = field->name;
         if(myDebugExec)	cout << "MySQLConnection::exec: nomeColonna = " << nomeColonna << "; type = " << DBLayer::integer2string((long)field->type) << "; length = " << DBLayer::integer2string((long)field->length) << endl;
         rs->columnName.push_back( string(nomeColonna) );
         rs->columnSize.push_back( (int) field->length );
         //rs->columnSize.push_back( field->length>0 ? field->length : field->max_length );
 
-        //delete nomeColonna;
         string nomeTipo = MySQLConnection::getNomeTipo(field);
         if(myDebugExec)	cout << "MySQLConnection::exec: nomeTipo=\'" << nomeTipo << "\'" << endl;
         if(nomeTipo.length()>0) {
@@ -205,7 +188,6 @@ ResultSet* MySQLConnection::exec(const string s) {
             if(myDebugExec)	cout << "MySQLConnection::exec: nomeTipo VUOTO" << endl;
             rs->columnType.push_back( DBLayer::type_blob );
         }
-        // delete nomeTipo;
     }
 
     MYSQL_ROW row;
@@ -254,25 +236,16 @@ ResultSet* MySQLConnection::exec(const string s) {
     }
     mysql_free_result(result);
 
-    /*	errorCode = mysql_query(this->db, query);
- if( errorCode!=0 ) {
-  this->errorMessage.append(
-   "errorCode: "+ DBLayer::integer2string((long)errorCode)
-   + "; msg: " + mysql_error(this->db)
-  );
-  return rs;
- }
-*/
-
     //	if(myDebugExec)	cout << "MySQLConnection::exec: rs=" << rs->toString() << endl;
     //	if(myDebugExec)	cout << "MySQLConnection::exec: fine." << endl;
     return rs;
 }
 
 string MySQLConnection::escapeString(string s) {
-    static string fromQuote("\'");
-    static string   toQuote("\'\'");
-    return DBLayer::replaceAll(s, fromQuote, toQuote);
+    return DBLayer::replaceAll(s, "\'", "\'\'");
+//    static string fromQuote("\'");
+//    static string   toQuote("\'\'");
+//    return DBLayer::replaceAll(s, fromQuote, toQuote);
 }
 string MySQLConnection::getNomeTipo(st_mysql_field* field) {
     switch( (long) field->type ) {
@@ -317,9 +290,8 @@ string MySQLConnection::getNomeTipo(st_mysql_field* field) {
 int MySQLConnection::getColumnSize(string* relname) {
     MYSQL_RES *result = mysql_list_fields(this->db, relname->c_str(), 0);
 
-    if(result==0) {
+    if(result==0)
         return -1;
-    }
     unsigned int lengths;
     lengths = mysql_field_count(this->db);
     mysql_free_result(result);
@@ -422,10 +394,7 @@ MySQLResultSet::MySQLResultSet() : ResultSet::ResultSet() {
 }
 
 
-MySQLResultSet::~MySQLResultSet() {
-//	cout << "SQLiteResultSet::~SQLiteResultSet: inizio." << endl;
-//	cout << "SQLiteResultSet::~SQLiteResultSet: fine." << endl;
-}
+MySQLResultSet::~MySQLResultSet() {}
 
 string MySQLResultSet::toString(string prefix) {
     string ret;

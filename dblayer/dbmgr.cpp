@@ -67,26 +67,14 @@ bool DBMgr::connect() {
     return false;
 }
 
-bool DBMgr::disconnect() {
-    return this->con==0 ? false : this->con->disconnect();
-}
+bool DBMgr::disconnect() { return this->con==0 ? false : this->con->disconnect(); }
 
-string DBMgr::getErrorMessage() {
-    return this->errorMessage;
-}
+string DBMgr::getErrorMessage() { return this->errorMessage; }
 
-void DBMgr::setDBEFactory(DBEFactory* dbeFactory) {
-    this->dbeFactory=dbeFactory;
-}
-DBEFactory* DBMgr::getDBEFactory() {
-    return this->dbeFactory;
-}
-void DBMgr::setVerbose(bool b) {
-    this->verbose=b;
-}
-DBEntityVector DBMgr::getRegisteredTypes() {
-    return this->dbeFactory->getRegisteredTypes();
-}
+void DBMgr::setDBEFactory(DBEFactory* dbeFactory) { this->dbeFactory=dbeFactory; }
+DBEFactory* DBMgr::getDBEFactory() { return this->dbeFactory; }
+void DBMgr::setVerbose(bool b) { this->verbose=b; }
+DBEntityVector DBMgr::getRegisteredTypes() { return this->dbeFactory->getRegisteredTypes(); }
 DBEntity* DBMgr::getClazz(string* typeName) {
     if(this->dbeFactory!=0)
         return this->dbeFactory->getClazz(typeName);
@@ -410,7 +398,6 @@ DBEntity* DBMgr::Copy(DBEntity* dbe) {
 
 
 DBEntityVector* DBMgr::Select(const string* tableName, const string* searchString) {
-    // 20091015: start.
 #ifdef WITH_PROXY_CONNECTIONS
     if(this->con->isProxy()) {
         DBEntityVector* ret = 0;
@@ -424,7 +411,6 @@ DBEntityVector* DBMgr::Select(const string* tableName, const string* searchStrin
         return ret;
     }
 #endif
-    // 20091015: end.
     DBEntityVector* ret = new DBEntityVector;
     ResultSet* res = this->con->exec( string(searchString->c_str()) );
     string* nomeTabella = new string( tableName->c_str() );
@@ -467,7 +453,7 @@ DBEntityVector* DBMgr::Select(const string* tableName, const string* searchStrin
             ret->push_back( dbe );
         }
     } else {
-        cout << "DBMgr::Select: error = " << con->getErrorMessage() << endl;
+        if( this->verbose ) cout << "DBMgr::Select: error = " << con->getErrorMessage() << endl;
     }
 
     delete nomeTabella;
@@ -476,14 +462,12 @@ DBEntityVector* DBMgr::Select(const string* tableName, const string* searchStrin
 }
 
 DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string* orderBy ) {
-    // 20091015: start.
 #ifdef WITH_PROXY_CONNECTIONS
     if(this->con->isProxy()) {
         //if( this->verbose ) cout << "DBMgr::Search: calling con->Search()" << endl;
         return this->con->Search(dbe, uselike, caseSensitive, orderBy);
     }
 #endif
-    // 20091015: end.
     string myquery = this->_buildSelectString( dbe, uselike, caseSensitive );
     if( orderBy->size()!=0 ) {
         myquery.append( " ORDER BY " );
@@ -507,18 +491,6 @@ DBEntityVector* DBMgr::searchByKeys(DBEntity* dbe) {
             cerca->setValue(&chiavi[i],&v);
     }
     return this->Search(cerca,false,false);
-    /*
-    string myTableName = this->_buildTableName(dbe).c_str();
-    string query;
-    query.append("select * from ");
-    query.append(myTableName.c_str());
-    query.append(" where ");
-    query.append( this->_buildKeysCondition(dbe) );
-
-    cout << "DBMgr::Search: query = " << query << endl;
-
-    return this->Select(&myTableName,&query);
-    */
 }
 bool DBMgr::exists(DBEntity* dbe) {
     if(dbe->isNew())
@@ -534,7 +506,6 @@ void DBMgr::Destroy(DBEntityVector* lista) {
     DBEntityVector::iterator theIterator;
     for(theIterator = lista->begin(); theIterator!=lista->end(); theIterator++) {
         delete (DBEntity*) (*theIterator);
-        //delete (DBField*) (*theIterator);
     }
     lista->clear();
     delete lista;

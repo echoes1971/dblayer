@@ -35,19 +35,17 @@
 
 namespace DBLayer {
 
-    class DLLEXPORT FloatField : public DBField  {
-    public:
-        FloatField(const string* nome);
-        FloatField(const string* nome, float valore);
-//        FloatField(bool isPK, const string* nome, float valore);
-        virtual ~FloatField();
-      /** No descriptions */
-      float getValue();
-      /** No descriptions */
-      void setValue(float valore);
-      string toString();
-        virtual Field* createNewInstance(const char* aName=0);
-    };
+class DLLEXPORT FloatField : public DBField  {
+public:
+    FloatField(const string* nome);
+    FloatField(const string* nome, float valore);
+    //FloatField(bool isPK, const string* nome, float valore);
+    virtual ~FloatField();
+    float getValue();
+    void setValue(float valore);
+    string toString();
+    virtual Field* createNewInstance(const char* aName=0);
+};
 
 }
 

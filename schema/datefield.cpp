@@ -151,7 +151,6 @@ void DateField::setValue(const string* valore) {
     this->setNull(false);
 }
 void DateField::setValue(long seconds) {
-    // TODO Testare!!!!
     this->year = 0;	this->month = 0;	this->day = 0;
     this->hour = 0;	this->minute = 0;	this->seconds = 0;
     this->millis = 0;
@@ -190,46 +189,8 @@ void DateField::setValue(long seconds) {
     this->setNull(false);
 }
 
-bool DateField::isValidDate(long y, long m, long d) {
-    return m>=1 && m<13 && d>=1 && d<=this->getDaysFor(y,m);
-}
-bool DateField::isValidHour(long h, long m, long s, long millis) {
-    return h>=0 && h<=23 && m>=0 && m<=59 && s>=0 && s<=59
-            && millis>=0 && millis<=999;
-}
-/*
-long DateField::getDaysFor(long y, long m) {
-	long ret = -1;
-	switch (m) {
-		case 1:
-		case 3:
-		case 5:
-		case 7:
-		case 8:
-		case 10:
-		case 12:
-			ret = 31;
-			break;
-		case 4:
-		case 6:
-		case 9:
-		case 11:
-			ret = 30;
-			break;
-		case 2:
-			if (y % 4 == 0)
-				ret = 29;
-			else
-				ret = 28;
-			if ((y % 100 == 0) && (y % 400 != 0))
-				ret = 28;
-	}
-	return ret;
-}
-long DateField::getDaysFor(long y) {
-	return (this->getDaysFor(y,2)==29) ? 366 : 365;
-}
-*/
+bool DateField::isValidDate(long y, long m, long d) { return m>=1 && m<13 && d>=1 && d<=this->getDaysFor(y,m); }
+bool DateField::isValidHour(long h, long m, long s, long millis) { return h>=0 && h<=23 && m>=0 && m<=59 && s>=0 && s<=59 && millis>=0 && millis<=999; }
 
 string DateField::toString() {
     char tmp[50];
@@ -251,37 +212,5 @@ string DateField::toString() {
     return string( (char*)&tmp );
 }
 
-long DateField::to_seconds() {
-    return Field::to_seconds(
-                this->hour,this->minute,this->seconds,
-                Field::to_days(this->year,this->month,this->day)
-                );
-/*
-	const static long GIORNO = 24L * 60L * 60L;
-	long ret = 0;
-	// Time
-	ret += this->seconds;
-	ret += this->minute * 60;
-	ret += this->hour * 60 * 60;
-	// Date
-	long giorni = this->to_days();
-	ret += (giorni*GIORNO);
-	return ret;
-*/
-}
-
-long DateField::to_days() {
-    return Field::to_days(this->year,this->month,this->day);
-/*
-	long ret = 0;
-	// Date
-	ret += (this->day-1);
-	for(int m=1; m<this->month-1; m++) {
-		ret += this->getDaysFor(this->year, m);
-	}
-	for(int y=1970; y<this->year; y++) {
-		ret += this->getDaysFor(y);
-	}
-	return ret;
-*/
-}
+long DateField::to_seconds() { return Field::to_seconds(this->hour,this->minute,this->seconds,Field::to_days(this->year,this->month,this->day)); }
+long DateField::to_days() { return Field::to_days(this->year,this->month,this->day); }

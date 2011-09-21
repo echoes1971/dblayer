@@ -27,25 +27,19 @@
 #include "integerfield.h"
 using namespace DBLayer;
 
-IntegerField::IntegerField(const string* nome) : DBField(nome) {
-  type = DBField::INTEGER;
-}
+IntegerField::IntegerField(const string* nome) : DBField(nome) { type = DBField::INTEGER; }
 IntegerField::IntegerField(const string* nome, long valore) : DBField(nome) {
-  type = DBField::INTEGER;
-  this->setValue(valore);
+    type = DBField::INTEGER;
+    this->setValue(valore);
 }
 //IntegerField::IntegerField(bool isPK, const string* nome, long valore) : DBField(isPK, nome) {
 //  type = DBField::INTEGER;
 //  this->setPK(isPK);
 //  this->setValue(valore);
 //}
-IntegerField::~IntegerField(){
-//	cout << "IntegerField::~IntegerField: " << this->name << " deleted." << endl;
-}
+IntegerField::~IntegerField() {}
 
-long IntegerField::getValue(){
-  return longValue;
-}
+long IntegerField::getValue() { return longValue; }
 
 void IntegerField::setValue(long valore){
   longValue=valore;

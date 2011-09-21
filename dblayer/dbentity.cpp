@@ -103,9 +103,7 @@ bool DBEntity::mapFromRS(ResultSet *rs) {
 }
 */
 
-string DBEntity::name() {
-  return "DBEntity";
-}
+string DBEntity::name() { return "DBEntity"; }
 
 string DBEntity::toString_nodes(string prefix) {
 	string ret( prefix + "<" );
@@ -177,48 +175,48 @@ string DBEntity::toString_nodes(string prefix) {
 }
 
 string DBEntity::toString(string prefix, bool valuesAsAttributes) {
-	if ( !valuesAsAttributes) {
-		return toString_nodes(prefix);
-	}
-  string ret( prefix + "<" );
-  ret.append( this->name() ); ret.append( " " );
-  // Keys
-  DBFieldVector* myKeys = this->getKeys();
-  if( myKeys->size()>0 ) {
-  	ret.append("_keys=\'{");
-  	unsigned int numeroChiavi = (unsigned int) myKeys->size();
-  	for(unsigned int i=0; i<numeroChiavi; i++) {
-  		ret.append( myKeys->at(i)->getName() );
-  		if( i!= (numeroChiavi-1) ) {
-  			ret.append(",");
-		}
-	}
-  	ret.append("}\' ");
-  }
-  // Fields
-  for(unsigned int i=0; i<fields.size(); i++) {
-    ret.append( fields[i]->getName().c_str() );
-    ret.append( "=\'" );
-    switch(fields[i]->getType()) {
-        case DBField::STRING:
-          ret.append( fields[i]->getStringValue()->c_str() );
-        break;
-        case DBField::INTEGER:
-          ret.append( DBLayer::integer2string( fields[i]->getIntegerValue() ).c_str() );
-        break;
-        case DBField::FLOAT:
-			ret.append( fields[i]->toString().c_str() );
-        break;
-        case DBField::BOOLEAN:
-			ret.append( fields[i]->toString().c_str() );
-        break;
-        case DBField::DATE:
-			ret.append( fields[i]->toString().c_str() );
-        break;
+    if ( !valuesAsAttributes) {
+        return toString_nodes(prefix);
     }
-    ret.append( "\' " );
-  }
-  return ret + "/>";
+    string ret( prefix + "<" );
+    ret.append( this->name() ); ret.append( " " );
+    // Keys
+    DBFieldVector* myKeys = this->getKeys();
+    if( myKeys->size()>0 ) {
+        ret.append("_keys=\'{");
+        unsigned int numeroChiavi = (unsigned int) myKeys->size();
+        for(unsigned int i=0; i<numeroChiavi; i++) {
+            ret.append( myKeys->at(i)->getName() );
+            if( i!= (numeroChiavi-1) ) {
+                ret.append(",");
+            }
+        }
+        ret.append("}\' ");
+    }
+    // Fields
+    for(unsigned int i=0; i<fields.size(); i++) {
+        ret.append( fields[i]->getName().c_str() );
+        ret.append( "=\'" );
+        switch(fields[i]->getType()) {
+          case DBField::STRING:
+            ret.append( fields[i]->getStringValue()->c_str() );
+            break;
+          case DBField::INTEGER:
+            ret.append( DBLayer::integer2string( fields[i]->getIntegerValue() ).c_str() );
+            break;
+          case DBField::FLOAT:
+            ret.append( fields[i]->toString().c_str() );
+            break;
+          case DBField::BOOLEAN:
+            ret.append( fields[i]->toString().c_str() );
+            break;
+          case DBField::DATE:
+            ret.append( fields[i]->toString().c_str() );
+            break;
+        }
+        ret.append( "\' " );
+    }
+    return ret + "/>";
 }
 
 void* DBEntity::getValue(string* field) {
@@ -271,27 +269,6 @@ string DBEntity::getStringValue(const string* fieldName) {
     return ret==0 ? "" : ret->toString();
 }
 
-/* Vedi header
-string* DBEntity::integer2string(long longValue) {
-  int i = 50-2;
-  char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
-  if ( longValue<0 ) {
-    string *tmpString = new string( "-" );
-    tmpString->append( DBEntity::integer2string( -1 * longValue )->c_str() );
-    return tmpString;
-  }
-  if (longValue>=0 && longValue<10) {
-    tmp[i] = (char) ((int)longValue%10)+'0';
-    i--;
-  } else {
-   for (i=50-2; i>=0 && longValue>0 ; i--) {
-     tmp[i] = (char) ((int)longValue%10)+'0';
-     longValue = longValue / 10;
-   }
-  }
-  return new string( (char*)&tmp[i+1] );
-}
-*/
 DBFieldVector* DBEntity::getKeys() {
     static DBFieldVector vuoto;
     return &vuoto;

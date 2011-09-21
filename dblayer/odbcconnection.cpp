@@ -50,10 +50,8 @@ ODBCConnection::ODBCConnection(string s) : Connection::Connection(s) {
 #endif
 }
 ODBCConnection::~ODBCConnection() {
-//	cout << "ODBCConnection::~ODBCConnection: inizio." << endl;
 	this->disconnect();
 	SQLFreeEnv(henv);
-//	cout << "ODBCConnection::~ODBCConnection: fine." << endl;
 }
 
 bool ODBCConnection::isRCSuccessful() { return (rc==SQL_SUCCESS) || (rc==SQL_SUCCESS_WITH_INFO); }
@@ -90,43 +88,31 @@ void ODBCConnection::saveErrorMessage() {
 }
 
 bool ODBCConnection::connect() {
-//	cout << "ODBCConnection::connect: inizio." << endl;
     bool ret = true;
     SQLAllocConnect(henv, &hdbc);
     rc=SQLConnect(hdbc,(SQLCHAR*) chr_ds_name,SQL_NTS,NULL,0,NULL,0);
     if( !this->isRCSuccessful() ) {
-        printf("ODBCConnection::connect: unable to connect - rc=\'%d\'\n",rc);
-//		SQLFreeEnv(henv);
-//		SQLFreeConnect(hdbc);
+        //printf("ODBCConnection::connect: unable to connect - rc=\'%d\'\n",rc);
         this->saveErrorMessage();
         ret = false;
     };
-//	rc=SQLAllocStmt(hdbc,&hstmt);
-//	if( !this->isRCSuccessful() ) {
-//		printf("ODBCConnection::connect: unable to allocate stmt - rc=\'%d\'\n",rc);
-//		this->saveErrorMessage();
-//		ret = false;
-//	};
-//	cout << "ODBCConnection::connect: fine." << endl;
     this->connectionEstablished = ret;
 
     this->dbmsName.clear();
     SQLCHAR dbmsNameChar[MAX_DATA];
     SQLSMALLINT dbmsName_length=-1;
     SQLGetInfo( hdbc, SQL_DBMS_NAME, &dbmsNameChar, MAX_DATA, &dbmsName_length);
-    printf("ODBCConnection::connect: dbmsName=\'%s\'\n",dbmsNameChar);
+    //printf("ODBCConnection::connect: dbmsName=\'%s\'\n",dbmsNameChar);
     this->dbmsName.append( (const char*) dbmsNameChar );
 
     return ret;
 }
 bool ODBCConnection::disconnect() {
-//	cout << "ODBCConnection::disconnect: inizio." << endl;
     if(this->connectionEstablished) {
 //		SQLFreeStmt(hstmt,SQL_DROP);
         SQLFreeConnect(hdbc);
         this->connectionEstablished = false;
     };
-//	cout << "ODBCConnection::disconnect: fine." << endl;
     return true;
 }
 
@@ -180,7 +166,7 @@ ResultSet* ODBCConnection::exec(const string s) {
 
     rc=SQLAllocStmt(hdbc,&hstmt);
     if( !this->isRCSuccessful() ) {
-        printf("ODBCConnection::connect: unable to allocate stmt - rc=\'%d\'\n",rc);
+        //printf("ODBCConnection::connect: unable to allocate stmt - rc=\'%d\'\n",rc);
         this->saveErrorMessage();
         return rs;
     };
@@ -190,8 +176,8 @@ ResultSet* ODBCConnection::exec(const string s) {
     //	printf("ODBCConnection::exec: rc=\'%d\'\n",rc);
     if( !this->isRCSuccessful() ) {
         saveErrorMessage();
-        cout << "ODBCConnection::exec: ERROR - msg = " << this->errorMessage << endl;
-        cout << "ODBCConnection::exec: ERROR -   s = " << s << endl;
+        //cout << "ODBCConnection::exec: ERROR - msg = " << this->errorMessage << endl;
+        //cout << "ODBCConnection::exec: ERROR -   s = " << s << endl;
         return rs;
     }
     // Preparo i metadati
@@ -230,17 +216,17 @@ ResultSet* ODBCConnection::exec(const string s) {
     // 2011.09.04: end.
     for (rc=SQLFetch(hstmt); rc == SQL_SUCCESS; rc=SQLFetch(hstmt)) {
         SQLNumResultCols(hstmt, &numColumns);
-        //		printf("ODBCConnection::exec: numColumns=%d\n",numColumns);
-        //		printf("ODBCConnection::exec: ( ");
+        //printf("ODBCConnection::exec: numColumns=%d\n",numColumns);
+        //printf("ODBCConnection::exec: ( ");
         for(int c=1; c<=numColumns; c++) {
             szData[0]='\0';
             SQLGetData(hstmt,c,SQL_C_CHAR,szData,sizeof(szData),&cbData);
             if(cbData>=0) {
-                //				printf("ODBCConnection::exec: szData=\'%s\'(%d)\n",szData,cbData);
+                //printf("ODBCConnection::exec: szData=\'%s\'(%d)\n",szData,cbData);
                 string tmp = string( (const char*) szData );
                 while(cbData>=MAX_DATA) {
                     SQLGetData(hstmt,c,SQL_C_CHAR,szData,sizeof(szData),&cbData);
-                    //					printf("ODBCConnection::exec: szData=\'%s\'(%d)\n",szData,cbData);
+                    //printf("ODBCConnection::exec: szData=\'%s\'(%d)\n",szData,cbData);
                     tmp.append( (const char*) szData );
                 }
                 rs->righe.push_back( tmp );
@@ -263,10 +249,7 @@ ResultSet* ODBCConnection::exec(const string s) {
 
 //********************* ODBCResultSet: inizio.
 ODBCResultSet::ODBCResultSet() : ResultSet::ResultSet() {}
-ODBCResultSet::~ODBCResultSet() {
-//	cout << "ODBCResultSet::~ODBCResultSet: inizio." << endl;
-//	cout << "ODBCResultSet::~ODBCResultSet: fine." << endl;
-}
+ODBCResultSet::~ODBCResultSet() {}
 //********************* ODBCResultSet: fine.
 
 #endif

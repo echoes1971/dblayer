@@ -64,8 +64,6 @@ namespace SchemaNS {
         /** Since 01/01/1970 */
         void setValue(long seconds);
         bool isValid();
-        //long getDaysFor(long year);
-        //long getDaysFor(long year, long month);
         virtual string toString();
         /** Convert to seconds since 01/01/1970 */
         long to_seconds();

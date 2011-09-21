@@ -117,7 +117,6 @@ DLLEXPORT int getFieldDistrutti();
         bool isNull();
         void setNull();
         void setNull(bool valore);
-        //typedef Kinds union{};
         enum FieldKind {
           ANY=0,
           INTEGER,

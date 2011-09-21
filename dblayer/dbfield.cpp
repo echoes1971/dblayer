@@ -31,22 +31,6 @@
 #include "dbfield.h"
 using namespace DBLayer;
 
-DBField::DBField() : Field() {
-//  this->nullo = true;
-//  this->stringValue=0;
-}
-DBField::DBField(const string* nome) : Field(nome) {
-//  this->name.append(nome->c_str());
-//  this->nullo = true;
-//  this->stringValue=0;
-}
-//DBField::DBField(bool isPK, const string* nome) {
-//  this->setPK(isPK);
-//  this->name.append(nome->c_str());
-//  this->nullo = true;
-//  this->stringValue=0;
-//}
-DBField::~DBField() {
-// 	cout << "DBField::~DBField(): name = " << this->getName() << endl;
-//	if( this->stringValue!=0 )	delete this->stringValue;
-}
+DBField::DBField() : Field() {}
+DBField::DBField(const string* nome) : Field(nome) {}
+DBField::~DBField() {}

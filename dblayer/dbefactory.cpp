@@ -50,17 +50,12 @@ DBEFactory::~DBEFactory() {
     if(this->_verbose) printf("DBEFactory::~DBEFactory: end.\n");
 }
 
-void DBEFactory::registerClass(string tablename, DBEntity* clazz) {
-    this->registerClass(&tablename, clazz);
-}
+void DBEFactory::registerClass(string tablename, DBEntity* clazz) { this->registerClass(&tablename, clazz); }
 void DBEFactory::registerClass(string* tablename, DBEntity* clazz) {
-//    string tmpIndex(tablename->c_str());
     string tmpIndex=(*tablename);
-    // 20100209: start.
-    // 20100209: SE esiste gia => cancello la vecchia
+    // SE esiste gia => cancello la vecchia
     if(this->_cache.find(tmpIndex)!=this->_cache.end())
         delete this->_cache[tmpIndex];
-    // 20100209: end.
     this->_cache[tmpIndex] = clazz;
 }
 

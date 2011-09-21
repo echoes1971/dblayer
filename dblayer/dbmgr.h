@@ -46,10 +46,6 @@
 #include "dbentity.h"
 #include "dbefactory.h"
 
-/**
-  *@author Roberto Rocco Angeloni
-  */
-
 namespace DBLayer {
 
 class DLLEXPORT DBMgr {
