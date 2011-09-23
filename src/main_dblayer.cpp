@@ -42,7 +42,7 @@
 #include "dblayer/dbmgr.h"
 using namespace DBLayer;
 
-//#include "dbschema.h"
+#include "dbshell.h"
 //using namespace MySchema;
 
 #ifdef HAVE_CONFIG_H
@@ -54,6 +54,7 @@ using namespace DBLayer;
 #endif
 
 #include <iostream>
+#include <map>
 #include <stdlib.h>
 #include <typeinfo>
 
@@ -67,77 +68,20 @@ do { \
 
 using namespace std;
 
-void testDBConnection(string& connString) {
-    DBLayer::Connection* con;
-    DBLayer::ResultSet* res;
-
-    con = DBLayer::createConnection( connString.c_str() );
-    con->connect();
-
-    if ( !con->hasErrors() ) {
-        string myquery("select * from rra_users order by id desc");
-        res = con->exec(myquery);
-        //res = con->exec(string("select * from kware_users order by id desc"));
-        //res = con->exec(string("select * from test_dblayer order by id desc"));
-        //res = con->exec(string("select * from societa"));
-        //res = con->exec(string("select oid,typname from pg_type"));
-        //string relname = string("comuni");
-        //res = con->exec(string("select conkey from pg_constraint join pg_class on pg_class.oid=conrelid where contype='p' and relname='" + relname + "' "));
-
-        if( !con->hasErrors() ) {
-            cout << "res.status: " << res->getStatus() << endl;
-            cout << "res.toString() = " << res->toString() << endl;
-
-            int nColonne = res->getNumColumns();
-            printf( "N. Colonne: %d\n", nColonne );
-            for( int i=0; i<nColonne; i++) {
-                cout << "Colonna[" << i << "]: " << string(res->getColumnName(i))
-                     << " - " << res->getColumnType(i)
-                     << ": " << res->getColumnSize(i)
-                     << endl;
-            }
-
-            int nRighe = res->getNumRows();
-            cout << " Righe:" << nRighe << endl;
-            for(int r=0; r<nRighe; r++) {
-                for(int c=0; c<nColonne; c++) {
-                    if (! res->isNull(r,c) ) {
-                        cout << res->getValue(r,c) << "\t";
-                    } else {
-                        cout << "\\N" << "\t";
-                    }
-                }
-                cout << endl;
-            }
-        } else {
-            cout << "Errori: " << con->getErrorMessage() << endl;
-        }
-        delete res;
-    } else {
-        cout << "(testDBConnection) Errori: " << con->getErrorMessage() << endl;
-    }
-    //con->disconnect();
-    delete con;
-}
-void testDBConnection(string host,string dbname,string usr,string pwd) {
-    string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testDBConnection( connString );
-}
 
 int main(int argc, char *argv[]) {
     string host,dbname,usr,pwd;
     string connString("dblayer:sqlite:./examples/test.db");
     //string connString("dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;");
     //string connString("dblayer:pg:host=localhost dbname=roberto user=roberto password=roberto");
-    //cout << "Content-type: text/html" << endl << endl;
 
     if(argc!=2 && argc!=5) {
         cerr << "Usage: " << argv[0] << " connect-string" << endl
                << "or     " << argv[0] << " dsn username password" << endl;
-        host = string("localhost");
-        dbname = string("roberto");
-        usr = string("roberto");
-        pwd = string("echoestrade");
+        host = "localhost";
+        dbname = "roberto";
+        usr = "roberto";
+        pwd = "echoestrade";
     } else if (argc==5) {
         host = string( argv[1] );
         dbname = string( argv[2] );
@@ -146,18 +90,9 @@ int main(int argc, char *argv[]) {
     } else {
         connString = string( argv[1] );
     }
-    //cout << "connString: " << connString << endl;
 
-    cout << "---------------->>  testDBConnection" << endl;
-    if( argc==5 ) {
-        testDBConnection( host, dbname, usr, pwd );
-    } else {
-        testDBConnection( connString );
-    }
-    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
-    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
-    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
-    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    DBShell dbShell(connString);
+    dbShell();
 
     return EXIT_SUCCESS;
 }

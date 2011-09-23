@@ -33,22 +33,32 @@
 using namespace DBLayer;
 
 string DBLayer::lowerCase(string& s) {
-  char* buf = new char[s.length()];
-  s.copy(buf, s.length());
-  for(unsigned int i = 0; i < s.length(); i++)
-	buf[i] = tolower(buf[i]);
-  string r(buf, s.length());
-  delete buf;
-  return r;
+    char* buf = new char[s.length()];
+    s.copy(buf, s.length());
+    for(unsigned int i = 0; i < s.length(); i++)
+        buf[i] = tolower(buf[i]);
+    string r(buf, s.length());
+    delete buf;
+    return r;
 }
 string DBLayer::upperCase(string& s) {
-  char* buf = new char[s.length()];
-  s.copy(buf, s.length());
-  for(unsigned int i = 0; i < s.length(); i++)
-	buf[i] = toupper(buf[i]);
-  string r(buf, s.length());
-  delete buf;
-  return r;
+    char* buf = new char[s.length()];
+    s.copy(buf, s.length());
+    for(unsigned int i = 0; i < s.length(); i++)
+        buf[i] = toupper(buf[i]);
+    string r(buf, s.length());
+    delete buf;
+    return r;
+}
+string DBLayer::capitalizeCase(string& s) {
+    char* buf = new char[s.length()];
+    s.copy(buf, s.length());
+    if(s.length()>0) buf[0]=toupper(buf[0]);
+    for(unsigned int i = 1; i < s.length(); i++)
+        buf[i] = tolower(buf[i]);
+    string r(buf, s.length());
+    delete buf;
+    return r;
 }
 string DBLayer::joinString( StringVector* vs, string* glue ) {
     string ret;

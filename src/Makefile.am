@@ -9,4 +9,4 @@ LDFLAGS += -L../dblayer -ldblayer
 
 dblayer_test_SOURCES = main_dblayer_test.cpp dbschema.cpp dbschema.h
 
-dblayer_SOURCES = main_dblayer.cpp
+dblayer_SOURCES = main_dblayer.cpp dbshell.cpp dbshell.h

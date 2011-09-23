@@ -208,9 +208,7 @@ DBEntityVector* Connection::Search(DBEntity* dbe, bool uselike, bool caseSensiti
 
 #ifdef USE_LIBPQ
 
-PGConnection::PGConnection(string s) : Connection::Connection(s) {
-    this->conn = 0;
-}
+PGConnection::PGConnection(string s) : Connection::Connection(s) { this->conn = 0; }
 
 PGConnection::~PGConnection() { this->disconnect(); }
 
@@ -237,10 +235,10 @@ bool PGConnection::disconnect() {
 }
 
 ResultSet* PGConnection::exec(const string s) {
-//		cout << "DBLayer::PGConnection::exec: s=" << s << endl;
+    //cout << "DBLayer::PGConnection::exec: s=" << s << endl;
     PGresult* res = PQexec(this->conn, s.c_str() );
-//		cout << "DBLayer::PGConnection::exec: status=" << PQresultStatus(res) << endl;
-//		cout << "DBLayer::PGConnection::exec: PGRES_TUPLES_OK=" << PGRES_TUPLES_OK << endl;
+    //cout << "DBLayer::PGConnection::exec: status=" << PQresultStatus(res) << endl;
+    //cout << "DBLayer::PGConnection::exec: PGRES_TUPLES_OK=" << PGRES_TUPLES_OK << endl;
     if (PQresultStatus(res) != PGRES_TUPLES_OK) { //PGRES_COMMAND_OK) {
         this->errorMessage = string( PQresultErrorMessage(res) );//PQerrorMessage(this->conn) );
     //PQclear(res);	RRA: lascio la distruzione del PGResultSet al chiamante
@@ -280,10 +278,10 @@ int PGConnection::getColumnSize(string* relname) {
     res = this->exec(myquery);
 
     if( !this->hasErrors() ) {
-            string tmp = res->getValue(0,0);
-            ret = atoi( tmp.c_str() );
+        string tmp = res->getValue(0,0);
+        ret = atoi( tmp.c_str() );
     } else {
-// 		cout << "Errori: " << this->getErrorMessage() << endl;
+        //cout << "Errori: " << this->getErrorMessage() << endl;
     }
     delete res;
     return ret;
@@ -304,7 +302,7 @@ string PGConnection::getColumnName(string* relname, int column) {
     if( !this->hasErrors() ) {
         ret = res->getValue(0,0);
     } else {
-// 		cout << "Errori: " << this->getErrorMessage() << endl;
+        //cout << "Errori: " << this->getErrorMessage() << endl;
     }
     delete res;
     return ret;
@@ -321,7 +319,7 @@ IntegerVector PGConnection::getKeys(string* relname) {
 
     if( !this->hasErrors() ) {
         string tmp = res->getValue(0,0);
-// 		tmp = string(" { 1,2,3 } ");
+        //tmp = string(" { 1,2,3 } ");
         // Elimino le graffe
         unsigned long apertaGraffa = tmp.find('{');
         if(apertaGraffa!=string::npos) tmp.erase( apertaGraffa, 1 );
@@ -341,7 +339,7 @@ IntegerVector PGConnection::getKeys(string* relname) {
         valore = atoi(tmp.c_str() );
         ret.push_back( valore );
     } else {
-// 		cout << "Errori: " << this->getErrorMessage() << endl;
+        //cout << "Errori: " << this->getErrorMessage() << endl;
     }
     delete res;
 
@@ -360,7 +358,6 @@ int PGConnection::setClientEncoding(string s) { return PQsetClientEncoding( this
 #endif
 
 //********************* ResultSet
-
 ResultSet::ResultSet() {}
 ResultSet::~ResultSet() {}
 int ResultSet::getNumColumns() { return (int) this->columnName.size();}
@@ -442,6 +439,7 @@ string ResultSet::toString(string prefix) {
     ret.append(prefix+"</ResultSet>");
     return ret;
 }
+
 //********************* PGResultSet
 
 #ifdef USE_LIBPQ
