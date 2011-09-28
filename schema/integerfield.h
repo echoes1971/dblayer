@@ -37,7 +37,7 @@
 namespace SchemaNS {
 
 	class DLLEXPORT IntegerField : public Field  {
-	public:
+      public:
 		IntegerField(const string* nome);
 		IntegerField(const string* nome, long valore);
 		virtual ~IntegerField();

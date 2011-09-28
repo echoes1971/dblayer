@@ -39,7 +39,6 @@ class DLLEXPORT FloatField : public DBField  {
 public:
     FloatField(const string* nome);
     FloatField(const string* nome, float valore);
-    //FloatField(bool isPK, const string* nome, float valore);
     virtual ~FloatField();
     float getValue();
     void setValue(float valore);

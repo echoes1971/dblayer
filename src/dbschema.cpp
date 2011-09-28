@@ -51,13 +51,8 @@ DBFieldVector* DBESocieta::getKeys() { return &DBESocieta::chiavi; }
 DBESocieta* DBESocieta::createNewInstance() { return new DBESocieta(); }
 
 void DBESocieta::_before_insert(DBMgr* dbmgr) {
-    // 2011.09.02: start.
     string query("select max(id) as max_id from societa");
     string nomeCampoDestinazione("id");
-//    static string query("select max(id) as max_id from societa");
-//    static string nomeCampo("max_id");
-//    static string nomeCampoDestinazione("id");
-    // 2011.09.02: end.
     string nomeTabella = this->name();
     DBEntityVector* lista = dbmgr->Select( &nomeTabella, &query );
     if( lista!=0 && lista->size()==1 ) {
@@ -70,7 +65,7 @@ void DBESocieta::_before_insert(DBMgr* dbmgr) {
 
         dbmgr->Destroy(lista);
     }
-    if(dbmgr==0) return; // Solo per togliere il warning di parametro non usato
+    if(dbmgr==0) return;
 }
 void DBESocieta::_before_copy(DBMgr* dbmgr) {
 	static string nomeCampo("ragione_sociale");
@@ -80,8 +75,7 @@ void DBESocieta::_before_copy(DBMgr* dbmgr) {
 	string nuovoValore("Copy of ");
 	nuovoValore.append( campo->toString() );
 	campo->setStringValue( nuovoValore );
-	//this->setValue( &nomeCampo, &nuovoValore );
 
-    if(dbmgr==0) return; // Solo per togliere il warning di parametro non usato
+    if(dbmgr==0) return;
 }
 //***********************	DBESocieta: inizio.

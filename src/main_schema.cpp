@@ -55,7 +55,6 @@ void testSchema() {
 
     string nomeSchema("Prova");
     Schema* schema = new Schema(&nomeSchema);
-// 	Schema::Schema* schema = new Schema::Schema(&nomeSchema);
 
     toString = schema->toString("\n",false);
     printf("testSchema: schema=%s\n", toString.c_str() );
@@ -96,7 +95,6 @@ void testSchema() {
     toString = copia->toString("\n",false);
     printf("testSchema: copia=%s\n", toString.c_str() );
     printf("testSchema: copia==schema?\n" );
-// 	if( copia->equals(schema) )
     if( (*copia) == (*schema) )
         printf("testSchema: copia==schema\n" );
     else

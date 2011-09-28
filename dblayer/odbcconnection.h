@@ -58,17 +58,9 @@ namespace DBLayer {
 		virtual bool disconnect();
 
 		virtual ResultSet* exec(const string s);
-		/** Force the write buffer to be written (or at least try) */
-//		virtual bool flush();
 		/** Chiude la connessione corrente e la riapre */
-//		virtual bool reconnect();
 
-//		virtual string escapeString(string s);
 		virtual string quoteDate(string s);
-
-//		virtual int getColumnSize(string* relname);
-//		virtual string getColumnName(string* relname, int column);
-//		virtual IntegerVector getKeys(string* relname);
 
 	  private:
 		RETCODE rc;		// ODBC return code
@@ -93,10 +85,7 @@ namespace DBLayer {
 
 	class DLLEXPORT ODBCResultSet : public ResultSet {
 		friend class ODBCConnection;
-		private:
-//			StringVector columnName;
-//			StringVector columnType;
-//			StringVector righe;
+      private:
 		public:
 			ODBCResultSet();
 			virtual ~ODBCResultSet();

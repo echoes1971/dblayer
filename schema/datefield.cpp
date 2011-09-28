@@ -123,9 +123,6 @@ void DateField::setValue(const string* valore) {
         this->year  = atoi( (const char*) &_year );
         this->month = atoi( (const char*) &_month );
         this->day   = atoi( (const char*) &_day );
-//        this->year  = atoi( valore->substr(0,4).c_str() );
-//        this->month = atoi( valore->substr(5,2).c_str() );
-//        this->day   = atoi( valore->substr(8,2).c_str() );
     }
     if ( tmpSize >= 19 ) {
         char _hour[]={'\0','\0','\0'};
@@ -137,15 +134,11 @@ void DateField::setValue(const string* valore) {
         this->hour = atoi( (const char*) &_hour );
         this->minute = atoi( (const char*) &_minute );
         this->seconds = atoi( (const char*) &_seconds );
-//        this->hour    = atoi( valore->substr(11,2).c_str() );
-//        this->minute  = atoi( valore->substr(14,2).c_str() );
-//        this->seconds = atoi( valore->substr(17,2).c_str() );
     }
     if ( tmpSize >= 23 ) {
         char _millis[]={'\0','\0','\0','\0','\0'};
         _millis[0]  = tmpValore[20]; _millis[1] = tmpValore[21]; _millis[2] = tmpValore[22]; _millis[3] = tmpValore[23];
         this->millis = atoi( (const char*) &_millis );
-//        this->millis = atoi( valore->substr(20,3).c_str() );
     }
 
     this->setNull(false);
@@ -164,7 +157,7 @@ void DateField::setValue(long seconds) {
     this->hour=ore%24;
     long giorni = (long)ore/24 + 1;
 
-    // Anno
+    // Year
     int y=1970;
     long mygiorni = this->getDaysFor(y);
     while( (giorni - mygiorni) > 0 ) {
@@ -174,7 +167,7 @@ void DateField::setValue(long seconds) {
     }
     this->year=y;
 
-    // Mese
+    // Month
     int m=1;
     mygiorni = this->getDaysFor(this->year,m);
     while( (giorni - mygiorni) > 0 && m<13 ) {

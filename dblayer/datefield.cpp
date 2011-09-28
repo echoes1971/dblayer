@@ -105,7 +105,7 @@ void DateField::setValue(long seconds) {
 	this->hour=ore%24;
 	long giorni = (long)ore/24 + 1;
 
-	// Anno
+    // Year
 	int y=1970;
 	long mygiorni = this->getDaysFor(y);
 	while( (giorni - mygiorni) > 0 ) {
@@ -115,7 +115,7 @@ void DateField::setValue(long seconds) {
 	}
 	this->year=y;
 
-	// Mese
+    // Month
 	int m=1;
 	mygiorni = this->getDaysFor(this->year,m);
 	while( (giorni - mygiorni) > 0 && m<13 ) {

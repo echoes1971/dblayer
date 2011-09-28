@@ -58,8 +58,6 @@ class DLLEXPORT XmlrpcConnection : public Connection {
     virtual bool disconnect();
 
     virtual ResultSet* exec(const string s);
-    /** Force the write buffer to be written (or at least try) */
-    //virtual bool flush();
     /** Chiude la connessione corrente e la riapre */
     virtual bool reconnect();
 
@@ -83,9 +81,6 @@ class DLLEXPORT XmlrpcConnection : public Connection {
 class DLLEXPORT XmlrpcResultSet : public ResultSet {
     friend class XmlrpcConnection;
   private:
-    //StringVector columnName;
-    //StringVector columnType;
-    //StringVector righe;
     static void valueToString(xmlrpc_c::value* v, std::string* out_string);
     static std::string integer2string(long longValue);
     static std::string double2string(double longValue);
@@ -95,18 +90,7 @@ class DLLEXPORT XmlrpcResultSet : public ResultSet {
   public:
     XmlrpcResultSet();
     virtual ~XmlrpcResultSet();
-    //virtual int getNumColumns();
-    //virtual int getNumRows();
-    //virtual string getValue(int row, int column);
-    //virtual int getLength(int row, int column);
-    //virtual bool isNull(int row, int column);
-    //virtual string getColumnName(int i);
-    //virtual int getColumnIndex(string* columnName );
-    //virtual string getColumnType(int i);
     virtual int getColumnSize(int i);
-
-    //virtual string getErrorMessage();
-    //virtual string getStatus();
 
     virtual string toString(string prefix="\n");
 };

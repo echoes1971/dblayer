@@ -45,11 +45,8 @@ namespace DBLayer {
       public:
 		IntegerField(const string* nome);
 		IntegerField(const string* nome, long valore);
-//		IntegerField(bool isPK, const string* nome, long valore);
 		virtual ~IntegerField();
-		/** No descriptions */
 		void setValue(long valore);
-		/** No descriptions */
 		long getValue();
 		string toString();
 

@@ -117,7 +117,6 @@ string DBLayer::replaceAll(string s, string f, string r) {
     unsigned long found = s.find(f);
 #endif
   while(found != string::npos && found<s.length()) {
-//    string tmp = s.replace(found, f.length(), r);
     s.replace(found, f.length(), r);
     found = (unsigned int) s.find(f, found+r.size());
   }

@@ -35,13 +35,13 @@
 using namespace SchemaNS;
 
 FloatField::FloatField(const string* nome) : Field(nome) {
-  this->type = Field::FLOAT;
-  this->validRepr=false;
+    this->type = Field::FLOAT;
+    this->validRepr=false;
 }
 FloatField::FloatField(const string* nome, float valore) : Field(nome) {
-  this->type = Field::FLOAT;
-  this->validRepr=false;
-  this->setValue(valore);
+    this->type = Field::FLOAT;
+    this->validRepr=false;
+    this->setValue(valore);
 }
 FloatField::~FloatField(){}
 
@@ -52,9 +52,9 @@ Field* FloatField::createNewInstance(const char* aName) {
 
 float FloatField::getValue() { return floatValue; }
 void FloatField::setValue(float valore){
-  floatValue = valore;
-  nullo = false;
-  this->validRepr=false;
+    floatValue = valore;
+    nullo = false;
+    this->validRepr=false;
 }
 
 string FloatField::toString() {

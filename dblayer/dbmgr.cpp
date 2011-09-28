@@ -51,7 +51,6 @@ DBMgr::DBMgr(Connection* con, bool verbose) {
 DBMgr::~DBMgr() {
     if( this->verbose ) { cout << "DBMgr::~DBMgr: inizio." << endl; }
     this->disconnect();
-    //if(this->dbeFactory!=0) delete this->dbeFactory; // RRA la factory mi viene passata dall'esterno ==> NON E' COMPITO DEL DBMGR CANCELLARLA!!!
     if( this->verbose ) { cout << "DBMgr::~DBMgr: fine." << endl; }
 }
 
@@ -405,7 +404,6 @@ DBEntityVector* DBMgr::Select(const string* tableName, const string* searchStrin
         DBEntity* dbe = this->getClazz(nomeTabella);
         string myTableName = this->_buildTableName(dbe);
         ret = this->con->Select(dbe,&myTableName,searchString);
-        //ret = this->con->Select(dbe,tableName,searchString);
         delete dbe;
         delete nomeTabella;
         return ret;

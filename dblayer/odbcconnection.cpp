@@ -40,7 +40,6 @@ ODBCConnection::ODBCConnection(string s) : Connection(s) {
 #else
 ODBCConnection::ODBCConnection(string s) : Connection::Connection(s) {
 #endif
-//	SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv1);
 	this->connectionEstablished = true;
 	SQLAllocEnv(&henv);
 #ifdef __WIN32
@@ -77,14 +76,8 @@ void ODBCConnection::saveErrorMessage() {
                 "Error:\nSQLSTATE=%s,Native	error=%ld,msg='%s'",
                 szSQLSTATE,(long int) nErr,msg);
 #endif
-//		printf((char *)szData,
-//			"Error:\nSQLSTATE=%s,Native	error=%ld,msg='%s'",
-//			szSQLSTATE,nErr,msg);
         this->errorMessage.append( (const char *) szData );
     }
-//		printf((char *)szData,
-//			"Error:\nSQLSTATE=%s,Native	error=%ld,msg='%s'",
-//			szSQLSTATE,nErr,msg);
 }
 
 bool ODBCConnection::connect() {
@@ -92,7 +85,6 @@ bool ODBCConnection::connect() {
     SQLAllocConnect(henv, &hdbc);
     rc=SQLConnect(hdbc,(SQLCHAR*) chr_ds_name,SQL_NTS,NULL,0,NULL,0);
     if( !this->isRCSuccessful() ) {
-        //printf("ODBCConnection::connect: unable to connect - rc=\'%d\'\n",rc);
         this->saveErrorMessage();
         ret = false;
     };
@@ -102,14 +94,12 @@ bool ODBCConnection::connect() {
     SQLCHAR dbmsNameChar[MAX_DATA];
     SQLSMALLINT dbmsName_length=-1;
     SQLGetInfo( hdbc, SQL_DBMS_NAME, &dbmsNameChar, MAX_DATA, &dbmsName_length);
-    //printf("ODBCConnection::connect: dbmsName=\'%s\'\n",dbmsNameChar);
     this->dbmsName.append( (const char*) dbmsNameChar );
 
     return ret;
 }
 bool ODBCConnection::disconnect() {
     if(this->connectionEstablished) {
-//		SQLFreeStmt(hstmt,SQL_DROP);
         SQLFreeConnect(hdbc);
         this->connectionEstablished = false;
     };
@@ -153,7 +143,6 @@ string ODBCConnection::decodeType(SQLSMALLINT mytype) {
     case SQL_LONGVARBINARY:
         return DBLayer::type_blob;
     default:
-        cout << "ODBCConnection::decodeType: ERROR Type " << mytype << " not recognized!!!" << endl;
         return DBLayer::type_blob;
     }
 }
@@ -166,32 +155,23 @@ ResultSet* ODBCConnection::exec(const string s) {
 
     rc=SQLAllocStmt(hdbc,&hstmt);
     if( !this->isRCSuccessful() ) {
-        //printf("ODBCConnection::connect: unable to allocate stmt - rc=\'%d\'\n",rc);
         this->saveErrorMessage();
         return rs;
     };
 
-    //	printf("ODBCConnection::exec: cmdstr=\'%s\'\n",cmdstr);
     rc=SQLExecDirect(hstmt,cmdstr,SQL_NTS);
-    //	printf("ODBCConnection::exec: rc=\'%d\'\n",rc);
     if( !this->isRCSuccessful() ) {
         saveErrorMessage();
-        //cout << "ODBCConnection::exec: ERROR - msg = " << this->errorMessage << endl;
-        //cout << "ODBCConnection::exec: ERROR -   s = " << s << endl;
         return rs;
     }
     // Preparo i metadati
     SQLSMALLINT numColumns=-1;
     SQLNumResultCols(hstmt, &numColumns);
-    //	printf("ODBCConnection::exec: numColumns=%d\n",numColumns);
     for(int c=1; c<=numColumns; c++) {
         SQLCHAR columnName[MAX_DATA];
         SQLSMALLINT columnName_size=-1;
         SQLSMALLINT columnType=-1;
-        // 2011.09.04: start.
         SQLULEN columnSize=0;
-//        SQLUINTEGER columnSize=0;
-        // 2011.09.04: end.
         SQLSMALLINT decimalDigits=-1;
         SQLSMALLINT nullable=-1;
         SQLDescribeCol( hstmt, c,
@@ -203,44 +183,29 @@ ResultSet* ODBCConnection::exec(const string s) {
         rs->columnName.push_back( string((const char*) columnName) );
         rs->columnType.push_back( columnTypeString );
         rs->columnSize.push_back( columnSize );
-        //printf("ODBCConnection::exec: columnName=\'%s\' size=%d type=\'%s\'(%d) decimalDigits=%d nullable=%d\n",
-        //	columnName, columnSize, columnTypeString.c_str(), columnType, decimalDigits, nullable
-        //);
     };
 
     // Leggo tutte le righe
     unsigned char szData[MAX_DATA];
-    // 2011.09.04: start.
     SQLLEN cbData;     // Output length of data
-//    SDWORD cbData;     // Output length of data
-    // 2011.09.04: end.
     for (rc=SQLFetch(hstmt); rc == SQL_SUCCESS; rc=SQLFetch(hstmt)) {
         SQLNumResultCols(hstmt, &numColumns);
-        //printf("ODBCConnection::exec: numColumns=%d\n",numColumns);
-        //printf("ODBCConnection::exec: ( ");
         for(int c=1; c<=numColumns; c++) {
             szData[0]='\0';
             SQLGetData(hstmt,c,SQL_C_CHAR,szData,sizeof(szData),&cbData);
             if(cbData>=0) {
-                //printf("ODBCConnection::exec: szData=\'%s\'(%d)\n",szData,cbData);
                 string tmp = string( (const char*) szData );
                 while(cbData>=MAX_DATA) {
                     SQLGetData(hstmt,c,SQL_C_CHAR,szData,sizeof(szData),&cbData);
-                    //printf("ODBCConnection::exec: szData=\'%s\'(%d)\n",szData,cbData);
                     tmp.append( (const char*) szData );
                 }
                 rs->righe.push_back( tmp );
             } else {
                 rs->righe.push_back( string("\\N") );
-                //				printf("\\N");
             }
-            //			if(c!=numColumns)	printf(",");
         };
-        //		printf(" )\n");
     };
-
     SQLFreeStmt(hstmt,SQL_DROP);
-
     return rs;
 }
 //********************* ODBCConnection: fine.

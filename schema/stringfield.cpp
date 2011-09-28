@@ -33,11 +33,11 @@
 using namespace SchemaNS;
 
 StringField::StringField(const string* nome) : Field(nome){
-  type = Field::STRING;
+    type = Field::STRING;
 }
 StringField::StringField(const string* nome,const string* valore) : Field(nome){
-  type = Field::STRING;
-  this->setValue( valore);
+    type = Field::STRING;
+    this->setValue( valore);
 }
 StringField::~StringField() {}
 

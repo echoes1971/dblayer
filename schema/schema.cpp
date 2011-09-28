@@ -39,9 +39,6 @@
 #include "schema.h"
 using namespace SchemaNS;
 
-//#define SCHEMA_DEBUG 1
-//bool debugSchema = false;
-
 int Schema::schemiCreati = 0;
 int Schema::schemiDistrutti = 0;
 
@@ -56,18 +53,9 @@ Schema::Schema(const string* nome) {
     schemiCreati++;
 }
 Schema::~Schema() {
-#ifdef SCHEMA_DEBUG
-    printf( "Schema::~Schema: name \'%s\' deleting %d fields...\n", this->name.c_str(), this->fields.size() );
-#endif
     for(unsigned int i=0; i<this->fields.size(); i++) {
-#ifdef SCHEMA_DEBUG
-        if(debugSchema) printf("Schema::~Schema:\t%s\n", this->fields.at(i)->getName().c_str() );
-#endif
         delete this->fields.at(i);
     }
-#ifdef SCHEMA_DEBUG
-    if(debugSchema) printf( "Schema::~Schema: =====\n");
-#endif
     schemiDistrutti++;
 }
 
@@ -157,7 +145,6 @@ string Schema::toString(string prefix, bool valuesAsAttributes) {
     return ret.append( "/>" );
 }
 
-//Schema* Schema::createNewInstance() { return this->createNewInstance(""); }
 Schema* Schema::createNewInstance(const char* aName) {
     string myName = aName==0 ? this->name : aName;
     return new Schema(&myName);
@@ -167,24 +154,15 @@ Schema* Schema::clone(Schema* newSchema) {
     int fieldSize = this->getFieldSize();
     for(int i=0; i<fieldSize; i++) {
         Field* myfield = this->getField(i);
-        ret->addField( myfield->clone() ); // 20091106
+        ret->addField( myfield->clone() );
     }
     return ret;
 }
 
 bool Schema::equals(Schema* right) {
     bool ret=true;
-#ifdef SCHEMA_DEBUG
-    if(debugSchema) printf( "Schema::operator==: inizio\n");
-#endif
     ret = ret && (this->getName() == right->getName());
-#ifdef SCHEMA_DEBUG
-    if(debugSchema) printf( "Schema::operator==: nomi uguali %d\n", ret);
-#endif
     ret = ret && (this->getFieldSize() == right->getFieldSize());
-#ifdef SCHEMA_DEBUG
-    if(debugSchema) printf( "Schema::operator==: fieldSize uguale %d\n", ret);
-#endif
     StringVector nomi = this->getNames();
 #ifdef WIN32
     size_t nomiSize = nomi.size();
@@ -200,9 +178,6 @@ bool Schema::equals(Schema* right) {
 #endif
 
 #endif
-#ifdef SCHEMA_DEBUG
-        if(debugSchema) printf( "Schema::operator==: cerco otherfield \'%s\'\n", nomi[i].c_str());
-#endif
         Field* otherfield = right->getField( &nomi[i] );
         if(otherfield==0) {
             ret=false;
@@ -213,13 +188,7 @@ bool Schema::equals(Schema* right) {
             ret=false;
             continue;
         }
-#ifdef SCHEMA_DEBUG
-        if(debugSchema) printf( "Schema::operator==: comparo \'%s\' e \'%s\' ==> ", myfield->toString().c_str(), otherfield->toString().c_str());
-#endif
         ret = ret && ( (*myfield) == (*otherfield) );
-#ifdef SCHEMA_DEBUG
-        if(debugSchema) printf( "%d\n",ret);
-#endif
     }
     return ret;
 }
@@ -268,7 +237,6 @@ int Schema::getFieldIndex(const string* field) {
 #endif
 
 #endif
-        //if ( strcmp(fields[i]->getName().c_str() ,fieldCstr ) == 0 ) {
         if ( fields[i]->getName().compare( fieldCstr ) == 0 ) {
             ret = (int)i;
         }
@@ -322,9 +290,6 @@ FieldMap Schema::getValuesDictionary() {
 void Schema::setDateValue(const string* fieldName, const string* valore) {
     Field* field = this->getField(fieldName);
     if(field==0) {
-#ifdef SCHEMA_DEBUG
-        if(debugSchema) printf("Schema::setDateValue: creo field per fieldName=%s valore=%s\n",fieldName->c_str(),valore->c_str() );
-#endif
         field = this->createNewDateField(fieldName, valore);
         this->addField(field);
     } else {
@@ -334,9 +299,6 @@ void Schema::setDateValue(const string* fieldName, const string* valore) {
 void Schema::setValue(const string* fieldName, const string* valore) {
     Field* field = this->getField(fieldName);
     if(field==0) {
-#ifdef SCHEMA_DEBUG
-        if(debugSchema) printf("Schema::setValue: creo field per fieldName=%s valore=%s\n",fieldName->c_str(),valore->c_str());
-#endif
         field = this->createNewField(fieldName, valore);
         this->addField(field);
     } else {
@@ -346,9 +308,6 @@ void Schema::setValue(const string* fieldName, const string* valore) {
 void Schema::setValue(const string* fieldName, bool valore) {
     Field* field = this->getField(fieldName);
     if(field==0) {
-#ifdef SCHEMA_DEBUG
-        if(debugSchema) printf("Schema::setValue: creo field per fieldName=%s valore=%s\n",fieldName->c_str(),(valore?"True":"False") );
-#endif
         field =  this->createNewField(fieldName, valore);
         this->addField(field);
     } else if(!field->isBoolean()) {
@@ -363,9 +322,6 @@ void Schema::setValue(const string* fieldName, bool valore) {
 void Schema::setValue(const string* fieldName, float valore) {
 	Field* field = this->getField(fieldName);
     if(field==0) {
-#ifdef SCHEMA_DEBUG
-        if(debugSchema) printf("Schema::setValue: creo field per fieldName=%s valore=%f\n",fieldName->c_str(),valore );
-#endif
 		field =  this->createNewField(fieldName, valore);
 		this->addField(field);
     } else if(!field->isFloat()) {
@@ -380,9 +336,6 @@ void Schema::setValue(const string* fieldName, float valore) {
 void Schema::setValue(const string* fieldName, long valore) {
 	Field* field = this->getField(fieldName);
     if(field==0) {
-#ifdef SCHEMA_DEBUG
-        if(debugSchema) printf("Schema::setValue: creo field per fieldName=%s valore=%ld\n",fieldName->c_str(),valore);
-#endif
 		field =  this->createNewField(fieldName, valore);
 		this->addField(field);
     } else if(!field->isInteger()) {
@@ -424,7 +377,6 @@ string SchemaNS::integer2string(long longValue) {
     int i = 50-2;
     char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
     if ( longValue<0 ) {
-        //string tmpString( "-" );
         return string("-").append( SchemaNS::integer2string( -1 * longValue ) );
     }
     if (longValue>=0 && longValue<10) {

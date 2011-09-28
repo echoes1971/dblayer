@@ -32,15 +32,14 @@
 namespace DBLayer {
 
     class DLLEXPORT StringField : public DBField  {
-    public:
+      public:
         StringField(const string* nome);
         StringField(const string* nome,const string* valore );
-//        StringField(bool isPK, const string* nome,const string* valore );
         virtual ~StringField();
-      void setValue(const string* valore);
-      const string* getValue();
-      string toString();
-      virtual Field* createNewInstance(const char* aName=0);
+        void setValue(const string* valore);
+        const string* getValue();
+        string toString();
+        virtual Field* createNewInstance(const char* aName=0);
     };
 
 }

@@ -50,8 +50,6 @@ namespace DBLayer {
         virtual bool disconnect();
 
         virtual ResultSet* exec(const string s);
-        /** Force the write buffer to be written (or at least try) */
-        //virtual bool flush();
         /** Chiude la connessione corrente e la riapre */
         virtual bool reconnect();
 
@@ -77,25 +75,10 @@ namespace DBLayer {
 
     class DLLEXPORT MySQLResultSet : public ResultSet {
         friend class MySQLConnection;
-        private:
-//			StringVector columnName;
-//			StringVector columnType;
-//			StringVector righe;
-        public:
+      private:
+      public:
             MySQLResultSet();
             virtual ~MySQLResultSet();
-//			virtual int getNumColumns();
-//			virtual int getNumRows();
-//			virtual string getValue(int row, int column);
-//			virtual int getLength(int row, int column);
-//			virtual bool isNull(int row, int column);
-//			virtual string getColumnName(int i);
-//			virtual int getColumnIndex(string* columnName );
-//			virtual string getColumnType(int i);
-// 			virtual int getColumnSize(int i);
-
-//			virtual string getErrorMessage();
-//			virtual string getStatus();
 
             virtual string toString(string prefix="\n");
     };

@@ -39,7 +39,7 @@ using namespace DBLayer;
 #ifdef USE_MYSQL
 
 
-//********************* MySQLConnection: inizio.
+//********************* MySQLConnection: start.
 #ifdef WIN32
 MySQLConnection::MySQLConnection(string s) : Connection(s) {
 #else
@@ -47,7 +47,6 @@ MySQLConnection::MySQLConnection(string s) : Connection::Connection(s) {
 #endif
     this->db = 0;
 
-    //cout << "MySQLConnection::MySQLConnection: s=" << s << endl;
     // Parsing connection string
 #if __i386__
     unsigned int indiceInizioStringa = s.find("host=", 0) + 5;
@@ -58,22 +57,18 @@ MySQLConnection::MySQLConnection(string s) : Connection::Connection(s) {
 #endif
     if( indiceInizioStringa != string::npos )
         this->host = s.substr(indiceInizioStringa, indiceFineStringa-indiceInizioStringa );
-    //cout << "MySQLConnection::MySQLConnection: inizio="<<indiceInizioStringa<< " fine="<<indiceFineStringa<<" host=" << this->host << endl;
     indiceInizioStringa = s.find("dbname=", 0) + 7;
     indiceFineStringa = s.find(";", indiceInizioStringa);
     if( indiceInizioStringa != string::npos )
         this->dbname = s.substr(indiceInizioStringa, indiceFineStringa-indiceInizioStringa );
-    //cout << "MySQLConnection::MySQLConnection: inizio="<<indiceInizioStringa<< " fine="<<indiceFineStringa<<" dbname=" << this->dbname << endl;
     indiceInizioStringa = s.find("user=", 0) + 5;
     indiceFineStringa = s.find(";", indiceInizioStringa);
     if( indiceInizioStringa != string::npos )
         this->user = s.substr(indiceInizioStringa, indiceFineStringa-indiceInizioStringa );
-    //cout << "MySQLConnection::MySQLConnection: inizio="<<indiceInizioStringa<< " fine="<<indiceFineStringa<<" user=" << this->user << endl;
     indiceInizioStringa = s.find("password=", 0) + 9;
     indiceFineStringa = s.find(";", indiceInizioStringa);
     if( indiceInizioStringa != string::npos )
         this->password = s.substr(indiceInizioStringa, indiceFineStringa-indiceInizioStringa );
-    //cout << "MySQLConnection::MySQLConnection: inizio="<<indiceInizioStringa<< " fine="<<indiceFineStringa<<" password=" << this->password << endl;
 }
 MySQLConnection::~MySQLConnection() { this->disconnect(); }
 
@@ -95,12 +90,10 @@ bool MySQLConnection::connect() {
                 0, 0, 0);
     unsigned int errorCode = mysql_errno(this->db);
     if( errorCode!=0 ) {
-        cout << "MySQLConnection::connect: errorCode = " << errorCode << endl;
         this->errorMessage.append(
                     "errorCode: "+ DBLayer::integer2string((long)errorCode)
                     + "; msg: " + mysql_error(this->db)
                     );
-        cout << "MySQLConnection::connect: errorMessage = " << this->errorMessage << endl;
         return false;
     }
     this->connected = true;
@@ -111,30 +104,24 @@ bool MySQLConnection::disconnect() {
     if( this->db!=0 ) {
         errorCode = mysql_errno(this->db);
         if( errorCode!=0 ) {
-            //cout << "MySQLConnection::disconnect: errorCode = " << errorCode << endl;
             this->errorMessage.append(
                         "errorCode: "+ DBLayer::integer2string((long)errorCode)
                         + "; msg: " + mysql_error(this->db)
                         );
-            //cout << "MySQLConnection::disconnect: errorMessage = " << this->errorMessage << endl;
             return false;
         }
         mysql_close(this->db);
         this->db = 0;
     }
-    //cout << "MySQLConnection::disconnect: fine." << endl;
     this->connected = false;
     return true;
 }
 bool MySQLConnection::reconnect() { return this->disconnect() ? this->connect() : false; }
 
-bool myDebugExec = false;
-
 ResultSet* MySQLConnection::exec(const string s) {
     int errorCode;
     const char* query = s.c_str();
     MySQLResultSet* rs = new MySQLResultSet();
-//    if(myDebugExec) cout << "MySQLConnection::exec: query = " << query << endl;
 
     this->errorMessage.clear();
 
@@ -149,25 +136,17 @@ ResultSet* MySQLConnection::exec(const string s) {
     }
     MYSQL_RES *result = mysql_store_result(this->db);
     if(result==0) {
-//        if(myDebugExec)	cout << "MySQLConnection::exec: result==NULL " << endl;
         return rs;
     }
 
     // Preparo i metadati
-//    if(myDebugExec)	cout << "MySQLConnection::exec: Preparo i metadati " << endl;
-//    unsigned int nColonne = mysql_num_fields(result);
-//    if(myDebugExec)	cout << "MySQLConnection::exec: nColonne=" << DBLayer::integer2string((long)nColonne) << endl;
-
     MYSQL_FIELD *field;
     while((field = mysql_fetch_field(result))) {
         const char* nomeColonna = field->name;
-        if(myDebugExec)	cout << "MySQLConnection::exec: nomeColonna = " << nomeColonna << "; type = " << DBLayer::integer2string((long)field->type) << "; length = " << DBLayer::integer2string((long)field->length) << endl;
         rs->columnName.push_back( string(nomeColonna) );
         rs->columnSize.push_back( (int) field->length );
-        //rs->columnSize.push_back( field->length>0 ? field->length : field->max_length );
 
         string nomeTipo = MySQLConnection::getNomeTipo(field);
-        if(myDebugExec)	cout << "MySQLConnection::exec: nomeTipo=\'" << nomeTipo << "\'" << endl;
         if(nomeTipo.length()>0) {
             if(nomeTipo == "integer") {
                 rs->columnType.push_back( DBLayer::type_integer );
@@ -180,43 +159,26 @@ ResultSet* MySQLConnection::exec(const string s) {
             } else if( nomeTipo == "blob" ) {
                 rs->columnType.push_back( DBLayer::type_blob );
             } else {
-                if(myDebugExec) cout << "MySQLConnection::exec: codiceTipo \'" << nomeTipo
-                                     << "\' NON riconosciuto!" << endl;
                 rs->columnType.push_back( DBLayer::type_blob );
             }
         } else {
-            if(myDebugExec)	cout << "MySQLConnection::exec: nomeTipo VUOTO" << endl;
             rs->columnType.push_back( DBLayer::type_blob );
         }
     }
 
     MYSQL_ROW row;
-    if(myDebugExec)	cout << "MySQLConnection::exec: Leggo tutte le righe " << endl;
-    my_ulonglong num_rows = mysql_num_rows(result);
-    if(myDebugExec)	cout << "MySQLConnection::exec: num_rows=\'" << DBLayer::integer2string((long)num_rows) << "\'" << endl;
     while ((row = mysql_fetch_row(result))) {
         unsigned long *lengths;
         lengths = mysql_fetch_lengths(result);
         for(unsigned int c=0; c<rs->columnName.size(); c++) {
-            //int sizeDato = lengths[c];
-
-            //if(myDebugExec)	cout << "MySQLConnection::exec: sizeDato=\'" << DBLayer::integer2string((long)sizeDato) << "\'" << endl;
-            //if(sizeDato>0 && row[c]) {
-            //if(myDebugExec)	cout << "MySQLConnection::exec: row[c]=\'" << DBLayer::integer2string((long)row[c]) << "\'" << endl;
             if(row[c]!=0) {
-                //if(myDebugExec)	printf("[%.*s] ", (int) lengths[c], row[c] ? row[c] : "NULL");
                 char* tmpValore = new char[ lengths[c] + 2 ];
                 char* tmpSorgente = row[c];
                 snprintf( tmpValore, lengths[c] + 2, "%s", tmpSorgente );
-                //if(myDebugExec)	cout << "MySQLConnection::exec: tmpValore=\'" << tmpValore << "\'" << endl;
-                // 2011.09.04: start.
                 string valore(tmpValore);
-                //string valore = string( tmpValore );
-                // 2011.09.04: start.
                 rs->righe.push_back( valore );
                 delete[] tmpValore;
             } else if (row[c]==0 && ( rs->columnType[c]==DBLayer::type_integer || rs->columnType[c]==DBLayer::type_double) ) {
-                //if(myDebugExec)	printf("[%.*s] ", (int) lengths[c], row[c] ? row[c] : "NULL");
                 char* tmpValore = new char[ lengths[c] + 2 ];
                 char* tmpSorgente = row[c];
 #ifdef __i386__
@@ -224,7 +186,6 @@ ResultSet* MySQLConnection::exec(const string s) {
 #else
                 snprintf( tmpValore, lengths[c] + 2, "%ld", (unsigned long) tmpSorgente );
 #endif
-                //if(myDebugExec)	cout << "MySQLConnection::exec: tmpValore=\'" << tmpValore << "\'" << endl;
                 string valore( tmpValore );
                 rs->righe.push_back( valore );
                 delete[] tmpValore;
@@ -232,20 +193,14 @@ ResultSet* MySQLConnection::exec(const string s) {
                 rs->righe.push_back( string("\\N") );
             }
         }
-        //if(myDebugExec)	printf("\n");
     }
     mysql_free_result(result);
 
-    //	if(myDebugExec)	cout << "MySQLConnection::exec: rs=" << rs->toString() << endl;
-    //	if(myDebugExec)	cout << "MySQLConnection::exec: fine." << endl;
     return rs;
 }
 
 string MySQLConnection::escapeString(string s) {
     return DBLayer::replaceAll(s, "\'", "\'\'");
-//    static string fromQuote("\'");
-//    static string   toQuote("\'\'");
-//    return DBLayer::replaceAll(s, fromQuote, toQuote);
 }
 string MySQLConnection::getNomeTipo(st_mysql_field* field) {
     switch( (long) field->type ) {
@@ -303,12 +258,11 @@ string MySQLConnection::getColumnName(string* relname, int column) {
     MYSQL_RES *result = mysql_list_fields(this->db, relname->c_str(), 0);
 
     if(result==0) {
-        //cout << "MySQLConnection::getColumnName: result==NULL " << endl;
         return "";
     }
+
     unsigned int lengths;
     lengths = mysql_field_count(this->db);
-    //cout << "MySQLConnection::getColumnName: lengths=\'" << DBLayer::integer2string((long)lengths) << "\'" << endl;
     MYSQL_FIELD *field;
     for(unsigned int i=0; ret=="" && i<lengths; i++) {
         field = mysql_fetch_field(result);
@@ -316,7 +270,6 @@ string MySQLConnection::getColumnName(string* relname, int column) {
         if( ((int) i+1) == column ) {
             ret.append( nomeColonna );
         }
-        //cout << "MySQLConnection::getColumnName: field=\'" << nomeColonna << " chiave=" << DBLayer::integer2string((long)field->flags&PRI_KEY_FLAG) << " chiave multipla=" << DBLayer::integer2string((long)field->flags&MULTIPLE_KEY_FLAG) << "\'" << endl;
     }
     mysql_free_result(result);
 
@@ -327,20 +280,17 @@ IntegerVector MySQLConnection::getKeys(string* relname) {
     IntegerVector ret;
 
     if(result==0) {
-        //cout << "MySQLConnection::getKeys: result==NULL " << endl;
         return ret;
     }
+
     unsigned int lengths;
     lengths = mysql_field_count(this->db);
-    //cout << "MySQLConnection::getKeys: lengths=\'" << DBLayer::integer2string((long)lengths) << "\'" << endl;
     MYSQL_FIELD *field;
     for(unsigned int i=0; ret.size()==0 && i<lengths; i++) {
         field = mysql_fetch_field(result);
         if( (field->flags & PRI_KEY_FLAG) > 0 ) {
             ret.push_back( (int) i+1 );
         }
-        //const char* nomeColonna = field->name;
-        //cout << "MySQLConnection::getKeys: field=\'" << nomeColonna << " chiave=" << DBLayer::integer2string((long)field->flags&PRI_KEY_FLAG) << " chiave multipla=" << DBLayer::integer2string((long)field->flags&MULTIPLE_KEY_FLAG)<< "\'" << endl;
     }
     mysql_free_result(result);
     return ret;
@@ -350,12 +300,11 @@ IntegerVector MySQLConnection::getForeignKeys(string* relname) {
     IntegerVector ret;
 
     if(result==0) {
-        //cout << "MySQLConnection::getKeys: result==NULL " << endl;
         return ret;
     }
+
     unsigned int lengths;
     lengths = mysql_field_count(this->db);
-    //cout << "MySQLConnection::getKeys: lengths=\'" << DBLayer::integer2string((long)lengths) << "\'" << endl;
     MYSQL_FIELD *field;
     for(unsigned int i=0; ret.size()==0 && i<lengths; i++) {
         field = mysql_fetch_field(result);
@@ -363,8 +312,6 @@ IntegerVector MySQLConnection::getForeignKeys(string* relname) {
         if( ( (field->flags&PRI_KEY_FLAG) == 0 ) && ( (field->flags&MULTIPLE_KEY_FLAG) == MULTIPLE_KEY_FLAG ) ) {
             ret.push_back( (int) i+1 );
         }
-        //const char* nomeColonna = field->name;
-        //cout << "MySQLConnection::getKeys: field=\'" << nomeColonna << " chiave=" << DBLayer::integer2string((long)field->flags&PRI_KEY_FLAG) << " chiave multipla=" << DBLayer::integer2string((long)field->flags&MULTIPLE_KEY_FLAG)<< "\'" << endl;
     }
     mysql_free_result(result);
     return ret;
@@ -377,14 +324,13 @@ void MySQLConnection::printField(MYSQL_FIELD* field) {
     cout << "MySQLConnection::printField: field->org_table=\'" << field->org_table <<  "\'" << endl;
     cout << "MySQLConnection::printField: field->db=\'" << field->db <<  "\'" << endl;
     cout << "MySQLConnection::printField: field->catalog=\'" << field->catalog <<  "\'" << endl;
-// 		cout << "MySQLConnection::printField: field->def=\'" << field->def <<  "\'" << endl;
 }
 
-//********************* MySQLConnection: fine.
+//********************* MySQLConnection: end.
 
 
 
-//********************* MySQLResultSet: inizio.
+//********************* MySQLResultSet: start.
 
 #ifdef WIN32
 MySQLResultSet::MySQLResultSet() : ResultSet() {
@@ -400,7 +346,6 @@ string MySQLResultSet::toString(string prefix) {
     string ret;
     ret.append(prefix+"<MySQLResultSet>");
 
-//	cout << "SQLiteResultSet::toString: Stampo le colonne." << endl;
     int nColonne = this->getNumColumns();
     ret.append(prefix+" <Columns>" );
     for( int i=0; i<nColonne; i++) {
@@ -413,16 +358,12 @@ string MySQLResultSet::toString(string prefix) {
     }
     ret.append(prefix+" </Columns>" );
 
-//	cout << "SQLiteResultSet::toString: Stampo le righe." << endl;
     ret.append(prefix+" <Rows>");
     int nRighe = this->getNumRows();
     for(int r=0; r<nRighe; r++) {
-//		cout << "SQLiteResultSet::toString: riga = " << DBLayer::integer2string((long)r) << endl;
         ret.append(prefix+"  <Row num=\'"+DBLayer::integer2string((long)r)+"\'>");
         for(int c=0; c<nColonne; c++) {
             string nomeColonna = this->getColumnName(c);
-//			cout << "SQLiteResultSet::toString: nomeColonna = " << nomeColonna << endl;
-//			cout << "SQLiteResultSet::toString: valoreColonna = " << this->getValue(r,c) << endl;
             if (! this->isNull(r,c) ) {
                 ret.append(prefix+"   <"+nomeColonna+">");
                 ret.append( this->getValue(r,c) );
@@ -438,6 +379,6 @@ string MySQLResultSet::toString(string prefix) {
     ret.append(prefix+"</MySQLResultSet>");
     return ret;
 }
-//********************* MySQLResultSet: fine.
+//********************* MySQLResultSet: end.
 
 #endif

@@ -36,8 +36,6 @@
 #include "field.h"
 using namespace SchemaNS;
 
-//bool debugField = false;
-
 int Field::fieldCreati = 0;
 int Field::fieldDistrutti = 0;
 
@@ -48,7 +46,6 @@ Field::Field() {
 }
 Field::Field(const string* nome) {
     this->name=*nome;
-    //this->name.append(nome->c_str());
     this->nullo = true;
     this->stringValue=0;
     fieldCreati++;
@@ -57,7 +54,6 @@ Field::~Field() {
     if( this->stringValue!=0 ) delete this->stringValue;
     fieldDistrutti++;
 }
-
 
 Field* Field::createNewInstance(const char* aName) {
     Field* ret=0;
@@ -106,10 +102,6 @@ bool Field::equals(Field* field) {
     return ret;
 }
 
-
-//int Field::getType() {
-//  return type;
-//}
 string Field::getTypeName() {
     switch(this->type) {
       case Field::ANY:
@@ -150,16 +142,16 @@ void Field::setStringValue(string valore) {
     nullo = false;
 }
 void Field::setFloatValue(float valore) {
-  floatValue = valore;
-  nullo = false;
+    floatValue = valore;
+    nullo = false;
 }
 void Field::setIntegerValue(long valore) {
-  longValue = valore;
-  nullo = false;
+    longValue = valore;
+    nullo = false;
 }
 void Field::setBooleanValue(bool valore) {
-  boolValue = valore;
-  nullo = false;
+    boolValue = valore;
+    nullo = false;
 }
 // YYYY-MM-DD HH:MM:SS
 void Field::setDateValue(const string* valore) {
@@ -196,28 +188,28 @@ void Field::setValue(string valore) {
     }
 }
 void Field::setValue(float valore) {
-  floatValue = valore;
-  if(this->nullo) {
-      if(this->type==Field::ANY)
-          this->type=Field::FLOAT;
-      this->nullo = false;
-  }
+    floatValue = valore;
+    if(this->nullo) {
+        if(this->type==Field::ANY)
+            this->type=Field::FLOAT;
+        this->nullo = false;
+    }
 }
 void Field::setValue(long valore) {
-  longValue = valore;
-  if(this->nullo) {
-      if(this->type==Field::ANY)
-          this->type=Field::INTEGER;
-      this->nullo = false;
-  }
+    longValue = valore;
+    if(this->nullo) {
+        if(this->type==Field::ANY)
+            this->type=Field::INTEGER;
+        this->nullo = false;
+    }
 }
 void Field::setValue(bool valore) {
-  boolValue = valore;
-  if(this->nullo) {
-      if(this->type==Field::ANY)
-          this->type=Field::BOOLEAN;
-      this->nullo = false;
-  }
+    boolValue = valore;
+    if(this->nullo) {
+        if(this->type==Field::ANY)
+            this->type=Field::BOOLEAN;
+        this->nullo = false;
+    }
 }
 
 void Field::setValue(void* value) {
@@ -293,10 +285,6 @@ string Field::toString() { return ""; }
 bool Field::isNull() { return nullo; }
 void Field::setNull() { nullo=true; }
 void Field::setNull(bool valore) { nullo = valore; }
-
-//string Field::getName() {
-//    return this->name;
-//}
 
 long Field::getDaysFor(long y, long m) {
     long ret = -1;

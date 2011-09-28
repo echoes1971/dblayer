@@ -73,9 +73,9 @@ namespace SchemaNS {
 
         virtual string toString(string prefix="", bool valuesAsAttributes=false);
 
-        /**	Ritorna una nuova istanza	*/
+        /** Returns a new instance */
         virtual Schema* createNewInstance(const char* aName=0);
-        /** Crea un duplicato dello schema attuale */
+        /** Create a copy of current schema */
         Schema* clone(Schema* newSchema=0);
 
         virtual bool equals(Schema* right);
@@ -130,9 +130,9 @@ namespace SchemaNS {
         static int getSchemiDistrutti();
 
       protected:
-        /** Nome dello schema. */
+        /** Schema name */
         string name;
-        /**	field dello schema	*/
+        /** Schema fields */
         FieldVector fields;
 
       private:

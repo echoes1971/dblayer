@@ -42,66 +42,9 @@ DBEntity::DBEntity(const string* tableName) {
     this->tableName.clear();
     this->tableName.append( tableName->c_str() );
 }
-DBEntity::~DBEntity() {
-	// Realizzato dalla superclasse
-/*	cout << "DBEntity::~DBEntity: tableName \'" << this->tableName
-			<< "\' deleting " << this->fields.size() << "  fields..." << endl;
-	// Elimino i fields
-	for(unsigned int i=0; i<this->fields.size(); i++) {
-		cout << "DBEntity::~DBEntity:\t" << this->fields.at(i)->getName() << endl;
-		delete this->fields.at(i);
-	}
-	cout << "DBEntity::~DBEntity: =====" << endl;*/
-}
+DBEntity::~DBEntity() {}
 const string* DBEntity::getSchemaName() { return 0; }
-string DBEntity::getTableName() {
-    return string(tableName);
-}
-
-/* TO DO
-bool DBEntity::mapFromRS(ResultSet *rs) {
-  try {
-#ifndef __WIN32
-    for(uint i=0; i<fields.size(); i++) {
-#else
-    for(int i=0; i<fields.size(); i++) {
-#endif
-//      this->setValue( fields[i]->Name , new string( rs->getString( fields[i]->Name->c_str() ) ) );
-      string cippa = string("");
-      string* lippa = fields[i]->Name;
-      int indice = rs->findColumn( string( fields[i]->Name->c_str() ) );
-      switch ( fields[i]->getType() ) {
-          case DBField::STRING:
-              cout << "DBEntity::mapFromRS: name=" << fields[i]->Name->c_str() <<endl;
-              cippa += rs->getString( indice );
-              printf( "--\'%s\'\n", rs->getString( 2 ).c_str()  );
-              cout << "DBEntity::mapFromRS: value="
-                   << rs->getString( indice )
-//                   << rs->getString( string( fields[i]->Name->c_str() ) )
-                   << endl;
-//            fields[i]->setStringValue( rs->getString( indice ) );
-            fields[i]->setStringValue( new string( rs->getString( indice ).c_str() ) );
-//            fields[i]->setStringValue( new string( rs->getString( fields[i]->Name->c_str() ) ) );
-          break;
-          case DBField::INTEGER:
-            fields[i]->setIntegerValue( rs->getLong( fields[i]->Name->c_str() ) );
-          break;
-          case DBField::FLOAT:
-            fields[i]->setFloatValue( rs->getFloat( fields[i]->Name->c_str() ) );
-          break;
-          case DBField::DATE:
-            // ATTENZIONE: taking address of temporary
-//            fields[i]->setDateValue( new odbc::Date( rs->getDate( fields[i]->Name->c_str() ) ) );
-          break;
-      }
-    }
-    return true;
-  } catch(SQLException& e) {
-    cerr << endl << e.getMessage() << endl;
-    return false;
-  }
-}
-*/
+string DBEntity::getTableName() { return string(tableName); }
 
 string DBEntity::name() { return "DBEntity"; }
 
@@ -224,13 +167,11 @@ void* DBEntity::getValue(string* field) {
     if (fields[i]->getName().compare(field->c_str()) == 0) {
       switch(fields[i]->getType()) {
         case Field::STRING:
-//          return fields[i]->getStringValue();
         break;
         case Field::INTEGER:
           return (void*) fields[i]->getIntegerValue();
         break;
         case Field::FLOAT:
-//          return fields[i]->getFloatValue();
         break;
         case Field::DATE:
 // TODO         return fields[i]->getDateValue();
@@ -246,13 +187,11 @@ void* DBEntity::getValue(const string& field) {
     if (fields[i]->getName().compare(field.c_str()) == 0) {
       switch(fields[i]->getType()) {
         case DBField::STRING:
-//          return fields[i]->getStringValue();
         break;
         case DBField::INTEGER:
           return (void*) fields[i]->getIntegerValue();
         break;
         case DBField::FLOAT:
-//          return fields[i]->getFloatValue();
         break;
         case DBField::DATE:
 // TODO         return fields[i]->getDateValue();

@@ -33,10 +33,7 @@
 #include "dbefactory.h"
 using namespace DBLayer;
 
-DBEFactory::DBEFactory(bool verbose) {
-    this->_verbose=verbose;
-//	this->registerClass(string("default"), new DBEntity("default"));
-}
+DBEFactory::DBEFactory(bool verbose) { this->_verbose=verbose; }
 
 DBEFactory::~DBEFactory() {
     if(this->_verbose) printf("DBEFactory::~DBEFactory: start.\n");
@@ -61,12 +58,9 @@ void DBEFactory::registerClass(string* tablename, DBEntity* clazz) {
 
 DBEntity* DBEFactory::getClazz(const string* tablename) {
     string nomeTabella(tablename->c_str());
-//    if(this->_verbose) printf("DBEFactory::getClazz: nomeTabella=%s\n",nomeTabella.c_str());
     if( this->_cache.find(nomeTabella) != this->_cache.end() ) {
-//        if(this->_verbose) printf("DBEFactory::getClazz: ritorno la dbentity corretta per %s\n", tablename->c_str() );
         return this->_cache[nomeTabella]->createNewInstance();
     }
-//    if(this->_verbose) printf("DBEFactory::getClazz: ritorno una dbentity generica per %s\n", tablename->c_str() );
     return new DBEntity(tablename);
 }
 
@@ -76,14 +70,12 @@ DBEntity* DBEFactory::getClazzByTypeName(string* typeName, bool caseSensitive) {
             return (*it).second->createNewInstance();
         }
     }
-    // 	printf("DBEFactory::getClazzByTypeName: ritorno una dbentity per %s\n", typeName->c_str() );
     return new DBEntity();
 }
 
 DBEntityVector DBEFactory::getRegisteredTypes() {
     DBEntityVector ret;
     for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
-//		cout << "DBEFactory::getRegisteredTypes: (*it).second=" << (*it).second << endl;
         ret.push_back( (*it).second );
     }
     return ret;

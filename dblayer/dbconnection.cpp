@@ -42,13 +42,11 @@
 #include "odbcconnection.h"
 #include "sqliteconnection.h"
 #include "xmlrpcconnection.h"
-//#include <cstdio>
 using namespace DBLayer;
 
 ConnectionBuildersMap DBLayer::connectionBuilders;// = ConnectionBuildersMap();
 
 Connection* DBLayer::createConnection(string s) {
-    //printf("DBLayer::createConnection: s=%s\n",s.c_str());
     string myConnString = s;
     string myDBType = db_type;
 
@@ -70,8 +68,6 @@ Connection* DBLayer::createConnection(string s) {
         myDBType = prefix;
         myConnString = connString;
     }
-//    printf("DBLayer::createConnection: myDBType=%s\n",myDBType.c_str());
-//    printf("DBLayer::createConnection: myConnString=%s\n",myConnString.c_str());
     if (myDBType == db_mysql) {
 #ifdef USE_MYSQL
         return new MySQLConnection(myConnString);
@@ -93,23 +89,15 @@ Connection* DBLayer::createConnection(string s) {
         return new XmlrpcConnection(myConnString);
 #endif
     };
-    //printf("DBLayer::createConnection: connectionBuilders=%x\n",&DBLayer::connectionBuilders);
-    //printf("DBLayer::createConnection: connectionBuilders.count=%d\n",DBLayer::connectionBuilders.size());
     ConnectionBuildersMap::iterator it;
     it = DBLayer::connectionBuilders.find(myDBType);
     if(it!=DBLayer::connectionBuilders.end())
         return (*it->second)(myConnString);
-    else {
-        //printf("DBLayer::createConnection: NOT FOUND\n");
-    }
-    cout << "DBLayer::createConnection: type '" << myDBType << "' not found." << endl;
+    cerr << "DBLayer::createConnection: type '" << myDBType << "' not found." << endl;
     return new Connection(s);
 }
 void DBLayer::registerConnectionType(string prefix, Connection* (*myBuilder)(string s)) {
-    //printf("DBLayer::registerConnectionType: prefix=%s\n", prefix.c_str());
     DBLayer::connectionBuilders[prefix] = myBuilder;
-    //printf("DBLayer::registerConnectionType: connectionBuilders=%x\n", &DBLayer::connectionBuilders );
-    //printf("DBLayer::registerConnectionType: connectionBuilders.size=%d\n", DBLayer::connectionBuilders.size());
 }
 
 //********************** Connection
@@ -153,25 +141,8 @@ bool Connection::flush() { return true; }
 bool Connection::reconnect() { return false; }
 
 string* Connection::escapeString(string* s) { return s; }
-string Connection::escapeString(string s) {
-    // 2011.09.02: start.
-    return DBLayer::replaceAll(s, "\'", "\'\'");
-//    static string fromQuote("\'");
-//    static string   toQuote("\'\'");
-//    return DBLayer::replaceAll(s, fromQuote, toQuote);
-    // 2011.09.02: end.
-}
-string Connection::quoteDate(string s) {
-    // 2011.09.02: start.
-    return "'"+DBLayer::replaceAll(s, " 00:00:00", "")+"'";
-    // 20091106: start.
-//    static string fromQuote(" 00:00:00");
-//    static string   toQuote("");
-//    return "'"+DBLayer::replaceAll(s, fromQuote, toQuote)+"'";
-    // 2011.09.02: end.
-    //return "'"+s+"'";
-    // 20091106: end.
-}
+string Connection::escapeString(string s) { return DBLayer::replaceAll(s, "\'", "\'\'"); }
+string Connection::quoteDate(string s) { return "'"+DBLayer::replaceAll(s, " 00:00:00", "")+"'"; }
 
 int Connection::getColumnSize(string* relname) { return -1; }
 string Connection::getColumnName(string* relname, int column) { return string(""); }
@@ -209,7 +180,6 @@ DBEntityVector* Connection::Search(DBEntity* dbe, bool uselike, bool caseSensiti
 #ifdef USE_LIBPQ
 
 PGConnection::PGConnection(string s) : Connection::Connection(s) { this->conn = 0; }
-
 PGConnection::~PGConnection() { this->disconnect(); }
 
 bool PGConnection::connect() {
@@ -235,10 +205,7 @@ bool PGConnection::disconnect() {
 }
 
 ResultSet* PGConnection::exec(const string s) {
-    //cout << "DBLayer::PGConnection::exec: s=" << s << endl;
     PGresult* res = PQexec(this->conn, s.c_str() );
-    //cout << "DBLayer::PGConnection::exec: status=" << PQresultStatus(res) << endl;
-    //cout << "DBLayer::PGConnection::exec: PGRES_TUPLES_OK=" << PGRES_TUPLES_OK << endl;
     if (PQresultStatus(res) != PGRES_TUPLES_OK) { //PGRES_COMMAND_OK) {
         this->errorMessage = string( PQresultErrorMessage(res) );//PQerrorMessage(this->conn) );
     //PQclear(res);	RRA: lascio la distruzione del PGResultSet al chiamante
@@ -280,8 +247,6 @@ int PGConnection::getColumnSize(string* relname) {
     if( !this->hasErrors() ) {
         string tmp = res->getValue(0,0);
         ret = atoi( tmp.c_str() );
-    } else {
-        //cout << "Errori: " << this->getErrorMessage() << endl;
     }
     delete res;
     return ret;
@@ -301,8 +266,6 @@ string PGConnection::getColumnName(string* relname, int column) {
 
     if( !this->hasErrors() ) {
         ret = res->getValue(0,0);
-    } else {
-        //cout << "Errori: " << this->getErrorMessage() << endl;
     }
     delete res;
     return ret;
@@ -319,7 +282,6 @@ IntegerVector PGConnection::getKeys(string* relname) {
 
     if( !this->hasErrors() ) {
         string tmp = res->getValue(0,0);
-        //tmp = string(" { 1,2,3 } ");
         // Elimino le graffe
         unsigned long apertaGraffa = tmp.find('{');
         if(apertaGraffa!=string::npos) tmp.erase( apertaGraffa, 1 );
@@ -338,20 +300,12 @@ IntegerVector PGConnection::getKeys(string* relname) {
         }
         valore = atoi(tmp.c_str() );
         ret.push_back( valore );
-    } else {
-        //cout << "Errori: " << this->getErrorMessage() << endl;
     }
     delete res;
 
     return ret;
 }
 
-/*int PGConnection::protocolVersion() {
-	return PQprotocolVersion( this->conn );
-}
-int PGConnection::serverVersion() {
-	return PQserverVersion( this->conn );
-}*/
 int PGConnection::clientEncoding() { return PQclientEncoding( this->conn ); }
 int PGConnection::setClientEncoding(string s) { return PQsetClientEncoding( this->conn, s.c_str() ); }
 
@@ -379,7 +333,7 @@ int ResultSet::getColumnSize(int i) { return this->columnSize[i]; }
 int ResultSet::getLength(int row, int column) { return (int) this->righe.at( row * this->columnName.size() + column ).size(); }
 bool ResultSet::isNull(int row, int column) {
     string tmp = this->getValue(row,column);
-    return tmp=="\\N";// || tmp.size()==0;
+    return tmp=="\\N";
 }
 
 string ResultSet::getErrorMessage() { return string(""); }

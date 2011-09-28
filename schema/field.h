@@ -55,8 +55,8 @@ using namespace std;
 
 namespace SchemaNS {
 
-    extern string integer2string(long longValue); // Forward declaration
-    extern string float2string(float f); // Forward declaration
+    extern string integer2string(long longValue);
+    extern string float2string(float f);
 
 DLLEXPORT int getFieldCreati();
 DLLEXPORT int getFieldDistrutti();
@@ -74,12 +74,8 @@ DLLEXPORT int getFieldDistrutti();
         /** L'implementazione di default va bene per i tipi normali, eccetto le <b>date</b> */
         virtual bool equals(Field* field);
 
-        // 2011.09.09: end.
         inline string getName() { return this->name; }
         inline int getType() { return type; }
-//        string getName();
-//        int getType();
-        // 2011.09.09: end.
         string getTypeName();
         bool isBoolean();
         bool isInteger();
@@ -126,23 +122,21 @@ DLLEXPORT int getFieldDistrutti();
           DATE
         };
 
-		// Datetime static functions: start.
         static long getDaysFor(long year);
         static long getDaysFor(long year, long month);
         static long to_days(long year, long month, long day);
         static long to_seconds(long hour, long minutes, long seconds, long days=0);
-        // Datetime static functions: end.
 
         static int getFieldCreati();
         static int getFieldDistrutti();
 
       protected:
 
-        /** Nome del field. */
+        /** Field name */
         string name;
-        /** Tipo del campo. */
+        /** Field type */
         int type;
-        /**  */
+        /** is null? */
         bool nullo;
 
         bool boolValue;

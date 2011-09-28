@@ -49,7 +49,6 @@
 #include "floatfield.h"
 #include "stringfield.h"
 #include "datefield.h"
-//#include "dblayer.h" RRA - 2010.03.31 - Spostato sopra
 #include "foreignkey.h"
 
 #include <schema/schema.h>
@@ -68,7 +67,6 @@ namespace DBLayer {
         /** Ritorna lo schema di appartenenza della tabella */
         virtual const string* getSchemaName();
         virtual string getTableName();
-    //  virtual bool mapFromRS(ResultSet *rs);
         /** Class name */
         virtual string name();
         /**	valuesAsAttributes:

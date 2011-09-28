@@ -35,11 +35,11 @@
 using namespace SchemaNS;
 
 IntegerField::IntegerField(const string* nome) : Field(nome) {
-  type = Field::INTEGER;
+    type = Field::INTEGER;
 }
 IntegerField::IntegerField(const string* nome, long valore) : Field(nome) {
-  type = Field::INTEGER;
-  this->setValue(valore);
+    type = Field::INTEGER;
+    this->setValue(valore);
 }
 IntegerField::~IntegerField(){}
 
@@ -50,9 +50,9 @@ Field* IntegerField::createNewInstance(const char* aName) {
 
 long IntegerField::getValue(){ return longValue; }
 void IntegerField::setValue(long valore){
-  longValue=valore;
-  if (valore!=0)
-    nullo = false;
+    longValue=valore;
+    if (valore!=0)
+        nullo = false;
 }
 
 string IntegerField::toString() {

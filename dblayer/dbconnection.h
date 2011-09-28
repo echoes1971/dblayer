@@ -195,7 +195,6 @@ namespace DBLayer {
                 /** Chiude la connessione corrente e la riapre */
                 virtual bool reconnect();
 
-//		virtual string* escapeString(string* s);
                 virtual string escapeString(string s);
 
                 virtual int getColumnSize(string* relname);
@@ -203,8 +202,6 @@ namespace DBLayer {
                 virtual IntegerVector getKeys(string* relname);
 
                 // PG Functions
-//		int protocolVersion();
-//		int serverVersion();
                 int clientEncoding();
                 int setClientEncoding(string s);
 	};

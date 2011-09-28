@@ -26,23 +26,18 @@
 #include "floatfield.h"
 
 DBLayer::FloatField::FloatField(const string* nome) : DBField(nome) {
-  type = DBField::FLOAT;
+    type = DBField::FLOAT;
 }
 DBLayer::FloatField::FloatField(const string* nome, float valore) : DBField(nome) {
-  type = DBField::FLOAT;
-  this->setValue(valore);
+    type = DBField::FLOAT;
+    this->setValue(valore);
 }
-//DBLayer::FloatField::FloatField(bool isPK, const string* nome, float valore) : DBField(isPK, nome) {
-//  type = DBField::FLOAT;
-//  this->setPK(isPK);
-//  this->setValue(valore);
-//}
 DBLayer::FloatField::~FloatField() {}
 
 float DBLayer::FloatField::getValue(){ return floatValue; }
 void DBLayer::FloatField::setValue(float valore){
-  floatValue = valore;
-  nullo = false;
+    floatValue = valore;
+    nullo = false;
 }
 
 string DBLayer::FloatField::toString() {

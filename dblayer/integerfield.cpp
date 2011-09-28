@@ -32,11 +32,6 @@ IntegerField::IntegerField(const string* nome, long valore) : DBField(nome) {
     type = DBField::INTEGER;
     this->setValue(valore);
 }
-//IntegerField::IntegerField(bool isPK, const string* nome, long valore) : DBField(isPK, nome) {
-//  type = DBField::INTEGER;
-//  this->setPK(isPK);
-//  this->setValue(valore);
-//}
 IntegerField::~IntegerField() {}
 
 long IntegerField::getValue() { return longValue; }

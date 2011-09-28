@@ -48,7 +48,6 @@ namespace DBLayer {
         DBEntityVector getRegisteredTypes();
         DBEntity* getClazz(const string* tablename);
         DBEntity* getClazzByTypeName(string* typeName, bool caseSensitive=true);
-        // C++ non ha la magia di Python :-(
         DBEntity* call(string* tablename, StringVector names, StringVector values);
 
         string toString(string prefix="\n");
