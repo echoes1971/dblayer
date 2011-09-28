@@ -46,62 +46,70 @@ using namespace DBLayer;
 namespace DBLayer {
 
 #ifdef USE_LIBXMLRPC
-	class DLLEXPORT XmlrpcConnection : public Connection {
-	  public:
-		XmlrpcConnection(string s);
-		virtual ~XmlrpcConnection();
-		
-		virtual bool connect();
-		virtual bool disconnect();
-		
-		virtual ResultSet* exec(const string s);
-		/** Force the write buffer to be written (or at least try) */
-//		virtual bool flush();
-		/** Chiude la connessione corrente e la riapre */
-		virtual bool reconnect();
-		
-		virtual string escapeString(string s);
-		
-		virtual int getColumnSize(string* relname);
-		virtual string getColumnName(string* relname, int column);
-		virtual IntegerVector getKeys(string* relname);
-		virtual IntegerVector getForeignKeys(string* relname);
-		
-	  private:
-		xmlrpc_c::clientSimple _client;
-	};
+
+class XmlrpcResultSet;
+
+class DLLEXPORT XmlrpcConnection : public Connection {
+  public:
+    XmlrpcConnection(string s);
+    virtual ~XmlrpcConnection();
+
+    virtual bool connect();
+    virtual bool disconnect();
+
+    virtual ResultSet* exec(const string s);
+    /** Force the write buffer to be written (or at least try) */
+    //virtual bool flush();
+    /** Chiude la connessione corrente e la riapre */
+    virtual bool reconnect();
+
+    virtual string escapeString(string s);
+
+    virtual int getColumnSize(string* relname);
+    virtual string getColumnName(string* relname, int column);
+    virtual IntegerVector getKeys(string* relname);
+    virtual IntegerVector getForeignKeys(string* relname);
+
+    virtual ResultSet* login(string user, string pwd);
+
+    static XmlrpcResultSet* list2resultset(xmlrpc_c::value_array* iLista, XmlrpcResultSet* ioResultSet);
+
+  private:
+    xmlrpc_c::clientSimple _client;
+
+};
 
 
-	class DLLEXPORT XmlrpcResultSet : public ResultSet {
-		friend class XmlrpcConnection;
-		private:
-//			StringVector columnName;
-//			StringVector columnType;
-//			StringVector righe;
-			static void valueToString(xmlrpc_c::value* v, std::string* out_string);
-			static std::string integer2string(long longValue);
-			static std::string double2string(double longValue);
-			static void bytestringToString(xmlrpc_c::value_bytestring* v, std::string* out_string);
-			static void structToString(xmlrpc_c::value_struct* v, std::string* out_string);
-			static void arrayToString(xmlrpc_c::value_array* v, std::string* out_string);
-		public:
-			XmlrpcResultSet();
-			virtual ~XmlrpcResultSet();
-//			virtual int getNumColumns();
-//			virtual int getNumRows();
-//			virtual string getValue(int row, int column);
-//			virtual int getLength(int row, int column);
-//			virtual bool isNull(int row, int column);
-//			virtual string getColumnName(int i);
-//			virtual int getColumnIndex(string* columnName );
-//			virtual string getColumnType(int i);
-			virtual int getColumnSize(int i);
+class DLLEXPORT XmlrpcResultSet : public ResultSet {
+    friend class XmlrpcConnection;
+  private:
+    //StringVector columnName;
+    //StringVector columnType;
+    //StringVector righe;
+    static void valueToString(xmlrpc_c::value* v, std::string* out_string);
+    static std::string integer2string(long longValue);
+    static std::string double2string(double longValue);
+    static void bytestringToString(xmlrpc_c::value_bytestring* v, std::string* out_string);
+    static void structToString(xmlrpc_c::value_struct* v, std::string* out_string);
+    static void arrayToString(xmlrpc_c::value_array* v, std::string* out_string);
+  public:
+    XmlrpcResultSet();
+    virtual ~XmlrpcResultSet();
+    //virtual int getNumColumns();
+    //virtual int getNumRows();
+    //virtual string getValue(int row, int column);
+    //virtual int getLength(int row, int column);
+    //virtual bool isNull(int row, int column);
+    //virtual string getColumnName(int i);
+    //virtual int getColumnIndex(string* columnName );
+    //virtual string getColumnType(int i);
+    virtual int getColumnSize(int i);
 
-//			virtual string getErrorMessage();
-//			virtual string getStatus();
+    //virtual string getErrorMessage();
+    //virtual string getStatus();
 
-			virtual string toString(string prefix="\n");
-	};
+    virtual string toString(string prefix="\n");
+};
 #endif
 }
 

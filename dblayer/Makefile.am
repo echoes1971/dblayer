@@ -2,7 +2,7 @@ CURRENT=1
 REVISION=0
 AGE=0
 
-CPPFLAGS = -Wall -I$(top_srcdir) $(MYSQL_CFLAGS)
+CPPFLAGS = -Wall -I$(top_srcdir) $(MYSQL_CFLAGS) $(XMLRPCC_CFLAGS)
 LDFLAGS = -L../schema -lschema
 lib_LTLIBRARIES = libdblayer.la
 libdblayer_ladir = $(includedir)/dblayer

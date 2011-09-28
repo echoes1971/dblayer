@@ -48,189 +48,204 @@ XmlrpcConnection::~XmlrpcConnection() {
 }
 
 bool XmlrpcConnection::connect() {
-	xmlrpc_c::value result;
-// 	cout << "XmlrpcConnection::connect: connectionString=" << this->connectionString << endl;
-	this->errorMessage.clear();
-	try {
-		this->_client.call(this->connectionString, "selectAsArray", "ss", &result, "nometabella"
-			, "show tables"
-// 			, "select * from rra_users"
-			);
-	} catch (std::exception const& e) {
-		this->errorMessage.append( "Client threw error: " ); this->errorMessage.append( e.what() );
-		return false;
-	} catch (...) {
-		this->errorMessage.append( "Client threw unexpected error." );
-		return false;
-	}
-	
-	// Voglio che result sia del tipo [ stringa, [] ], altrimenti errore
-	if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
-		this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
-			+ " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
-		return false;
-	}
-	
-	xmlrpc_c::value_array myarray(result);
-	
-	if( myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_STRING
-			&& myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_BYTESTRING ) {
-		this->errorMessage.append( "Server returned a wrong type at return[0]: " + integer2string(myarray.vectorValueValue().at(0).type())
-			+ " instead of " + integer2string(xmlrpc_c::value::TYPE_STRING)
-			+ " or " + integer2string(xmlrpc_c::value::TYPE_BYTESTRING) );
-		return false;
-	}
-	if( myarray.vectorValueValue().at(1).type()!=xmlrpc_c::value::TYPE_ARRAY ) {
-		this->errorMessage.append( "Server returned a wrong type at return[1]: " + integer2string(myarray.vectorValueValue().at(1).type())
-			+ " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
-		return false;
-	}
-	
-// 	std::string out_string;
-// 	XmlrpcResultSet::valueToString( &(myarray.vectorValueValue().at(0)), &out_string );
-// 	std::cout << "XmlrpcConnection::connect: Messaggi=" << out_string << std::endl;
-	
-// 	out_string.clear();
-// 	XmlrpcResultSet::valueToString( &(myarray.vectorValueValue().at(1)), &out_string );
-// 	std::cout << "XmlrpcConnection::connect: Lista=" << out_string << std::endl;
-	
-	return true;
+    xmlrpc_c::value result;
+    this->connected=false;
+    this->errorMessage.clear();
+    try {
+        this->_client.call(this->connectionString, "selectAsArray", "ss", &result, "nometabella"
+                           , "show tables"
+                           //, "select * from rra_users"
+                           );
+    } catch (std::exception const& e) {
+        this->errorMessage.append( "Client threw error: " ); this->errorMessage.append( e.what() );
+        return false;
+    } catch (...) {
+        this->errorMessage.append( "Client threw unexpected error." );
+        return false;
+    }
+
+    // Voglio che result sia del tipo [ stringa, [] ], altrimenti errore
+    if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
+        this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
+                                   + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
+        return false;
+    }
+
+    xmlrpc_c::value_array myarray(result);
+
+    if( myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_STRING
+            && myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_BYTESTRING ) {
+        this->errorMessage.append( "Server returned a wrong type at return[0]: " + integer2string(myarray.vectorValueValue().at(0).type())
+                                   + " instead of " + integer2string(xmlrpc_c::value::TYPE_STRING)
+                                   + " or " + integer2string(xmlrpc_c::value::TYPE_BYTESTRING) );
+        return false;
+    }
+    if( myarray.vectorValueValue().at(1).type()!=xmlrpc_c::value::TYPE_ARRAY ) {
+        this->errorMessage.append( "Server returned a wrong type at return[1]: " + integer2string(myarray.vectorValueValue().at(1).type())
+                                   + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
+        return false;
+    }
+
+    this->connected=true;
+    return true;
 }
-bool XmlrpcConnection::disconnect() { return true; }
+bool XmlrpcConnection::disconnect() { this->connected=false; return true; }
 bool XmlrpcConnection::reconnect() { return this->connect(); }
 
-bool debugXmlrpcExec = false;
-
 ResultSet* XmlrpcConnection::exec(const string s) {
-	XmlrpcResultSet* rs = new XmlrpcResultSet();
-	xmlrpc_c::value result;
-    //cout << "XmlrpcConnection::exec: s=" << this->connectionString << endl;
-	this->errorMessage.clear();
-	try {
-		this->_client.call(this->connectionString, "selectAsArray", "ss", &result, "nometabella", s.c_str());
-	} catch (std::exception const& e) {
-		this->errorMessage.append( "Client threw error: " ); this->errorMessage.append( e.what() );
-		return false;
-	} catch (...) {
-		this->errorMessage.append( "Client threw unexpected error." );
-		return false;
-	}
-	
-	// Voglio che result sia del tipo [ stringa, [] ], altrimenti errore
-	if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
-		this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
-			+ " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
-		return false;
-	}
-	
-	xmlrpc_c::value_array myarray(result);
-	
-	if( myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_STRING
-			&& myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_BYTESTRING ) {
-		this->errorMessage.append( "Server returned a wrong type at return[0]: " + integer2string(myarray.vectorValueValue().at(0).type())
-			+ " instead of " + integer2string(xmlrpc_c::value::TYPE_STRING)
-			+ " or " + integer2string(xmlrpc_c::value::TYPE_BYTESTRING) );
-		return false;
-	}
-	if( myarray.vectorValueValue().at(1).type()!=xmlrpc_c::value::TYPE_ARRAY ) {
-		this->errorMessage.append( "Server returned a wrong type at return[1]: " + integer2string(myarray.vectorValueValue().at(1).type())
-			+ " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
-		return false;
-	}
-	
-	if(debugXmlrpcExec)	{
-		std::string out_string;
-		XmlrpcResultSet::valueToString( &(myarray.vectorValueValue().at(0)), &out_string );
-		std::cout << "XmlrpcConnection::connect: Messaggi=" << out_string << std::endl;
-		
-		out_string.clear();
-		XmlrpcResultSet::valueToString( &(myarray.vectorValueValue().at(1)), &out_string );
-		std::cout << "XmlrpcConnection::connect: Lista=" << out_string << std::endl;
-	}
-	xmlrpc_c::value_array lista(myarray.vectorValueValue().at(1));
-	// Map
-	std::map<std::string, xmlrpc_c::value> m;
-	// Iterator
-	std::map<std::string, xmlrpc_c::value>::const_iterator i;
-	for(unsigned int r=0; r<lista.size(); r++) {
-		if(debugXmlrpcExec) {
-			std::string out_string;
-			XmlrpcResultSet::valueToString( &(lista.vectorValueValue().at(r)), &out_string );
-			std::cout << "XmlrpcConnection::connect: " << r << ") " << out_string << std::endl;
-		}
-		// Struct
-		xmlrpc_c::value_struct v( lista.vectorValueValue().at(r) );
-		// Map
-		m = (std::map<std::string, xmlrpc_c::value>) v;
-		unsigned int colonna=0;
-		string my_string;
-		for(i=m.begin(); i!=m.end(); ++i) {
-			// Metadati
-			if(rs->columnName.size()<=colonna) rs->columnName.push_back( i->first );
-			my_string.clear();
-			switch(i->second.type()) {
-				case xmlrpc_c::value::TYPE_INT:
-					if(rs->columnType.size()<=colonna) rs->columnType.push_back( DBLayer::type_integer );
-					rs->righe.push_back( XmlrpcResultSet::integer2string( (int) xmlrpc_c::value_int(i->second) ) );
-					break;
-				case xmlrpc_c::value::TYPE_BOOLEAN:
-					if(rs->columnType.size()<=colonna) rs->columnType.push_back( DBLayer::type_integer );
-					rs->righe.push_back( XmlrpcResultSet::integer2string( ( (bool) xmlrpc_c::value_boolean(i->second) ) ? 1 : 0 ) );
-					break;
-				case xmlrpc_c::value::TYPE_DOUBLE:
-					if(rs->columnType.size()<=colonna) rs->columnType.push_back( DBLayer::type_double );
-					rs->righe.push_back( XmlrpcResultSet::double2string( (double) ((float) xmlrpc_c::value_double(i->second)) ) );
-					break;
-				case xmlrpc_c::value::TYPE_STRING:
-					if(rs->columnType.size()<=colonna) rs->columnType.push_back( DBLayer::type_string );
-					rs->righe.push_back( xmlrpc_c::value_string(i->second) );
-					break;
-				case xmlrpc_c::value::TYPE_BYTESTRING:
-					if(rs->columnType.size()<=colonna) rs->columnType.push_back( DBLayer::type_string );
-					XmlrpcResultSet::bytestringToString( &xmlrpc_c::value_bytestring( i->second ), &my_string );
-					rs->righe.push_back( my_string );
-					break;
-// 				default:
-// 					case xmlrpc_c::value::TYPE_ARRAY:
-// 					case xmlrpc_c::value::TYPE_STRUCT:
-// 					case xmlrpc_c::value::TYPE_DATETIME:
-// 					case xmlrpc_c::value::TYPE_C_PTR:
-// 					case xmlrpc_c::value::TYPE_NIL:
-// 					case xmlrpc_c::value::TYPE_I8:
-// 					case xmlrpc_c::value::TYPE_DEAD:
-				default:
-					if(rs->columnType.size()<=colonna) rs->columnType.push_back( DBLayer::type_blob );
-					XmlrpcResultSet::valueToString( &xmlrpc_c::value(i->second), &my_string );
-					rs->righe.push_back( my_string );
-					break;
-			}
-			colonna++;
-		}
-	}
-	
-	return rs;
+    XmlrpcResultSet* rs = new XmlrpcResultSet();
+    xmlrpc_c::value result;
+    this->errorMessage.clear();
+    try {
+        this->_client.call(this->connectionString, "selectAsArray", "ss", &result, "nometabella", s.c_str());
+    } catch (std::exception const& e) {
+        this->errorMessage.append( "Client threw error: " ); this->errorMessage.append( e.what() );
+        return false;
+    } catch (...) {
+        this->errorMessage.append( "Client threw unexpected error." );
+        return false;
+    }
+
+    // Voglio che result sia del tipo [ stringa, [] ], altrimenti errore
+    if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
+        this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
+                                   + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
+        return false;
+    }
+
+    xmlrpc_c::value_array myarray(result);
+
+    if( myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_STRING
+            && myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_BYTESTRING ) {
+        this->errorMessage.append( "Server returned a wrong type at return[0]: " + integer2string(myarray.vectorValueValue().at(0).type())
+                                   + " instead of " + integer2string(xmlrpc_c::value::TYPE_STRING)
+                                   + " or " + integer2string(xmlrpc_c::value::TYPE_BYTESTRING) );
+        return false;
+    }
+    if( myarray.vectorValueValue().at(1).type()!=xmlrpc_c::value::TYPE_ARRAY ) {
+        this->errorMessage.append( "Server returned a wrong type at return[1]: " + integer2string(myarray.vectorValueValue().at(1).type())
+                                   + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
+        return false;
+    }
+
+    xmlrpc_c::value_array lista(myarray.vectorValueValue().at(1));
+
+    return XmlrpcConnection::list2resultset( &lista, new XmlrpcResultSet() );
 }
 
-string XmlrpcConnection::escapeString(string s) {
-    return DBLayer::replaceAll(s, "\'", "\'\'");
-//	static string fromQuote("\'");
-//	static string   toQuote("\'\'");
-//	return DBLayer::replaceAll(s, fromQuote, toQuote);
-}
+string XmlrpcConnection::escapeString(string s) { return DBLayer::replaceAll(s, "\'", "\'\'"); }
 
 int XmlrpcConnection::getColumnSize(string* relname) { return -1; }
 string XmlrpcConnection::getColumnName(string* relname, int column) { return ""; }
 IntegerVector XmlrpcConnection::getKeys(string* relname) {
-	IntegerVector ret;
+    IntegerVector ret;
     this->errorMessage.append("XmlrpcConnection::getKeys: UNSUPPORTED; relname=" + string(relname->c_str()) );
-    //cout << "XmlrpcConnection::getKeys: UNSUPPORTED; relname=" << relname << endl;
-	return ret;
+    return ret;
 }
 IntegerVector XmlrpcConnection::getForeignKeys(string* relname) {
-	IntegerVector ret;
+    IntegerVector ret;
     this->errorMessage.append("XmlrpcConnection::getForeignKeys: UNSUPPORTED; relname=" + string(relname->c_str()) );
-    //cout << "XmlrpcConnection::getForeignKeys: UNSUPPORTED; relname=" << relname << endl;
-	return ret;
+    return ret;
+}
+
+
+ResultSet* XmlrpcConnection::login(string user, string pwd) {
+    xmlrpc_c::value result;
+    this->errorMessage.clear();
+    try {
+        this->_client.call(this->connectionString, "login", "ss", &result, user.c_str(), pwd.c_str());
+    } catch (std::exception const& e) {
+        this->errorMessage.append( "Client threw error: " ); this->errorMessage.append( e.what() );
+        return false;
+    } catch (...) {
+        this->errorMessage.append( "Client threw unexpected error." );
+        return false;
+    }
+
+    if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
+        this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
+                                   + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
+        return 0;
+    }
+    xmlrpc_c::value_array myarray(result);
+
+    if( myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_STRING
+            && myarray.vectorValueValue().at(0).type()!=xmlrpc_c::value::TYPE_BYTESTRING ) {
+        this->errorMessage.append( "Server returned a wrong type at return[0]: " + integer2string(myarray.vectorValueValue().at(0).type())
+                                   + " instead of " + integer2string(xmlrpc_c::value::TYPE_STRING)
+                                   + " or " + integer2string(xmlrpc_c::value::TYPE_BYTESTRING) );
+        return false;
+    }
+    if( myarray.vectorValueValue().at(1).type()!=xmlrpc_c::value::TYPE_ARRAY ) {
+        this->errorMessage.append( "Server returned a wrong type at return[1]: " + integer2string(myarray.vectorValueValue().at(1).type())
+                                   + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
+        return false;
+    }
+
+    xmlrpc_c::value_array lista(myarray.vectorValueValue().at(1));
+
+    ResultSet* ret = XmlrpcConnection::list2resultset( &lista, new XmlrpcResultSet() );
+
+    return ret;
+}
+
+XmlrpcResultSet* XmlrpcConnection::list2resultset(xmlrpc_c::value_array* iLista, XmlrpcResultSet* ioResultSet) {
+    // Map
+    std::map<std::string, xmlrpc_c::value> m;
+    // Iterator
+    std::map<std::string, xmlrpc_c::value>::const_iterator i;
+    for(unsigned int r=0; r<iLista->size(); r++) {
+        // Struct
+        xmlrpc_c::value_struct v( iLista->vectorValueValue().at(r) );
+        // Map
+        m = (std::map<std::string, xmlrpc_c::value>) v;
+        unsigned int colonna=0;
+        string my_string;
+        for(i=m.begin(); i!=m.end(); ++i) {
+            // Metadati
+            if(ioResultSet->columnName.size()<=colonna) ioResultSet->columnName.push_back( i->first );
+            my_string.clear();
+            switch(i->second.type()) {
+            case xmlrpc_c::value::TYPE_INT:
+                if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_integer );
+                ioResultSet->righe.push_back( XmlrpcResultSet::integer2string( (int) xmlrpc_c::value_int(i->second) ) );
+                break;
+            case xmlrpc_c::value::TYPE_BOOLEAN:
+                if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_integer );
+                ioResultSet->righe.push_back( XmlrpcResultSet::integer2string( ( (bool) xmlrpc_c::value_boolean(i->second) ) ? 1 : 0 ) );
+                break;
+            case xmlrpc_c::value::TYPE_DOUBLE:
+                if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_double );
+                ioResultSet->righe.push_back( XmlrpcResultSet::double2string( (double) ((float) xmlrpc_c::value_double(i->second)) ) );
+                break;
+            case xmlrpc_c::value::TYPE_STRING:
+                if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_string );
+                ioResultSet->righe.push_back( xmlrpc_c::value_string(i->second) );
+                break;
+            case xmlrpc_c::value::TYPE_BYTESTRING:
+                if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_string );
+                XmlrpcResultSet::bytestringToString( &xmlrpc_c::value_bytestring( i->second ), &my_string );
+                ioResultSet->righe.push_back( my_string );
+                break;
+            //default:
+            //	case xmlrpc_c::value::TYPE_ARRAY:
+            //	case xmlrpc_c::value::TYPE_STRUCT:
+            //	case xmlrpc_c::value::TYPE_DATETIME:
+            //	case xmlrpc_c::value::TYPE_C_PTR:
+            //	case xmlrpc_c::value::TYPE_NIL:
+            //	case xmlrpc_c::value::TYPE_I8:
+            //	case xmlrpc_c::value::TYPE_DEAD:
+            default:
+                if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_blob );
+                XmlrpcResultSet::valueToString( &xmlrpc_c::value(i->second), &my_string );
+                ioResultSet->righe.push_back( my_string );
+                break;
+            }
+            colonna++;
+        }
+    }
+
+    return ioResultSet;
 }
 //********************* XmlrpcConnection: fine.
 
@@ -244,201 +259,152 @@ XmlrpcResultSet::XmlrpcResultSet() : ResultSet::ResultSet() {
 }
 XmlrpcResultSet::~XmlrpcResultSet() {}
 
-//int XmlrpcResultSet::getNumColumns() {
-//	return this->columnName.size();
-//}
-//int XmlrpcResultSet::getNumRows() {
-//	if( this->columnName.size()!=0 )
-//		return this->righe.size() / this->columnName.size() ;
-//	else
-//		return 0;
-//}
-
-//string XmlrpcResultSet::getColumnName(int i) {
-//	return this->columnName[i];
-//}
-//string XmlrpcResultSet::getColumnType(int i) {
-//	return this->columnType[i];
-//}
 int XmlrpcResultSet::getColumnSize(int i) {
-	// Non significativo per Xmlrpc
     return -i;
 }
-//int XmlrpcResultSet::getColumnIndex(string* columnName ) {
-//	int ret = -1;
-//	const char* columnNameChar = columnName->c_str();
-//	for(unsigned int i=0; i<this->columnName.size() && ret<0; i++) {
-//		const char* currentColumnNameChar = this->columnName[i].c_str();
-//		if( strcmp( columnNameChar, currentColumnNameChar )==0 )
-//			ret = i;
-//	}
-//	return ret;
-//}
-
-//string XmlrpcResultSet::getValue(int row, int column) {
-//	return this->righe.at( row * this->columnName.size() + column );
-//}
-//bool XmlrpcResultSet::isNull(int row, int column) {
-//	string tmp = this->getValue(row,column);
-//	return tmp=="\\N";// || tmp.size()==0;
-//}
-//int XmlrpcResultSet::getLength(int row, int column) {
-//	return this->righe.at( row * this->columnName.size() + column ).size();
-//}
 string XmlrpcResultSet::toString(string prefix) {
-	string ret;
-	ret.append(prefix+"<XmlrpcResultSet>");
+    string ret;
+    ret.append(prefix+"<XmlrpcResultSet>");
 
-//	cout << "XmlrpcResultSet::toString: Stampo le colonne." << endl;
-	int nColonne = this->getNumColumns();
-	ret.append(prefix+" <Columns>" );
-	for( int i=0; i<nColonne; i++) {
-		ret.append(prefix+"  <Column ");
-		ret.append("position=\'"+DBLayer::integer2string((long)i)+"\' ");
-		ret.append("name=\'" + this->getColumnName(i)+"\' ");
-		ret.append("type=\'" + this->getColumnType(i)+"\' ");
-		ret.append("size=\'" + DBLayer::integer2string((long)this->getColumnSize(i))+"\' ");
-		ret.append("/>");
-	}
-	ret.append(prefix+" </Columns>" );
+    int nColonne = this->getNumColumns();
+    ret.append(prefix+" <Columns>" );
+    for( int i=0; i<nColonne; i++) {
+        ret.append(prefix+"  <Column ");
+        ret.append("position=\'"+DBLayer::integer2string((long)i)+"\' ");
+        ret.append("name=\'" + this->getColumnName(i)+"\' ");
+        ret.append("type=\'" + this->getColumnType(i)+"\' ");
+        ret.append("size=\'" + DBLayer::integer2string((long)this->getColumnSize(i))+"\' ");
+        ret.append("/>");
+    }
+    ret.append(prefix+" </Columns>" );
 
-//	cout << "XmlrpcResultSet::toString: Stampo le righe." << endl;
-	ret.append(prefix+" <Rows>");
-	int nRighe = this->getNumRows();
-	for(int r=0; r<nRighe; r++) {
-//		cout << "XmlrpcResultSet::toString: riga = " << DBLayer::integer2string((long)r) << endl;
-		ret.append(prefix+"  <Row num=\'"+DBLayer::integer2string((long)r)+"\'>");
-		for(int c=0; c<nColonne; c++) {
-			string nomeColonna = this->getColumnName(c);
-//			cout << "XmlrpcResultSet::toString: nomeColonna = " << nomeColonna << endl;
-//			cout << "XmlrpcResultSet::toString: valoreColonna = " << this->getValue(r,c) << endl;
-			if (! this->isNull(r,c) ) {
-				ret.append(prefix+"   <"+nomeColonna+">");
-				ret.append( this->getValue(r,c) );
-				ret.append("</"+nomeColonna+">");
-			} else {
-				ret.append(prefix+"   <"+nomeColonna+" />");
-			}
-		}
-		ret.append(prefix+"  </Row>");
-	}
-	ret.append(prefix+" </Rows>");
+    ret.append(prefix+" <Rows>");
+    int nRighe = this->getNumRows();
+    for(int r=0; r<nRighe; r++) {
+        ret.append(prefix+"  <Row num=\'"+DBLayer::integer2string((long)r)+"\'>");
+        for(int c=0; c<nColonne; c++) {
+            string nomeColonna = this->getColumnName(c);
+            if (! this->isNull(r,c) ) {
+                ret.append(prefix+"   <"+nomeColonna+">");
+                ret.append( this->getValue(r,c) );
+                ret.append("</"+nomeColonna+">");
+            } else {
+                ret.append(prefix+"   <"+nomeColonna+" />");
+            }
+        }
+        ret.append(prefix+"  </Row>");
+    }
+    ret.append(prefix+" </Rows>");
 
-	ret.append(prefix+"</XmlrpcResultSet>");
-	return ret;
-};
+    ret.append(prefix+"</XmlrpcResultSet>");
+    return ret;
+}
 
 std::string XmlrpcResultSet::integer2string(long longValue) {
-	int i = 50-2;
-	char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
-	if ( longValue<0 ) {
-		std::string tmpString = std::string( "-" );
-		tmpString.append( integer2string( -1 * longValue ) );
-		return tmpString;
-	}
-	if (longValue>=0 && longValue<10) {
-		tmp[i] = (char) ((int)longValue%10)+'0';
-		i--;
-	} else {
-		for (i=50-2; i>=0 && longValue>0 ; i--) {
-			tmp[i] = (char) ((int)longValue%10)+'0';
-			longValue = longValue / 10;
-		}
-	}
-	return std::string( (char*)&tmp[i+1] );
+    int i = 50-2;
+    char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
+    if ( longValue<0 ) {
+        std::string tmpString = std::string( "-" );
+        tmpString.append( integer2string( -1 * longValue ) );
+        return tmpString;
+    }
+    if (longValue>=0 && longValue<10) {
+        tmp[i] = (char) ((int)longValue%10)+'0';
+        i--;
+    } else {
+        for (i=50-2; i>=0 && longValue>0 ; i--) {
+            tmp[i] = (char) ((int)longValue%10)+'0';
+            longValue = longValue / 10;
+        }
+    }
+    return std::string( (char*)&tmp[i+1] );
 }
 std::string XmlrpcResultSet::double2string(double longValue) {
-	int i = 50-2;
-	char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
-	if ( longValue<0 ) {
-		std::string tmpString = std::string( "-" );
-		tmpString.append( double2string( -1 * longValue ) );
-		return tmpString;
-	}
-	std::string parte_intera;
-	if ( longValue>=1 ) {
-		parte_intera.append( integer2string( (long) longValue ) );
-	}
-	double decimale = longValue - ((long)longValue);
-	if( decimale>0 && decimale<1 ) {
-		parte_intera.append( "." );
-		long decimale_long = 0;
-		int num_decimali = 5;
-		while( decimale>0 && decimale<1 && decimale!=0.0 && num_decimali>0 ) {
-			decimale_long = decimale_long*10 + (long)(decimale*10);
-			decimale = (decimale*10) - (long)(decimale*10);
-			num_decimali--;
-		}
-		parte_intera.append( integer2string( decimale_long ) );
-	}
-	return parte_intera + std::string( (char*)&tmp[i+1] );
+    int i = 50-2;
+    char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
+    if ( longValue<0 ) {
+        std::string tmpString = std::string( "-" );
+        tmpString.append( double2string( -1 * longValue ) );
+        return tmpString;
+    }
+    std::string parte_intera;
+    if ( longValue>=1 ) {
+        parte_intera.append( integer2string( (long) longValue ) );
+    }
+    double decimale = longValue - ((long)longValue);
+    if( decimale>0 && decimale<1 ) {
+        parte_intera.append( "." );
+        long decimale_long = 0;
+        int num_decimali = 5;
+        while( decimale>0 && decimale<1 && decimale!=0.0 && num_decimali>0 ) {
+            decimale_long = decimale_long*10 + (long)(decimale*10);
+            decimale = (decimale*10) - (long)(decimale*10);
+            num_decimali--;
+        }
+        parte_intera.append( integer2string( decimale_long ) );
+    }
+    return parte_intera + std::string( (char*)&tmp[i+1] );
 }
 
 void XmlrpcResultSet::bytestringToString(xmlrpc_c::value_bytestring* v, std::string* out_string) {
-// 	out_string->append("\"");
     for(unsigned int i=0; i<v->length(); i++) {
-		const char c( v->vectorUcharValue().at(i));
-		out_string->push_back( c );
-	}
-// 	out_string->append("\"");
+        const char c( v->vectorUcharValue().at(i));
+        out_string->push_back( c );
+    }
 }
 
 void XmlrpcResultSet::structToString(xmlrpc_c::value_struct* v, std::string* out_string) {
-	std::map<std::string, xmlrpc_c::value> m = (std::map<std::string, xmlrpc_c::value>) (*v);
-	out_string->append("{");
-	std::map<std::string, xmlrpc_c::value>::const_iterator i;
-	for(i=m.begin(); i!=m.end(); ++i) {
-		if(i!=m.begin()) out_string->append(",");
-// 		out_string->append("\"");
-		out_string->append( i->first );
-// 		out_string->append("\"");
-		out_string->append("=>");
-		valueToString( (xmlrpc_c::value*)&(i->second), out_string );
-	}
-	out_string->append("}");
+    std::map<std::string, xmlrpc_c::value> m = (std::map<std::string, xmlrpc_c::value>) (*v);
+    out_string->append("{");
+    std::map<std::string, xmlrpc_c::value>::const_iterator i;
+    for(i=m.begin(); i!=m.end(); ++i) {
+        if(i!=m.begin()) out_string->append(",");
+        out_string->append( i->first );
+        out_string->append("=>");
+        valueToString( (xmlrpc_c::value*)&(i->second), out_string );
+    }
+    out_string->append("}");
 }
 
 void XmlrpcResultSet::arrayToString(xmlrpc_c::value_array* v, std::string* out_string) {
-	out_string->append("[");
-	for(unsigned int i=0; i<v->size(); i++) {
-		valueToString( &(v->vectorValueValue().at(i)), out_string );
-		if(i<(v->size() - 1)) out_string->append(",");
-	}
-	out_string->append("]");
+    out_string->append("[");
+    for(unsigned int i=0; i<v->size(); i++) {
+        valueToString( &(v->vectorValueValue().at(i)), out_string );
+        if(i<(v->size() - 1)) out_string->append(",");
+    }
+    out_string->append("]");
 }
 void XmlrpcResultSet::valueToString(xmlrpc_c::value* v, std::string* out_string) {
-	switch( v->type() ) {
-		case xmlrpc_c::value::TYPE_INT:
-			out_string->append( integer2string( (int) xmlrpc_c::value_int(*v) ) );
-			break;
-		case xmlrpc_c::value::TYPE_BOOLEAN:
-			out_string->append( ( (bool) xmlrpc_c::value_boolean(*v) ) ? "True":"False" );
-			break;
-		case xmlrpc_c::value::TYPE_DOUBLE:
-			out_string->append( double2string( (double) ((float) xmlrpc_c::value_double(*v)) ) );
-			break;
-		case xmlrpc_c::value::TYPE_STRING:
-// 			out_string->append("\"");
-			out_string->append( xmlrpc_c::value_string(*v).crlfValue() );
-// 			out_string->append("\"");
-			break;
-		case xmlrpc_c::value::TYPE_BYTESTRING:
-			bytestringToString( &xmlrpc_c::value_bytestring( (*v) ), out_string );
-			break;
-		case xmlrpc_c::value::TYPE_ARRAY:
-			arrayToString( &xmlrpc_c::value_array( (*v) ), out_string );
-			break;
-		case xmlrpc_c::value::TYPE_STRUCT:
-			structToString( &xmlrpc_c::value_struct( (*v) ), out_string );
-			break;
-		case xmlrpc_c::value::TYPE_DATETIME:
-		case xmlrpc_c::value::TYPE_C_PTR:
-		case xmlrpc_c::value::TYPE_NIL:
-		case xmlrpc_c::value::TYPE_I8:
-		case xmlrpc_c::value::TYPE_DEAD:
-		default:
-			out_string->append( integer2string( v->type() ) );
-	}
+    switch( v->type() ) {
+      case xmlrpc_c::value::TYPE_INT:
+        out_string->append( integer2string( (int) xmlrpc_c::value_int(*v) ) );
+        break;
+      case xmlrpc_c::value::TYPE_BOOLEAN:
+        out_string->append( ( (bool) xmlrpc_c::value_boolean(*v) ) ? "True":"False" );
+        break;
+      case xmlrpc_c::value::TYPE_DOUBLE:
+        out_string->append( double2string( (double) ((float) xmlrpc_c::value_double(*v)) ) );
+        break;
+      case xmlrpc_c::value::TYPE_STRING:
+        out_string->append( xmlrpc_c::value_string(*v).crlfValue() );
+        break;
+      case xmlrpc_c::value::TYPE_BYTESTRING:
+        bytestringToString( &xmlrpc_c::value_bytestring( (*v) ), out_string );
+        break;
+      case xmlrpc_c::value::TYPE_ARRAY:
+        arrayToString( &xmlrpc_c::value_array( (*v) ), out_string );
+        break;
+      case xmlrpc_c::value::TYPE_STRUCT:
+        structToString( &xmlrpc_c::value_struct( (*v) ), out_string );
+        break;
+//      case xmlrpc_c::value::TYPE_DATETIME:
+//      case xmlrpc_c::value::TYPE_C_PTR:
+//      case xmlrpc_c::value::TYPE_NIL:
+//      case xmlrpc_c::value::TYPE_I8:
+//      case xmlrpc_c::value::TYPE_DEAD:
+      default:
+        out_string->append( integer2string( v->type() ) );
+    }
 }
 //********************* XmlrpcResultSet: fine.
 

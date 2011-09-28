@@ -21,6 +21,7 @@ class DBShell {
     static void cmdConnect(DBShell* dbShell, string s);
     static void cmdDisconnect(DBShell* dbShell, string s);
     static void cmdExec(DBShell* dbShell, string s);
+    static void cmdLogin(DBShell* dbShell, string s);
 
     static void cmdTable2Cpp(DBShell* dbShell, string s);
 

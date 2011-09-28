@@ -7,14 +7,13 @@ using namespace DBLayer;
 DBShell::DBShell(string connString): connString(connString), exitLoop(false),con(0) {
     this->commands["connect"]=&cmdConnect;    this->cmdsHelp["connect"]=" Syntax: connect [conn.string]\n Connects to the desired DB";
     this->commands["disconnect"]=&cmdDisconnect;    this->cmdsHelp["disconnect"]=" Syntax: disconnect\n Disconnect from db";
+    this->commands["login"]=&cmdLogin;    this->cmdsHelp["login"]=" Syntax: login user pwd\n Logs into the remote xmlrpc server.";
     this->commands["exec"]=&cmdExec;    this->cmdsHelp["exec"]=" Syntax: exec sql\n Exec an sql statement";
 
     this->commands["table2cpp"]=&cmdTable2Cpp;    this->cmdsHelp["table2cpp"]=" Syntax: table2cpp table1 [table2] ...\n Generate code for the tables in the list.";
 
     this->commands["help"]=&cmdHelp;    this->cmdsHelp["help"]=" Syntax: help\n Show available commands";
     this->commands["quit"]=&cmdQuit;    this->cmdsHelp["quit"]=" Syntax: quit\n Quit the shell";
-
-//    this->commands["xxx"]=&cmdXxx;    this->cmdsHelp["xxx"]="Syntax: xxx arg1\n Descrip.";
 }
 DBShell::~DBShell() {
     if(this->con!=0) delete con;
@@ -38,6 +37,22 @@ void DBShell::cmdDisconnect(DBShell* dbShell, string s) {
     dbShell->con=0;
 
     dbShell->cmdOut = "Disconnected from: " + dbShell->connString;
+}
+void DBShell::cmdLogin(DBShell* dbShell, string s) {
+    if(dbShell->con==0) return;
+
+    StringVector tmp;
+    DBLayer::splitString(s,' ',tmp);
+    string user = tmp.size()>0 ? tmp[0] : "";
+    string pwd = tmp.size()>1 ? tmp[1] : "";
+
+    dbShell->con->login(user,pwd);
+
+    if ( !dbShell->con->hasErrors() ) {
+        dbShell->cmdOut = "Logged into: " + dbShell->connString;
+    } else {
+        dbShell->cmdOut = "Login Errors: " + dbShell->con->getErrorMessage();
+    }
 }
 void DBShell::cmdExec(DBShell* dbShell, string s) {
     if(dbShell->con==0 || !dbShell->con->isConnected()) {
@@ -106,7 +121,7 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
     dbShell->cmdOut.append("#include \"dblayer/dbmgr.h\"\n");
     dbShell->cmdOut.append("using namespace DBLayer;\n");
     dbShell->cmdOut.append("#include <string>\n");
-    dbShell->cmdOut.append("using namespace std;\n)");
+    dbShell->cmdOut.append("using namespace std;\n");
     dbShell->cmdOut.append("\n");
     dbShell->cmdOut.append("namespace ").append(mySchemaName).append(" {\n");
     dbShell->cmdOut.append("\n");
@@ -124,9 +139,6 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
         }
         string typeName("DBE"); typeName.append(DBLayer::capitalizeCase(tableName));
         string myquery; myquery.append("select * from ").append((*it)).append(" where 1=0");
-//        dbShell->cmdOut.append("tableName:\t").append(tableName).append("\n");
-//        dbShell->cmdOut.append("typeName:\t").append(typeName).append("\n");
-//        dbShell->cmdOut.append("myquery:\t").append(myquery).append("\n");
         DBLayer::ResultSet* res;
         res = dbShell->con->exec(myquery);
         if( !dbShell->con->hasErrors() ) {
@@ -150,7 +162,6 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
                     string tipo_chiave = res->getColumnType( chiavi[i] );
                     if(tipo_chiave=="integer") tipoField="IntegerField";
                     dbShell->cmdOut.append("      static ").append(tipoField).append(" chiave").append(DBLayer::integer2string(numChiave)).append("; // ").append(tipo_chiave).append("\n");
-                    //res->getColumnName( chiavi[i] );
                     numChiave++;
                 }
             } else {
@@ -224,8 +235,6 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
                         .append("::nomiCampiChiave[")
                         .append(DBLayer::integer2string(num_chiave))
                         .append("] );\n");
-                //print "$tipoField $typeName::chiave".($num_chiave+1)."( (const string*)&$typeName::nomiCampiChiave[$num_chiave] );\n";
-                //res->getColumnName( chiavi[i] );
                 append_chiavi.push_back( string("ret.push_back( &").append(typeName).append("::chiave").append(DBLayer::integer2string(num_chiave+1)).append(" );") );
                 num_chiave++;
             }
@@ -265,22 +274,6 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
 
     dbShell->cmdOut.append("table2cpp: TODO - ForeignKeys e altro\n");
 }
-/*
-connect dblayer:sqlite:./examples/test.db
-connect dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;
-connect dblayer:pg:host=localhost dbname=roberto user=roberto password=roberto
-table2cpp rra_users rra_people rra_timetracks rra_todo mylog
-table2cpp rra_users mylog
-disconnect
-quit
-
-
-connect dblayer:mysql:host=localhost;dbname=namirialpec;user=root;password=;
-table2cpp ADMIN ADMIN_STORY AZIENDE COS DOMINI DOMINI_STORY STATO STATO_ADMIN STATO_DOMINI TITOLARI TITOLARI_TMP UTENTI UTENTI_STORY
-table2cpp UTENTI_STORY UTENTI
-disconnect
-quit
-*/
 
 void DBShell::cmdHelp(DBShell* dbShell, string s) {
     dbShell->cmdOut.append("DBShell\n=======\n\n");
@@ -298,7 +291,7 @@ void DBShell::cmdQuit(DBShell* dbShell, string s) {
 
 void DBShell::operator()(bool prompt) {
     cout << "- Type quit to exit or help for a list of commands." << endl;
-    while(!exitLoop) { // && cin>>line) {
+    while(!exitLoop) {
         if(prompt) cout << "> ";
         getline(cin, line);
         int index = line.find(" ");
