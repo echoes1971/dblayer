@@ -265,7 +265,7 @@ int XmlrpcResultSet::getColumnSize(int i) {
 string XmlrpcResultSet::toString(string prefix) {
     string ret;
     ret.append(prefix+"<XmlrpcResultSet>");
-
+    // Columns
     int nColonne = this->getNumColumns();
     ret.append(prefix+" <Columns>" );
     for( int i=0; i<nColonne; i++) {
@@ -277,7 +277,7 @@ string XmlrpcResultSet::toString(string prefix) {
         ret.append("/>");
     }
     ret.append(prefix+" </Columns>" );
-
+    // Rows
     ret.append(prefix+" <Rows>");
     int nRighe = this->getNumRows();
     for(int r=0; r<nRighe; r++) {

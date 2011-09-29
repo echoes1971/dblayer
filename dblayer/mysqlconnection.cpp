@@ -199,9 +199,7 @@ ResultSet* MySQLConnection::exec(const string s) {
     return rs;
 }
 
-string MySQLConnection::escapeString(string s) {
-    return DBLayer::replaceAll(s, "\'", "\'\'");
-}
+string MySQLConnection::escapeString(string s) { return DBLayer::replaceAll(s, "\'", "\'\'"); }
 string MySQLConnection::getNomeTipo(st_mysql_field* field) {
     switch( (long) field->type ) {
     case MYSQL_TYPE_VARCHAR:
@@ -260,7 +258,6 @@ string MySQLConnection::getColumnName(string* relname, int column) {
     if(result==0) {
         return "";
     }
-
     unsigned int lengths;
     lengths = mysql_field_count(this->db);
     MYSQL_FIELD *field;
@@ -282,7 +279,6 @@ IntegerVector MySQLConnection::getKeys(string* relname) {
     if(result==0) {
         return ret;
     }
-
     unsigned int lengths;
     lengths = mysql_field_count(this->db);
     MYSQL_FIELD *field;
@@ -302,7 +298,6 @@ IntegerVector MySQLConnection::getForeignKeys(string* relname) {
     if(result==0) {
         return ret;
     }
-
     unsigned int lengths;
     lengths = mysql_field_count(this->db);
     MYSQL_FIELD *field;
@@ -345,7 +340,7 @@ MySQLResultSet::~MySQLResultSet() {}
 string MySQLResultSet::toString(string prefix) {
     string ret;
     ret.append(prefix+"<MySQLResultSet>");
-
+    // Columns
     int nColonne = this->getNumColumns();
     ret.append(prefix+" <Columns>" );
     for( int i=0; i<nColonne; i++) {
@@ -357,7 +352,7 @@ string MySQLResultSet::toString(string prefix) {
         ret.append("/>");
     }
     ret.append(prefix+" </Columns>" );
-
+    // Rows
     ret.append(prefix+" <Rows>");
     int nRighe = this->getNumRows();
     for(int r=0; r<nRighe; r++) {

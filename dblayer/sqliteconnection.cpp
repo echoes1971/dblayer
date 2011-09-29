@@ -331,7 +331,7 @@ int SQLiteResultSet::getColumnSize(int i) {
 string SQLiteResultSet::toString(string prefix) {
     string ret;
     ret.append(prefix+"<SQLiteResultSet>");
-
+    // Columns
     int nColonne = this->getNumColumns();
     ret.append(prefix+" <Columns>" );
     for( int i=0; i<nColonne; i++) {
@@ -343,7 +343,7 @@ string SQLiteResultSet::toString(string prefix) {
         ret.append("/>");
     }
     ret.append(prefix+" </Columns>" );
-
+    // Rows
     ret.append(prefix+" <Rows>");
     int nRighe = this->getNumRows();
     for(int r=0; r<nRighe; r++) {

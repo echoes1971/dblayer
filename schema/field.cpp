@@ -101,7 +101,6 @@ bool Field::equals(Field* field) {
     }
     return ret;
 }
-
 string Field::getTypeName() {
     switch(this->type) {
       case Field::ANY:
@@ -142,16 +141,16 @@ void Field::setStringValue(string valore) {
     nullo = false;
 }
 void Field::setFloatValue(float valore) {
-    floatValue = valore;
-    nullo = false;
+  floatValue = valore;
+  nullo = false;
 }
 void Field::setIntegerValue(long valore) {
-    longValue = valore;
-    nullo = false;
+  longValue = valore;
+  nullo = false;
 }
 void Field::setBooleanValue(bool valore) {
-    boolValue = valore;
-    nullo = false;
+  boolValue = valore;
+  nullo = false;
 }
 // YYYY-MM-DD HH:MM:SS
 void Field::setDateValue(const string* valore) {
@@ -188,28 +187,28 @@ void Field::setValue(string valore) {
     }
 }
 void Field::setValue(float valore) {
-    floatValue = valore;
-    if(this->nullo) {
-        if(this->type==Field::ANY)
-            this->type=Field::FLOAT;
-        this->nullo = false;
-    }
+  floatValue = valore;
+  if(this->nullo) {
+      if(this->type==Field::ANY)
+          this->type=Field::FLOAT;
+      this->nullo = false;
+  }
 }
 void Field::setValue(long valore) {
-    longValue = valore;
-    if(this->nullo) {
-        if(this->type==Field::ANY)
-            this->type=Field::INTEGER;
-        this->nullo = false;
-    }
+  longValue = valore;
+  if(this->nullo) {
+      if(this->type==Field::ANY)
+          this->type=Field::INTEGER;
+      this->nullo = false;
+  }
 }
 void Field::setValue(bool valore) {
-    boolValue = valore;
-    if(this->nullo) {
-        if(this->type==Field::ANY)
-            this->type=Field::BOOLEAN;
-        this->nullo = false;
-    }
+  boolValue = valore;
+  if(this->nullo) {
+      if(this->type==Field::ANY)
+          this->type=Field::BOOLEAN;
+      this->nullo = false;
+  }
 }
 
 void Field::setValue(void* value) {
