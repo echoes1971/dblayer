@@ -34,7 +34,6 @@
 using namespace DBLayer;
 
 DBEFactory::DBEFactory(bool verbose) { this->_verbose=verbose; }
-
 DBEFactory::~DBEFactory() {
     if(this->_verbose) printf("DBEFactory::~DBEFactory: start.\n");
     // Svuoto la cache

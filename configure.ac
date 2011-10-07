@@ -53,7 +53,9 @@ fi
 if test "x$have_odbc" = "xyes"
 then
  AC_DEFINE([USE_ODBCPP],[1],[Enables ODBC specific driver.])
- ODBC_LDFLAGS="-lodbc"
+ odbc_lib="odbc"
+ AC_CHECK_LIB(odbc,SQLAllocHandle,[odbc_lib="odbc"],[odbc_lib="iodbc"])
+ ODBC_LDFLAGS="-l$odbc_lib"
  AC_SUBST(ODBC_LDFLAGS)
 fi
 if test "x$have_pg" = "xyes"
