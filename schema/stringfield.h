@@ -36,7 +36,7 @@
 
 namespace SchemaNS {
 
-    class StringField : public Field  {
+    class DLLEXPORT StringField : public Field  {
       public:
         StringField(const string* nome);
         StringField(const string* nome,const string* valore );

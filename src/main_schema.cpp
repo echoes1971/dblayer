@@ -1,4 +1,9 @@
+#ifdef WIN32
+#include "stdafx.h"
+using namespace System;
+#else
 #include <config.h>
+#endif
 
 #include <cstdio>
 

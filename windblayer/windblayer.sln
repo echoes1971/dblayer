@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dblayer", "winlib\winlib.vcproj", "{F5406801-D190-4F9E-A383-F8CB81D5032C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testSchema", "testSchema\testSchema.vcproj", "{BCE7261A-8CFF-4C2F-8F28-614CCEBBBAC8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F5406801-D190-4F9E-A383-F8CB81D5032C} = {F5406801-D190-4F9E-A383-F8CB81D5032C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -54,12 +54,11 @@ using namespace std;
 
 
 namespace SchemaNS {
-
-    extern string integer2string(long longValue);
+	DLLIMPORT extern string integer2string(long longValue);
     extern string float2string(float f);
 
-DLLEXPORT int getFieldCreati();
-DLLEXPORT int getFieldDistrutti();
+	int getFieldCreati();
+	int getFieldDistrutti();
 
     class DLLEXPORT Field {
       public:
@@ -148,7 +147,7 @@ DLLEXPORT int getFieldDistrutti();
         static int fieldDistrutti;
     };
 
-    DLLEXPORT bool operator==(const Field& left, const Field& right);
+    bool operator==(const Field& left, const Field& right);
 }
 
 #endif
