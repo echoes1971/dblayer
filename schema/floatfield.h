@@ -36,7 +36,7 @@
 
 namespace SchemaNS {
 
-    class DLLEXPORT FloatField : public Field  {
+    class DECLSPECIFIER FloatField : public Field  {
       public:
         FloatField(const string* nome);
         FloatField(const string* nome, float valore);

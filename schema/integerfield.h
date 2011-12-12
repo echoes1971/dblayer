@@ -36,7 +36,7 @@
 
 namespace SchemaNS {
 
-	class DLLEXPORT IntegerField : public Field  {
+	class DECLSPECIFIER IntegerField : public Field  {
       public:
 		IntegerField(const string* nome);
 		IntegerField(const string* nome, long valore);

@@ -40,7 +40,7 @@ using namespace std;
 
 namespace SchemaNS {
 
-    class DLLEXPORT DateField : public Field  {
+    class DECLSPECIFIER DateField : public Field  {
       private:
         bool isValidDate(long y, long m, long d);
         bool isValidHour(long h, long m, long s, long millis);

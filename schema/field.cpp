@@ -344,7 +344,7 @@ bool SchemaNS::operator==(const Field& left, const Field& right) {
     Field* right_pointer = (Field*) &right;
     return left_pointer->equals( right_pointer );
 }
-int SchemaNS::getFieldCreati() { return Field::getFieldCreati(); }
-int SchemaNS::getFieldDistrutti() { return Field::getFieldDistrutti(); }
-int Field::getFieldCreati() { return Field::fieldCreati; }
-int Field::getFieldDistrutti() { return Field::fieldDistrutti; }
+DECLSPECIFIER int SchemaNS::getFieldCreati() { return Field::getFieldCreati(); }
+DECLSPECIFIER int SchemaNS::getFieldDistrutti() { return Field::getFieldDistrutti(); }
+DECLSPECIFIER int Field::getFieldCreati() { return Field::fieldCreati; }
+DECLSPECIFIER int Field::getFieldDistrutti() { return Field::fieldDistrutti; }

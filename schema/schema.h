@@ -62,7 +62,7 @@ namespace SchemaNS {
     /**
      * Contenitore di field
      */
-    public class DLLEXPORT Schema {
+    class DECLSPECIFIER Schema {
 
       public:
         Schema();
@@ -142,8 +142,8 @@ namespace SchemaNS {
         static int schemiDistrutti;
     };
 
-    DLLEXPORT typedef vector<Schema*>     SchemaVector;
-    DLLEXPORT typedef map<string,Schema*> SchemaMap;
+    typedef vector<Schema*>     SchemaVector;
+    typedef map<string,Schema*> SchemaMap;
 
     string integer2string(long longValue);
     string float2string(float f);

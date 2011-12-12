@@ -11,12 +11,12 @@ using namespace System::Security::Permissions;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly:AssemblyTitleAttribute("winlib")];
+[assembly:AssemblyTitleAttribute("dblayer")];
 [assembly:AssemblyDescriptionAttribute("")];
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("")];
-[assembly:AssemblyProductAttribute("winlib")];
-[assembly:AssemblyCopyrightAttribute("Copyright (c)  2011")];
+[assembly:AssemblyProductAttribute("dblayer")];
+[assembly:AssemblyCopyrightAttribute("Copyright (c) 2011 by Roberto Rocco Angeloni")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 

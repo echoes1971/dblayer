@@ -36,7 +36,7 @@
 
 namespace SchemaNS {
 
-    class DLLEXPORT BooleanField : public Field {
+    class DECLSPECIFIER BooleanField : public Field {
       public:
         BooleanField();
         BooleanField(const string* nome);

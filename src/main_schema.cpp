@@ -110,7 +110,6 @@ void testSchema() {
 }
 
 int main() {
-
     bool cippa = true;
     long lippa = 7;
     float lippo = 5.3;

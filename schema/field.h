@@ -32,9 +32,12 @@
 #ifndef SCHEMA_FIELD_H
 #define SCHEMA_FIELD_H
 
+/*
 #ifndef DLLEXPORT
 #if defined(_WIN32) || defined(__CYGWIN__)
+//#ifndef _WINDLL
 #define DLLEXPORT __declspec(dllexport)
+//#endif
 #else
 #define DLLEXPORT
 #endif
@@ -42,10 +45,22 @@
 
 #ifndef DLLIMPORT
 #if defined(_WIN32) || defined(__CYGWIN__)
+//#ifndef _WINDLL
 #define DLLIMPORT __declspec(dllimport)
+//#endif
 #else
 #define DLLIMPORT
 #endif
+#endif
+*/
+#ifndef DECLSPECIFIER
+#  ifdef _WINDLL
+#    define DECLSPECIFIER __declspec(dllexport)
+#    define EXPIMP_TEMPLATE
+#  else
+#    define DECLSPECIFIER __declspec(dllimport)
+#    define EXPIMP_TEMPLATE extern
+#  endif
 #endif
 
 
@@ -54,13 +69,13 @@ using namespace std;
 
 
 namespace SchemaNS {
-	DLLIMPORT extern string integer2string(long longValue);
+	extern string integer2string(long longValue);
     extern string float2string(float f);
 
-	int getFieldCreati();
-	int getFieldDistrutti();
+	DECLSPECIFIER int getFieldCreati();
+	DECLSPECIFIER int getFieldDistrutti();
 
-    class DLLEXPORT Field {
+    class DECLSPECIFIER Field {
       public:
         Field();
         Field(const string* nome);
