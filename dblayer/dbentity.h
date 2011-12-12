@@ -55,9 +55,9 @@
 using namespace SchemaNS;
 
 namespace DBLayer {
-    class DBMgr;
+    class DECLSPECIFIER DBMgr;
 
-    class DLLEXPORT DBEntity : public Schema {
+    class DECLSPECIFIER DBEntity : public Schema {
         friend class DBMgr;
       public:
         DBEntity();

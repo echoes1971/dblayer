@@ -38,7 +38,7 @@
 
 namespace DBLayer {
 
-    class DLLEXPORT DBEFactory {
+    class DECLSPECIFIER DBEFactory {
       public:
         DBEFactory(bool verbose=false);
         virtual ~DBEFactory();

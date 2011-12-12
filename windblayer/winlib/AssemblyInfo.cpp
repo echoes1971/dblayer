@@ -11,11 +11,11 @@ using namespace System::Security::Permissions;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly:AssemblyTitleAttribute("dblayer")];
+[assembly:AssemblyTitleAttribute("schema")];
 [assembly:AssemblyDescriptionAttribute("")];
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("")];
-[assembly:AssemblyProductAttribute("dblayer")];
+[assembly:AssemblyProductAttribute("schema")];
 [assembly:AssemblyCopyrightAttribute("Copyright (c) 2011 by Roberto Rocco Angeloni")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];

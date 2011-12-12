@@ -49,7 +49,7 @@ namespace DBLayer {
 
 #ifdef USE_ODBCPP
 
-	class DLLEXPORT ODBCConnection : public Connection {
+	class DECLSPECIFIER ODBCConnection : public Connection {
 	  public:
 		ODBCConnection(string s);
 		virtual ~ODBCConnection();
@@ -83,7 +83,7 @@ namespace DBLayer {
 	};
 
 
-	class DLLEXPORT ODBCResultSet : public ResultSet {
+	class DECLSPECIFIER ODBCResultSet : public ResultSet {
 		friend class ODBCConnection;
       private:
 		public:

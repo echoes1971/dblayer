@@ -42,32 +42,32 @@
 namespace DBLayer {
     using namespace std;
 
-    class DLLEXPORT DBField;
-    class DLLEXPORT DBEntity;
-    class DLLEXPORT ForeignKey;
-    typedef DLLEXPORT vector<DBField*>      DBFieldVector;
-    typedef DLLEXPORT map<string,DBField*>  DBFieldMap;
-    typedef DLLEXPORT vector<DBEntity*>     DBEntityVector;
-    typedef DLLEXPORT map<string,DBEntity*> DBEntityMap;
-    typedef DLLEXPORT vector<ForeignKey*>   ForeignKeyVector;
+    class DECLSPECIFIER DBField;
+    class DECLSPECIFIER DBEntity;
+    class DECLSPECIFIER ForeignKey;
+    typedef DECLSPECIFIER vector<DBField*>      DBFieldVector;
+    typedef DECLSPECIFIER map<string,DBField*>  DBFieldMap;
+    typedef DECLSPECIFIER vector<DBEntity*>     DBEntityVector;
+    typedef DECLSPECIFIER map<string,DBEntity*> DBEntityMap;
+    typedef DECLSPECIFIER vector<ForeignKey*>   ForeignKeyVector;
 
-    typedef DLLEXPORT vector<int>    IntegerVector;
-    typedef DLLEXPORT vector<string> StringVector;
+    typedef DECLSPECIFIER vector<int>    IntegerVector;
+    typedef DECLSPECIFIER vector<string> StringVector;
 
-    DLLEXPORT string lowerCase(string& s);
-    DLLEXPORT string upperCase(string& s);
-    DLLEXPORT string capitalizeCase(string& s);
-    DLLEXPORT string joinString( StringVector* vs, string* glue );
-    DLLEXPORT StringVector& splitString(const string& s, char delim, StringVector& elems);
+    DECLSPECIFIER string lowerCase(string& s);
+    DECLSPECIFIER string upperCase(string& s);
+    DECLSPECIFIER string capitalizeCase(string& s);
+    DECLSPECIFIER string joinString( StringVector* vs, string* glue );
+    DECLSPECIFIER StringVector& splitString(const string& s, char delim, StringVector& elems);
     /** trim from start */
-    DLLEXPORT string& string_ltrim(string& s);
+    DECLSPECIFIER string& string_ltrim(string& s);
     /** trim from end */
-    DLLEXPORT string& string_rtrim(string& s);
+    DECLSPECIFIER string& string_rtrim(string& s);
     /** trim from both ends */
-    DLLEXPORT string& string_trim(string& s);
-    DLLEXPORT string integer2string(long longValue);
+    DECLSPECIFIER string& string_trim(string& s);
+    DECLSPECIFIER string integer2string(long longValue);
     /**	Rimpiazza tutte le occorrenze di <b>f</b> con <b>r</b> in <b>s</b>. */
-    DLLEXPORT string replaceAll(string s, string f, string r);
+    DECLSPECIFIER string replaceAll(string s, string f, string r);
 }
 
 #endif

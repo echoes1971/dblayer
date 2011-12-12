@@ -35,7 +35,7 @@
 
 namespace DBLayer {
 
-    class DLLEXPORT DateField : public DBField  {
+    class DECLSPECIFIER DateField : public DBField  {
 	  private:
 		long year,month,day,hour,minute,seconds, millis;
 		bool isValidDate(long y, long m, long d);

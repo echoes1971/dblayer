@@ -49,7 +49,7 @@ namespace DBLayer {
 
 class XmlrpcResultSet;
 
-class DLLEXPORT XmlrpcConnection : public Connection {
+class DECLSPECIFIER XmlrpcConnection : public Connection {
   public:
     XmlrpcConnection(string s);
     virtual ~XmlrpcConnection();
@@ -78,7 +78,7 @@ class DLLEXPORT XmlrpcConnection : public Connection {
 };
 
 
-class DLLEXPORT XmlrpcResultSet : public ResultSet {
+class DECLSPECIFIER XmlrpcResultSet : public ResultSet {
     friend class XmlrpcConnection;
   private:
     static void valueToString(xmlrpc_c::value* v, std::string* out_string);

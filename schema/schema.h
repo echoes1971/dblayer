@@ -56,8 +56,8 @@ namespace SchemaNS {
     typedef map<string,Field*>  FieldMap;
     typedef map<string,int>  FieldIndex;
 
-    int getSchemiCreati();
-    int getSchemiDistrutti();
+    DECLSPECIFIER int getSchemiCreati();
+    DECLSPECIFIER int getSchemiDistrutti();
 
     /**
      * Contenitore di field

@@ -38,7 +38,7 @@ using namespace SchemaNS;
 
 namespace DBLayer {
 
-class DLLEXPORT DBField : public Field {
+class DECLSPECIFIER DBField : public Field {
   public:
     DBField();
     DBField(const string* nome);

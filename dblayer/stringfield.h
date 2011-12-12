@@ -31,7 +31,7 @@
 
 namespace DBLayer {
 
-    class DLLEXPORT StringField : public DBField  {
+    class DECLSPECIFIER StringField : public DBField  {
       public:
         StringField(const string* nome);
         StringField(const string* nome,const string* valore );

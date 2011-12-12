@@ -59,7 +59,7 @@ namespace DBLayer {
     static string db_xmlrpc = string("xmlrpc");
     static string db_type = db_pg;
 
-    class DLLEXPORT ResultSet {
+    class DECLSPECIFIER ResultSet {
         protected:
             StringVector  columnName;
             StringVector  columnType;
@@ -87,7 +87,7 @@ namespace DBLayer {
     };
 
 #ifdef USE_LIBPQ
-    class DLLEXPORT PGResultSet : public ResultSet {
+    class DECLSPECIFIER PGResultSet : public ResultSet {
         private:
             PGresult* res;
         public:
@@ -108,10 +108,10 @@ namespace DBLayer {
     };
 #endif
 
-    class DLLEXPORT Connection;
+    class DECLSPECIFIER Connection;
     typedef map<string,Connection* (*)(string s)> ConnectionBuildersMap; // 20090811
 
-    class DLLEXPORT Connection {
+    class DECLSPECIFIER Connection {
         private:
             // Nothing upto now
         protected:
@@ -180,7 +180,7 @@ namespace DBLayer {
 	};
 
 #ifdef USE_LIBPQ
-	class DLLEXPORT PGConnection : public Connection {
+	class DECLSPECIFIER PGConnection : public Connection {
             private:
                 PGconn* conn;
             public:
@@ -220,7 +220,7 @@ namespace DBLayer {
      *		"dblayer:sqlite3:c:\tmp\test.db"
      *		"dblayer:pg:host=localhost dbname=roberto user=roberto password="
      */
-    DLLEXPORT Connection* createConnection(string s);
+    DECLSPECIFIER Connection* createConnection(string s);
 
     extern ConnectionBuildersMap connectionBuilders;
     void registerConnectionType(string prefix, Connection* (*myBuilder)(string s));

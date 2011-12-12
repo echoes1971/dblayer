@@ -41,7 +41,7 @@
 
 namespace DBLayer {
 
-	class DLLEXPORT IntegerField : public DBField  {
+	class DECLSPECIFIER IntegerField : public DBField  {
       public:
 		IntegerField(const string* nome);
 		IntegerField(const string* nome, long valore);

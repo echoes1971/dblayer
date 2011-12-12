@@ -34,7 +34,12 @@
 ** ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
+#ifdef WIN32
+#include "stdafx.h"
+using namespace System;
+#else
 #include <config.h>
+#endif
 #ifdef USE_LIBPQ
  #include "dbconnection.h"
 #endif
@@ -170,8 +175,8 @@ bool Connection::isProxy() { return false; }
 DBEntity* Connection::Insert(DBEntity *dbe) { return dbe; }
 DBEntity* Connection::Update(DBEntity *dbe) { return dbe; }
 DBEntity* Connection::Delete(DBEntity *dbe) { return dbe; }
-DBEntityVector* Connection::Select(DBEntity* dbe, const string* tableName, const string* searchString) { return 0 & (long)dbe & (long)tableName & (long)searchString; }
-DBEntityVector* Connection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string* orderBy ) { return 0 & (long)dbe & (long)uselike & (long)caseSensitive & (long)orderBy; }
+DBEntityVector* Connection::Select(DBEntity* dbe, const string* tableName, const string* searchString) { return (DBEntityVector*) (0 & (long)dbe & (long)tableName & (long)searchString); }
+DBEntityVector* Connection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string* orderBy ) { return (DBEntityVector*) (0 & (long)dbe & (long)uselike & (long)caseSensitive & (long)orderBy); }
 // **************** Proxy Connections: end. *********************
 
 

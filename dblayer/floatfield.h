@@ -35,7 +35,7 @@
 
 namespace DBLayer {
 
-class DLLEXPORT FloatField : public DBField  {
+class DECLSPECIFIER FloatField : public DBField  {
 public:
     FloatField(const string* nome);
     FloatField(const string* nome, float valore);

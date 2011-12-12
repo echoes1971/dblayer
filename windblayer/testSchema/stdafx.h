@@ -5,8 +5,8 @@
 
 #pragma once
 #ifdef DEBUG
-#pragma comment(lib, "..\\Debug\\dblayer.lib")
+#pragma comment(lib, "..\\Debug\\schema.lib")
 #else
-#pragma comment(lib, "..\\Debug\\dblayer.lib")
+#pragma comment(lib, "..\\Debug\\schema.lib")
 #endif
 // TODO: reference additional headers your program requires here

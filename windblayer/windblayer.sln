@@ -1,12 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dblayer", "winlib\winlib.vcproj", "{F5406801-D190-4F9E-A383-F8CB81D5032C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "schema", "winlib\winlib.vcproj", "{F5406801-D190-4F9E-A383-F8CB81D5032C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testSchema", "testSchema\testSchema.vcproj", "{BCE7261A-8CFF-4C2F-8F28-614CCEBBBAC8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F5406801-D190-4F9E-A383-F8CB81D5032C} = {F5406801-D190-4F9E-A383-F8CB81D5032C}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dblayer", "dblayer\dblayer.vcproj", "{9D9940A4-9B76-448E-AB2A-668DD6935516}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testDblayer", "testDblayer\testDblayer.vcproj", "{AAD189E5-6B98-4609-BE8C-7E45DAF3F328}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,6 +26,14 @@ Global
 		{BCE7261A-8CFF-4C2F-8F28-614CCEBBBAC8}.Debug|Win32.Build.0 = Debug|Win32
 		{BCE7261A-8CFF-4C2F-8F28-614CCEBBBAC8}.Release|Win32.ActiveCfg = Release|Win32
 		{BCE7261A-8CFF-4C2F-8F28-614CCEBBBAC8}.Release|Win32.Build.0 = Release|Win32
+		{9D9940A4-9B76-448E-AB2A-668DD6935516}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9D9940A4-9B76-448E-AB2A-668DD6935516}.Debug|Win32.Build.0 = Debug|Win32
+		{9D9940A4-9B76-448E-AB2A-668DD6935516}.Release|Win32.ActiveCfg = Release|Win32
+		{9D9940A4-9B76-448E-AB2A-668DD6935516}.Release|Win32.Build.0 = Release|Win32
+		{AAD189E5-6B98-4609-BE8C-7E45DAF3F328}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AAD189E5-6B98-4609-BE8C-7E45DAF3F328}.Debug|Win32.Build.0 = Debug|Win32
+		{AAD189E5-6B98-4609-BE8C-7E45DAF3F328}.Release|Win32.ActiveCfg = Release|Win32
+		{AAD189E5-6B98-4609-BE8C-7E45DAF3F328}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

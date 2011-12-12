@@ -35,7 +35,7 @@
 
 namespace DBLayer {
 
-    class DLLEXPORT ForeignKey {
+    class DECLSPECIFIER ForeignKey {
       public:
         ForeignKey(string colonna_fk, string tabella_riferita, string colonna_riferita);
         virtual ~ForeignKey();

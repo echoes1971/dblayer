@@ -41,7 +41,7 @@ using namespace DBLayer;
 namespace DBLayer {
 
 #ifdef USE_MYSQL
-    class DLLEXPORT MySQLConnection : public Connection {
+    class DECLSPECIFIER MySQLConnection : public Connection {
     public:
         MySQLConnection(string s);
         virtual ~MySQLConnection();
@@ -73,7 +73,7 @@ namespace DBLayer {
         static string getNomeTipo(st_mysql_field* field);
     };
 
-    class DLLEXPORT MySQLResultSet : public ResultSet {
+    class DECLSPECIFIER MySQLResultSet : public ResultSet {
         friend class MySQLConnection;
       private:
       public:

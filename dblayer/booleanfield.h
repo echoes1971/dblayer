@@ -35,7 +35,7 @@
 #include "dbfield.h"
 
 namespace DBLayer {
-	class DLLEXPORT BooleanField : public DBField {
+	class DECLSPECIFIER BooleanField : public DBField {
 	  public:
         BooleanField();
         BooleanField(const string* nome);

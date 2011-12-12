@@ -25,20 +25,14 @@
 #ifndef IMPORTED_PACKAGES_H
 #define IMPORTED_PACKAGES_H
 
-#ifndef DLLEXPORT
-#if defined(_WIN32) || defined(__CYGWIN__)
-#define DLLEXPORT __declspec(dllexport)
-#else
-#define DLLEXPORT
-#endif
-#endif
-
-#ifndef DLLIMPORT
-#if defined(_WIN32) || defined(__CYGWIN__)
-#define DLLIMPORT __declspec(dllimport)
-#else
-#define DLLIMPORT
-#endif
+#ifndef DECLSPECIFIER
+#  ifdef _WINDLL
+#    define DECLSPECIFIER __declspec(dllexport)
+#    define EXPIMP_TEMPLATE
+#  else
+#    define DECLSPECIFIER __declspec(dllimport)
+#    define EXPIMP_TEMPLATE extern
+#  endif
 #endif
 
 #ifdef USE_MYSQL

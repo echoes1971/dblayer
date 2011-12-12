@@ -48,7 +48,7 @@
 
 namespace DBLayer {
 
-class DLLEXPORT DBMgr {
+class DECLSPECIFIER DBMgr {
     private:
         Connection* con;
         bool verbose;

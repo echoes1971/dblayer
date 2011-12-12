@@ -107,15 +107,29 @@ DBLayer::StringVector DBMgr::_buildWhereCondition(DBEntity* dbe, bool uselike, b
             if(uselike) {
                 if(caseSensitive) {
                     clausola.append( nome )
+#ifdef WIN32
+                            .append( " like '%" )
+                            .append( valore )
+                            .append( "%'" );
+#else
                             .append( " like '\%" )
                             .append( valore )
                             .append( "\%'" );
+#endif
                 } else {
+#ifdef WIN32
+                    clausola.append( "lower(" )
+                            .append( nome )
+                            .append( ") like '%" )
+                            .append( lowerCase( valore ).c_str() )
+                            .append( "%'" );
+#else
                     clausola.append( "lower(" )
                             .append( nome )
                             .append( ") like '\%" )
                             .append( lowerCase( valore ).c_str() )
                             .append( "\%'" );
+#endif
                 }
             } else {
                 if(caseSensitive) {

@@ -41,7 +41,7 @@ using namespace DBLayer;
 namespace DBLayer {
 
 #ifdef USE_LIBSQLITE3
-	class DLLEXPORT SQLiteConnection : public Connection {
+	class DECLSPECIFIER SQLiteConnection : public Connection {
 	  public:
 		SQLiteConnection(string s);
 		virtual ~SQLiteConnection();
@@ -67,7 +67,7 @@ namespace DBLayer {
 	};
 
 
-	class DLLEXPORT SQLiteResultSet : public ResultSet {
+	class DECLSPECIFIER SQLiteResultSet : public ResultSet {
 		friend class SQLiteConnection;
 		private:
 		public:
