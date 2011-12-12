@@ -79,7 +79,7 @@ namespace SchemaNS {
         Schema* clone(Schema* newSchema=0);
 
         virtual bool equals(Schema* right);
-        friend bool operator==(const Schema& left, const Schema& right);
+        friend DECLSPECIFIER bool operator==(const Schema& left, const Schema& right);
 
         virtual Field* createNewField(const string* fieldName, bool valore);
         virtual Field* createNewField(const string* fieldName, float valore);
@@ -144,6 +144,8 @@ namespace SchemaNS {
 
     typedef vector<Schema*>     SchemaVector;
     typedef map<string,Schema*> SchemaMap;
+
+	DECLSPECIFIER bool operator==(const Schema& left, const Schema& right);
 
     string integer2string(long longValue);
     string float2string(float f);

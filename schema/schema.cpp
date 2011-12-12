@@ -193,7 +193,7 @@ bool Schema::equals(Schema* right) {
     return ret;
 }
 
-bool SchemaNS::operator==(const Schema& left, const Schema& right) {
+DECLSPECIFIER bool SchemaNS::operator==(const Schema& left, const Schema& right) {
     Schema* left_pointer = (Schema*) &left;
     Schema* right_pointer = (Schema*) &right;
     return left_pointer->equals( right_pointer );
