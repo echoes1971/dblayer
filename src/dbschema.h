@@ -26,7 +26,7 @@ using namespace std;
 
 namespace MySchema {
 
-	class DBETestDBLayer : public DBEntity {
+	class DLLEXPORT DBETestDBLayer : public DBEntity {
 	  public:
 		DBETestDBLayer();
 		virtual ~DBETestDBLayer();
@@ -41,7 +41,7 @@ namespace MySchema {
 		static DBFieldVector chiavi;
 	};
 
-	class DBESocieta : public DBEntity {
+	class DLLEXPORT DBESocieta : public DBEntity {
 	  public:
 		DBESocieta();
 		virtual ~DBESocieta();

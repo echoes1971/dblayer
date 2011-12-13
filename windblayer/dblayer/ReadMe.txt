@@ -2,30 +2,16 @@
     DYNAMIC LINK LIBRARY : dblayer Project Overview
 ========================================================================
 
-AppWizard has created this dblayer DLL for you.  
 
-This file contains a summary of what you will find in each of the files that
-make up your dblayer application.
+MYSQL Support
+=============
 
-dblayer.vcproj
-    This is the main project file for VC++ projects generated using an Application Wizard. 
-    It contains information about the version of Visual C++ that generated the file, and 
-    information about the platforms, configurations, and project features selected with the
-    Application Wizard.
+1. Download the connector from: http://dev.mysql.com/downloads/connector/c/
 
-dblayer.cpp
-    This is the main DLL source file.
+2. In dblayer -> Properties -> Configuration Properties -> C/C++
+	-> Preprocessor -> Preprocessor Definitions
+	append ;USE_MYSQL
 
-dblayer.h
-    This file contains a class declaration.
-
-AssemblyInfo.cpp
-	Contains custom attributes for modifying assembly metadata.
-
-/////////////////////////////////////////////////////////////////////////////
-Other notes:
-
-AppWizard uses "TODO:" to indicate parts of the source code you
-should add to or customize.
-
-/////////////////////////////////////////////////////////////////////////////
+3. In dblayer -> Properties -> Configuration Properties -> C/C++
+	-> General -> Additional Include Directories
+	add C:\Program Files\MySQL\MySQL Connector C 6.0.2\include

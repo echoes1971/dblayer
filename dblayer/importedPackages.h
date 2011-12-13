@@ -25,7 +25,8 @@
 #ifndef IMPORTED_PACKAGES_H
 #define IMPORTED_PACKAGES_H
 
-#ifndef DECLSPECIFIER
+#ifdef WIN32
+# ifndef DECLSPECIFIER
 #  ifdef _WINDLL
 #    define DECLSPECIFIER __declspec(dllexport)
 #    define EXPIMP_TEMPLATE
@@ -33,6 +34,13 @@
 #    define DECLSPECIFIER __declspec(dllimport)
 #    define EXPIMP_TEMPLATE extern
 #  endif
+# endif
+# ifndef DLLEXPORT
+#  define DLLEXPORT __declspec(dllexport)
+# endif
+# ifndef DLLIMPORT
+#  define DLLIMPORT __declspec(dllimport)
+# endif
 #endif
 
 #ifdef USE_MYSQL

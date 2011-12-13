@@ -42,7 +42,11 @@ void DBLayer::FloatField::setValue(float valore){
 
 string DBLayer::FloatField::toString() {
 	char tmp[50];
-	sprintf(
+#if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
+    sprintf_s(
+#else
+    sprintf(
+#endif
 		tmp,
 		"%f",this->floatValue
 	);

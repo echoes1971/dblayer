@@ -45,7 +45,11 @@ void IntegerField::setValue(long valore){
 
 string IntegerField::toString() {
 	char tmp[50];
-	sprintf(
+#if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
+    sprintf_s(
+#else
+    sprintf(
+#endif
 		tmp,
 		"%ld",this->longValue
 	);

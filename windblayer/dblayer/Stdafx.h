@@ -9,3 +9,7 @@
 #else
 #pragma comment(lib, "..\\Debug\\schema.lib")
 #endif
+
+#ifdef USE_MYSQL
+//# pragma comment(lib, "C:\\Program Files\\MySQL\\MySQL Connector C 6.0.2\\lib\\opt\\libmysql.lib")
+#endif
