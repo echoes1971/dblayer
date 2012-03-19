@@ -1,5 +1,5 @@
 /***************************************************************************
-**	dbentity.h  v0.1.2 - 2006.05.11
+**	dbentity.h  v0.1.2 - 2011.10.11
 **	-------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
@@ -64,18 +64,75 @@ namespace DBLayer {
         DBEntity(const string* tableName);
         virtual ~DBEntity();
 
+        // 2011.10.10: start.
+        string getColumnType(const string& column_name);
+        ColumnDefinitions getColumns();
+        static string dbeType2dbType(const string& dbetype);
+        static string dbType2dbeType(const string& dbtype);
+        static string dbConstraints2dbeConstraints(map<string,string>& def);
+        static string dbColumnDefinition2dbeColumnDefinition(map<string,string>& def);
+
+        // /** Ritorna il nome della classe */
+        // vedi name() sotto <---- function getTypeName() { return $this->_typeName; }
+
+        /** Returns the column names of the default orderby */
+        virtual DBLayer::StringVector getOrderBy() const;
+        virtual string getOrderByString() const;
+
+        static string uuid2hex(const string& str);
+        static string hex2uuid(const string& a_str);
+
+        /* TODO fare le funzioni qua sotto? */
+//    /**	Ritorna una stringa chiave1=valore1&...&chiaven=valoren */
+//    function getCGIKeysCondition($prefix="field_") {
+//        $mychiavi = is_array( $this->getKeys() ) ? array_keys( $this->getKeys() ) : array();
+//        $clausole = array();	$clausole_index=0;
+//        for( $i=0; $i<count($mychiavi) ; $i++ ) {
+//            $k = $mychiavi[ $i ];
+//            $v = $this->getValue( $k );
+//            $clausole[ $clausole_index++ ] = $prefix.$k."=".urlencode($v);
+//        }
+//        return join( $clausole, "&" );
+//    }
+//    /**	Ritorna una stringa con l'hash (sha1) dei <b>valori</b> della chiave */
+//    function getKeyAsHash() {
+//        $mychiavi = is_array( $this->getKeys() ) ? array_keys( $this->getKeys() ) : array();
+//        $tmp = "";
+//        for( $i=0; $i<count($mychiavi) ; $i++ ) {
+//            $tmp .= $this->getValue( $mychiavi[ $i ] );
+//        }
+//        return sha1( $tmp );
+//    }
+//    /**
+//     *	Data una dbe_master ed una classe di detail, costruisce le clausole CGI
+//     *	per le foreign keys della figlia.
+//     */
+//    function getFKCGIConditionFromMaster( $dbe_master ) {
+//        $ret = array();
+//        $fks = $this->getFKForTable( $dbe_master->getTableName() );
+//        foreach( $fks as $f ) {
+//            $v = $dbe_master->getValue( $f->colonna_riferita );
+//            if ( $v!==null && $v!=='' && $v!==0 ) {
+//                $ret[] = "field_" . $f->colonna_fk . "=" . urlencode($v);
+//            }
+//        }
+//        return join( $ret, "&" );
+//    }
+        // 2011.10.10: end.
+
         /** Ritorna lo schema di appartenenza della tabella */
         virtual const string* getSchemaName();
         virtual string getTableName();
         /** Class name */
         virtual string name();
-        /**	valuesAsAttributes:
-            se true, i valori vengono rappresentati come attributi
-            se false, i valori vengono rappresentati come nodi
+        /**
+         * @param valuesAsAttributes
+         *  se true, i valori vengono rappresentati come attributi
+         *  se false, i valori vengono rappresentati come nodi
         */
         virtual string toString(string prefix="", bool valuesAsAttributes=false);
 
-        /**	Ritorna una nuova istanza della DBE	*/
+        /** @return a new DBE instance */
         virtual DBEntity* createNewInstance();
         virtual Field* createNewField(const string* fieldName, bool valore);
         virtual Field* createNewField(const string* fieldName, float valore);
@@ -90,13 +147,13 @@ namespace DBLayer {
 
         string getStringValue(const string* fieldName);
 
-        /**	Ritorna i campi chiave	*/
-        virtual DBFieldVector* getKeys();
-        /**	Ritorna i NOMI dei campi chiave	*/
-        StringVector getKeyNames();
-        /**	true se il campo e' chiave	*/
-        bool isKey(string nomeCampo);
-        /**	Ritorna le foreign keys	*/
+        /** @return the key fields */
+        virtual DBFieldVector* getKeys() const;
+        /** @return the key fields NAMES */
+        StringVector getKeyNames() const;
+        /** @return true if the field name is key */
+        bool isKey(string fieldName);
+        /** @return the foreign keys */
         virtual ForeignKeyVector* getFK();
         ForeignKeyVector getFKForTable(string tablename);
         /**	Reads the content of the referenced columns in the referenced table
@@ -112,7 +169,7 @@ namespace DBLayer {
         Metodo di appoggio per la <b>copy</b> del DBMgr	*/
         void cleanKeyFields();
 
-        /** Controlla tutti i campi chiave e ritorna true <=> sono tutti vuoti */
+        /** @return true <=> all key fields are empty */
         bool isNew();
 
         virtual void _before_insert(DBMgr* dbmgr=0);
@@ -129,6 +186,9 @@ namespace DBLayer {
 
       protected:
         string tableName;
+
+        /* nome_colonna => array('tipo','constraints', ...) */
+        static ColumnDefinitions _columns;
 
       private:
         string toString_nodes(string prefix);

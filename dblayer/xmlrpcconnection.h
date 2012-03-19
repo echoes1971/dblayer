@@ -84,9 +84,9 @@ class DECLSPECIFIER XmlrpcResultSet : public ResultSet {
     static void valueToString(xmlrpc_c::value* v, std::string* out_string);
     static std::string integer2string(long longValue);
     static std::string double2string(double longValue);
-    static void bytestringToString(xmlrpc_c::value_bytestring* v, std::string* out_string);
-    static void structToString(xmlrpc_c::value_struct* v, std::string* out_string);
-    static void arrayToString(xmlrpc_c::value_array* v, std::string* out_string);
+    static void bytestringToString(xmlrpc_c::value* v, std::string* out_string);
+    static void structToString(xmlrpc_c::value* v, std::string* out_string);
+    static void arrayToString(xmlrpc_c::value* v, std::string* out_string);
   public:
     XmlrpcResultSet();
     virtual ~XmlrpcResultSet();

@@ -26,6 +26,7 @@
 #define IMPORTED_PACKAGES_H
 
 #ifndef DECLSPECIFIER
+# if defined(_WIN32) || defined(__CYGWIN__)
 #  ifdef _WINDLL
 #    define DECLSPECIFIER __declspec(dllexport)
 #    define EXPIMP_TEMPLATE
@@ -33,6 +34,9 @@
 #    define DECLSPECIFIER __declspec(dllimport)
 #    define EXPIMP_TEMPLATE extern
 #  endif
+# else
+#  define DECLSPECIFIER
+# endif
 #endif
 
 #ifdef USE_MYSQL

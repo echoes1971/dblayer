@@ -64,7 +64,11 @@ void ODBCConnection::saveErrorMessage() {
 #ifdef __APPLE__
     SQLINTEGER nErr;
 #else
+ #if (ODBCVER <= 0x0351)
+    SQLINTEGER nErr;
+ #else
     SDWORD nErr;
+#endif
 #endif
     unsigned char msg[SQL_MAX_MESSAGE_LENGTH+1];
     SWORD cbmsg;

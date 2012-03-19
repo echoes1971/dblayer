@@ -30,10 +30,12 @@
 ****************************************************************************/
 
 #include <stdlib.h>
+#include <cstdio> // For sprintf in DBEntity::uuid2hex
 
 #include "dbentity.h"
 using namespace DBLayer;
 
+ColumnDefinitions DBEntity::_columns;
 
 DBEntity::DBEntity() {
     this->tableName = this->tableName.append( "no table name" );
@@ -49,72 +51,72 @@ string DBEntity::getTableName() { return string(tableName); }
 string DBEntity::name() { return "DBEntity"; }
 
 string DBEntity::toString_nodes(string prefix) {
-	string ret( prefix + "<" );
-	ret.append( this->name() ); ret.append( " " );
-	// Keys
-	DBFieldVector* myKeys = this->getKeys();
-	if( myKeys->size()>0 ) {
-		ret.append("_keys=\'{");
-		unsigned int numeroChiavi = (unsigned int) myKeys->size();
-		for(unsigned int i=0; i<numeroChiavi; i++) {
-			ret.append( myKeys->at(i)->getName() );
-			if( i!= (numeroChiavi-1) ) {
-				ret.append(",");
-			}
-		}
-		ret.append("}\' ");
-	}
-	ret.append(">");
-	// Fields
-	for(unsigned int i=0; i<fields.size(); i++) {
-		ret.append( prefix + " <" + fields[i]->getName() + " " );
-		if( this->isKey( fields[i]->getName() ) ) {
-			ret.append( "isKey=\'true\' " );
-		}
+    string ret( prefix + "<" );
+    ret.append( this->name() ); ret.append( " " );
+    // Keys
+    DBFieldVector* myKeys = this->getKeys();
+    if( myKeys->size()>0 ) {
+        ret.append("_keys=\'{");
+        unsigned int numeroChiavi = (unsigned int) myKeys->size();
+        for(unsigned int i=0; i<numeroChiavi; i++) {
+            ret.append( myKeys->at(i)->getName() );
+            if( i!= (numeroChiavi-1) ) {
+                ret.append(",");
+            }
+        }
+        ret.append("}\' ");
+    }
+    ret.append(">");
+    // Fields
+    for(unsigned int i=0; i<fields.size(); i++) {
+        ret.append( prefix + " <" + fields[i]->getName() + " " );
+        if( this->isKey( fields[i]->getName() ) ) {
+            ret.append( "isKey=\'true\' " );
+        }
         ret.append("type=\'");
         switch(fields[i]->getType()) {
-            case Field::STRING:
-                ret.append( "string" );
+          case Field::STRING:
+            ret.append( "string" );
             break;
-            case Field::INTEGER:
-                ret.append( "integer" );
+          case Field::INTEGER:
+            ret.append( "integer" );
             break;
-            case Field::FLOAT:
-                ret.append( "float" );
+          case Field::FLOAT:
+            ret.append( "float" );
             break;
-            case Field::BOOLEAN:
-                ret.append( "boolean" );
+          case Field::BOOLEAN:
+            ret.append( "boolean" );
             break;
-            case Field::DATE:
-                ret.append( "date" );
+          case Field::DATE:
+            ret.append( "date" );
             break;
-            default:
-                ret.append("unknown");
+          default:
+            ret.append("unknown");
             break;
         }
         ret.append("\' ");
-		ret.append(">");
-		switch(fields[i]->getType()) {
-			case Field::STRING:
-				ret.append( fields[i]->getStringValue()->c_str() );
-			break;
-			case Field::INTEGER:
-                ret.append( DBLayer::integer2string( fields[i]->getIntegerValue() ).c_str() );
-			break;
-			case Field::FLOAT:
-				ret.append( fields[i]->toString().c_str() );
-			break;
-			case Field::BOOLEAN:
-				ret.append( fields[i]->toString().c_str() );
-			break;
-			case Field::DATE:
-				ret.append( fields[i]->toString().c_str() );
-			break;
-		}
-		ret.append( "</" + fields[i]->getName() + ">" );
-	}
-	ret.append( prefix + "</" + this->name() + ">" );
-	return ret;
+        ret.append(">");
+        switch(fields[i]->getType()) {
+          case Field::STRING:
+            ret.append( fields[i]->getStringValue()->c_str() );
+            break;
+          case Field::INTEGER:
+            ret.append( DBLayer::integer2string( fields[i]->getIntegerValue() ).c_str() );
+            break;
+          case Field::FLOAT:
+            ret.append( fields[i]->toString().c_str() );
+            break;
+          case Field::BOOLEAN:
+            ret.append( fields[i]->toString().c_str() );
+            break;
+          case Field::DATE:
+            ret.append( fields[i]->toString().c_str() );
+            break;
+        }
+        ret.append( "</" + fields[i]->getName() + ">" );
+    }
+    ret.append( prefix + "</" + this->name() + ">" );
+    return ret;
 }
 
 string DBEntity::toString(string prefix, bool valuesAsAttributes) {
@@ -208,11 +210,11 @@ string DBEntity::getStringValue(const string* fieldName) {
     return ret==0 ? "" : ret->toString();
 }
 
-DBFieldVector* DBEntity::getKeys() {
+DBFieldVector* DBEntity::getKeys() const {
     static DBFieldVector vuoto;
     return &vuoto;
 }
-DBLayer::StringVector DBEntity::getKeyNames() {
+DBLayer::StringVector DBEntity::getKeyNames() const {
     StringVector ret;
     DBFieldVector* chiavi = this->getKeys();
     unsigned int chiaviSize = (unsigned int)chiavi->size();
@@ -222,11 +224,11 @@ DBLayer::StringVector DBEntity::getKeyNames() {
     }
     return ret;
 }
-bool DBEntity::isKey(string nomeCampo) {
+bool DBEntity::isKey(string fieldName) {
     StringVector chiavi = this->getKeyNames();
     bool found = false;
     for(unsigned int i=0; i<chiavi.size() && !found; i++) {
-        found = ( nomeCampo==chiavi[i] );
+        found = ( fieldName==chiavi[i] );
     }
     return found;
 }
@@ -329,6 +331,103 @@ void DBEntity::cleanKeyFields() {
             }
         }
     }
+}
+
+string DBEntity::getColumnType(const string& column_name) {
+    ColumnDefinitions::iterator it = this->_columns.find(column_name);
+    if(it!=this->_columns.end()) {
+        string cerca = (*it).second[0];
+        int parentesi = cerca.find('(');
+        if(parentesi>0) {
+            cerca = cerca.substr(0,parentesi);
+        }
+        if(cerca=="char" || cerca=="varchar" || cerca=="text")
+            return "string";
+        else
+            return cerca;
+    } else {
+        return "";
+    }
+}
+ColumnDefinitions DBEntity::getColumns() { return this->_columns; }
+string DBEntity::dbeType2dbType(const string& dbetype) {
+    string ret = dbetype;
+    if(dbetype=="int")
+        ret = "int(11)";
+    else if(dbetype=="uuid")
+        ret = "varchar(16)";
+    return ret;
+}
+string DBEntity::dbType2dbeType(const string& dbtype) {
+    string ret = dbtype;
+    if(dbtype=="int(11)")
+        ret = "int";
+    else if(dbtype=="varchar(16)")
+        ret = "uuid";
+    return ret;
+}
+
+string DBEntity::dbConstraints2dbeConstraints(map<string,string>& def) {
+    StringVector constraints;
+    if( def["Null"]=="NO") constraints.push_back("not null");
+    if( def.find("Default")!=def.end() ) {
+        string apice ="\'";
+        if( def["Type"]=="int(11)" || def["Type"]=="float")
+            apice = "";
+        constraints.push_back( string("default ").append(apice).append(def["Default"]).append(apice) );
+    } else if(def.find("Default")==def.end() && def["Null"]=="YES") {
+        constraints.push_back("default null");
+    }
+    string glue(" ");
+    return constraints.size()>0 ? DBLayer::joinString(&constraints, &glue) : "";
+}
+string DBEntity::dbColumnDefinition2dbeColumnDefinition(map<string,string>& def) {
+    string constraints = DBEntity::dbConstraints2dbeConstraints(def);
+    return string("'$col'=>array('").append( DBEntity::dbType2dbeType(def["Type"]) ).append("',")
+            .append( constraints.length()>0 ? constraints : "" )
+            .append("),\n");
+}
+DBLayer::StringVector DBEntity::getOrderBy() const { return this->getKeyNames(); }
+string DBEntity::getOrderByString() const {
+    string glue(",");
+    DBLayer::StringVector tmp = this->getOrderBy();
+    return DBLayer::joinString(&tmp, &glue);
+}
+string DBEntity::uuid2hex(const string& str) {
+    if(str.length()==0) return str;
+    int str_len = str.length();
+    if(str_len<4) return str;
+    if(str.substr(0,4)=="uuid")
+        return str;
+    string hex = "";
+    int i = 0;
+    do {
+        char tmp[20];
+    #if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
+        sprintf_s(tmp,"%x",str.c_str()[i]);
+    #else
+        sprintf(tmp,"%x",str.c_str()[i]);
+    #endif
+        hex.append(tmp);
+        i++;
+    } while (i<str_len);
+    return string("uuid").append(hex);
+}
+string DBEntity::hex2uuid(const string& str) {
+    int str_len = str.length();
+    if(str_len==0 || str_len<4 || str.substr(0,4)!="uuid")
+        return str;
+    string tmp = str.substr(4);
+    string bin;
+    int i = 0;
+    str_len = tmp.length();
+    do {
+        unsigned long x = strtoul( tmp.substr(i,2).c_str(), 0, 16 );
+        char c = char(x);
+        bin.append( &c );
+        i+=2;
+    } while(i<str_len);
+    return bin;
 }
 
 bool DBEntity::isNew() {

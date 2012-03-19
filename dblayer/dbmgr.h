@@ -54,6 +54,7 @@ class DECLSPECIFIER DBMgr {
         bool verbose;
         DBEFactory* dbeFactory;
         string _schema;
+        DBEntity* _dbeuser;
 
         string _buildTableName(DBEntity* dbe);
         string _buildKeysCondition(DBEntity* dbe);
@@ -94,8 +95,105 @@ class DECLSPECIFIER DBMgr {
         void setVerbose(bool b);
         DBEFactory* getDBEFactory();
         DBEntityVector getRegisteredTypes();
+        /** get clazz by table name */
         DBEntity* getClazz(string* typeName);
         DBEntity* getClazzByTypeName(string* typeName);
+
+        DBEntity* getDBEUser();
+        void setDBEUser(DBEntity* dbe);
+//        function getUserGroupsList() { return $this->user_groups_list; }
+//        function setUserGroupsList($user_groups_list) { $this->user_groups_list = $user_groups_list; }
+//        /** The logged user has the requested group_id ? */
+//        function hasGroup($group_id) { return in_array(DBEntity::uuid2hex($group_id),$this->user_groups_list); }
+//        function addGroup($group_id) { if(!in_array($group_id,$this->user_groups_list)) $this->user_groups_list[]=$group_id; }
+
+        ColumnDefinitions getColumnsForTable(const string& tablename);
+
+//	function getColumnName( $tablename, $num_column ) {
+//		$this->connect();
+//		if ($this->tipo_dbms=='PG') {
+//			return -1;
+//		} else if ($this->tipo_dbms=='MYSQL') {
+//			$ret="";
+//			$result = mysql_query("SHOW COLUMNS FROM $tablename",$this->conn);
+//			if ($result===false) {
+//				echo 'Could not run query: ' . mysql_error();
+//				return $ret;
+//			}
+//			if (mysql_num_rows($result) > 0) {
+//				$colonna=1;
+//				while ($row = mysql_fetch_assoc($result)) {
+//					if($colonna==$num_column) {
+//						$ret=$row["Field"];
+//						break;
+//					}
+//					$colonna++;
+//				}
+//			}
+//			echo "mysql_num_rows(result): ".$ret."\n";
+//			return $ret;
+//		}
+//	}
+//	function getColumnSize( $tablename ) {
+//		$this->connect();
+//		if ($this->tipo_dbms=='PG') {
+//			return -1;
+//		} else if ($this->tipo_dbms=='MYSQL') {
+//			$ret=-1;
+//			$result = mysql_query("SHOW COLUMNS FROM $tablename",$this->conn);
+//			if ($result===false) {
+//				echo 'Could not run query: ' . mysql_error();
+//				return $ret;
+//			}
+//			$ret = mysql_num_rows($result);
+//			echo "mysql_num_rows(result): ".$ret."\n";
+//			return $ret;
+//		}
+//	}
+//	function getKeys( $tablename ) {
+//		$this->connect();
+//		if ($this->tipo_dbms=='PG') {
+//			return array("TODO");
+//		} else if ($this->tipo_dbms=='MYSQL') {
+//			$ret=array();
+//			$result = mysql_query("SHOW COLUMNS FROM $tablename",$this->conn);
+//			if ($result===false) {
+//				echo 'Could not run query: ' . mysql_error();
+//				return $ret;
+//			}
+//			if (mysql_num_rows($result) > 0) {
+//				$colonna=0;
+//				while ($row = mysql_fetch_assoc($result)) {
+//					if($row["Key"]=="PRI")
+//						$ret[]=$colonna;
+//					$colonna++;
+//				}
+//			}
+//			return $ret;
+//		}
+//	}
+//	function getForeignKeys( $tablename ) {
+//		$this->connect();
+//		if ($this->tipo_dbms=='PG') {
+//			return array("TODO");
+//		} else if ($this->tipo_dbms=='MYSQL') {
+//			$ret=array();
+//			$result = mysql_query("SHOW COLUMNS FROM $tablename",$this->conn);
+//			if ($result===false) {
+//				echo 'Could not run query: ' . mysql_error();
+//				return $ret;
+//			}
+//			if (mysql_num_rows($result) > 0) {
+//				$colonna=0;
+//				while ($row = mysql_fetch_assoc($result)) {
+//					if($row["Key"]=="MUL")
+//						$ret[]=$colonna;
+//					$colonna++;
+//				}
+//			}
+//			return $ret;
+//		}
+//	}
 
         DBEntity* Insert(DBEntity *dbe);
         DBEntity* Update(DBEntity *dbe);
@@ -117,6 +215,56 @@ class DECLSPECIFIER DBMgr {
 
         void setSchema(string schema);
         string getSchema();
+
+//        function getNextId(&$dbe) {
+//		$nomeTabella = $this->_schema . "_seq_id";
+//		$tmp = $this->_select( get_class( $dbe ), $nomeTabella, "select id from $nomeTabella where name=''" );
+//		$myid = count($tmp)>0 ? $tmp[0]->getValue('id') + 1 : 1;
+//		if ($this->_verbose) { print "DBMgr.getNextId: nomeTabella=$nomeTabella<br />\n"; }
+//		if ($this->_verbose) { print "DBMgr.getNextId: count(tmp)=".count($tmp)."<br />\n"; }
+//		if(count($tmp)==0)
+//			$this->db_query( "insert into $nomeTabella (id,name) values($myid,'') " );
+//		else
+//			$this->db_query( "update $nomeTabella set id=$myid where name='' " );
+//		return $myid;
+//	}
+//	/**
+//	 * SE esiste uniqid, la usa per generare l'uuid,
+//	 * altrimenti usa la vecchia getNextId
+//	 * @date 2010.07.27
+//	 */
+//	function getNextUuid(&$dbe, $prefix="",$length=16) {
+//		if(strlen($prefix)==0)
+//			$prefix=$_SERVER['SERVER_NAME'];
+//		$ret="$prefix.";
+//		if(function_exists("uniqid")) {
+//			$ret.=uniqid();
+//		} else {
+//			$ret.=$this->getNextId($dbe);
+//		}
+//		if(strlen($ret)>$length)
+//			$ret=substr($ret,-1*$length);
+//		elseif(strlen($ret)<$length)
+//			$ret = sprintf("%-16s", $ret);
+//		return $ret;
+//	}
+
+//        /**
+//	 * Date le chiavi di una dbe, controlla se esiste gia una entry nel DB
+//	 * @date 2007.07.27
+//	 */
+//	function exists($dbe) {
+//		$ret=false;
+//		$myclausole = $this->_buildKeysCondition($dbe);
+//		if ( strlen($myclausole)==0 )
+//			return $ret;
+//		$mytablename = $this->_buildTableName($dbe); // 2009.12.15 $dbe->getTableName();
+//		$query = "select count(*) as numero from $mytablename where $myclausole";
+//		$classname = $dbe->getTypeName()>"" ? $dbe->getTypeName() : get_class( $dbe );
+//		$tmp=$this->select($classname, $mytablename, $query);
+//		$ret = $tmp[0]->getValue('numero')>0;
+//		return $ret;
+//	}
 };
 
 }

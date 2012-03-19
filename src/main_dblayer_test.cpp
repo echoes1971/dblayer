@@ -213,7 +213,6 @@ void testGetForeignKeys(string host,string dbname,string usr,string pwd, string 
     testGetForeignKeys(connString, relname);
 }
 
-
 void testDBMgr(string connString) {
     DBLayer::Connection* con;
     DBMgr* dbmgr;
@@ -545,6 +544,54 @@ void testCRUD(string host,string dbname,string usr,string pwd) {
     testCRUD( connString );
 }
 
+void testGetColumnsForTable(string connString, string relname) {
+    Connection* con;
+    DBMgr* dbmgr;
+    DBEFactory* dbeFactory;
+
+    int fieldCreati = SchemaNS::getFieldCreati();
+    int fieldDistrutti = SchemaNS::getFieldDistrutti();
+    int schemiCreati = SchemaNS::getSchemiCreati();
+    int schemiDistrutti = SchemaNS::getSchemiDistrutti();
+    printf("::testGetColumnsForTable: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+
+    con = DBLayer::createConnection( connString.c_str() );
+
+    dbmgr = new DBLayer::DBMgr(con, false);
+
+    dbeFactory = new DBEFactory();
+    dbeFactory->registerClass("societa",new DBESocieta());
+    dbeFactory->registerClass("test_dblayer",new DBETestDBLayer());
+
+    dbmgr->setDBEFactory(dbeFactory);
+    cout << "testGetColumnsForTable: Creata DBEFactory." << endl;
+    printf("::testGetColumnsForTable: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+
+    if ( dbmgr->connect() ) {
+        // Insert
+        cout << endl;
+        cout << "testGetColumnsForTable: recupero le definizioni per la tabella " << relname << endl;
+        ColumnDefinitions cols = dbmgr->getColumnsForTable(relname);
+
+        for(ColumnDefinitions::iterator it = cols.begin(); it!=cols.end(); it++) {
+            cout << (*it).first << endl;
+            string glue(",");
+            cout << "  " << joinString( (DBLayer::StringVector*) &((*it).second),&glue) << endl;
+        }
+
+    } else {
+        cout << "testGetColumnsForTable: ERRORE " << dbmgr->getErrorMessage() << endl;
+    }
+    printf("::testGetColumnsForTable: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+    delete dbmgr;
+    delete dbeFactory;
+    printf("::testGetColumnsForTable: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+    delete con;
+}
+void testGetColumnsForTable(string host,string dbname,string usr,string pwd, string relname) {
+    string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
+    testGetColumnsForTable( connString, relname );
+}
 
 
 
@@ -582,7 +629,7 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-
+/*
     cout << "---------------->>  testGetKeys" << endl;
     if(argc==5) {
         testGetKeys( host, dbname, usr, pwd, string("societa") );
@@ -653,6 +700,18 @@ int main(int argc, char *argv[]) {
     } else {
         testGetForeignKeys( connString, "test_dblayer" );
         testGetForeignKeys( connString, "societa" );
+    }
+*/
+    cout << "---------------->>  testGetColumnsForTable" << endl;
+    if( argc==5 ) {
+        testGetColumnsForTable( host, dbname, usr, pwd, "test_dblayer" );
+        testGetColumnsForTable( host, dbname, usr, pwd, "societa" );
+        testGetColumnsForTable( host, dbname, usr, pwd, "rra_users" );
+    } else {
+        testGetColumnsForTable( connString, "test_dblayer" );
+        testGetColumnsForTable( connString, "societa" );
+        testGetColumnsForTable( connString, "rra_users" );
+        //testGetColumnsForTable( connString, "rra_people" );
     }
 
     return EXIT_SUCCESS;

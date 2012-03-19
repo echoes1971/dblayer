@@ -218,6 +218,70 @@ ResultSet* SQLiteConnection::exec(const string s) {
 
 string SQLiteConnection::escapeString(string s) { return DBLayer::replaceAll(s, "\'", "\'\'"); }
 
+/* Name, type, null, key (PRI,MUL), default */
+ColumnDefinitions SQLiteConnection::getColumnsForTable(const string& tablename) {
+    ColumnDefinitions ret;
+#ifdef WIN32
+    size_t errorCode = SQLITE_OK;
+#else
+    int errorCode = SQLITE_OK;
+#endif
+
+    cout << "SQLiteConnection::getColumnsForTable: cols = ..." << endl;
+    int cols = this->getColumnSize((string*) &tablename);
+    cout << "SQLiteConnection::getColumnsForTable: cols = " << cols << endl;
+    for(int c=1; c<=cols && errorCode==SQLITE_OK; c++) {
+        StringVector row;
+        string columnName = this->getColumnName((string*) &tablename,c);
+        //cout << "SQLiteConnection::getColumnsForTable: columnName = " << columnName << endl;
+        char const *pzDataType = 0;
+        char const *pzCollSeq = 0;
+        int notNull = 0;
+        int primaryKey = 0;
+        int autoinc = 0;
+        try {
+            errorCode = sqlite3_table_column_metadata(
+                        this->db,
+                        0,
+                        tablename.c_str(),
+                        columnName.c_str(),
+                        &pzDataType,    /* OUTPUT: Declared data type */
+                        &pzCollSeq,     /* OUTPUT: Collation sequence name */
+                        &notNull,       /* OUTPUT: True if NOT NULL constraint exists */
+                        &primaryKey,    /* OUTPUT: True if column part of PK */
+                        &autoinc        /* OUTPUT: True if column is auto-increment */
+                    );
+            if( errorCode!=SQLITE_OK ) {
+                cout << "SQLiteConnection::getColumnsForTable: errorCode = " << errorCode << endl;
+                this->errorMessage.append(
+                            "errorCode: "+ DBLayer::integer2string((long)errorCode) +
+                            "; msg: " + sqlite3_errmsg(this->db)
+                            );
+                cout << "SQLiteConnection::getColumnsForTable: errorMessage = " << this->errorMessage << endl;
+                cout << "SQLiteConnection::getColumnsForTable: error columnName = " << columnName << endl;
+                break;
+            }
+        } catch(exception e) {
+            cerr << "SQLiteConnection::getColumnsForTable: exception = " << e.what() << endl;
+        }
+        printf("SQLiteConnection::getColumnsForTable: %s,%s,%s,%s,%s,%s,%s\n"
+               ,tablename.c_str(),columnName.c_str()
+               ,pzDataType
+               ,pzCollSeq
+               ,(notNull>0?"not null":"null")
+               ,(primaryKey>0?"PRI":"")
+               ,(autoinc>1?"autoincr":""));
+        row.push_back(columnName);
+        row.push_back(pzDataType);
+        row.push_back(notNull>0?"not null":"null");
+        row.push_back(primaryKey>0?"PRI":"");
+
+        ret[columnName]=row;
+    }
+
+    return ret;
+}
+
 int SQLiteConnection::getColumnSize(string* relname) {
     int ret=-1;
 #ifdef WIN32
@@ -225,7 +289,7 @@ int SQLiteConnection::getColumnSize(string* relname) {
 #else
     int errorCode;
 #endif
-    string s = string("select * from ");
+    string s("select * from ");
     s.append( relname->c_str() );
     const char* query = s.c_str();
     const char* zTail = 0;

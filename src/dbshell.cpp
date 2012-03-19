@@ -216,8 +216,9 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
             dbShell->cmdOut.append("//*********************** ").append(typeName).append(": start.\n");
             DBLayer::IntegerVector chiavi = dbShell->con->getKeys( &fullTableName );
             StringVector lista_nomi_chiavi = dbShell->con->getKeysNames( &fullTableName );
+            string myglue("\"), string(\"");
             dbShell->cmdOut.append("const string ").append(typeName).append("::nomiCampiChiave[] = { string(\"")
-                    .append( DBLayer::joinString(&lista_nomi_chiavi,&string("\"), string(\"")) )
+                    .append( DBLayer::joinString(&lista_nomi_chiavi,&myglue) )
                     .append( "\") };\n" );
 
             int num_chiave=0;
@@ -242,7 +243,7 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
             dbShell->cmdOut.append("DBFieldVector ").append(typeName).append("::chiavi = ").append(typeName).append("::___init_keys();\n");
             dbShell->cmdOut.append("DBFieldVector ").append(typeName).append("::___init_keys() {");
             dbShell->cmdOut.append(" DBFieldVector ret;"); //ret = DBFieldVector();");
-            dbShell->cmdOut.append(" ").append(DBLayer::joinString(&append_chiavi,&string(" ")));
+            string myglue2(" "); dbShell->cmdOut.append(" ").append(DBLayer::joinString(&append_chiavi,&myglue2));
             dbShell->cmdOut.append(" return ret; }\n");
             dbShell->cmdOut.append("").append(typeName).append("::").append(typeName).append("() { this->tableName.clear(); }\n");
             dbShell->cmdOut.append("").append(typeName).append("::~").append(typeName).append("() {}\n");
@@ -268,7 +269,7 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
     }
     dbShell->cmdOut.append("string ").append(mySchemaName).append("::getSchema() { return \"").append(dbSchemaName).append("\"; }\n");
     dbShell->cmdOut.append("void ").append(mySchemaName).append("::registerClasses(DBEFactory* dbeFactory) {\n");
-    dbShell->cmdOut.append("  ").append(DBLayer::joinString(&myRegisterClasses,&string("\n  "))).append("\n");
+    string myglue("\n  "); dbShell->cmdOut.append("  ").append(DBLayer::joinString(&myRegisterClasses,&myglue)).append("\n");
     dbShell->cmdOut.append("}\n");
     dbShell->cmdOut.append("\n");
 

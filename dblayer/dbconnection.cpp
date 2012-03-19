@@ -149,6 +149,11 @@ string* Connection::escapeString(string* s) { return s; }
 string Connection::escapeString(string s) { return DBLayer::replaceAll(s, "\'", "\'\'"); }
 string Connection::quoteDate(string s) { return "'"+DBLayer::replaceAll(s, " 00:00:00", "")+"'"; }
 
+ColumnDefinitions Connection::getColumnsForTable(const string& tablename) {
+    ColumnDefinitions ret;
+    return ret;
+}
+
 int Connection::getColumnSize(string* relname) { return -1; }
 string Connection::getColumnName(string* relname, int column) { return string(""); }
 
@@ -240,13 +245,60 @@ bool PGConnection::reconnect() {
     return true;
 }
 
+/* Name, type, null, key (PRI,MUL), default */
+/*
+select a.*, b.adsrc
+  from pg_attribute a join pg_class c on (a.attrelid=c.oid)
+       left join pg_attrdef b on (a.attnum=b.adnum and a.attrelid=b.adrelid)
+ where relname='rra_users' and attnum>0
+ order by a.attnum
+*/
+ColumnDefinitions PGConnection::getColumnsForTable(const string& tablename) {
+    ColumnDefinitions ret;
+    DBLayer::ResultSet* res;
+
+    string myquery;
+    myquery.append("select a.attname as nome, a.atttypid as tipo, a.attnotnull as nullo, a.atthasdef as hasdefault, b.adsrc as valoredefault")
+            .append("  from pg_attribute a join pg_class c on (a.attrelid=c.oid)")
+            .append("       left join pg_attrdef b on (a.attnum=b.adnum and a.attrelid=b.adrelid)")
+            .append(" where c.relname=\'").append( tablename.c_str() ).append("\' and a.attnum>0")
+            .append(" order by a.attnum");
+    res = this->exec(myquery);
+    //cout << res->toString() << endl;
+
+    if( !this->hasErrors() ) {
+        for(int r=0; r<res->getNumRows(); r++) {
+            StringVector row;
+            int c=0;
+            row.push_back( res->getValue(r,c++) );
+            row.push_back( PGConnection::pgtype2string( atoi( res->getValue(r,c++).c_str() ) ) );
+            if( res->getValue(r,c++)=="t" )
+                row.push_back("not null");
+            else
+                row.push_back("");
+            if(res->getValue(r,c++)=="t") // has default?
+                //TODO: eliminare le parti in piu di postgresql
+                row.push_back( res->getValue(r,c++) );
+            else
+                row.push_back( "\\N" );
+            ret[ res->getValue(r,0) ] = row;
+        }
+    } else {
+        //cout << "Errori: " << this->getErrorMessage() << endl;
+    }
+
+    delete res;
+    return ret;
+}
+
 int PGConnection::getColumnSize(string* relname) {
     int ret = -1;
     DBLayer::ResultSet* res;
 
-    string myquery = string("select count(*) as numero from pg_attribute a join pg_class c on (a.attrelid=c.oid) where relname='");
-    myquery.append( relname->c_str() );
-    myquery.append("' and attnum>0");
+    string myquery;
+    myquery.append("select count(*) as numero")
+            .append("  from pg_attribute a join pg_class c on (a.attrelid=c.oid)")
+            .append(" where relname='").append( relname->c_str() ).append("' and attnum>0");
     res = this->exec(myquery);
 
     if( !this->hasErrors() ) {
@@ -263,10 +315,10 @@ string PGConnection::getColumnName(string* relname, int column) {
     char numColonna[50];
     sprintf( numColonna, "%d", column );
 
-    string myquery = string("select a.attname as numero from pg_attribute a join pg_class c on (a.attrelid=c.oid) where relname=\'");
-    myquery.append( relname->c_str() );
-    myquery.append("\' and attnum=");
-    myquery.append(string(numColonna));
+    string myquery;
+    myquery.append("select a.attname as numero")
+            .append("  from pg_attribute a join pg_class c on (a.attrelid=c.oid)")
+            .append(" where relname=\'").append( relname->c_str() ).append("\' and attnum=").append(string(numColonna));
     res = this->exec(myquery);
 
     if( !this->hasErrors() ) {
@@ -311,6 +363,50 @@ IntegerVector PGConnection::getKeys(string* relname) {
     return ret;
 }
 
+/*int PGConnection::protocolVersion() {
+	return PQprotocolVersion( this->conn );
+}
+int PGConnection::serverVersion() {
+	return PQserverVersion( this->conn );
+}*/
+string PGConnection::pgtype2string(int t) {
+    switch( t ) {
+    case 16:
+        return DBLayer::type_boolean;
+        break;
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+    case 26:
+        return DBLayer::type_integer;
+        break;
+    case 700:
+    case 701:
+        return DBLayer::type_double;
+        break;
+    case 18:
+    case 19:
+    case 25:
+    case 1042:
+    case 1043:
+        return DBLayer::type_string;
+        break;
+    case 702:
+    case 703:
+    case 704:
+    case 1082:
+    case 1083:
+    case 1114:
+    case 1184:
+    case 1266:
+        return DBLayer::type_datetime;
+        break;
+    default:
+        printf("DBLayer::PGConnection::pgtype2string: unknown type = %d\n", t );
+        return DBLayer::type_blob;
+    }
+}
 int PGConnection::clientEncoding() { return PQclientEncoding( this->conn ); }
 int PGConnection::setClientEncoding(string s) { return PQsetClientEncoding( this->conn, s.c_str() ); }
 
@@ -320,17 +416,9 @@ int PGConnection::setClientEncoding(string s) { return PQsetClientEncoding( this
 ResultSet::ResultSet() {}
 ResultSet::~ResultSet() {}
 int ResultSet::getNumColumns() { return (int) this->columnName.size();}
-int ResultSet::getNumRows() {
-    if( this->columnName.size()!=0 )
-        return (int) ( this->righe.size() / this->columnName.size() );
-    else
-        return 0;
-}
+int ResultSet::getNumRows() { return this->columnName.size()!=0 ? (int) ( this->righe.size() / this->columnName.size() ) : 0; }
 string ResultSet::getValue(int row, int column) { return this->righe.at( row * this->columnName.size() + column ); }
-string ResultSet::getValue(int row, string* columnName) {
-    int column = this->getColumnIndex(columnName);
-    return this->getValue(row, column);
-}
+string ResultSet::getValue(int row, string* columnName) { return this->getValue(row, this->getColumnIndex(columnName)); }
 string ResultSet::getColumnName(int i) { return this->columnName[i]; }
 string ResultSet::getColumnType(int i) { return this->columnType[i]; }
 int ResultSet::getColumnSize(int i) { return this->columnSize[i]; }
@@ -418,42 +506,43 @@ string PGResultSet::getColumnName(int i) { return string( PQfname(this->res, i) 
 /*	I tipi di postgres si vedono con la query: select oid,typname from pg_type	*/
 string PGResultSet::getColumnType(int i) {
     int mytype = (int) PQftype( this->res, i );
-    switch( mytype ) {
-    case 16:
-        return DBLayer::type_boolean;
-        break;
-    case 20:
-    case 21:
-    case 22:
-    case 23:
-    case 26:
-        return DBLayer::type_integer;
-        break;
-    case 700:
-    case 701:
-        return DBLayer::type_double;
-        break;
-    case 18:
-    case 19:
-    case 25:
-    case 1042:
-    case 1043:
-        return DBLayer::type_string;
-        break;
-    case 702:
-    case 703:
-    case 704:
-    case 1082:
-    case 1083:
-    case 1114:
-    case 1184:
-    case 1266:
-        return DBLayer::type_datetime;
-        break;
-    default:
-        printf("DBLayer::PGResultSet::getColumnType: unknown type = %d\n", mytype );
-        return DBLayer::type_blob;
-    }
+    return PGConnection::pgtype2string(mytype);
+//    switch( mytype ) {
+//    case 16:
+//        return DBLayer::type_boolean;
+//        break;
+//    case 20:
+//    case 21:
+//    case 22:
+//    case 23:
+//    case 26:
+//        return DBLayer::type_integer;
+//        break;
+//    case 700:
+//    case 701:
+//        return DBLayer::type_double;
+//        break;
+//    case 18:
+//    case 19:
+//    case 25:
+//    case 1042:
+//    case 1043:
+//        return DBLayer::type_string;
+//        break;
+//    case 702:
+//    case 703:
+//    case 704:
+//    case 1082:
+//    case 1083:
+//    case 1114:
+//    case 1184:
+//    case 1266:
+//        return DBLayer::type_datetime;
+//        break;
+//    default:
+//        printf("DBLayer::PGResultSet::getColumnType: unknown type = %d\n", mytype );
+//        return DBLayer::type_blob;
+//    }
 }
 
 int PGResultSet::getColumnSize(int i) { return PQfsize(this->res, i); }

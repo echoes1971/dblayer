@@ -46,19 +46,22 @@ namespace DBLayer {
 		SQLiteConnection(string s);
 		virtual ~SQLiteConnection();
 
-		virtual bool connect();
-		virtual bool disconnect();
+    // Override: start.
+    bool connect();
+    bool disconnect();
 
-		virtual ResultSet* exec(const string s);
-		/** Chiude la connessione corrente e la riapre */
-		virtual bool reconnect();
+    ResultSet* exec(const string s);
+    /** Chiude la connessione corrente e la riapre */
+    bool reconnect();
 
-		virtual string escapeString(string s);
+    string escapeString(string s);
 
-		virtual int getColumnSize(string* relname);
-		virtual string getColumnName(string* relname, int column);
-		virtual IntegerVector getKeys(string* relname);
-		virtual IntegerVector getForeignKeys(string* relname);
+    ColumnDefinitions getColumnsForTable(const string& tablename);
+    int getColumnSize(string* relname);
+    string getColumnName(string* relname, int column);
+    IntegerVector getKeys(string* relname);
+    IntegerVector getForeignKeys(string* relname);
+    // Override: end.
 
 	  private:
 		sqlite3* db;

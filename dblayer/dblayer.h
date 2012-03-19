@@ -54,6 +54,9 @@ namespace DBLayer {
     typedef DECLSPECIFIER vector<int>    IntegerVector;
     typedef DECLSPECIFIER vector<string> StringVector;
 
+    /* Name, type, null, key (PRI,MUL), default */
+    typedef DECLSPECIFIER map<string,StringVector> ColumnDefinitions; // 2011.10.10
+
     DECLSPECIFIER string lowerCase(string& s);
     DECLSPECIFIER string upperCase(string& s);
     DECLSPECIFIER string capitalizeCase(string& s);

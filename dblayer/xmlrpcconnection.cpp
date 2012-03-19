@@ -98,7 +98,7 @@ bool XmlrpcConnection::disconnect() { this->connected=false; return true; }
 bool XmlrpcConnection::reconnect() { return this->connect(); }
 
 ResultSet* XmlrpcConnection::exec(const string s) {
-    XmlrpcResultSet* rs = new XmlrpcResultSet();
+    // 2011.09.26 - XmlrpcResultSet* rs = new XmlrpcResultSet();
     xmlrpc_c::value result;
     this->errorMessage.clear();
     try {
@@ -229,10 +229,9 @@ XmlrpcResultSet* XmlrpcConnection::list2resultset(xmlrpc_c::value_array* iLista,
                 break;
             case xmlrpc_c::value::TYPE_BYTESTRING:
                 if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_string );
-                XmlrpcResultSet::bytestringToString( &xmlrpc_c::value_bytestring( i->second ), &my_string );
+                XmlrpcResultSet::bytestringToString( (xmlrpc_c::value*) &(i->second), &my_string );
                 ioResultSet->righe.push_back( my_string );
                 break;
-            //default:
             //	case xmlrpc_c::value::TYPE_ARRAY:
             //	case xmlrpc_c::value::TYPE_STRUCT:
             //	case xmlrpc_c::value::TYPE_DATETIME:
@@ -242,7 +241,8 @@ XmlrpcResultSet* XmlrpcConnection::list2resultset(xmlrpc_c::value_array* iLista,
             //	case xmlrpc_c::value::TYPE_DEAD:
             default:
                 if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_blob );
-                XmlrpcResultSet::valueToString( &xmlrpc_c::value(i->second), &my_string );
+                xmlrpc_c::value tmp_value = xmlrpc_c::value(i->second);
+                XmlrpcResultSet::valueToString( &tmp_value, &my_string );
                 ioResultSet->righe.push_back( my_string );
                 break;
             }
@@ -351,15 +351,16 @@ std::string XmlrpcResultSet::double2string(double longValue) {
     return parte_intera + std::string( (char*)&tmp[i+1] );
 }
 
-void XmlrpcResultSet::bytestringToString(xmlrpc_c::value_bytestring* v, std::string* out_string) {
-    for(unsigned int i=0; i<v->length(); i++) {
-        const char c( v->vectorUcharValue().at(i));
+void XmlrpcResultSet::bytestringToString(xmlrpc_c::value* v, std::string* out_string) {
+    xmlrpc_c::value_bytestring my_bytestring( (*v) );
+    for(unsigned int i=0; i<my_bytestring.length(); i++) {
+        const char c( my_bytestring.vectorUcharValue().at(i));
         out_string->push_back( c );
     }
 }
-
-void XmlrpcResultSet::structToString(xmlrpc_c::value_struct* v, std::string* out_string) {
-    std::map<std::string, xmlrpc_c::value> m = (std::map<std::string, xmlrpc_c::value>) (*v);
+void XmlrpcResultSet::structToString(xmlrpc_c::value* v, std::string* out_string) {
+    xmlrpc_c::value_struct my_value( (*v) );
+    std::map<std::string, xmlrpc_c::value> m = (std::map<std::string, xmlrpc_c::value>) my_value;
     out_string->append("{");
     std::map<std::string, xmlrpc_c::value>::const_iterator i;
     for(i=m.begin(); i!=m.end(); ++i) {
@@ -370,12 +371,12 @@ void XmlrpcResultSet::structToString(xmlrpc_c::value_struct* v, std::string* out
     }
     out_string->append("}");
 }
-
-void XmlrpcResultSet::arrayToString(xmlrpc_c::value_array* v, std::string* out_string) {
+void XmlrpcResultSet::arrayToString(xmlrpc_c::value* v, std::string* out_string) {
+    xmlrpc_c::value_array my_value( (*v) );
     out_string->append("[");
-    for(unsigned int i=0; i<v->size(); i++) {
-        valueToString( &(v->vectorValueValue().at(i)), out_string );
-        if(i<(v->size() - 1)) out_string->append(",");
+    for(unsigned int i=0; i<my_value.size(); i++) {
+        valueToString( &(my_value.vectorValueValue().at(i)), out_string );
+        if(i<(my_value.size() - 1)) out_string->append(",");
     }
     out_string->append("]");
 }
@@ -391,16 +392,21 @@ void XmlrpcResultSet::valueToString(xmlrpc_c::value* v, std::string* out_string)
         out_string->append( double2string( (double) ((float) xmlrpc_c::value_double(*v)) ) );
         break;
       case xmlrpc_c::value::TYPE_STRING:
+        //out_string->append("\"");
+#ifdef XMLRPCC_HAVE_CRLF
         out_string->append( xmlrpc_c::value_string(*v).crlfValue() );
+#else
+        out_string->append( (string) xmlrpc_c::value_string(*v) ); // BOH
+#endif
         break;
       case xmlrpc_c::value::TYPE_BYTESTRING:
-        bytestringToString( &xmlrpc_c::value_bytestring( (*v) ), out_string );
+        bytestringToString( v , out_string );
         break;
       case xmlrpc_c::value::TYPE_ARRAY:
-        arrayToString( &xmlrpc_c::value_array( (*v) ), out_string );
+        arrayToString( v, out_string );
         break;
       case xmlrpc_c::value::TYPE_STRUCT:
-        structToString( &xmlrpc_c::value_struct( (*v) ), out_string );
+        structToString( v, out_string );
         break;
 //      case xmlrpc_c::value::TYPE_DATETIME:
 //      case xmlrpc_c::value::TYPE_C_PTR:

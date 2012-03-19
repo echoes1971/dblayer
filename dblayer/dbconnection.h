@@ -94,17 +94,19 @@ namespace DBLayer {
             PGResultSet();
             PGResultSet(PGresult* res);
             virtual ~PGResultSet();
-            virtual int getNumColumns();
-            virtual int getNumRows();
-            virtual string getValue(int row, int column);
-            virtual int getLength(int row, int column);
-            virtual bool isNull(int row, int column);
-            virtual string getColumnName(int i);
-            virtual int getColumnIndex(string* columnName );
-            virtual string getColumnType(int i);
-            virtual int getColumnSize(int i);
-            virtual string getErrorMessage();
-            virtual string getStatus();
+            // Override: start.
+            int getNumColumns();
+            int getNumRows();
+            string getValue(int row, int column);
+            int getLength(int row, int column);
+            bool isNull(int row, int column);
+            string getColumnName(int i);
+            int getColumnIndex(string* columnName );
+            string getColumnType(int i);
+            int getColumnSize(int i);
+            string getErrorMessage();
+            string getStatus();
+            // Override: start.
     };
 #endif
 
@@ -144,6 +146,7 @@ namespace DBLayer {
             virtual string escapeString(string s);
             virtual string quoteDate(string s);
 
+            virtual ColumnDefinitions getColumnsForTable(const string& tablename);
             /** Ritorna il numero di colonne di una tabella */
             virtual int getColumnSize(string* relname);
             /** @param column 1..n */
@@ -187,21 +190,28 @@ namespace DBLayer {
                 PGConnection(string s);
                 ~PGConnection();
 
-                virtual bool connect();
-                virtual bool disconnect();
-                virtual ResultSet* exec(const string s);
+        // Overridden: start.
+        bool connect();
+        bool disconnect();
+        ResultSet* exec(const string s);
                 /** Force the write buffer to be written (or at least try) */
-                virtual bool flush();
+        bool flush();
                 /** Chiude la connessione corrente e la riapre */
-                virtual bool reconnect();
+        bool reconnect();
 
-                virtual string escapeString(string s);
+        // virtual string* escapeString(string* s);
+        string escapeString(string s);
 
-                virtual int getColumnSize(string* relname);
-                virtual string getColumnName(string* relname, int column);
-                virtual IntegerVector getKeys(string* relname);
+        ColumnDefinitions getColumnsForTable(const string& tablename);
+        int getColumnSize(string* relname);
+        string getColumnName(string* relname, int column);
+        IntegerVector getKeys(string* relname);
+        // Overridden: end.
 
                 // PG Functions
+        static string pgtype2string(int t);
+        // int protocolVersion();
+        // int serverVersion();
                 int clientEncoding();
                 int setClientEncoding(string s);
 	};

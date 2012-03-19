@@ -71,9 +71,12 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     string host,dbname,usr,pwd;
-    string connString("dblayer:sqlite:./examples/test.db");
+    //string connString("dblayer:sqlite:./examples/test.db");
     //string connString("dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;");
+    //string connString("dblayer:mysql:host=localhost;dbname=fav;user=root;password=;");
     //string connString("dblayer:pg:host=localhost dbname=roberto user=roberto password=roberto");
+    //string connString("dblayer:xmlrpc:http://rproject.ath.cx/~robertoroccoangeloni/rproject/xmlrpc_server.php");
+    string connString("dblayer:xmlrpc:http://localhost/~roberto/rproject/xmlrpc_server.php");
 
     if(argc!=2 && argc!=5) {
         cerr << "Usage: " << argv[0] << " connect-string" << endl

@@ -55,6 +55,7 @@ namespace DBLayer {
 
         virtual string escapeString(string s);
 
+        ColumnDefinitions getColumnsForTable(const string& tablename);
         virtual int getColumnSize(string* relname);
         virtual string getColumnName(string* relname, int column);
         virtual IntegerVector getKeys(string* relname);

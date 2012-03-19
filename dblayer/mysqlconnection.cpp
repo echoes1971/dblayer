@@ -245,6 +245,44 @@ string MySQLConnection::getNomeTipo(st_mysql_field* field) {
     return string("unknown");
 }
 
+ColumnDefinitions MySQLConnection::getColumnsForTable(const string& tablename) {
+    ColumnDefinitions ret;
+    ResultSet* rs = this->exec("SHOW COLUMNS FROM "+tablename);
+
+    //cout << "MySQLConnection::getColumnsForTable: rs=" << rs->toString() << endl;
+
+    int cols = rs->getNumColumns();
+    for(int r=0; r<rs->getNumRows(); r++) {
+        StringVector sv;
+        for(int c=0; c<cols; c++) {
+            sv.push_back( rs->getValue(r, c) );
+        }
+        string fieldField("Field");
+        ret[ rs->getValue(r, &fieldField) ] = sv;
+    }
+
+    delete rs;
+    return ret;
+    //$ret=array();
+    //ob_start();
+    //$result = mysql_query("SHOW COLUMNS FROM $tablename",$this->conn);
+    //$messaggi = ob_get_contents();
+    //ob_end_clean();
+    //if ($this->_verbose ) { echo "DBMgr.getColumnsForTable: $messaggi<br />\n"; }
+    //if ($result===false) {
+    //    if ($this->_verbose ) echo 'Could not run query: ' . mysql_error();
+    //    return $ret;
+    //}
+    //if (mysql_num_rows($result) > 0) {
+    //    $colonna=1;
+    //    while ($row = mysql_fetch_assoc($result)) {
+    //        $ret[ $row["Field"] ]=$row;//["Field"];
+    //    }
+    //}
+    //if ($this->_verbose ) echo "mysql_num_rows(result): ".$ret."\n";
+    //return $ret;
+}
+
 int MySQLConnection::getColumnSize(string* relname) {
     MYSQL_RES *result = mysql_list_fields(this->db, relname->c_str(), 0);
 

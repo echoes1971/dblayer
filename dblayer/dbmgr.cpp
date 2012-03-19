@@ -38,6 +38,7 @@ DBLayer::DBMgr::DBMgr() {
     this->setConnection(0);
     this->dbeFactory = 0;
     this->_schema="";
+    this->_dbeuser=0;
 }
 
 DBMgr::DBMgr(Connection* con, bool verbose) {
@@ -46,6 +47,7 @@ DBMgr::DBMgr(Connection* con, bool verbose) {
     this->verbose = verbose;
     this->dbeFactory = 0;
     this->_schema="";
+    this->_dbeuser=0;
 }
 
 DBMgr::~DBMgr() {
@@ -83,6 +85,16 @@ DBEntity* DBMgr::getClazzByTypeName(string* typeName) {
     if(this->dbeFactory!=0)
         return this->dbeFactory->getClazzByTypeName(typeName);
     return new DBEntity(typeName);
+}
+
+DBEntity* DBMgr::getDBEUser() { return this->_dbeuser; }
+void DBMgr::setDBEUser(DBEntity* dbe) { this->_dbeuser=dbe; }
+
+ColumnDefinitions DBMgr::getColumnsForTable(const string& tablename) {
+    ColumnDefinitions ret;
+    if(this->con==0) return ret;
+    ret = this->con->getColumnsForTable(tablename);
+    return ret;
 }
 
 string DBMgr::escapeString(string s) { return this->con->escapeString(s); }
