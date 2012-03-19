@@ -1,9 +1,9 @@
 /***************************************************************************
-**	odbcconnection.h  v0.1.2 - 2006.05.23
-**	-------------------------------------
+**	odbcconnection.h  v0.1.2 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset per ODBC
 **	To Do:		- ...
 **	Future:
@@ -17,7 +17,7 @@
 **				<b>quoteDate</b> mette la data tra <b>#</b> piuttosto che tra <b>'</b>
 **		v0.1.2 - 2006.05.23 Adattato per Linux
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: odbcconnection.h $
 ** @package rproject::dblayer
@@ -58,7 +58,6 @@ namespace DBLayer {
 		virtual bool disconnect();
 
 		virtual ResultSet* exec(const string s);
-		/** Chiude la connessione corrente e la riapre */
 
 		virtual string quoteDate(string s);
 
@@ -76,9 +75,8 @@ namespace DBLayer {
 		string dbmsName;
 
 		inline bool isRCSuccessful();
-		/**	Copia il messaggio di errore	*/
 		void saveErrorMessage();
-		/**	Decodifica il tipo di colonna	*/
+        /**	Decode column type */
 		inline string decodeType(SQLSMALLINT mytype);
 	};
 
@@ -89,7 +87,7 @@ namespace DBLayer {
 		public:
 			ODBCResultSet();
 			virtual ~ODBCResultSet();
-	};
+    };
 
 #endif
 

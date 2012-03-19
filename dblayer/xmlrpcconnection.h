@@ -1,16 +1,16 @@
 /***************************************************************************
-**	xmlrpcconnection.h  v0.1.0 - 2009.05.19
-**	---------------------------------------
+**	xmlrpcconnection.h  v0.1.0 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset per Xmlrpc
 **	To Do:		- 
 **	Future:
 **	History:
 **		v0.1.0 - 2006.05.11 Iniziato lo sviluppo
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: xmlrpcconnection.h $
 ** @package rproject::dblayer
@@ -36,12 +36,6 @@
 #include "dbconnection.h"
 using namespace DBLayer;
 
-/*
-
-*/
-
-
-
 
 namespace DBLayer {
 
@@ -58,7 +52,6 @@ class DECLSPECIFIER XmlrpcConnection : public Connection {
     virtual bool disconnect();
 
     virtual ResultSet* exec(const string s);
-    /** Chiude la connessione corrente e la riapre */
     virtual bool reconnect();
 
     virtual string escapeString(string s);

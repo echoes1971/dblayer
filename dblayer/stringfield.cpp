@@ -1,10 +1,5 @@
 /***************************************************************************
-**                        stringfield.cpp  -  description
-**                        -------------------
-**  begin                : lun dic 2 2002
-**  email                : roberto@roccoangeloni.net
-**
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: stringfield.cpp $
 ** @package rproject::dblayer
@@ -27,16 +22,11 @@ using namespace DBLayer;
 
 StringField::StringField(const string* nome) : DBField(nome) {
   type = DBField::STRING;
-//  this->setPK(false);
 }
 StringField::StringField(const string* nome,const string* valore) : DBField(nome) {
   type = DBField::STRING;
   this->setValue(valore);
 }
-//StringField::StringField(bool isPK, const string* nome,const string* valore) : DBField(isPK, nome){
-//  type = DBField::STRING;
-//  this->setValue(valore);
-//}
 StringField::~StringField() {}
 
 void StringField::setValue(const string* valore) {
@@ -49,7 +39,7 @@ void StringField::setValue(const string* valore) {
 const string* DBLayer::StringField::getValue(){ return this->stringValue; }
 
 string DBLayer::StringField::toString() {
-    string ret( this->getValue()->c_str() ); // TODO ???
+    string ret( this->getValue()->c_str() );
     return ret;
 }
 

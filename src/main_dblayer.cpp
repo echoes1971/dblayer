@@ -43,7 +43,6 @@
 using namespace DBLayer;
 
 #include "dbshell.h"
-//using namespace MySchema;
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -71,20 +70,19 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     string host,dbname,usr,pwd;
-    //string connString("dblayer:sqlite:./examples/test.db");
+    string connString("dblayer:sqlite:./examples/test.db");
     //string connString("dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;");
     //string connString("dblayer:mysql:host=localhost;dbname=fav;user=root;password=;");
     //string connString("dblayer:pg:host=localhost dbname=roberto user=roberto password=roberto");
-    //string connString("dblayer:xmlrpc:http://rproject.ath.cx/~robertoroccoangeloni/rproject/xmlrpc_server.php");
-    string connString("dblayer:xmlrpc:http://localhost/~roberto/rproject/xmlrpc_server.php");
+    //string connString("dblayer:xmlrpc:http://localhost/~roberto/rproject/xmlrpc_server.php");
 
     if(argc!=2 && argc!=5) {
         cerr << "Usage: " << argv[0] << " connect-string" << endl
                << "or     " << argv[0] << " dsn username password" << endl;
         host = "localhost";
         dbname = "roberto";
-        usr = "roberto";
-        pwd = "echoestrade";
+        usr = "username";
+        pwd = "userpassword";
     } else if (argc==5) {
         host = string( argv[1] );
         dbname = string( argv[2] );

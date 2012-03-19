@@ -1,9 +1,9 @@
 /***************************************************************************
-**	sqliteconnection.cpp  v0.1.1 - 2006.05.14
-**	-----------------------------------------
+**	sqliteconnection.cpp  v0.1.1 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset per SQLite
 **	To Do:		- SQLiteResultSet::getColumnType: RICONOSCERE SE E' UNA DATA!!!
 **	Future:
@@ -12,7 +12,7 @@
 **		v0.1.1 - 2006.05.14 Completato SQLiteResultSet e SQLiteConnection ad
 **				 eccezione di alcuni metodi che non sono supportati in sqlite3
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: sqliteconnection.cpp $
 ** @package rproject::dblayer
@@ -44,7 +44,7 @@ using namespace DBLayer;
 #ifdef USE_LIBSQLITE3
 
 
-//********************* SQLiteConnection: inizio.
+//********************* SQLiteConnection: start.
 
 #ifdef WIN32
 SQLiteConnection::SQLiteConnection(string s) : Connection(s) {
@@ -72,7 +72,6 @@ bool SQLiteConnection::connect() {
 bool SQLiteConnection::disconnect() {
     int errorCode;
     if( this->db!=0 ) {
-
         errorCode = sqlite3_close(this->db);
 
         if( errorCode!=SQLITE_OK ) {
@@ -93,7 +92,7 @@ int SQLiteConnection::sqliteCallback(void *NotUsed, int argc, char **argv, char 
     int i;
     SQLiteResultSet* rs = (SQLiteResultSet*) NotUsed;
 
-    for(i=0; i<argc; i++){
+    for(i=0; i<argc; i++) {
         printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
     }
     printf("\n");
@@ -131,7 +130,7 @@ ResultSet* SQLiteConnection::exec(const string s) {
         return rs;
     }
 
-    // Preparo i metadati
+    // Preparing metadata
     int nColonne = sqlite3_column_count(pStmt);
     for( int i=0; i<nColonne; i++) {
         const char* nomeColonna = sqlite3_column_name(pStmt,i);
@@ -147,8 +146,8 @@ ResultSet* SQLiteConnection::exec(const string s) {
             } else if( strcmp(nomeTipo,"blob"  )==0 ) {
                 rs->columnType.push_back( DBLayer::type_blob );
             } else {
-                cerr << "SQLiteConnection::exec: codiceTipo \'" << nomeTipo
-                     << "\' NON riconosciuto!" << endl;
+                cerr << "SQLiteConnection::exec: typeCode \'" << nomeTipo
+                     << "\' Unknown!" << endl;
                 rs->columnType.push_back( DBLayer::type_blob );
             }
         } else {
@@ -156,7 +155,7 @@ ResultSet* SQLiteConnection::exec(const string s) {
         }
     }
 
-    // Leggo la prima riga
+    // Fetching first row
     errorCode = sqlite3_step(pStmt);
     if( errorCode!=SQLITE_ROW && errorCode!=SQLITE_DONE ) {
         this->errorMessage.append(
@@ -165,12 +164,10 @@ ResultSet* SQLiteConnection::exec(const string s) {
                     );
     }
 
-    // Leggo tutte le righe
+    // Fetching all rows
     while( errorCode==SQLITE_ROW ) {
         for(unsigned int c=0; c<rs->columnName.size(); c++) {
             int sizeDato = sqlite3_column_bytes(pStmt,c);
-            // SE il tipo e' blob, allora probabilmente non e' stato identificato
-            // inizialmente, quindi lo aggiorniamo mentre leggiamo la riga
             if( rs->columnType[c]==DBLayer::type_blob ) {
                 int tipoDiDato = sqlite3_column_type(pStmt,c);
                 switch( tipoDiDato ) {
@@ -227,13 +224,10 @@ ColumnDefinitions SQLiteConnection::getColumnsForTable(const string& tablename) 
     int errorCode = SQLITE_OK;
 #endif
 
-    cout << "SQLiteConnection::getColumnsForTable: cols = ..." << endl;
     int cols = this->getColumnSize((string*) &tablename);
-    cout << "SQLiteConnection::getColumnsForTable: cols = " << cols << endl;
     for(int c=1; c<=cols && errorCode==SQLITE_OK; c++) {
         StringVector row;
         string columnName = this->getColumnName((string*) &tablename,c);
-        //cout << "SQLiteConnection::getColumnsForTable: columnName = " << columnName << endl;
         char const *pzDataType = 0;
         char const *pzCollSeq = 0;
         int notNull = 0;
@@ -252,25 +246,15 @@ ColumnDefinitions SQLiteConnection::getColumnsForTable(const string& tablename) 
                         &autoinc        /* OUTPUT: True if column is auto-increment */
                     );
             if( errorCode!=SQLITE_OK ) {
-                cout << "SQLiteConnection::getColumnsForTable: errorCode = " << errorCode << endl;
                 this->errorMessage.append(
                             "errorCode: "+ DBLayer::integer2string((long)errorCode) +
                             "; msg: " + sqlite3_errmsg(this->db)
                             );
-                cout << "SQLiteConnection::getColumnsForTable: errorMessage = " << this->errorMessage << endl;
-                cout << "SQLiteConnection::getColumnsForTable: error columnName = " << columnName << endl;
                 break;
             }
         } catch(exception e) {
             cerr << "SQLiteConnection::getColumnsForTable: exception = " << e.what() << endl;
         }
-        printf("SQLiteConnection::getColumnsForTable: %s,%s,%s,%s,%s,%s,%s\n"
-               ,tablename.c_str(),columnName.c_str()
-               ,pzDataType
-               ,pzCollSeq
-               ,(notNull>0?"not null":"null")
-               ,(primaryKey>0?"PRI":"")
-               ,(autoinc>1?"autoincr":""));
         row.push_back(columnName);
         row.push_back(pzDataType);
         row.push_back(notNull>0?"not null":"null");
@@ -313,7 +297,7 @@ int SQLiteConnection::getColumnSize(string* relname) {
         return ret;
     }
 
-    // Preparo i metadati
+    // Preparing metadata
     int nColonne = sqlite3_column_count(pStmt);
     ret = nColonne;
     errorCode = sqlite3_finalize( pStmt );
@@ -356,7 +340,7 @@ string SQLiteConnection::getColumnName(string* relname, int column) {
         return ret;
     }
 
-    // Preparo i metadati
+    // Preparing metadata
     const char* nomeColonna = sqlite3_column_name(pStmt, column-1 );
     ret=string(nomeColonna);
 
@@ -379,10 +363,10 @@ IntegerVector SQLiteConnection::getForeignKeys(string* relname) {
     this->errorMessage.append("SQLiteConnection::getForeignKeys: UNSUPPORTED; relname=" + string(relname->c_str()));
     return ret;
 }
-//********************* SQLiteConnection: fine.
+//********************* SQLiteConnection: end.
 
 
-//********************* SQLiteResultSet: inizio.
+//********************* SQLiteResultSet: start.
 
 #ifdef WIN32
 SQLiteResultSet::SQLiteResultSet() : ResultSet() {
@@ -392,10 +376,7 @@ SQLiteResultSet::SQLiteResultSet() : ResultSet::ResultSet() {
 }
 SQLiteResultSet::~SQLiteResultSet() {}
 
-int SQLiteResultSet::getColumnSize(int i) {
-    // Non significativo per SQLite
-    return -i;
-}
+int SQLiteResultSet::getColumnSize(int i) { return -i; }
 
 string SQLiteResultSet::toString(string prefix) {
     string ret;
@@ -434,6 +415,6 @@ string SQLiteResultSet::toString(string prefix) {
     ret.append(prefix+"</SQLiteResultSet>");
     return ret;
 }
-//********************* SQLiteResultSet: fine.
+//********************* SQLiteResultSet: end.
 
 #endif

@@ -629,7 +629,7 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-/*
+
     cout << "---------------->>  testGetKeys" << endl;
     if(argc==5) {
         testGetKeys( host, dbname, usr, pwd, string("societa") );
@@ -701,7 +701,7 @@ int main(int argc, char *argv[]) {
         testGetForeignKeys( connString, "test_dblayer" );
         testGetForeignKeys( connString, "societa" );
     }
-*/
+
     cout << "---------------->>  testGetColumnsForTable" << endl;
     if( argc==5 ) {
         testGetColumnsForTable( host, dbname, usr, pwd, "test_dblayer" );

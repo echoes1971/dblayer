@@ -1,16 +1,16 @@
 /***************************************************************************
-**	xmlrpcconnection.cpp  v0.1.0 - 2009.05.22
-**	-----------------------------------------
+**	xmlrpcconnection.cpp  v0.1.0 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset per Xmlrpc
 **	To Do:		- 
 **	Future:
 **	History:
 **		v0.1.0 - 2009.05.22 Iniziato lo sviluppo
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: xmlrpcconnection.cpp $
 ** @package rproject::dblayer
@@ -59,7 +59,6 @@ bool XmlrpcConnection::connect() {
     try {
         this->_client.call(this->connectionString, "selectAsArray", "ss", &result, "nometabella"
                            , "show tables"
-                           //, "select * from rra_users"
                            );
     } catch (std::exception const& e) {
         this->errorMessage.append( "Client threw error: " ); this->errorMessage.append( e.what() );
@@ -69,7 +68,7 @@ bool XmlrpcConnection::connect() {
         return false;
     }
 
-    // Voglio che result sia del tipo [ stringa, [] ], altrimenti errore
+    // If not result is [ stringa, [] ], then error
     if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
         this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
                                    + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
@@ -98,7 +97,6 @@ bool XmlrpcConnection::disconnect() { this->connected=false; return true; }
 bool XmlrpcConnection::reconnect() { return this->connect(); }
 
 ResultSet* XmlrpcConnection::exec(const string s) {
-    // 2011.09.26 - XmlrpcResultSet* rs = new XmlrpcResultSet();
     xmlrpc_c::value result;
     this->errorMessage.clear();
     try {
@@ -111,7 +109,7 @@ ResultSet* XmlrpcConnection::exec(const string s) {
         return false;
     }
 
-    // Voglio che result sia del tipo [ stringa, [] ], altrimenti errore
+    // If not result is [ stringa, [] ], then error
     if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
         this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
                                    + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
@@ -207,7 +205,7 @@ XmlrpcResultSet* XmlrpcConnection::list2resultset(xmlrpc_c::value_array* iLista,
         unsigned int colonna=0;
         string my_string;
         for(i=m.begin(); i!=m.end(); ++i) {
-            // Metadati
+            // Metadata
             if(ioResultSet->columnName.size()<=colonna) ioResultSet->columnName.push_back( i->first );
             my_string.clear();
             switch(i->second.type()) {
@@ -232,13 +230,6 @@ XmlrpcResultSet* XmlrpcConnection::list2resultset(xmlrpc_c::value_array* iLista,
                 XmlrpcResultSet::bytestringToString( (xmlrpc_c::value*) &(i->second), &my_string );
                 ioResultSet->righe.push_back( my_string );
                 break;
-            //	case xmlrpc_c::value::TYPE_ARRAY:
-            //	case xmlrpc_c::value::TYPE_STRUCT:
-            //	case xmlrpc_c::value::TYPE_DATETIME:
-            //	case xmlrpc_c::value::TYPE_C_PTR:
-            //	case xmlrpc_c::value::TYPE_NIL:
-            //	case xmlrpc_c::value::TYPE_I8:
-            //	case xmlrpc_c::value::TYPE_DEAD:
             default:
                 if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_blob );
                 xmlrpc_c::value tmp_value = xmlrpc_c::value(i->second);
@@ -392,7 +383,6 @@ void XmlrpcResultSet::valueToString(xmlrpc_c::value* v, std::string* out_string)
         out_string->append( double2string( (double) ((float) xmlrpc_c::value_double(*v)) ) );
         break;
       case xmlrpc_c::value::TYPE_STRING:
-        //out_string->append("\"");
 #ifdef XMLRPCC_HAVE_CRLF
         out_string->append( xmlrpc_c::value_string(*v).crlfValue() );
 #else
@@ -408,11 +398,6 @@ void XmlrpcResultSet::valueToString(xmlrpc_c::value* v, std::string* out_string)
       case xmlrpc_c::value::TYPE_STRUCT:
         structToString( v, out_string );
         break;
-//      case xmlrpc_c::value::TYPE_DATETIME:
-//      case xmlrpc_c::value::TYPE_C_PTR:
-//      case xmlrpc_c::value::TYPE_NIL:
-//      case xmlrpc_c::value::TYPE_I8:
-//      case xmlrpc_c::value::TYPE_DEAD:
       default:
         out_string->append( integer2string( v->type() ) );
     }

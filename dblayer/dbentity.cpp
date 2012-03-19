@@ -1,9 +1,9 @@
 /***************************************************************************
-**	dbentity.cpp  v0.1.0 - 2006.05.04
-**	---------------------------------
+**	dbentity.cpp  v0.1.0 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:
 **	To Do:
 **	Future:
@@ -11,7 +11,7 @@
 **		v0.0.1 - 2002.10.20	First Old Version
 **		v0.1.0 - 2006.05.04 Rewritten for the new framework
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbentity.cpp $
 ** @package rproject::dblayer
@@ -299,12 +299,12 @@ DBEntity* DBEntity::writeFKTo(DBEntity* dbemaster) {
     }
     return dbemaster;
 }
-bool DBEntity::isFK(string field_name, string tabella_riferita) {
+bool DBEntity::isFK(string field_name, string referred_table) {
     bool found = false;
     ForeignKeyVector myfks;
     ForeignKeyVector* fks;
-    if( tabella_riferita.length()>0 ) {
-        myfks = this->getFKForTable( tabella_riferita );
+    if( referred_table.length()>0 ) {
+        myfks = this->getFKForTable( referred_table );
         fks = &myfks;
     } else {
         fks = this->getFK();
@@ -336,15 +336,15 @@ void DBEntity::cleanKeyFields() {
 string DBEntity::getColumnType(const string& column_name) {
     ColumnDefinitions::iterator it = this->_columns.find(column_name);
     if(it!=this->_columns.end()) {
-        string cerca = (*it).second[0];
-        int parentesi = cerca.find('(');
+        string search = (*it).second[0];
+        int parentesi = search.find('(');
         if(parentesi>0) {
-            cerca = cerca.substr(0,parentesi);
+            search = search.substr(0,parentesi);
         }
-        if(cerca=="char" || cerca=="varchar" || cerca=="text")
+        if(search=="char" || search=="varchar" || search=="text")
             return "string";
         else
-            return cerca;
+            return search;
     } else {
         return "";
     }
@@ -435,7 +435,7 @@ bool DBEntity::isNew() {
     DBLayer::StringVector nomiChiavi = this->getKeyNames();
     for(DBLayer::StringVector::iterator it=nomiChiavi.begin(); !ret && it!=nomiChiavi.end(); it++) {
         Field* field = this->getField( &(*it) );
-        if(field==0) ret=true;//continue;
+        if(field==0) ret=true;
         else if(field->isNull()) ret=true;
     }
     return ret;

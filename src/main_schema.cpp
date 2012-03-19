@@ -123,8 +123,8 @@ int main() {
 
     cout << "--------------------------> testSchema" << endl;
     for(int i=0; i<5; i++) {
-            printf("--------------------------> testSchema[%d]\n",i);
-            testSchema();
+        printf("--------------------------> testSchema[%d]\n",i);
+        testSchema();
     }
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );

@@ -1,9 +1,9 @@
 /***************************************************************************
-**	dbconnection.h  v0.1.2 - 2006.05.22
+**	dbconnection.h  v0.1.2 - 2012.03.19
 **	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset
 **	To Do:		- getForeignKeys
 **	Future:
@@ -19,7 +19,7 @@
 **					Aggiunto -quoteDate-
 **		v0.1.3 - 2007.04.20 Implementato MySQLResultSet e MySQLConnection
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbconnection.h $
 ** @package rproject::dblayer
@@ -163,7 +163,7 @@ namespace DBLayer {
             virtual string getSchemaName();
 
             
-            // **************** Proxy Connections :: 20091015: start. *********************
+            // **************** Proxy Connections: start. *********************
             // The proxy connections are used by DBMgr to execute the following methods
             virtual bool isProxy();
             virtual DBEntity* Insert(DBEntity *dbe);
@@ -172,14 +172,8 @@ namespace DBLayer {
             virtual DBEntityVector* Select(DBEntity* dbe, const string* tableName, const string* searchString);
             virtual DBEntityVector* Search(DBEntity* dbe, bool uselike=true,
                                     bool caseSensitive=true, const string* orderBy=new string("") );
-            // **************** Proxy Connections :: 20091015: end. *********************
+            // **************** Proxy Connections: end. *********************
 
-            /**
-            FOREIGN KEY
-            select c.oid, c.relname, k.confrelid, k.confkey
-               from pg_constraint k join pg_class c on (k.conrelid=c.oid)
-             where k.contype='f';
-             */
 	};
 
 #ifdef USE_LIBPQ
@@ -194,12 +188,11 @@ namespace DBLayer {
         bool connect();
         bool disconnect();
         ResultSet* exec(const string s);
-                /** Force the write buffer to be written (or at least try) */
+        /** Force the write buffer to be written (or at least try) */
         bool flush();
-                /** Chiude la connessione corrente e la riapre */
+        /** Chiude la connessione corrente e la riapre */
         bool reconnect();
 
-        // virtual string* escapeString(string* s);
         string escapeString(string s);
 
         ColumnDefinitions getColumnsForTable(const string& tablename);
@@ -208,12 +201,10 @@ namespace DBLayer {
         IntegerVector getKeys(string* relname);
         // Overridden: end.
 
-                // PG Functions
+        // PG Functions
         static string pgtype2string(int t);
-        // int protocolVersion();
-        // int serverVersion();
-                int clientEncoding();
-                int setClientEncoding(string s);
+        int clientEncoding();
+        int setClientEncoding(string s);
 	};
 #endif
 

@@ -1,16 +1,16 @@
 /***************************************************************************
-**	integerfield.h  v0.1.0 - 2006.05.26
+**	integerfield.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset per ODBC
 **	To Do:		- ...
 **	Future:
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: integerfield.h $
 ** @package rproject::dblayer
@@ -36,8 +36,8 @@
 #include "dbfield.h"
 
 /**
-  *@author Roberto Rocco Angeloni
-  */
+ *@author Roberto Rocco Angeloni
+ */
 
 namespace DBLayer {
 

@@ -1,9 +1,9 @@
 /***************************************************************************
-**	MySQLConnection.cpp  v0.1.1 - 2006.05.14
-**	-----------------------------------------
+**	MySQLConnection.cpp  v0.1.1 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset per SQLite
 **	To Do:		- SQLiteResultSet::getColumnType: RICONOSCERE SE E' UNA DATA!!!
 **	Future:
@@ -12,7 +12,7 @@
 **		v0.1.1 - 2006.05.14 Completato SQLiteResultSet e MySQLConnection ad
 **				 eccezione di alcuni metodi che non sono supportati in sqlite3
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: mysqlconnection.cpp $
 ** @package rproject::dblayer
@@ -144,7 +144,7 @@ ResultSet* MySQLConnection::exec(const string s) {
         return rs;
     }
 
-    // Preparo i metadati
+    // Preparing metadata
     MYSQL_FIELD *field;
     while((field = mysql_fetch_field(result))) {
         const char* nomeColonna = field->name;
@@ -249,8 +249,6 @@ ColumnDefinitions MySQLConnection::getColumnsForTable(const string& tablename) {
     ColumnDefinitions ret;
     ResultSet* rs = this->exec("SHOW COLUMNS FROM "+tablename);
 
-    //cout << "MySQLConnection::getColumnsForTable: rs=" << rs->toString() << endl;
-
     int cols = rs->getNumColumns();
     for(int r=0; r<rs->getNumRows(); r++) {
         StringVector sv;
@@ -263,24 +261,6 @@ ColumnDefinitions MySQLConnection::getColumnsForTable(const string& tablename) {
 
     delete rs;
     return ret;
-    //$ret=array();
-    //ob_start();
-    //$result = mysql_query("SHOW COLUMNS FROM $tablename",$this->conn);
-    //$messaggi = ob_get_contents();
-    //ob_end_clean();
-    //if ($this->_verbose ) { echo "DBMgr.getColumnsForTable: $messaggi<br />\n"; }
-    //if ($result===false) {
-    //    if ($this->_verbose ) echo 'Could not run query: ' . mysql_error();
-    //    return $ret;
-    //}
-    //if (mysql_num_rows($result) > 0) {
-    //    $colonna=1;
-    //    while ($row = mysql_fetch_assoc($result)) {
-    //        $ret[ $row["Field"] ]=$row;//["Field"];
-    //    }
-    //}
-    //if ($this->_verbose ) echo "mysql_num_rows(result): ".$ret."\n";
-    //return $ret;
 }
 
 int MySQLConnection::getColumnSize(string* relname) {

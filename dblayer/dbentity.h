@@ -1,9 +1,9 @@
 /***************************************************************************
-**	dbentity.h  v0.1.2 - 2011.10.11
-**	-------------------------------
+**	dbentity.h  v0.1.2 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:
 **	TODO:		- TESTARE la gestione delle FKs
 **				- TESTARE getValuesDictionary, getDBFieldIndex
@@ -19,7 +19,7 @@
 **		v0.1.2 - 2006.05.11 Implemented:
 **					getKeyNames, isKey, cleanKeyFields
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbentity.h $
 ** @package rproject::dblayer
@@ -64,16 +64,12 @@ namespace DBLayer {
         DBEntity(const string* tableName);
         virtual ~DBEntity();
 
-        // 2011.10.10: start.
         string getColumnType(const string& column_name);
         ColumnDefinitions getColumns();
         static string dbeType2dbType(const string& dbetype);
         static string dbType2dbeType(const string& dbtype);
         static string dbConstraints2dbeConstraints(map<string,string>& def);
         static string dbColumnDefinition2dbeColumnDefinition(map<string,string>& def);
-
-        // /** Ritorna il nome della classe */
-        // vedi name() sotto <---- function getTypeName() { return $this->_typeName; }
 
         /** Returns the column names of the default orderby */
         virtual DBLayer::StringVector getOrderBy() const;
@@ -82,54 +78,16 @@ namespace DBLayer {
         static string uuid2hex(const string& str);
         static string hex2uuid(const string& a_str);
 
-        /* TODO fare le funzioni qua sotto? */
-//    /**	Ritorna una stringa chiave1=valore1&...&chiaven=valoren */
-//    function getCGIKeysCondition($prefix="field_") {
-//        $mychiavi = is_array( $this->getKeys() ) ? array_keys( $this->getKeys() ) : array();
-//        $clausole = array();	$clausole_index=0;
-//        for( $i=0; $i<count($mychiavi) ; $i++ ) {
-//            $k = $mychiavi[ $i ];
-//            $v = $this->getValue( $k );
-//            $clausole[ $clausole_index++ ] = $prefix.$k."=".urlencode($v);
-//        }
-//        return join( $clausole, "&" );
-//    }
-//    /**	Ritorna una stringa con l'hash (sha1) dei <b>valori</b> della chiave */
-//    function getKeyAsHash() {
-//        $mychiavi = is_array( $this->getKeys() ) ? array_keys( $this->getKeys() ) : array();
-//        $tmp = "";
-//        for( $i=0; $i<count($mychiavi) ; $i++ ) {
-//            $tmp .= $this->getValue( $mychiavi[ $i ] );
-//        }
-//        return sha1( $tmp );
-//    }
-//    /**
-//     *	Data una dbe_master ed una classe di detail, costruisce le clausole CGI
-//     *	per le foreign keys della figlia.
-//     */
-//    function getFKCGIConditionFromMaster( $dbe_master ) {
-//        $ret = array();
-//        $fks = $this->getFKForTable( $dbe_master->getTableName() );
-//        foreach( $fks as $f ) {
-//            $v = $dbe_master->getValue( $f->colonna_riferita );
-//            if ( $v!==null && $v!=='' && $v!==0 ) {
-//                $ret[] = "field_" . $f->colonna_fk . "=" . urlencode($v);
-//            }
-//        }
-//        return join( $ret, "&" );
-//    }
-        // 2011.10.10: end.
-
-        /** Ritorna lo schema di appartenenza della tabella */
+        /** Returns the table's own schema */
         virtual const string* getSchemaName();
         virtual string getTableName();
         /** Class name */
         virtual string name();
         /**
          * @param valuesAsAttributes
-         *  se true, i valori vengono rappresentati come attributi
-         *  se false, i valori vengono rappresentati come nodi
-        */
+         *  if true, values are represented as attributes
+         *  if false, values are represented as nodes
+         */
         virtual string toString(string prefix="", bool valuesAsAttributes=false);
 
         /** @return a new DBE instance */
@@ -162,11 +120,11 @@ namespace DBLayer {
         /**	Writes the content of the referenced columns in the referenced table
         mapped in the given dbe	and returns it	*/
         DBEntity* writeFKTo(DBEntity* dbemaster);
-        /**	Dice se il field della dbe e' foreign key.
-        Se specificato, dice se il field e' foreign key VERSO la tabella riferita	*/
-        bool isFK(string field_name, string tabella_riferita="");
-        /**	Elimino tutti i campi chiave presenti nella DBE
-        Metodo di appoggio per la <b>copy</b> del DBMgr	*/
+        /**	true if the given field name is foreign key.
+        If specified, tells wheter is fk FOR the given table */
+        bool isFK(string field_name, string referred_table="");
+        /**	Destroy all the key fields in the given DBE
+        Utility method for <b>DBMgr::copy</b>	*/
         void cleanKeyFields();
 
         /** @return true <=> all key fields are empty */
@@ -187,7 +145,7 @@ namespace DBLayer {
       protected:
         string tableName;
 
-        /* nome_colonna => array('tipo','constraints', ...) */
+        /* column_name => array('type','constraints', ...) */
         static ColumnDefinitions _columns;
 
       private:

@@ -1,10 +1,5 @@
 /***************************************************************************
-**                        importedPackages.h  -  description
-**                        -------------------
-**  begin                : Tue Nov 5 2002
-**  email                : roberto_rocco@libero.it
-**
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: importedPackages.h $
 ** @package rproject::dblayer
@@ -41,7 +36,6 @@
 
 #ifdef USE_MYSQL
  #ifdef WIN32
-  //#include <config-win.h>
   #include <winsock2.h>
   #include <mysql.h>
  #else
@@ -56,21 +50,12 @@
 # ifdef USE_ODBCPP
  #ifdef __WIN32
   #include <windef.h>
-  //#include <winnt.h>
   #include <mbstring.h>
   #include <windows.h>
  #else
   #include <sqlext.h>
   #include <odbcinst.h>
  #endif
- // ODBC++
- //#include <odbc++/connection.h>
- //#include <odbc++/drivermanager.h>
- //#include <odbc++/preparedstatement.h>
- //#include <odbc++/resultset.h>
- //#include <odbc++/resultsetmetadata.h>
- //#include <odbc++/types.h>
- //using namespace odbc;
 # endif
 
 #ifdef USE_LIBPQ
@@ -83,14 +68,11 @@
   #else
    #include <postgresql/libpq-fe.h>
   #endif
-  //#include <pgsql/libpq-fe.h>
-  //#include <pgsql/sql3types.h>
  #endif
 # endif
 
 #ifdef USE_LIBSQLITE3
 #ifdef WIN32
-//#include <windef.h>
 #endif
 #include <sqlite3.h>
 #endif

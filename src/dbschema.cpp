@@ -18,7 +18,7 @@ using namespace MySchema;
 #include <string>
 using namespace std;
 
-//***********************	DBETestDBLayer: inizio.
+//***********************	DBETestDBLayer: start.
 const string DBETestDBLayer::nomiCampiChiave[] = { string("id") };
 IntegerField DBETestDBLayer::chiave1( (const string*)&DBETestDBLayer::nomiCampiChiave[0] );
 DBFieldVector DBETestDBLayer::chiavi( 1, &DBETestDBLayer::chiave1 );
@@ -31,10 +31,10 @@ DBETestDBLayer::~DBETestDBLayer() {}
 string DBETestDBLayer::name() { return "DBETestDBLayer"; }
 DBFieldVector* DBETestDBLayer::getKeys() { return &DBETestDBLayer::chiavi; }
 DBETestDBLayer* DBETestDBLayer::createNewInstance() { return new DBETestDBLayer(); }
-//***********************	DBETestDBLayer: inizio.
+//***********************	DBETestDBLayer: end.
 
 
-//***********************	DBESocieta: inizio.
+//***********************	DBESocieta: start.
 
 const string DBESocieta::nomiCampiChiave[] = { string("id") };
 IntegerField DBESocieta::chiave1( (const string*)&DBESocieta::nomiCampiChiave[0] );
@@ -78,4 +78,4 @@ void DBESocieta::_before_copy(DBMgr* dbmgr) {
 
     if(dbmgr==0) return;
 }
-//***********************	DBESocieta: inizio.
+//***********************	DBESocieta: end.

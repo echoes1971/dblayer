@@ -1,9 +1,9 @@
 /***************************************************************************
-**	dbconnection.cpp  v0.1.2 - 2006.05.22
-**	-------------------------------------
+**	dbconnection.cpp  v0.1.2 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset
 **	To Do:		- getForeignKeys
 **	Future:
@@ -17,7 +17,7 @@
 **		v0.1.2 - 2006.05.22 Implementato ResultSet come SQLiteResultSet, ovvero con
 **					l'utilizzo di vettori di stringhe per memorizzare i risultati
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbconnection.cpp $
 ** @package rproject::dblayer
@@ -49,7 +49,7 @@ using namespace System;
 #include "xmlrpcconnection.h"
 using namespace DBLayer;
 
-ConnectionBuildersMap DBLayer::connectionBuilders;// = ConnectionBuildersMap();
+ConnectionBuildersMap DBLayer::connectionBuilders;
 
 Connection* DBLayer::createConnection(string s) {
     string myConnString = s;
@@ -216,9 +216,9 @@ bool PGConnection::disconnect() {
 
 ResultSet* PGConnection::exec(const string s) {
     PGresult* res = PQexec(this->conn, s.c_str() );
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) { //PGRES_COMMAND_OK) {
-        this->errorMessage = string( PQresultErrorMessage(res) );//PQerrorMessage(this->conn) );
-    //PQclear(res);	RRA: lascio la distruzione del PGResultSet al chiamante
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        this->errorMessage = string( PQresultErrorMessage(res) );
+    //PQclear(res);	caller MUST destroy the PGResultSet
     PGResultSet* ret = new PGResultSet(res);
         return ret;
     } else {
@@ -245,14 +245,6 @@ bool PGConnection::reconnect() {
     return true;
 }
 
-/* Name, type, null, key (PRI,MUL), default */
-/*
-select a.*, b.adsrc
-  from pg_attribute a join pg_class c on (a.attrelid=c.oid)
-       left join pg_attrdef b on (a.attnum=b.adnum and a.attrelid=b.adrelid)
- where relname='rra_users' and attnum>0
- order by a.attnum
-*/
 ColumnDefinitions PGConnection::getColumnsForTable(const string& tablename) {
     ColumnDefinitions ret;
     DBLayer::ResultSet* res;
@@ -264,7 +256,6 @@ ColumnDefinitions PGConnection::getColumnsForTable(const string& tablename) {
             .append(" where c.relname=\'").append( tablename.c_str() ).append("\' and a.attnum>0")
             .append(" order by a.attnum");
     res = this->exec(myquery);
-    //cout << res->toString() << endl;
 
     if( !this->hasErrors() ) {
         for(int r=0; r<res->getNumRows(); r++) {
@@ -277,14 +268,11 @@ ColumnDefinitions PGConnection::getColumnsForTable(const string& tablename) {
             else
                 row.push_back("");
             if(res->getValue(r,c++)=="t") // has default?
-                //TODO: eliminare le parti in piu di postgresql
                 row.push_back( res->getValue(r,c++) );
             else
                 row.push_back( "\\N" );
             ret[ res->getValue(r,0) ] = row;
         }
-    } else {
-        //cout << "Errori: " << this->getErrorMessage() << endl;
     }
 
     delete res;
@@ -339,7 +327,7 @@ IntegerVector PGConnection::getKeys(string* relname) {
 
     if( !this->hasErrors() ) {
         string tmp = res->getValue(0,0);
-        // Elimino le graffe
+        // Removing {} parenthesis
         unsigned long apertaGraffa = tmp.find('{');
         if(apertaGraffa!=string::npos) tmp.erase( apertaGraffa, 1 );
         unsigned long chiusaGraffa = tmp.find('}');
@@ -363,12 +351,6 @@ IntegerVector PGConnection::getKeys(string* relname) {
     return ret;
 }
 
-/*int PGConnection::protocolVersion() {
-	return PQprotocolVersion( this->conn );
-}
-int PGConnection::serverVersion() {
-	return PQserverVersion( this->conn );
-}*/
 string PGConnection::pgtype2string(int t) {
     switch( t ) {
     case 16:
@@ -507,42 +489,6 @@ string PGResultSet::getColumnName(int i) { return string( PQfname(this->res, i) 
 string PGResultSet::getColumnType(int i) {
     int mytype = (int) PQftype( this->res, i );
     return PGConnection::pgtype2string(mytype);
-//    switch( mytype ) {
-//    case 16:
-//        return DBLayer::type_boolean;
-//        break;
-//    case 20:
-//    case 21:
-//    case 22:
-//    case 23:
-//    case 26:
-//        return DBLayer::type_integer;
-//        break;
-//    case 700:
-//    case 701:
-//        return DBLayer::type_double;
-//        break;
-//    case 18:
-//    case 19:
-//    case 25:
-//    case 1042:
-//    case 1043:
-//        return DBLayer::type_string;
-//        break;
-//    case 702:
-//    case 703:
-//    case 704:
-//    case 1082:
-//    case 1083:
-//    case 1114:
-//    case 1184:
-//    case 1266:
-//        return DBLayer::type_datetime;
-//        break;
-//    default:
-//        printf("DBLayer::PGResultSet::getColumnType: unknown type = %d\n", mytype );
-//        return DBLayer::type_blob;
-//    }
 }
 
 int PGResultSet::getColumnSize(int i) { return PQfsize(this->res, i); }

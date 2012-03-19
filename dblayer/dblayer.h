@@ -1,9 +1,9 @@
 /***************************************************************************
-**	dblayer.h  v0.1.0 - 2006.05.04
-**	---------------------------------
+**	dblayer.h  v0.1.0 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:
 **	To Do:
 **	Future:
@@ -11,7 +11,7 @@
 **		v0.0.1 - 2002.11.05	First Old Version
 **		v0.1.0 - 2006.05.04 Rewritten for the new framework
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dblayer.h $
 ** @package rproject::dblayer
@@ -55,7 +55,7 @@ namespace DBLayer {
     typedef DECLSPECIFIER vector<string> StringVector;
 
     /* Name, type, null, key (PRI,MUL), default */
-    typedef DECLSPECIFIER map<string,StringVector> ColumnDefinitions; // 2011.10.10
+    typedef DECLSPECIFIER map<string,StringVector> ColumnDefinitions;
 
     DECLSPECIFIER string lowerCase(string& s);
     DECLSPECIFIER string upperCase(string& s);

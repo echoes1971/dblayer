@@ -1,16 +1,16 @@
 /***************************************************************************
-**	dbefactory.cpp  v0.1.0 - 2006.05.09
+**	dbefactory.cpp  v0.1.0 - 2012.03.19
 **	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:
 **	To Do:
 **	Future:
 **	History:
 **		v0.1.0 - 2006.05.09	Completata la prima versione.
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbefactory.cpp $
 ** @package rproject::dblayer
@@ -36,7 +36,7 @@ using namespace DBLayer;
 DBEFactory::DBEFactory(bool verbose) { this->_verbose=verbose; }
 DBEFactory::~DBEFactory() {
     if(this->_verbose) printf("DBEFactory::~DBEFactory: start.\n");
-    // Svuoto la cache
+    // Cleaning the cache
     DBEntityMap::iterator theIterator;
     for(theIterator = this->_cache.begin(); theIterator!=this->_cache.end(); theIterator++) {
         if(this->_verbose) printf("DBEFactory::~DBEFactory: cancello %s => %s\n",(*theIterator).first.c_str(), (*theIterator).second->name().c_str() );
@@ -49,7 +49,7 @@ DBEFactory::~DBEFactory() {
 void DBEFactory::registerClass(string tablename, DBEntity* clazz) { this->registerClass(&tablename, clazz); }
 void DBEFactory::registerClass(string* tablename, DBEntity* clazz) {
     string tmpIndex=(*tablename);
-    // SE esiste gia => cancello la vecchia
+    // IF exists => delete the old definition
     if(this->_cache.find(tmpIndex)!=this->_cache.end())
         delete this->_cache[tmpIndex];
     this->_cache[tmpIndex] = clazz;

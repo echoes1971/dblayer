@@ -1,16 +1,16 @@
 /***************************************************************************
-**	odbcconnection.cpp  v0.1.0 - 2006.05.21
-**	---------------------------------------
+**	odbcconnection.cpp  v0.1.0 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset per ODBC
 **	To Do:		- ...
 **	Future:
 **	History:
 **		v0.1.0 - 2006.05.21 Iniziato lo sviluppo
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: odbcconnection.cpp $
 ** @package rproject::dblayer
@@ -142,8 +142,6 @@ string ODBCConnection::decodeType(SQLSMALLINT mytype) {
     case SQL_TYPE_DATE:
     case SQL_TYPE_TIME:
     case SQL_TYPE_TIMESTAMP:
-    //case SQL_TYPE_UTCDATETIME:
-    //case SQL_TYPE_UTCTIME:
     case 9:
     case 11:
         return DBLayer::type_datetime;
@@ -173,7 +171,7 @@ ResultSet* ODBCConnection::exec(const string s) {
         saveErrorMessage();
         return rs;
     }
-    // Preparo i metadati
+    // Preparing metadata
     SQLSMALLINT numColumns=-1;
     SQLNumResultCols(hstmt, &numColumns);
     for(int c=1; c<=numColumns; c++) {
@@ -194,9 +192,9 @@ ResultSet* ODBCConnection::exec(const string s) {
         rs->columnSize.push_back( columnSize );
     };
 
-    // Leggo tutte le righe
+    // Fetching all rows
     unsigned char szData[MAX_DATA];
-    SQLLEN cbData;     // Output length of data
+    SQLLEN cbData;
     for (rc=SQLFetch(hstmt); rc == SQL_SUCCESS; rc=SQLFetch(hstmt)) {
         SQLNumResultCols(hstmt, &numColumns);
         for(int c=1; c<=numColumns; c++) {

@@ -1,9 +1,9 @@
 /***************************************************************************
-**	dbmgr.cpp  v0.1.0 - 2006.05.04
-**	---------------------------------
+**	dbmgr.cpp  v0.1.0 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:
 **	To Do:
 **	Future:
@@ -11,7 +11,7 @@
 **		v0.0.1 - 2002.10.23	First Old Version
 **		v0.1.0 - 2006.05.04 Rewritten for the new framework
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbmgr.cpp $
 ** @package rproject::dblayer
@@ -261,8 +261,6 @@ string DBMgr::_buildDeleteString(DBEntity* dbe) {
 string DBMgr::_buildTableName(DBEntity* dbe) {
     string ret = "";
     if(this->_schema.length()>0) {
-        // RRA: in mysql non esistono schemi, questo e' un'escamotage per emulare l'esistenza di schemi
-        //	all'interno dello stesso DB
         ret.append(this->_schema);
         ret.append("_");
     }
@@ -396,7 +394,7 @@ DBEntity* DBMgr::Delete(DBEntity* dbe) {
     return dbe;
 }
 DBEntity* DBMgr::Copy(DBEntity* dbe) {
-    // 1. Leggo la DBE Completa
+    // 1. Read the full DBE
     DBEntityVector* tmp = this->Search( dbe, false, true );
     if( tmp==0 || tmp->size()!=1 ) {
         delete tmp;
@@ -405,9 +403,8 @@ DBEntity* DBMgr::Copy(DBEntity* dbe) {
     DBEntity* mydbe = tmp->at(0);
     delete tmp;
 
-    // 2. Azzero le chiavi
+    // 2. Cleaning key fields
     mydbe->cleanKeyFields();
-    // 3. Chiamo la insert
 
     // Before Copy
     mydbe->_before_copy(this);

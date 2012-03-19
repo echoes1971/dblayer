@@ -1,16 +1,16 @@
 /***************************************************************************
-**	dbfield.h  v0.1.0 - 2006.05.25
-**	------------------------------
+**	dbfield.h  v0.1.0 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:
 **	To Do:		- ...
 **	Future:
 **	History:
 **		v0.1.0 - 2006.05.25 Versione iniziale
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbfield.h $
 ** @package rproject::dblayer

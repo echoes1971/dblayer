@@ -1,9 +1,9 @@
 /***************************************************************************
-**	sqliteconnection.h  v0.1.2 - 2006.05.22
-**	---------------------------------------
+**	sqliteconnection.h  v0.1.2 - 2012.03.19
+**	-----------------------------------
 **
 **	Author:		Roberto Rocco Angeloni.
-**	email:		roberto@roccoangeloni.it
+**	E-mail:		roberto@roccoangeloni.it
 **	Comment:	Implementazione di connection e resultset per SQLite
 **	To Do:		- SQLiteResultSet::getColumnType: RICONOSCERE SE E' UNA DATA!!!
 **	Future:
@@ -12,7 +12,7 @@
 **		v0.1.1 - 2006.05.14 Completato SQLiteResultSet e SQLiteConnection ad
 **				 eccezione di alcuni metodi che non sono supportati in sqlite3
 **
-** @copyright &copy; 2011 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: sqliteconnection.h $
 ** @package rproject::dblayer
