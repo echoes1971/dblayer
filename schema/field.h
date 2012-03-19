@@ -32,27 +32,6 @@
 #ifndef SCHEMA_FIELD_H
 #define SCHEMA_FIELD_H
 
-/*
-#ifndef DLLEXPORT
-#if defined(_WIN32) || defined(__CYGWIN__)
-//#ifndef _WINDLL
-#define DLLEXPORT __declspec(dllexport)
-//#endif
-#else
-#define DLLEXPORT
-#endif
-#endif
-
-#ifndef DLLIMPORT
-#if defined(_WIN32) || defined(__CYGWIN__)
-//#ifndef _WINDLL
-#define DLLIMPORT __declspec(dllimport)
-//#endif
-#else
-#define DLLIMPORT
-#endif
-#endif
-*/
 #ifndef DECLSPECIFIER
 # if defined(_WIN32) || defined(__CYGWIN__)
 #  ifdef _WINDLL
