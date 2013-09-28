@@ -181,8 +181,13 @@ void DateField::setValue(long seconds) {
     this->setNull(false);
 }
 
-bool DateField::isValidDate(long y, long m, long d) { return m>=1 && m<13 && d>=1 && d<=this->getDaysFor(y,m); }
-bool DateField::isValidHour(long h, long m, long s, long millis) { return h>=0 && h<=23 && m>=0 && m<=59 && s>=0 && s<=59 && millis>=0 && millis<=999; }
+bool DateField::isValidDate(long y, long m, long d) const {
+    return m>=1 && m<13 && d>=1 && d<=this->getDaysFor(y,m);
+}
+bool DateField::isValidHour(long h, long m, long s, long millis) const {
+    return h>=0 && h<=23 && m>=0 && m<=59 && s>=0 && s<=59
+            && millis>=0 && millis<=999;
+}
 
 string DateField::toString() {
     char tmp[50];
@@ -204,5 +209,13 @@ string DateField::toString() {
     return string( (char*)&tmp );
 }
 
-long DateField::to_seconds() { return Field::to_seconds(this->hour,this->minute,this->seconds,Field::to_days(this->year,this->month,this->day)); }
-long DateField::to_days() { return Field::to_days(this->year,this->month,this->day); }
+long DateField::to_seconds() const {
+    return Field::to_seconds(
+                this->hour,this->minute,this->seconds,
+                Field::to_days(this->year,this->month,this->day)
+                );
+}
+
+long DateField::to_days() const {
+    return Field::to_days(this->year,this->month,this->day);
+}

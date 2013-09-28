@@ -47,14 +47,14 @@ namespace DBLayer {
         void setValue(const string* valore);
         /** Since 01/01/1970 */
         void setValue(long seconds);
-        bool isValid();
-		long getDaysFor(long year);
-		long getDaysFor(long year, long month);
-        virtual string toString();
+        //bool isValid();
+        long getDaysFor(long year) const;
+        long getDaysFor(long year, long month) const;
+        virtual string toString() const;
 		/** Convert to seconds since 01/01/1970 */
-		long to_seconds();
+        long to_seconds() const;
 		/** Convert to days since 01/01/1970 */
-		long to_days();
+        long to_days() const;
         virtual Field* createNewInstance(const char* aName=0);
     };
 }

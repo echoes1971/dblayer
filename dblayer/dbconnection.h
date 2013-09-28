@@ -69,21 +69,21 @@ namespace DBLayer {
             ResultSet();
             virtual ~ResultSet();
 
-            virtual int getNumColumns();
-            virtual int getNumRows();
-            virtual string getValue(int row, int column);
-            virtual string getValue(int row, string* columnName);
-            virtual int getLength(int row, int column);
-            virtual bool isNull(int row, int column);
-            virtual string getColumnName(int i);
-            virtual int getColumnIndex(string* columnName );
-            virtual string getColumnType(int i);
-            virtual int getColumnSize(int i);
-            virtual string getErrorMessage();
-            bool hasErrors();
-            virtual string getStatus();
+            virtual int getNumColumns() const;
+            virtual int getNumRows() const;
+            virtual string getValue(int row, int column) const;
+            virtual string getValue(int row, string* columnName) const;
+            virtual int getLength(int row, int column) const;
+            virtual bool isNull(int row, int column) const;
+            virtual string getColumnName(int i) const;
+            virtual int getColumnIndex(string* columnName ) const;
+            virtual string getColumnType(int i) const;
+            virtual int getColumnSize(int i) const;
+            virtual string getErrorMessage() const;
+            bool hasErrors() const;
+            virtual string getStatus() const;
             /**	A scopo di debug...	*/
-            virtual string toString(string prefix="\n");
+            virtual string toString(string prefix="\n") const;
     };
 
 #ifdef USE_LIBPQ
@@ -94,19 +94,17 @@ namespace DBLayer {
             PGResultSet();
             PGResultSet(PGresult* res);
             virtual ~PGResultSet();
-            // Override: start.
-            int getNumColumns();
-            int getNumRows();
-            string getValue(int row, int column);
-            int getLength(int row, int column);
-            bool isNull(int row, int column);
-            string getColumnName(int i);
-            int getColumnIndex(string* columnName );
-            string getColumnType(int i);
-            int getColumnSize(int i);
-            string getErrorMessage();
-            string getStatus();
-            // Override: start.
+            virtual int getNumColumns() const;
+            virtual int getNumRows() const;
+            virtual string getValue(int row, int column) const;
+            virtual int getLength(int row, int column) const;
+            virtual bool isNull(int row, int column) const;
+            virtual string getColumnName(int i) const;
+            virtual int getColumnIndex(string* columnName ) const;
+            virtual string getColumnType(int i) const;
+            virtual int getColumnSize(int i) const;
+            virtual string getErrorMessage() const;
+            virtual string getStatus() const;
     };
 #endif
 
@@ -125,15 +123,15 @@ namespace DBLayer {
             Connection(string s);
             virtual ~Connection();
 
-            string getErrorMessage();
-            bool hasErrors();
+            string getErrorMessage() const;
+            bool hasErrors() const;
 
             void setVerbose(bool b);
-            bool isVerbose();
+            bool isVerbose() const;
 
             virtual bool connect();
             virtual bool disconnect();
-            bool isConnected();
+            bool isConnected() const;
 
             virtual ResultSet* login(string user, string pwd);
 
@@ -142,9 +140,9 @@ namespace DBLayer {
             virtual bool flush();
             /** Chiude la connessione corrente e la riapre */
             virtual bool reconnect();
-            virtual string* escapeString(string* s);
-            virtual string escapeString(string s);
-            virtual string quoteDate(string s);
+            virtual string* escapeString(string* s) const;
+            virtual string escapeString(string s) const;
+            virtual string quoteDate(string s) const;
 
             virtual ColumnDefinitions getColumnsForTable(const string& tablename);
             /** Ritorna il numero di colonne di una tabella */
@@ -165,7 +163,7 @@ namespace DBLayer {
             
             // **************** Proxy Connections: start. *********************
             // The proxy connections are used by DBMgr to execute the following methods
-            virtual bool isProxy();
+            virtual bool isProxy() const;
             virtual DBEntity* Insert(DBEntity *dbe);
             virtual DBEntity* Update(DBEntity *dbe);
             virtual DBEntity* Delete(DBEntity *dbe);
@@ -188,9 +186,9 @@ namespace DBLayer {
         bool connect();
         bool disconnect();
         ResultSet* exec(const string s);
-        /** Force the write buffer to be written (or at least try) */
+                /** Force the write buffer to be written (or at least try) */
         bool flush();
-        /** Chiude la connessione corrente e la riapre */
+                /** Chiude la connessione corrente e la riapre */
         bool reconnect();
 
         string escapeString(string s);
@@ -201,10 +199,10 @@ namespace DBLayer {
         IntegerVector getKeys(string* relname);
         // Overridden: end.
 
-        // PG Functions
+                // PG Functions
         static string pgtype2string(int t);
-        int clientEncoding();
-        int setClientEncoding(string s);
+                int clientEncoding();
+                int setClientEncoding(string s);
 	};
 #endif
 

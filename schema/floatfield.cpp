@@ -49,7 +49,7 @@ Field* FloatField::createNewInstance(const char* aName) {
     return new FloatField(&myName);
 }
 
-float FloatField::getValue() { return floatValue; }
+float FloatField::getValue() const { return floatValue; }
 void FloatField::setValue(float valore){
     floatValue = valore;
     nullo = false;

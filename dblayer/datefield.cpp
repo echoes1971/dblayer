@@ -134,7 +134,7 @@ bool DateField::isValidHour(long h, long m, long s, long millis) {
 			&& millis>=0 && millis<=999;
 }
 
-long DateField::getDaysFor(long y, long m) {
+long DateField::getDaysFor(long y, long m) const {
     long ret = -1;
     switch (m) {
     case 1:
@@ -162,11 +162,11 @@ long DateField::getDaysFor(long y, long m) {
     }
     return ret;
 }
-long DateField::getDaysFor(long y) {
+long DateField::getDaysFor(long y) const {
     return (this->getDaysFor(y,2)==29) ? 366 : 365;
 }
 
-string DateField::toString() {
+string DateField::toString() const {
     char tmp[30];
 #if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
     sprintf_s(
@@ -181,7 +181,7 @@ string DateField::toString() {
     return (char*)&tmp;
 }
 
-long DateField::to_seconds() {
+long DateField::to_seconds() const {
 	const static long GIORNO = 24L * 60L * 60L;
 	long ret = 0;
 	// Time
@@ -194,7 +194,7 @@ long DateField::to_seconds() {
 	return ret;
 }
 
-long DateField::to_days() {
+long DateField::to_days() const {
 	long ret = 0;
 	// Date
 	ret += (this->day-1);

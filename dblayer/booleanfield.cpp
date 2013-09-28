@@ -57,4 +57,4 @@ Field* BooleanField::createNewInstance(const char* aName) {
     return ret;
 }
 
-string BooleanField::toString() { return this->boolValue ? string("true") : string("false"); }
+string BooleanField::toString() const { return this->boolValue ? string("true") : string("false"); }

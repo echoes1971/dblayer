@@ -43,7 +43,7 @@ namespace SchemaNS {
 
         virtual Field* createNewInstance(const char* aName=0);
 
-        float getValue();
+        float getValue() const;
         void setValue(float valore);
 
         string toString();

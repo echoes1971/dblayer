@@ -44,7 +44,7 @@ namespace SchemaNS {
 
         virtual Field* createNewInstance(const char* aName=0);
 
-        string toString();
+        string toString() const;
     };
 }
 

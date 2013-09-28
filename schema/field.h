@@ -68,24 +68,28 @@ namespace SchemaNS {
         virtual Field* clone();
 
         /** L'implementazione di default va bene per i tipi normali, eccetto le <b>date</b> */
-        virtual bool equals(Field* field);
+        virtual bool equals(const Field* field);
 
-        inline string getName() { return this->name; }
-        inline int getType() { return type; }
-        string getTypeName();
-        bool isBoolean();
-        bool isInteger();
-        bool isFloat();
-        bool isDouble();
-        bool isDate();
-        bool isString();
+        // 2011.09.09: end.
+        inline string getName() const { return this->name; }
+        inline int getType() const { return type; }
+//        string getName();
+//        int getType();
+        // 2011.09.09: end.
+        string getTypeName() const;
+        bool isBoolean() const;
+        bool isInteger() const;
+        bool isFloat() const;
+        bool isDouble() const;
+        bool isDate() const;
+        bool isString() const;
 
-        virtual string toString();
+        virtual string toString() const;
 
-        const string* getStringValue();
-        float getFloatValue();
-        long getIntegerValue();
-        bool getBooleanValue();
+        const string* getStringValue() const;
+        float getFloatValue() const;
+        long getIntegerValue() const;
+        bool getBooleanValue() const;
 
         void setDateValue(const string* valore);
         void setDateValue(time_t valore);
@@ -104,9 +108,9 @@ namespace SchemaNS {
         void* getValue();
 
         /** @return the field value as a string */
-        string getValueAsString();
+        string getValueAsString() const;
 
-        bool isNull();
+        bool isNull() const;
         void setNull();
         void setNull(bool valore);
         enum FieldKind {

@@ -50,5 +50,8 @@ void StringField::setValue(const string* valore){
     if ( ((unsigned long)valore!=0) && valore->size()>0 )
         nullo = false;
 }
-const string* StringField::getValue(){ return this->stringValue; }
-string StringField::toString() { return string( this->getValue()->c_str() ); }
+const string* StringField::getValue() const{ return this->stringValue; }
+
+string StringField::toString() const {
+    return string( this->getValue()->c_str() );
+}

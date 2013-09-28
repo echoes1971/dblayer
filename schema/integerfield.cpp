@@ -47,14 +47,14 @@ Field* IntegerField::createNewInstance(const char* aName) {
     return (Field*) new IntegerField(&myName);
 }
 
-long IntegerField::getValue(){ return longValue; }
+long IntegerField::getValue() const{ return longValue; }
 void IntegerField::setValue(long valore){
     longValue=valore;
     if (valore!=0)
         nullo = false;
 }
 
-string IntegerField::toString() {
+string IntegerField::toString() const {
 	char tmp[50];
 #if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
 	sprintf_s(tmp,"%ld",this->longValue);

@@ -125,7 +125,7 @@ bool Connection::disconnect() {
     return true;
 }
 
-bool Connection::isConnected() { return this->connected; }
+bool Connection::isConnected() const { return this->connected; }
 
 ResultSet* Connection::login(string user, string pwd) { return new ResultSet(); }
 
@@ -135,19 +135,19 @@ string Connection::getSchemaName() { return "Connection::getSchemaName: NOT SUPP
 
 ResultSet* Connection::exec(const string s) { return new ResultSet(); }
 
-string Connection::getErrorMessage() { return this->errorMessage; }
-bool Connection::hasErrors() { return this->getErrorMessage().length() > 0; }
+string Connection::getErrorMessage() const { return this->errorMessage; }
+bool Connection::hasErrors() const { return this->getErrorMessage().length() > 0; }
 
 void Connection::setVerbose(bool b) { this->verbose=b; }
-bool Connection::isVerbose() { return this->verbose; }
+bool Connection::isVerbose() const { return this->verbose; }
 
 bool Connection::flush() { return true; }
 
 bool Connection::reconnect() { return false; }
 
-string* Connection::escapeString(string* s) { return s; }
-string Connection::escapeString(string s) { return DBLayer::replaceAll(s, "\'", "\'\'"); }
-string Connection::quoteDate(string s) { return "'"+DBLayer::replaceAll(s, " 00:00:00", "")+"'"; }
+string* Connection::escapeString(string* s) const { return s; }
+string Connection::escapeString(string s) const { return DBLayer::replaceAll(s, "\'", "\'\'"); }
+string Connection::quoteDate(string s) const { return "'"+DBLayer::replaceAll(s, " 00:00:00", "")+"'"; }
 
 ColumnDefinitions Connection::getColumnsForTable(const string& tablename) {
     ColumnDefinitions ret;
@@ -176,7 +176,7 @@ StringVector Connection::getKeysNames(string* relname) {
 }
 // **************** Proxy Connections *********************
 // The proxy connections are used by DBMgr to execute the following methods
-bool Connection::isProxy() { return false; }
+bool Connection::isProxy() const { return false; }
 DBEntity* Connection::Insert(DBEntity *dbe) { return dbe; }
 DBEntity* Connection::Update(DBEntity *dbe) { return dbe; }
 DBEntity* Connection::Delete(DBEntity *dbe) { return dbe; }
@@ -397,27 +397,27 @@ int PGConnection::setClientEncoding(string s) { return PQsetClientEncoding( this
 //********************* ResultSet
 ResultSet::ResultSet() {}
 ResultSet::~ResultSet() {}
-int ResultSet::getNumColumns() { return (int) this->columnName.size();}
-int ResultSet::getNumRows() { return this->columnName.size()!=0 ? (int) ( this->righe.size() / this->columnName.size() ) : 0; }
-string ResultSet::getValue(int row, int column) { return this->righe.at( row * this->columnName.size() + column ); }
-string ResultSet::getValue(int row, string* columnName) { return this->getValue(row, this->getColumnIndex(columnName)); }
-string ResultSet::getColumnName(int i) { return this->columnName[i]; }
-string ResultSet::getColumnType(int i) { return this->columnType[i]; }
-int ResultSet::getColumnSize(int i) { return this->columnSize[i]; }
+int ResultSet::getNumColumns() const { return (int) this->columnName.size();}
+int ResultSet::getNumRows() const { return this->columnName.size()!=0 ? (int) ( this->righe.size() / this->columnName.size() ) : 0; }
+string ResultSet::getValue(int row, int column) const { return this->righe.at( row * this->columnName.size() + column ); }
+string ResultSet::getValue(int row, string* columnName) const { return this->getValue(row, this->getColumnIndex(columnName)); }
+string ResultSet::getColumnName(int i) const { return this->columnName[i]; }
+string ResultSet::getColumnType(int i) const { return this->columnType[i]; }
+int ResultSet::getColumnSize(int i) const { return this->columnSize[i]; }
 
-int ResultSet::getLength(int row, int column) { return (int) this->righe.at( row * this->columnName.size() + column ).size(); }
-bool ResultSet::isNull(int row, int column) {
+int ResultSet::getLength(int row, int column) const { return (int) this->righe.at( row * this->columnName.size() + column ).size(); }
+bool ResultSet::isNull(int row, int column) const {
     string tmp = this->getValue(row,column);
     return tmp=="\\N";
 }
 
-string ResultSet::getErrorMessage() { return string(""); }
+string ResultSet::getErrorMessage() const { return string(""); }
 
-bool ResultSet::hasErrors() { return this->getErrorMessage().length() > 0; }
+bool ResultSet::hasErrors() const { return this->getErrorMessage().length() > 0; }
 
-string ResultSet::getStatus() { return string( "" ); }
+string ResultSet::getStatus() const { return string( "" ); }
 
-int ResultSet::getColumnIndex(string* columnName ) {
+int ResultSet::getColumnIndex(string* columnName ) const {
     int ret = -1;
     const char* columnNameChar = columnName->c_str();
     for(unsigned int i=0; i<this->columnName.size() && ret<0; i++) {
@@ -428,7 +428,7 @@ int ResultSet::getColumnIndex(string* columnName ) {
     return ret;
 }
 
-string ResultSet::toString(string prefix) {
+string ResultSet::toString(string prefix) const {
     string ret;
     ret.append(prefix+"<ResultSet>");
 
@@ -476,26 +476,26 @@ string ResultSet::toString(string prefix) {
 PGResultSet::PGResultSet() : ResultSet::ResultSet() {}
 PGResultSet::PGResultSet(PGresult* res) : ResultSet::ResultSet() { this->res = res; }
 PGResultSet::~PGResultSet() { PQclear(this->res); }
-int PGResultSet::getNumColumns() { return PQnfields( this->res ); }
-int PGResultSet::getNumRows() { return PQntuples( this->res ); }
-string PGResultSet::getValue(int row, int column) {
+int PGResultSet::getNumColumns() const { return PQnfields( this->res ); }
+int PGResultSet::getNumRows() const { return PQntuples( this->res ); }
+string PGResultSet::getValue(int row, int column) const {
     string ret;
     char* tmp = PQgetvalue( this->res, row, column );
     if(tmp!=0) ret.append(tmp);
     return ret;
 }
-string PGResultSet::getColumnName(int i) { return string( PQfname(this->res, i) ); }
+string PGResultSet::getColumnName(int i) const { return string( PQfname(this->res, i) ); }
 /*	I tipi di postgres si vedono con la query: select oid,typname from pg_type	*/
-string PGResultSet::getColumnType(int i) {
+string PGResultSet::getColumnType(int i) const {
     int mytype = (int) PQftype( this->res, i );
     return PGConnection::pgtype2string(mytype);
 }
 
-int PGResultSet::getColumnSize(int i) { return PQfsize(this->res, i); }
-int PGResultSet::getLength(int row, int column) { return PQgetlength(this->res, row, column); }
-bool PGResultSet::isNull(int row, int column) { return PQgetisnull(this->res, row, column)>0 ? true : false; }
-string PGResultSet::getErrorMessage() { return string( PQresultErrorMessage(this->res) ); }
-string PGResultSet::getStatus() { return string( PQresStatus( PQresultStatus( (this->res) ) ) ); }
-int PGResultSet::getColumnIndex(string* columnName ) { return PQfnumber( this->res, columnName->c_str() ); }
+int PGResultSet::getColumnSize(int i) const { return PQfsize(this->res, i); }
+int PGResultSet::getLength(int row, int column) const { return PQgetlength(this->res, row, column); }
+bool PGResultSet::isNull(int row, int column) const { return PQgetisnull(this->res, row, column)>0 ? true : false; }
+string PGResultSet::getErrorMessage() const { return string( PQresultErrorMessage(this->res) ); }
+string PGResultSet::getStatus() const { return string( PQresStatus( PQresultStatus( (this->res) ) ) ); }
+int PGResultSet::getColumnIndex(string* columnName ) const { return PQfnumber( this->res, columnName->c_str() ); }
 
 #endif

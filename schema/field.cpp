@@ -80,7 +80,7 @@ Field* Field::clone() {
     return ret;
 }
 
-bool Field::equals(Field* field) {
+bool Field::equals(const Field *field) {
     bool ret=true;
     ret = ret && (field->getName() == this->getName());
     ret = ret && (field->getType() == this->getType());
@@ -100,7 +100,9 @@ bool Field::equals(Field* field) {
     }
     return ret;
 }
-string Field::getTypeName() {
+
+
+string Field::getTypeName() const {
     switch(this->type) {
       case Field::ANY:
         return "ANY";
@@ -117,17 +119,17 @@ string Field::getTypeName() {
     }
     return "UNKNOWN";
 }
-bool Field::isBoolean() { return type==Field::BOOLEAN; }
-bool Field::isInteger() { return type==Field::INTEGER; }
-bool Field::isString() { return type==Field::STRING; }
-bool Field::isDate() { return type==Field::DATE; }
-bool Field::isFloat() { return type==Field::FLOAT; }
-bool Field::isDouble() { return type==Field::FLOAT; }
+bool Field::isBoolean() const { return type==Field::BOOLEAN; }
+bool Field::isInteger() const { return type==Field::INTEGER; }
+bool Field::isString() const { return type==Field::STRING; }
+bool Field::isDate() const { return type==Field::DATE; }
+bool Field::isFloat() const { return type==Field::FLOAT; }
+bool Field::isDouble() const { return type==Field::FLOAT; }
 
-long Field::getIntegerValue() { return this->longValue; }
-float Field::getFloatValue() { return this->floatValue; }
-const string* Field::getStringValue() { return this->stringValue; }
-bool Field::getBooleanValue() { return this->boolValue; }
+long Field::getIntegerValue() const { return this->longValue; }
+float Field::getFloatValue() const { return this->floatValue; }
+const string* Field::getStringValue() const { return this->stringValue; }
+bool Field::getBooleanValue() const { return this->boolValue; }
 
 void Field::setStringValue(const string* valore) {
     if(this->stringValue!=0) delete this->stringValue;
@@ -252,7 +254,7 @@ void* Field::getValue() {
         break;
     }
 }
-string Field::getValueAsString() {
+string Field::getValueAsString() const {
     if(this->isNull()) return "<NULL>";
     switch(type) {
       case BOOLEAN:
@@ -278,9 +280,9 @@ string Field::getValueAsString() {
     return "";
 }
 
-string Field::toString() { return ""; }
+string Field::toString() const { return ""; }
 
-bool Field::isNull() { return nullo; }
+bool Field::isNull() const { return nullo; }
 void Field::setNull() { nullo=true; }
 void Field::setNull(bool valore) { nullo = valore; }
 
@@ -312,7 +314,9 @@ long Field::getDaysFor(long y, long m) {
     }
     return ret;
 }
-long Field::getDaysFor(long y) { return (Field::getDaysFor(y,2)==29) ? 366 : 365; }
+long Field::getDaysFor(long y) {
+    return (Field::getDaysFor(y,2)==29) ? 366 : 365;
+}
 long Field::to_days(long year, long month, long day) {
     long ret = 0;
     // Date
