@@ -139,11 +139,11 @@ ResultSet* SQLiteConnection::exec(const string s) {
         if(nomeTipo!=0) {
             if( strcmp(nomeTipo,"int")==0 || strcmp(nomeTipo,"integer")==0) {
                 rs->columnType.push_back( DBLayer::type_integer );
-            } else if( strcmp(nomeTipo,"text"  )==0 ) {
+            } else if( strcmp(nomeTipo,"text")==0 || strncmp(nomeTipo,"varchar",7)==0 ) {
                 rs->columnType.push_back( DBLayer::type_string );
-            } else if( strcmp(nomeTipo,"float"  )==0 ) {
+            } else if( strcmp(nomeTipo,"float")==0 ) {
                 rs->columnType.push_back( DBLayer::type_double );
-            } else if( strcmp(nomeTipo,"blob"  )==0 ) {
+            } else if( strcmp(nomeTipo,"blob")==0 ) {
                 rs->columnType.push_back( DBLayer::type_blob );
             } else {
                 cerr << "SQLiteConnection::exec: typeCode \'" << nomeTipo

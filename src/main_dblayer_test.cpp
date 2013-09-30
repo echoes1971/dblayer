@@ -86,7 +86,7 @@ void testDBConnection(string& connString) {
         //res = con->exec(string("select conkey from pg_constraint join pg_class on pg_class.oid=conrelid where contype='p' and relname='" + relname + "' "));
 
         if( !con->hasErrors() ) {
-            cout << "res.status: " << res->getStatus() << endl;
+            cout << "res.status: " << res->getStatus() << "." << endl;
             cout << "res.toString() = " << res->toString() << endl;
 
             int nColonne = res->getNumColumns();
