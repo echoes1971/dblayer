@@ -58,9 +58,9 @@ Schema::~Schema() {
     schemiDistrutti++;
 }
 
-string Schema::getName() { return this->name; }
+string Schema::getName() const { return this->name; }
 
-string Schema::toString_nodes(string prefix) {
+string Schema::toString_nodes(string prefix) const {
     string ret=prefix;
     ret.append("<").append(this->getName()).append(">");
     // Fields
@@ -100,7 +100,7 @@ string Schema::toString_nodes(string prefix) {
     ret.append(prefix).append("</").append(this->getName()).append(">");
     return ret;
 }
-string Schema::toString(string prefix, bool valuesAsAttributes) {
+string Schema::toString(string prefix, bool valuesAsAttributes) const {
     if ( !valuesAsAttributes ) {
         return toString_nodes(prefix);
     }
@@ -144,11 +144,11 @@ string Schema::toString(string prefix, bool valuesAsAttributes) {
     return ret.append( "/>" );
 }
 
-Schema* Schema::createNewInstance(const char* aName) {
+Schema* Schema::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
     return new Schema(&myName);
 }
-Schema* Schema::clone(Schema* newSchema) {
+Schema* Schema::clone(Schema* newSchema) const {
     Schema* ret = newSchema==0 ? this->createNewInstance() : newSchema;
     int fieldSize = this->getFieldSize();
     for(int i=0; i<fieldSize; i++) {
@@ -158,7 +158,7 @@ Schema* Schema::clone(Schema* newSchema) {
     return ret;
 }
 
-bool Schema::equals(Schema* right) {
+bool Schema::equals(Schema* right) const {
     bool ret=true;
     ret = ret && (this->getName() == right->getName());
     ret = ret && (this->getFieldSize() == right->getFieldSize());
@@ -198,28 +198,28 @@ DECLSPECIFIER bool SchemaNS::operator==(const Schema& left, const Schema& right)
     return left_pointer->equals( right_pointer );
 }
 
-Field* Schema::createNewField(const string* fieldName, bool valore) { return new BooleanField(fieldName, valore); }
-Field* Schema::createNewField(const string* fieldName, float valore) { return new FloatField(fieldName, valore); }
-Field* Schema::createNewField(const string* fieldName, long valore) { return new IntegerField(fieldName, valore); }
-Field* Schema::createNewField(const string* fieldName, const string* valore) { return new StringField(fieldName, valore); }
-Field* Schema::createNewDateField(const string* fieldName, const string* valore) { return new DateField(fieldName, valore); }
+Field* Schema::createNewField(const string* fieldName, bool valore) const { return new BooleanField(fieldName, valore); }
+Field* Schema::createNewField(const string* fieldName, float valore) const { return new FloatField(fieldName, valore); }
+Field* Schema::createNewField(const string* fieldName, long valore) const { return new IntegerField(fieldName, valore); }
+Field* Schema::createNewField(const string* fieldName, const string* valore) const { return new StringField(fieldName, valore); }
+Field* Schema::createNewDateField(const string* fieldName, const string* valore) const { return new DateField(fieldName, valore); }
 void Schema::addField( Field* field ) { this->fields.push_back( field ); }
-Field* Schema::getField(const string* field) {
+Field* Schema::getField(const string* field) const {
     Field* ret = (Field*)0;
     int indice = this->getFieldIndex(field);
     if( indice>=0 )
         ret = this->getField( indice );
     return ret;
 }
-Field* Schema::getField(string* field) {
+Field* Schema::getField(string* field) const {
     Field* ret = (Field*)0;
     int indice = this->getFieldIndex(field);
     if( indice>=0 )
         ret = this->getField( indice );
     return ret;
 }
-Field* Schema::getField(int i) { return i>=0 && i<((int)this->fields.size()) ? this->fields[i] : 0; }
-int Schema::getFieldIndex(const string* field) {
+Field* Schema::getField(int i) const { return i>=0 && i<((int)this->fields.size()) ? this->fields[i] : 0; }
+int Schema::getFieldIndex(const string* field) const {
     int ret = -1;
     const char* fieldCstr = field->c_str();
 #ifdef WIN32
@@ -242,9 +242,9 @@ int Schema::getFieldIndex(const string* field) {
     }
     return ret;
 }
-int Schema::getFieldSize() { return (int) this->fields.size(); }
+int Schema::getFieldSize() const { return (int) this->fields.size(); }
 
-StringVector Schema::getNames() {
+StringVector Schema::getNames() const {
     StringVector ret;
 #ifdef WIN32
     size_t fieldsSize = fields.size();
@@ -264,7 +264,7 @@ StringVector Schema::getNames() {
     }
     return ret;
 }
-FieldMap Schema::getValuesDictionary() {
+FieldMap Schema::getValuesDictionary() const {
     FieldMap ret;
 #ifdef WIN32
     size_t fieldsSize = fields.size();
@@ -347,16 +347,16 @@ void Schema::setValue(const string* fieldName, long valore) {
 	}
 }
 
-string Schema::getValue(const string* fieldName) {
+string Schema::getValue(const string* fieldName) const {
     Field* field = this->getField(fieldName);
     return field==0 ? "" : field->toString();
 }
-string Schema::getDateValue(const string* fieldName) {
+string Schema::getDateValue(const string* fieldName) const {
     Field* field = this->getField(fieldName);
     return field==0 ? "" : field->toString();
 }
 
-bool Schema::isNull(const string* fieldName) {
+bool Schema::isNull(const string* fieldName) const {
 	Field* field = this->getField(fieldName);
 	return field==0 ? true : field->isNull();
 }

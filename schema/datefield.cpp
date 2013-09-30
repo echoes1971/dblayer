@@ -60,12 +60,12 @@ DateField::DateField(const string* nome,
 }
 DateField::~DateField(){}
 
-Field* DateField::createNewInstance(const char* aName) {
+Field* DateField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
     return new DateField(&myName,0L);
 }
 
-Field* DateField::clone() {
+Field* DateField::clone() const {
     DateField* ret = (DateField*) this->createNewInstance();
     ret->year=this->year;
     ret->month=this->month;
@@ -77,7 +77,7 @@ Field* DateField::clone() {
     return ret;
 }
 
-bool DateField::equals(Field* field) {
+bool DateField::equals(Field* field) const {
     bool ret=true;
     ret = ret && (field->getName() == this->getName());
     ret = ret && (field->getType() == this->getType());
@@ -189,7 +189,7 @@ bool DateField::isValidHour(long h, long m, long s, long millis) const {
             && millis>=0 && millis<=999;
 }
 
-string DateField::toString() {
+string DateField::toString() const {
     char tmp[50];
 #if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
     sprintf_s(

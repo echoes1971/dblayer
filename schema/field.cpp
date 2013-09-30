@@ -54,14 +54,14 @@ Field::~Field() {
     fieldDistrutti++;
 }
 
-Field* Field::createNewInstance(const char* aName) {
+Field* Field::createNewInstance(const char* aName) const {
     Field* ret=0;
     string myName = aName==0 ? this->name : aName ;
     ret = new Field(&myName);
     ret->type = this->type;
     return ret;
 }
-Field* Field::clone() {
+Field* Field::clone() const {
     Field* ret = this->createNewInstance();
     switch( this->getType() ) {
     case Field::BOOLEAN:
@@ -80,7 +80,7 @@ Field* Field::clone() {
     return ret;
 }
 
-bool Field::equals(const Field *field) {
+bool Field::equals(const Field *field) const {
     bool ret=true;
     ret = ret && (field->getName() == this->getName());
     ret = ret && (field->getType() == this->getType());
@@ -233,7 +233,7 @@ void Field::setValue(void* value) {
         break;
     }
 }
-void* Field::getValue() {
+void* Field::getValue() const {
     if(this->isNull()) return 0;
     switch(type) {
       case BOOLEAN:

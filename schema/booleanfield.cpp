@@ -45,7 +45,7 @@ BooleanField::BooleanField(const string* nome, bool valore) : Field(nome) {
 }
 BooleanField::~BooleanField(){}
 
-Field* BooleanField::createNewInstance(const char* aName) {
+Field* BooleanField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
     return new BooleanField(&myName);
 }

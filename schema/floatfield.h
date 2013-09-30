@@ -41,7 +41,7 @@ namespace SchemaNS {
         FloatField(const string* nome, float valore);
         virtual ~FloatField();
 
-        virtual Field* createNewInstance(const char* aName=0);
+        virtual Field* createNewInstance(const char* aName=0) const;
 
         float getValue() const;
         void setValue(float valore);

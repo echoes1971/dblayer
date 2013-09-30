@@ -63,19 +63,15 @@ namespace SchemaNS {
         Field(const string* nome);
         virtual ~Field();
 
-        virtual Field* createNewInstance(const char* aName=0);
+        virtual Field* createNewInstance(const char* aName=0) const;
         /** L'implementazione di default va bene per i tipi normali, eccetto le <b>date</b> */
-        virtual Field* clone();
+        virtual Field* clone() const;
 
         /** L'implementazione di default va bene per i tipi normali, eccetto le <b>date</b> */
-        virtual bool equals(const Field* field);
+        virtual bool equals(const Field* field) const;
 
-        // 2011.09.09: end.
         inline string getName() const { return this->name; }
         inline int getType() const { return type; }
-//        string getName();
-//        int getType();
-        // 2011.09.09: end.
         string getTypeName() const;
         bool isBoolean() const;
         bool isInteger() const;
@@ -105,7 +101,7 @@ namespace SchemaNS {
         void setValue(string value);
 
         void setValue(void* value);
-        void* getValue();
+        void* getValue() const;
 
         /** @return the field value as a string */
         string getValueAsString() const;

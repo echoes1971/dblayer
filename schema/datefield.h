@@ -55,9 +55,9 @@ namespace SchemaNS {
             );
         virtual ~DateField();
 
-        virtual Field* createNewInstance(const char* aName=0);
-        virtual Field* clone();
-        virtual bool equals(Field* field);
+        virtual Field* createNewInstance(const char* aName=0) const;
+        virtual Field* clone() const;
+        virtual bool equals(Field* field) const;
 
         void setValue(const string* valore);
         /** Since 01/01/1970 */
@@ -65,7 +65,7 @@ namespace SchemaNS {
         //bool isValid();
         //long getDaysFor(long year);
         //long getDaysFor(long year, long month);
-        virtual string toString();
+        virtual string toString() const;
         /** Convert to seconds since 01/01/1970 */
         long to_seconds() const;
         /** Convert to days since 01/01/1970 */

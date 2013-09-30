@@ -42,7 +42,7 @@ IntegerField::IntegerField(const string* nome, long valore) : Field(nome) {
 }
 IntegerField::~IntegerField(){}
 
-Field* IntegerField::createNewInstance(const char* aName) {
+Field* IntegerField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
     return (Field*) new IntegerField(&myName);
 }

@@ -68,37 +68,37 @@ namespace SchemaNS {
         Schema(const string* nome);
         virtual ~Schema();
 
-        string getName();
+        string getName() const;
 
-        virtual string toString(string prefix="", bool valuesAsAttributes=false);
+        virtual string toString(string prefix="", bool valuesAsAttributes=false) const;
 
         /** Returns a new instance */
-        virtual Schema* createNewInstance(const char* aName=0);
+        virtual Schema* createNewInstance(const char* aName=0) const;
         /** Create a copy of current schema */
-        Schema* clone(Schema* newSchema=0);
+        Schema* clone(Schema* newSchema=0) const;
 
-        virtual bool equals(Schema* right);
+        virtual bool equals(Schema* right) const;
         friend DECLSPECIFIER bool operator==(const Schema& left, const Schema& right);
 
-        virtual Field* createNewField(const string* fieldName, bool valore);
-        virtual Field* createNewField(const string* fieldName, float valore);
-        virtual Field* createNewField(const string* fieldName, long valore);
-        virtual Field* createNewField(const string* fieldName, const string* valore);
-        virtual Field* createNewDateField(const string* fieldName, const string* valore);
+        virtual Field* createNewField(const string* fieldName, bool valore) const;
+        virtual Field* createNewField(const string* fieldName, float valore) const;
+        virtual Field* createNewField(const string* fieldName, long valore) const;
+        virtual Field* createNewField(const string* fieldName, const string* valore) const;
+        virtual Field* createNewDateField(const string* fieldName, const string* valore) const;
 
         void addField( Field* field );
-        Field* getField(string* field);
-        Field* getField(const string* field);
-        Field* getField(int i);
+        Field* getField(string* field) const;
+        Field* getField(const string* field) const;
+        Field* getField(int i) const;
         /** Ritorna la posizione del field nel vettore */
-        int getFieldIndex(const string* field);
+        int getFieldIndex(const string* field) const;
         /** Ritorna i dbfields presenti nella dbe */
-        int getFieldSize();
+        int getFieldSize() const;
 
         /** Ritorna i nomi dei campi presenti nella DBE */
-        StringVector getNames();
+        StringVector getNames() const;
         /** Ritorna un dizionario nome:valore della DBE */
-        FieldMap getValuesDictionary();
+        FieldMap getValuesDictionary() const;
 
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
         void setValue(const string* fieldName, bool valore);
@@ -115,13 +115,13 @@ namespace SchemaNS {
          * Ritorna il valore del field in argomento
          * L'esistenza del field deve essere prima testata con la funzione isNull
          */
-        string getValue(const string* fieldName);
-        string getDateValue(const string* fieldName);
+        string getValue(const string* fieldName) const;
+        string getDateValue(const string* fieldName) const;
 
         /**
          * Ritorna true se il field non è presente oppure se è presente ma ha valore nullo
          */
-        bool isNull(const string* fieldName);
+        bool isNull(const string* fieldName) const;
         void setNull(const string* fieldName);
         void setNull(const string* fieldName, bool valore);
 
@@ -135,7 +135,7 @@ namespace SchemaNS {
         FieldVector fields;
 
       private:
-        string toString_nodes(string prefix);
+        string toString_nodes(string prefix) const;
 
         static int schemiCreati;
         static int schemiDistrutti;

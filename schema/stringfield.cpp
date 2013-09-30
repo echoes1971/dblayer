@@ -40,7 +40,7 @@ StringField::StringField(const string* nome,const string* valore) : Field(nome){
 }
 StringField::~StringField() {}
 
-Field* StringField::createNewInstance(const char* aName) {
+Field* StringField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
     return (Field*) new StringField(&myName);
 }

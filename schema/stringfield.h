@@ -41,7 +41,7 @@ namespace SchemaNS {
         StringField(const string* nome,const string* valore );
         virtual ~StringField();
 
-        virtual Field* createNewInstance(const char* aName=0);
+        virtual Field* createNewInstance(const char* aName=0) const;
 
 		void setValue(const string* valore);
         const string* getValue() const;

@@ -44,7 +44,7 @@ FloatField::FloatField(const string* nome, float valore) : Field(nome) {
 }
 FloatField::~FloatField() {}
 
-Field* FloatField::createNewInstance(const char* aName) {
+Field* FloatField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
     return new FloatField(&myName);
 }

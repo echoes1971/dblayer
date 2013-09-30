@@ -41,7 +41,7 @@ namespace SchemaNS {
 		IntegerField(const string* nome, long valore);
 		virtual ~IntegerField();
 		
-		virtual Field* createNewInstance(const char* aName=0);
+        virtual Field* createNewInstance(const char* aName=0) const;
 		
 		void setValue(long valore);
         long getValue() const;
