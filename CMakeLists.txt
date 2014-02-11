@@ -13,5 +13,6 @@ message("INCLUDE_DIRECTORIES: ${INCLUDE_DIRECTORIES}")
 #include_directories ("${PROJECT_SOURCE_DIR}/dblayer")
 add_subdirectory (schema)
 add_subdirectory (dblayer)
+add_subdirectory (src)
 
 
