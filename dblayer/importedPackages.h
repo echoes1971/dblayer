@@ -47,7 +47,7 @@
  #endif
 #endif
 
-# ifdef USE_ODBCPP
+#ifdef USE_ODBCPP
  #ifdef __WIN32
   #include <windef.h>
   #include <mbstring.h>

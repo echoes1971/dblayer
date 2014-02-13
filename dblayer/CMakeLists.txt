@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 
-
-add_library(dblayer
+add_library(DBLayer
 	booleanfield.cpp
 	dbconnection.cpp
 	dbentity.cpp
@@ -20,4 +19,3 @@ add_library(dblayer
 	sqliteconnection.cpp
 	xmlrpcconnection.cpp
 	)
-

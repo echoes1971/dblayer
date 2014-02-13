@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 
-
-add_library(schema
+add_library(Schema
 	booleanfield.cpp
 	datefield.cpp
 	field.cpp
@@ -11,4 +10,3 @@ add_library(schema
 	schema.cpp
 	stringfield.cpp
 	)
-
