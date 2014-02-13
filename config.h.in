@@ -1,0 +1,41 @@
+/* Name of package */
+#define PACKAGE "dblayer"
+
+/* Define to the address where bug reports for this package should be sent. */
+#define PACKAGE_BUGREPORT "roberto@roccoangeloni.it"
+
+/* Define to the full name of this package. */
+#define PACKAGE_NAME "dblayer"
+
+/* Define to the full name and version of this package. */
+#define PACKAGE_STRING "dblayer 0.@Tutorial_VERSION_MAJOR@.@Tutorial_VERSION_MINOR@"
+
+/* Define to the one symbol short name of this package. */
+#define PACKAGE_TARNAME "dblayer"
+
+/* Define to the home page for this package. */
+#define PACKAGE_URL ""
+
+/* Define to the version of this package. */
+#define PACKAGE_VERSION "0.@Tutorial_VERSION_MAJOR@.@Tutorial_VERSION_MINOR@"
+
+/* Define to 1 if you have the ANSI C header files. */
+#define STDC_HEADERS 1
+
+/* Enables PostgreSQL specific driver. */
+#cmakedefine USE_LIBPQ
+
+/* Enables SQLite3 specific driver. */
+#cmakedefine USE_LIBSQLITE3
+
+/* Enables Xmlrpc-c specific driver. */
+#cmakedefine USE_LIBXMLRPC
+
+/* Enables MySQL specific driver. */
+#cmakedefine USE_MYSQL
+
+/* Enables ODBC specific driver. */
+#cmakedefine USE_ODBCPP
+
+/* Version number of package */
+#define VERSION "0.@Tutorial_VERSION_MAJOR@.@Tutorial_VERSION_MINOR@"
