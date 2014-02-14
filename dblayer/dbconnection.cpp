@@ -218,8 +218,8 @@ ResultSet* PGConnection::exec(const string s) {
     PGresult* res = PQexec(this->conn, s.c_str() );
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         this->errorMessage = string( PQresultErrorMessage(res) );
-    //PQclear(res);	caller MUST destroy the PGResultSet
-    PGResultSet* ret = new PGResultSet(res);
+        //PQclear(res);	caller MUST destroy the PGResultSet
+        PGResultSet* ret = new PGResultSet(res);
         return ret;
     } else {
         this->errorMessage.clear();

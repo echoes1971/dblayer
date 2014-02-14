@@ -103,17 +103,17 @@ ResultSet* XmlrpcConnection::exec(const string s) {
         this->_client.call(this->connectionString, "selectAsArray", "ss", &result, "nometabella", s.c_str());
     } catch (std::exception const& e) {
         this->errorMessage.append( "Client threw error: " ); this->errorMessage.append( e.what() );
-        return false;
+        return new XmlrpcResultSet();
     } catch (...) {
         this->errorMessage.append( "Client threw unexpected error." );
-        return false;
+        return new XmlrpcResultSet();
     }
 
     // If not result is [ stringa, [] ], then error
     if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
         this->errorMessage.append( "Server returned a wrong type: " + integer2string(result.type())
                                    + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
-        return false;
+        return new XmlrpcResultSet();
     }
 
     xmlrpc_c::value_array myarray(result);
@@ -123,12 +123,12 @@ ResultSet* XmlrpcConnection::exec(const string s) {
         this->errorMessage.append( "Server returned a wrong type at return[0]: " + integer2string(myarray.vectorValueValue().at(0).type())
                                    + " instead of " + integer2string(xmlrpc_c::value::TYPE_STRING)
                                    + " or " + integer2string(xmlrpc_c::value::TYPE_BYTESTRING) );
-        return false;
+        return new XmlrpcResultSet();
     }
     if( myarray.vectorValueValue().at(1).type()!=xmlrpc_c::value::TYPE_ARRAY ) {
         this->errorMessage.append( "Server returned a wrong type at return[1]: " + integer2string(myarray.vectorValueValue().at(1).type())
                                    + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
-        return false;
+        return new XmlrpcResultSet();
     }
 
     xmlrpc_c::value_array lista(myarray.vectorValueValue().at(1));
@@ -159,10 +159,10 @@ ResultSet* XmlrpcConnection::login(string user, string pwd) {
         this->_client.call(this->connectionString, "login", "ss", &result, user.c_str(), pwd.c_str());
     } catch (std::exception const& e) {
         this->errorMessage.append( "Client threw error: " ); this->errorMessage.append( e.what() );
-        return false;
+        return new XmlrpcResultSet();
     } catch (...) {
         this->errorMessage.append( "Client threw unexpected error." );
-        return false;
+        return new XmlrpcResultSet();
     }
 
     if(result.type()!=xmlrpc_c::value::TYPE_ARRAY) {
@@ -177,12 +177,12 @@ ResultSet* XmlrpcConnection::login(string user, string pwd) {
         this->errorMessage.append( "Server returned a wrong type at return[0]: " + integer2string(myarray.vectorValueValue().at(0).type())
                                    + " instead of " + integer2string(xmlrpc_c::value::TYPE_STRING)
                                    + " or " + integer2string(xmlrpc_c::value::TYPE_BYTESTRING) );
-        return false;
+        return new XmlrpcResultSet();
     }
     if( myarray.vectorValueValue().at(1).type()!=xmlrpc_c::value::TYPE_ARRAY ) {
         this->errorMessage.append( "Server returned a wrong type at return[1]: " + integer2string(myarray.vectorValueValue().at(1).type())
                                    + " instead of " + integer2string(xmlrpc_c::value::TYPE_ARRAY) );
-        return false;
+        return new XmlrpcResultSet();
     }
 
     xmlrpc_c::value_array lista(myarray.vectorValueValue().at(1));
