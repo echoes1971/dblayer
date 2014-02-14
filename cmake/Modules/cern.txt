@@ -1,0 +1,5 @@
+Nice modules from CERN
+
+
+http://root.cern.ch/svn/root/trunk/cmake/modules/
+
