@@ -12,7 +12,7 @@
 **		v0.1.1 - 2006.05.14 Completato SQLiteResultSet e SQLiteConnection ad
 **				 eccezione di alcuni metodi che non sono supportati in sqlite3
 **
-** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: sqliteconnection.cpp $
 ** @package rproject::dblayer

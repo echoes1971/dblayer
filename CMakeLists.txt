@@ -8,6 +8,10 @@ project(DBLayer)
 set (Tutorial_VERSION_MAJOR 5)
 set (Tutorial_VERSION_MINOR 2)
 
+# Changing year of copyright:
+# sed -i "s/2012 by /2014 by /g" *.h
+# sed -i "s/2012 by /2014 by /g" *.cpp
+
 ############################################
 # External libraries
 ############################################

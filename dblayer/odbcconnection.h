@@ -17,7 +17,7 @@
 **				<b>quoteDate</b> mette la data tra <b>#</b> piuttosto che tra <b>'</b>
 **		v0.1.2 - 2006.05.23 Adattato per Linux
 **
-** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: odbcconnection.h $
 ** @package rproject::dblayer

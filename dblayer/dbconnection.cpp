@@ -17,7 +17,7 @@
 **		v0.1.2 - 2006.05.22 Implementato ResultSet come SQLiteResultSet, ovvero con
 **					l'utilizzo di vettori di stringhe per memorizzare i risultati
 **
-** @copyright &copy; 2011-2012 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbconnection.cpp $
 ** @package rproject::dblayer
