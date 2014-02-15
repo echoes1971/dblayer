@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 
-add_library(DBLayer
+add_library(dblayer
 	booleanfield.cpp
 	dbconnection.cpp
 	dbentity.cpp

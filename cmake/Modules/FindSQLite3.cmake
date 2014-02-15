@@ -20,36 +20,41 @@ if (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIRS)
 else (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIRS)
   # use pkg-config to get the directories and then use these values
   # in the FIND_PATH() and FIND_LIBRARY() calls
-  if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-    include(UsePkgConfig)
-    pkgconfig(sqlite3 _SQLITE3_INCLUDEDIR _SQLITE3_LIBDIR _SQLITE3_LDFLAGS _SQLITE3_CFLAGS)
-  else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-    find_package(PkgConfig)
-    if (PKG_CONFIG_FOUND)
-      pkg_check_modules(_SQLITE3 sqlite3)
-    endif (PKG_CONFIG_FOUND)
-  endif (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+#  if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+#    include(UsePkgConfig)
+#    pkgconfig(sqlite3 _SQLITE3_INCLUDEDIR _SQLITE3_LIBDIR _SQLITE3_LDFLAGS _SQLITE3_CFLAGS)
+#  else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+#    find_package(PkgConfig)
+#    if (PKG_CONFIG_FOUND)
+#      pkg_check_modules(_SQLITE3 sqlite3)
+#    endif (PKG_CONFIG_FOUND)
+#  endif (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
   find_path(SQLITE3_INCLUDE_DIR
     NAMES
       sqlite3.h
     PATHS
-      ${_SQLITE3_INCLUDEDIR}
+      /opt/local/include
+      #${_SQLITE3_INCLUDEDIR}
       /opt/local/include
       /usr/include
       /usr/local/include
       /sw/include
+    NO_DEFAULT_PATH
   )
+#  message("SQLITE3_INCLUDE_DIR: ${SQLITE3_INCLUDE_DIR}")
 
   find_library(SQLITE3_LIBRARY
     NAMES
       sqlite3
     PATHS
       /opt/local/lib
-      ${_SQLITE3_LIBDIR}
+      #${_SQLITE3_LIBDIR}
       /usr/lib
       /usr/local/lib
       /sw/lib
+    NO_DEFAULT_PATH
   )
+#  message("SQLITE3_LIBRARY: ${SQLITE3_LIBRARY}")
 
   if (SQLITE3_LIBRARY)
     set(SQLITE3_FOUND TRUE)

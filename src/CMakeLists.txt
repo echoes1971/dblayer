@@ -8,8 +8,8 @@ add_executable(dblayer_test
     )
 target_link_libraries(dblayer_test ${EXTRA_LIBS})
 
-add_executable(dblayer
+add_executable(dbshell
     main_dblayer.cpp
     dbshell.cpp
     )
-target_link_libraries(dblayer ${EXTRA_LIBS})
+target_link_libraries(dbshell ${EXTRA_LIBS})
