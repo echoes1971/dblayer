@@ -1,0 +1,5 @@
+
+sudo port install libpqxx
+
+sudo port install mysql55
+
