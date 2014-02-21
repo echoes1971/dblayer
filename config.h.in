@@ -38,4 +38,4 @@
 #cmakedefine USE_ODBCPP
 
 /* Version number of package */
-#define VERSION "0.@Tutorial_VERSION_MAJOR@.@Tutorial_VERSION_MINOR@"
+#define VERSION "0.@DBLayer_VERSION_MAJOR@.@DBLayer_VERSION_MINOR@"

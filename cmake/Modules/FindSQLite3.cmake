@@ -17,76 +17,97 @@
 if (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIRS)
   # in cache already
   set(SQLITE3_FOUND TRUE)
-else (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIRS)
-  # use pkg-config to get the directories and then use these values
-  # in the FIND_PATH() and FIND_LIBRARY() calls
-#  if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-#    include(UsePkgConfig)
-#    pkgconfig(sqlite3 _SQLITE3_INCLUDEDIR _SQLITE3_LIBDIR _SQLITE3_LDFLAGS _SQLITE3_CFLAGS)
-#  else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-#    find_package(PkgConfig)
-#    if (PKG_CONFIG_FOUND)
-#      pkg_check_modules(_SQLITE3 sqlite3)
-#    endif (PKG_CONFIG_FOUND)
-#  endif (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-  find_path(SQLITE3_INCLUDE_DIR
-    NAMES
-      sqlite3.h
-    PATHS
-      /opt/local/include
-      #${_SQLITE3_INCLUDEDIR}
-      /usr/include
-      /usr/local/include
-      /sw/include
-    NO_DEFAULT_PATH
-  )
-#  message("SQLITE3_INCLUDE_DIR: ${SQLITE3_INCLUDE_DIR}")
+else()
+  if(APPLE)
+    message("APPLE!!!!!!!!!!!!!!!!!!!!!!!!!")
+    find_path(SQLITE3_INCLUDE_DIR
+        NAMES
+        sqlite3.h
+        PATHS
+        /opt/local/include
+        /usr/include
+        /usr/local/include
+        /sw/include
+        NO_DEFAULT_PATH
+    )
+    find_library(SQLITE3_LIBRARY
+        NAMES
+        sqlite3
+        PATHS
+        /opt/local/lib
+        /usr/lib
+        /usr/local/lib
+        /sw/lib
+        NO_DEFAULT_PATH
+    )
+  else()
+    # use pkg-config to get the directories and then use these values
+    # in the FIND_PATH() and FIND_LIBRARY() calls
+    find_package(PkgConfig)
+    if(PKG_CONFIG_FOUND)
+      pkg_check_modules(_SQLITE3 REQUIRED sqlite3)
+      set(SQLITE3_DEFINITIONS ${_SQLITE3_CFLAGS})
+      #set(SQLITE3_DEFINITIONS ${_SQLITE3_CFLAGS_OTHER})
+      message("_SQLITE3_LIBRARIES: ${_SQLITE3_LIBRARIES}")
+      message("_SQLITE3_INCLUDE_DIRS: ${_SQLITE3_INCLUDE_DIRS}")
+      message("_SQLITE3_INCLUDEDIR: ${_SQLITE3_INCLUDEDIR}")
+      message("_SQLITE3_CFLAGS: ${_SQLITE3_CFLAGS}")
+      message("_SQLITE3_CFLAGS_OTHER: ${_SQLITE3_CFLAGS_OTHER}")
+      message("_SQLITE3_LDFLAGS: ${_SQLITE3_LDFLAGS}")
+      message("_SQLITE3_LDFLAGS_OTHER: ${_SQLITE3_LDFLAGS_OTHER}")
+    endif()
 
-  find_library(SQLITE3_LIBRARY
-    NAMES
-      sqlite3
-    PATHS
-      /opt/local/lib
-      #${_SQLITE3_LIBDIR}
-      /usr/lib
-      /usr/lib/x86_64-linux-gnu/
-      /usr/local/lib
-      /sw/lib
-    NO_DEFAULT_PATH
-  )
-#  message("SQLITE3_LIBRARY: ${SQLITE3_LIBRARY}")
+    find_path(SQLITE3_INCLUDE_DIR
+      NAMES
+        sqlite3.h
+      PATHS
+        ${_SQLITE3_INCLUDEDIR}
+        /usr/include
+        /usr/local/include
+        /sw/include
+    )
+    find_library(SQLITE3_LIBRARY
+      NAMES
+        sqlite3
+      PATHS
+        ${_SQLITE3_LIBRARIES}
+        /usr/lib
+        /usr/local/lib
+        /sw/lib
+    )
+  endif()
+  message("SQLITE3_INCLUDE_DIR: ${SQLITE3_INCLUDE_DIR}")
+  message("SQLITE3_LIBRARY: ${SQLITE3_LIBRARY}")
 
-  if (SQLITE3_LIBRARY)
+  if(SQLITE3_LIBRARY)
     set(SQLITE3_FOUND TRUE)
-  endif (SQLITE3_LIBRARY)
+  endif()
 
-  set(SQLITE3_INCLUDE_DIRS
-    ${SQLITE3_INCLUDE_DIR}
-  )
+  set(SQLITE3_INCLUDE_DIRS ${SQLITE3_INCLUDE_DIR} )
 
-  if (SQLITE3_FOUND)
+  if(SQLITE3_FOUND)
     set(SQLITE3_LIBRARIES
       ${SQLITE3_LIBRARIES}
       ${SQLITE3_LIBRARY}
     )
-  endif (SQLITE3_FOUND)
+  endif()
 
-  if (SQLITE3_INCLUDE_DIRS AND SQLITE3_LIBRARIES)
+  if(SQLITE3_INCLUDE_DIRS AND SQLITE3_LIBRARIES)
      set(SQLITE3_FOUND TRUE)
-  endif (SQLITE3_INCLUDE_DIRS AND SQLITE3_LIBRARIES)
+  endif()
 
-  if (SQLITE3_FOUND)
-    if (NOT Sqlite3_FIND_QUIETLY)
+  if(SQLITE3_FOUND)
+    if(NOT Sqlite3_FIND_QUIETLY)
       message(STATUS "Found Sqlite3: ${SQLITE3_LIBRARIES}")
-    endif (NOT Sqlite3_FIND_QUIETLY)
-  else (SQLITE3_FOUND)
+    endif()
+  else()
     if (Sqlite3_FIND_REQUIRED)
       message(FATAL_ERROR "Could not find Sqlite3")
     endif (Sqlite3_FIND_REQUIRED)
-  endif (SQLITE3_FOUND)
+  endif()
 
   # show the SQLITE3_INCLUDE_DIRS and SQLITE3_LIBRARIES variables only in the advanced view
   mark_as_advanced(SQLITE3_INCLUDE_DIRS SQLITE3_LIBRARIES)
 
-endif (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIRS)
+endif()
 
