@@ -37,10 +37,14 @@ DBEFactory::DBEFactory(bool verbose) { this->_verbose=verbose; }
 DBEFactory::~DBEFactory() {
     if(this->_verbose) printf("DBEFactory::~DBEFactory: start.\n");
     // Cleaning the cache
-    for(DBEntityMap::iterator theIterator = this->_cache.begin(); theIterator!=this->_cache.end(); theIterator++) {
-        if(this->_verbose) printf("DBEFactory::~DBEFactory: cancello %s => %s\n",(*theIterator).first.c_str(), (*theIterator).second->name().c_str() );
-        delete (*theIterator).second;
+    for(const auto& elem : this->_cache) {
+        if(this->_verbose) printf("DBEFactory::~DBEFactory: cancello %s => %s\n",elem.first.c_str(), elem.second->name().c_str() );
+        delete elem.second;
     }
+//    for(DBEntityMap::iterator theIterator = this->_cache.begin(); theIterator!=this->_cache.end(); theIterator++) {
+//        if(this->_verbose) printf("DBEFactory::~DBEFactory: cancello %s => %s\n",(*theIterator).first.c_str(), (*theIterator).second->name().c_str() );
+//        delete (*theIterator).second;
+//    }
     this->_cache.clear();
     if(this->_verbose) printf("DBEFactory::~DBEFactory: end.\n");
 }
@@ -63,31 +67,45 @@ DBEntity* DBEFactory::getClazz(const string* tablename) {
 }
 
 DBEntity* DBEFactory::getClazzByTypeName(string* typeName, bool caseSensitive) {
-    for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
-        if (caseSensitive && (*it).second->name()== (*typeName) ) {
-            return (*it).second->createNewInstance();
+    for(const auto& elem : this->_cache) {
+        if (caseSensitive && elem.second->name()== (*typeName) ) {
+            return elem.second->createNewInstance();
         }
     }
+//    for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
+//        if (caseSensitive && (*it).second->name()== (*typeName) ) {
+//            return (*it).second->createNewInstance();
+//        }
+//    }
     return new DBEntity();
 }
 
 DBEntityVector DBEFactory::getRegisteredTypes() {
     DBEntityVector ret;
-    for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
-        ret.push_back( (*it).second );
+    for(const auto& elem : this->_cache) {
+        ret.push_back(elem.second);
     }
+//    for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
+//        ret.push_back( (*it).second );
+//    }
     return ret;
 }
 
 string DBEFactory::toString(string prefix) {
     string ret;
     ret.append(prefix + "<DBEFactory>");
-    for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
+    for(const auto& elem : this->_cache) {
         ret.append(prefix + " <clazz>");
-        ret.append(prefix + "  <key>" + (*it).first + "</key>" );
-        ret.append(prefix + "  <value>" +  (*it).second->name() + "</value>");
+        ret.append(prefix + "  <key>" + elem.first + "</key>" );
+        ret.append(prefix + "  <value>" +  elem.second->name() + "</value>");
         ret.append(prefix + " </clazz>");
     }
+//    for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
+//        ret.append(prefix + " <clazz>");
+//        ret.append(prefix + "  <key>" + (*it).first + "</key>" );
+//        ret.append(prefix + "  <value>" +  (*it).second->name() + "</value>");
+//        ret.append(prefix + " </clazz>");
+//    }
     ret.append(prefix + "</DBEFactory>");
     return ret;
 }

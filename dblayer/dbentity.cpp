@@ -319,6 +319,17 @@ bool DBEntity::isFK(string field_name, string referred_table) {
 void DBEntity::cleanKeyFields() {
     bool cancellato = true;
     while(cancellato) {
+//        for(const auto& elem : fields) {
+//            string nomeField = elem->getName();
+//            if( this->isKey( nomeField ) ) {
+//                delete elem;
+//                fields.erase( (*elem) );
+//                cancellato = true;
+//                break;
+//            } else {
+//                cancellato = false;
+//            }
+//        }
         for(FieldVector::iterator it=fields.begin(); it!=fields.end(); it++) {
             string nomeField = (*it)->getName();
             if( this->isKey( nomeField ) ) {
