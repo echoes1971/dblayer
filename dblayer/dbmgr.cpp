@@ -224,9 +224,9 @@ string DBMgr::_buildUpdateString(DBEntity* dbe) {
     string ret;
     FieldMap campi = dbe->getValuesDictionary();
     StringVector setstring;
-    for(FieldMap::iterator it=campi.begin(); it!=campi.end(); it++) {
-        string nomeCampo = (*it).first;
-        DBField* field = (DBField*) (*it).second;
+    for(const auto& elem : campi) {
+        string nomeCampo = elem.first;
+        DBField* field = (DBField*) elem.second;
         if( ! dbe->isKey( nomeCampo ) ) {
             string clausola;
             clausola.append( nomeCampo + "=" );
@@ -524,9 +524,8 @@ bool DBMgr::exists(DBEntity* dbe) {
 
 void DBMgr::Destroy(DBEntityVector* lista) {
     if(lista==0) return;
-    DBEntityVector::iterator theIterator;
-    for(theIterator = lista->begin(); theIterator!=lista->end(); theIterator++) {
-        delete (DBEntity*) (*theIterator);
+    for(DBEntity* elem : (*lista) ) {
+        delete elem;
     }
     lista->clear();
     delete lista;

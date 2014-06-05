@@ -41,10 +41,6 @@ DBEFactory::~DBEFactory() {
         if(this->_verbose) printf("DBEFactory::~DBEFactory: cancello %s => %s\n",elem.first.c_str(), elem.second->name().c_str() );
         delete elem.second;
     }
-//    for(DBEntityMap::iterator theIterator = this->_cache.begin(); theIterator!=this->_cache.end(); theIterator++) {
-//        if(this->_verbose) printf("DBEFactory::~DBEFactory: cancello %s => %s\n",(*theIterator).first.c_str(), (*theIterator).second->name().c_str() );
-//        delete (*theIterator).second;
-//    }
     this->_cache.clear();
     if(this->_verbose) printf("DBEFactory::~DBEFactory: end.\n");
 }
@@ -72,11 +68,6 @@ DBEntity* DBEFactory::getClazzByTypeName(string* typeName, bool caseSensitive) {
             return elem.second->createNewInstance();
         }
     }
-//    for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
-//        if (caseSensitive && (*it).second->name()== (*typeName) ) {
-//            return (*it).second->createNewInstance();
-//        }
-//    }
     return new DBEntity();
 }
 
@@ -85,9 +76,6 @@ DBEntityVector DBEFactory::getRegisteredTypes() {
     for(const auto& elem : this->_cache) {
         ret.push_back(elem.second);
     }
-//    for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
-//        ret.push_back( (*it).second );
-//    }
     return ret;
 }
 
@@ -100,12 +88,6 @@ string DBEFactory::toString(string prefix) {
         ret.append(prefix + "  <value>" +  elem.second->name() + "</value>");
         ret.append(prefix + " </clazz>");
     }
-//    for(DBEntityMap::iterator it = this->_cache.begin(); it!= this->_cache.end(); it++) {
-//        ret.append(prefix + " <clazz>");
-//        ret.append(prefix + "  <key>" + (*it).first + "</key>" );
-//        ret.append(prefix + "  <value>" +  (*it).second->name() + "</value>");
-//        ret.append(prefix + " </clazz>");
-//    }
     ret.append(prefix + "</DBEFactory>");
     return ret;
 }

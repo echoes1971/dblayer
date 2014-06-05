@@ -444,8 +444,8 @@ string DBEntity::hex2uuid(const string& str) {
 bool DBEntity::isNew() {
     bool ret = false;
     DBLayer::StringVector nomiChiavi = this->getKeyNames();
-    for(DBLayer::StringVector::iterator it=nomiChiavi.begin(); !ret && it!=nomiChiavi.end(); it++) {
-        Field* field = this->getField( &(*it) );
+    for(const string& elem : nomiChiavi) {
+        Field* field = this->getField( &elem );
         if(field==0) ret=true;
         else if(field->isNull()) ret=true;
     }
