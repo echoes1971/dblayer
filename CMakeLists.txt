@@ -4,6 +4,11 @@ project(DBLayer)
 
 # https://bitbucket.org/catanasoaei/nanocv/src/fd9713422b20f1129b211c88d77151d8f7b38377/CMakeLists.txt?at=dev
 
+ADD_DEFINITIONS(
+    -std=c++11 # Or -std=c++0x
+    # Other flags
+)
+
 # The version number.
 set(DBLayer_VERSION_MAJOR 5)
 set(DBLayer_VERSION_MINOR 2)

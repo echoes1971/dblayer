@@ -37,8 +37,7 @@ DBEFactory::DBEFactory(bool verbose) { this->_verbose=verbose; }
 DBEFactory::~DBEFactory() {
     if(this->_verbose) printf("DBEFactory::~DBEFactory: start.\n");
     // Cleaning the cache
-    DBEntityMap::iterator theIterator;
-    for(theIterator = this->_cache.begin(); theIterator!=this->_cache.end(); theIterator++) {
+    for(DBEntityMap::iterator theIterator = this->_cache.begin(); theIterator!=this->_cache.end(); theIterator++) {
         if(this->_verbose) printf("DBEFactory::~DBEFactory: cancello %s => %s\n",(*theIterator).first.c_str(), (*theIterator).second->name().c_str() );
         delete (*theIterator).second;
     }
