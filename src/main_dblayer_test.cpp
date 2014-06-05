@@ -14,6 +14,10 @@
 **		dblayer:xmlrpc:http://localhost/~roberto/rproject/xmlrpc_server.php
 **		dblayer:xmlrpc:http://www.roccoangeloni.it/rproject/xmlrpc_server.php
 **		"dblayer:mysql:host=localhost;dbname=roberto;user=root;password=;"
+**
+**
+** cmake . ; make && ./src/dblayer_test dblayer:sqlite:./test.db
+**
 **	TODO: - Controllare che tutti i metodi virtual della classe DBConnection abbiano implementazione nelle sottoclassi
 **				PG: OK
 **				MYSQL: OK
