@@ -101,9 +101,6 @@ endif()
 
 message("EXTRA_LIBS: ${EXTRA_LIBS}")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -DCGAL_DISABLE_ROUNDING_MATH_CHECK")
-set(CMAKE_BUILD_TYPE "Debug")
-
 #include_directories ("${PROJECT_SOURCE_DIR}/dblayer")
 add_subdirectory (schema)
 add_subdirectory (dblayer)

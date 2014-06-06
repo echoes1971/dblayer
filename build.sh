@@ -6,6 +6,8 @@ SRC_DIR=../src
 
 
 cmake_params="-DPROJECT_SOURCE_DIR=${SRC_DIR}"
+cmake_params="${cmake_params} -DCMAKE_BUILD_TYPE=Debug "
+#cmake_params="${cmake_params} -DCMAKE_BUILD_TYPE=Release "
 
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR
