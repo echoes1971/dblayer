@@ -26,7 +26,7 @@ configure_file(
 # External libraries
 ############################################
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake/Modules/")
 
 find_package(MySQL)
 find_package(ODBC)
@@ -71,7 +71,9 @@ configure_file(
 
 message("PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
 
-include_directories("${PROJECT_SOURCE_DIR}")
+include_directories(
+        ${PROJECT_BINARY_DIR}             # config.h
+        ${PROJECT_SOURCE_DIR})
 
 message("INCLUDE_DIRECTORIES: ${INCLUDE_DIRECTORIES}")
 
@@ -99,6 +101,8 @@ endif()
 
 message("EXTRA_LIBS: ${EXTRA_LIBS}")
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -DCGAL_DISABLE_ROUNDING_MATH_CHECK")
+set(CMAKE_BUILD_TYPE "Debug")
 
 #include_directories ("${PROJECT_SOURCE_DIR}/dblayer")
 add_subdirectory (schema)

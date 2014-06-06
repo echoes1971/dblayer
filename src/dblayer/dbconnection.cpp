@@ -38,7 +38,7 @@
 #include "stdafx.h"
 using namespace System;
 #else
-#include <config.h>
+#include "config.h"
 #endif
 #ifdef USE_LIBPQ
  #include "dbconnection.h"
@@ -403,7 +403,7 @@ string ResultSet::getValue(int row, int column) const { return this->righe.at( r
 string ResultSet::getValue(int row, string* columnName) const { return this->getValue(row, this->getColumnIndex(columnName)); }
 string ResultSet::getColumnName(int i) const { return this->columnName[i]; }
 string ResultSet::getColumnType(int i) const { return this->columnType[i]; }
-int ResultSet::getColumnSize(int i) const { return this->columnSize[i]; }
+int ResultSet::getColumnSize(int i) const { return this->columnSize.size()>=(i+1) ? this->columnSize[i] : -1; }
 
 int ResultSet::getLength(int row, int column) const { return (int) this->righe.at( row * this->columnName.size() + column ).size(); }
 bool ResultSet::isNull(int row, int column) const {

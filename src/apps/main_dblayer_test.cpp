@@ -644,7 +644,7 @@ int main(int argc, char *argv[]) {
     } else {
         connString = string( argv[1] );
     }
-    //cout << "connString: " << connString << endl;
+    cout << "connString: " << connString << endl;
 
     cout << "---------------->>  testDBConnection" << endl;
     if( argc==5 ) {
