@@ -17,6 +17,11 @@ set(DBLayer_VERSION_MINOR 2)
 # sed -i "s/2012 by /2014 by /g" *.h
 # sed -i "s/2012 by /2014 by /g" *.cpp
 
+# Configuration file
+configure_file(
+        "${CMAKE_SOURCE_DIR}/config.h.in"
+        "${CMAKE_BINARY_DIR}/config.h")
+
 ############################################
 # External libraries
 ############################################
