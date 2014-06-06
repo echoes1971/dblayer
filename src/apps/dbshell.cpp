@@ -126,9 +126,12 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
     dbShell->cmdOut.append("namespace ").append(mySchemaName).append(" {\n");
     dbShell->cmdOut.append("\n");
 
-    for(StringVector::const_iterator it=tables.begin(); it!=tables.end(); it++) {
-        string fullTableName=(*it);
-        string tableName=(*it);
+    for(const string& elem : tables) {
+        string fullTableName=elem;
+        string tableName=elem;
+//    for(StringVector::const_iterator it=tables.begin(); it!=tables.end(); it++) {
+//        string fullTableName=(*it);
+//        string tableName=(*it);
         string schemaName;
         unsigned long schemaSeparator_index = tableName.find_first_of(schemaSeparator);
         if(schemaSeparator_index>0) {
@@ -138,7 +141,8 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
             if(dbSchemaName.length()==0) dbSchemaName = schemaName;
         }
         string typeName("DBE"); typeName.append(DBLayer::capitalizeCase(tableName));
-        string myquery; myquery.append("select * from ").append((*it)).append(" where 1=0");
+        string myquery; myquery.append("select * from ").append(elem).append(" where 1=0");
+//        string myquery; myquery.append("select * from ").append((*it)).append(" where 1=0");
         DBLayer::ResultSet* res;
         res = dbShell->con->exec(myquery);
         if( !dbShell->con->hasErrors() ) {
@@ -197,9 +201,12 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
     dbShell->cmdOut.append("using namespace std;\n");
     dbShell->cmdOut.append("\n");
     StringVector myRegisterClasses;
-    for(StringVector::const_iterator it=tables.begin(); it!=tables.end(); it++) {
-        string fullTableName=(*it);
-        string tableName=(*it);
+    for(const string& elem : tables) {
+        string fullTableName=elem;
+        string tableName=elem;
+//        for(StringVector::const_iterator it=tables.begin(); it!=tables.end(); it++) {
+//            string fullTableName=(*it);
+//            string tableName=(*it);
         string schemaName;
         unsigned long schemaSeparator_index = tableName.find_first_of(schemaSeparator);
         if(schemaSeparator_index>0) {
@@ -209,7 +216,8 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
             if(dbSchemaName.length()==0) dbSchemaName = schemaName;
         }
         string typeName("DBE"); typeName.append(DBLayer::capitalizeCase(tableName));
-        string myquery; myquery.append("select * from ").append((*it)).append(" where 1=0");
+        string myquery; myquery.append("select * from ").append(elem).append(" where 1=0");
+//        string myquery; myquery.append("select * from ").append((*it)).append(" where 1=0");
         DBLayer::ResultSet* res;
         res = dbShell->con->exec(myquery);
         if( !dbShell->con->hasErrors() ) {
@@ -279,11 +287,16 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
 void DBShell::cmdHelp(DBShell* dbShell, string s) {
     dbShell->cmdOut.append("DBShell\n=======\n\n");
     dbShell->cmdOut.append("Available commands:\n\n");
-    for(map<string,string>::const_iterator it=dbShell->cmdsHelp.begin(); it!=dbShell->cmdsHelp.end(); it++) {
+    for(const auto& elem : dbShell->cmdsHelp) {
         dbShell->cmdOut
-                .append("- ").append((*it).first).append("\n")
-                .append( (*it).second ).append("\n\n");
+                .append("- ").append(elem.first).append("\n")
+                .append( elem.second ).append("\n\n");
     }
+//    for(map<string,string>::const_iterator it=dbShell->cmdsHelp.begin(); it!=dbShell->cmdsHelp.end(); it++) {
+//        dbShell->cmdOut
+//                .append("- ").append((*it).first).append("\n")
+//                .append( (*it).second ).append("\n\n");
+//    }
 }
 void DBShell::cmdQuit(DBShell* dbShell, string s) {
     dbShell->exitLoop=true;
