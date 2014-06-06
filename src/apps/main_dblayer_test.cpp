@@ -234,10 +234,6 @@ void testDBMgr(string connString) {
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
-//            for(DBEntityVector::iterator theIterator = lista->begin(); theIterator!=lista->end(); theIterator++) {
-//                string miastringa = (*theIterator)->toString();
-//                cout << "\t" << miastringa << endl;
-//            }
             cout << "====" << endl;
         } else {
             cout << "testDBMgr: LISTA VUOTA!!!" << endl;
@@ -299,9 +295,6 @@ void testSearch(string connString) {
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
-//            for(theIterator = lista->begin(); theIterator!=lista->end(); theIterator++) {
-//                cout << "\t" << (*theIterator)->toString() << endl;
-//            }
         }
 
         dbmgr->Destroy(lista);
@@ -376,9 +369,6 @@ void testDBE(string connString) {
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
-//            for(DBEntityVector::iterator theIterator = lista->begin(); theIterator!=lista->end(); theIterator++) {
-//                cout << "\t" << (*theIterator)->toString() << endl;
-//            }
         }
         delete cerca;
         dbmgr->Destroy(lista);
@@ -452,9 +442,6 @@ void testCRUD(string connString) {
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
-//            for(DBEntityVector::iterator theIterator = lista->begin(); theIterator!=lista->end(); theIterator++) {
-//                cout << "- " << (*theIterator)->toString() << endl;
-//            }
         } else {
             cout << "testCRUD: LISTA VUOTA!!!" << endl;
         }
@@ -479,9 +466,6 @@ void testCRUD(string connString) {
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
-//            for(DBEntityVector::iterator theIterator = lista->begin(); theIterator!=lista->end(); theIterator++) {
-//                cout << "- " << (*theIterator)->toString() << endl;
-//            }
         } else {
             cout << "testCRUD: LISTA VUOTA!!!" << endl;
         }
@@ -509,9 +493,6 @@ void testCRUD(string connString) {
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
-//            for(DBEntityVector::iterator theIterator = lista->begin(); theIterator!=lista->end(); theIterator++) {
-//                cout << "- " << (*theIterator)->toString() << endl;
-//            }
         } else {
             cout << "testCRUD: LISTA VUOTA!!!" << endl;
         }
@@ -537,9 +518,6 @@ void testCRUD(string connString) {
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
-//            for(DBEntityVector::iterator theIterator = lista->begin(); theIterator!=lista->end(); theIterator++) {
-//                cout << "- " << (*theIterator)->toString() << endl;
-//            }
         } else {
             cout << "testCRUD: LISTA VUOTA!!!" << endl;
         }
@@ -601,11 +579,6 @@ void testGetColumnsForTable(string connString, string relname) {
             string glue(",");
             cout << "  " << joinString( (DBLayer::StringVector*) &(elem.second),&glue) << endl;
         }
-//        for(ColumnDefinitions::iterator it = cols.begin(); it!=cols.end(); it++) {
-//            cout << (*it).first << endl;
-//            string glue(",");
-//            cout << "  " << joinString( (DBLayer::StringVector*) &((*it).second),&glue) << endl;
-//        }
     } else {
         cout << "testGetColumnsForTable: ERRORE " << dbmgr->getErrorMessage() << endl;
     }
