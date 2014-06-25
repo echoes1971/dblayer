@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include <xrmethodcall.h>
+#include "qutexmlrpc/xrmethodcall.h"
 
 XRMethodCall::XRMethodCall() : QDomDocument(),
                                 _method_name(),

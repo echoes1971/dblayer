@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <qdatetime.h>
 #include <qstring.h>
 #include <QList>
-#include <xrbase64.h>
+#include "qutexmlrpc/xrbase64.h"
 /**
  * This subclass of QT's QVariant class represents the data types that are
  * defined in XML-RPC.  It handles serialization to and from XML using QDOM.

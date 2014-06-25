@@ -24,14 +24,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <qurl.h>
 #include <qvariant.h>
-#include <qdom.h>
-#include <qhttp.h>
+#include <QDomDocument>
+#include <qnetworkaccessmanager>
 #include <qmap.h>
 #include <qmutex.h>
 #include <qbuffer.h>
-#include <xrmethodcall.h>
-#include <xrmethodresponse.h>
-#include <xrfaultcodes.h>
+#include "qutexmlrpc/xrmethodcall.h"
+#include "qutexmlrpc/xrmethodresponse.h"
+#include "qutexmlrpc/xrfaultcodes.h"
 
 #include <QEventLoop>
 #include <QThread>

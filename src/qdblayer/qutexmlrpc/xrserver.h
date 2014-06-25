@@ -34,9 +34,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <qmap.h>
 #include <qhttp.h>
 
-#include <xrmethodcall.h>
-#include <xrmethodresponse.h>
-#include <xrfaultcodes.h>
+#include "qutexmlrpc/xrmethodcall.h"
+#include "qutexmlrpc/xrmethodresponse.h"
+#include "qutexmlrpc/xrfaultcodes.h"
 
 /**
  * Provides a minimal HTTP Server to handle XML-RPC

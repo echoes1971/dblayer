@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include <xrbase64.h>
+#include "qutexmlrpc/xrbase64.h"
 
 /**
  * this code is adapted from Wei Dai's public domain base64.cpp

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QThread>
 
-#include <xrclient.h>
+#include "qutexmlrpc/xrclient.h"
 
 class XRSyncClient : public QObject {
     Q_OBJECT

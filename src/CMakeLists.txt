@@ -34,6 +34,8 @@ find_package(PostgreSQL)
 find_package(SQLite3)
 find_package(XmlrpcC)
 
+find_package(Qt5Widgets)
+
 if(MYSQL_FOUND)
  set(USE_MYSQL TRUE)
 endif()
@@ -58,6 +60,8 @@ message("Odbc: ${ODBC_FOUND}")
 message("PostgreSQL: ${USE_LIBPQ}")
 message("SQLite3: ${SQLITE3_FOUND}")
 message("Xmlrpc-C: ${XMLRPCC_FOUND}")
+message("")
+message("Qt5: ${Qt5Widgets_FOUND}")
 message("")
 
 configure_file(
@@ -98,11 +102,29 @@ if(USE_LIBXMLRPC)
  set(EXTRA_LIBS ${EXTRA_LIBS} xmlrpc_client++ xmlrpc_client xmlrpc++ xmlrpc xmlrpc_util xmlrpc_xmlparse xmlrpc_xmltok)
 endif()
 
-
 message("EXTRA_LIBS: ${EXTRA_LIBS}")
 
 #include_directories ("${PROJECT_SOURCE_DIR}/dblayer")
 add_subdirectory (schema)
 add_subdirectory (dblayer)
 add_subdirectory (apps)
+
+if(Qt5Widgets_FOUND)
+ find_package(Qt5Xml REQUIRED)
+ include_directories(${Qt5Xml_INCLUDE_DIRS})
+ find_package(Qt5Network REQUIRED)
+ include_directories(${Qt5Network_INCLUDE_DIRS})
+
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
+     ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+
+ set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Network Qt5::Widgets Qt5::Xml)
+ #set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Network Qt5::Widgets Qt5::Xml)
+ # Find includes in corresponding build directories
+ set(CMAKE_INCLUDE_CURRENT_DIR ON)
+ # Instruct CMake to run moc automatically when needed.
+ set(CMAKE_AUTOMOC ON)
+
+ add_subdirectory (qdblayer)
+endif()
 

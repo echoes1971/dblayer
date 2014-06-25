@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
    
  */
 
-#include <xrvariant.h>
+#include "qutexmlrpc/xrvariant.h"
 
 XRVariant::XRVariant(const QVariant& aqv) {
   this->QVariant::operator=(aqv);

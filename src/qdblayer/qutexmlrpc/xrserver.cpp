@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
    
  */
 
-#include <xrserver.h>
+#include "qutexmlrpc/xrserver.h"
 
 XRServer::XRServer(quint16 port, QObject* parent) : QObject(parent)
 {

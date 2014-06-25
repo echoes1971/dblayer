@@ -1,6 +1,6 @@
 #include <cstdio>
 
-#include <xrclient.h>
+#include "qutexmlrpc/xrclient.h"
 
 #include "qxmlrpcconnection.h"
 #include "qxmlrpcresultset.h"

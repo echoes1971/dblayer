@@ -1,4 +1,4 @@
-#include "xrsyncclient.h"
+#include "qutexmlrpc/xrsyncclient.h"
 
 XRSyncClient::XRSyncClient(const QUrl& server_url, QObject * parent) {
     this->server_url = server_url;

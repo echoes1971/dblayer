@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <QList>
 #include <QVariant>
 #include <qdom.h>
-#include <xrvariant.h>
+#include "qutexmlrpc/xrvariant.h"
 
 /**
  * Represents the XML structure for XML-RPC method responses.
