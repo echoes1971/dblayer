@@ -34,7 +34,7 @@ find_package(PostgreSQL)
 find_package(SQLite3)
 find_package(XmlrpcC)
 
-find_package(Qt5Widgets)
+find_package(Qt5Widgets PATHS ~/Qt/)
 
 if(MYSQL_FOUND)
  set(USE_MYSQL TRUE)
@@ -110,20 +110,34 @@ add_subdirectory (dblayer)
 add_subdirectory (apps)
 
 if(Qt5Widgets_FOUND)
- find_package(Qt5Xml REQUIRED)
- include_directories(${Qt5Xml_INCLUDE_DIRS})
- find_package(Qt5Network REQUIRED)
- include_directories(${Qt5Network_INCLUDE_DIRS})
 
- set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
-     ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+message("PATH: ${PATH}")
 
- set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Network Qt5::Widgets Qt5::Xml)
- #set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Network Qt5::Widgets Qt5::Xml)
- # Find includes in corresponding build directories
- set(CMAKE_INCLUDE_CURRENT_DIR ON)
- # Instruct CMake to run moc automatically when needed.
- set(CMAKE_AUTOMOC ON)
+find_package(Qt5Core REQUIRED)
+message("Qt5Core_INCLUDE_DIRS: ${Qt5Core_INCLUDE_DIRS}")
+include_directories(${Qt5Core_INCLUDE_DIRS})
+
+include_directories(${Qt5Widgets_INCLUDE_DIRS})
+
+find_package(Qt5Xml REQUIRED)
+include_directories(${Qt5Xml_INCLUDE_DIRS})
+find_package(Qt5Network REQUIRED)
+include_directories(${Qt5Network_INCLUDE_DIRS})
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
+#    ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
+    ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+
+#set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Network Qt5::Widgets Qt5::Xml)
+
+# Find includes in corresponding build directories
+#set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# Instruct CMake to run moc automatically when needed.
+set(CMAKE_AUTOMOC ON)
+
+
 
  add_subdirectory (qdblayer)
 endif()

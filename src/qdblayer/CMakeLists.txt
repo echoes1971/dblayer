@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
+include_directories("../")
 
 add_library(qdblayer
     qdblayer.cpp
@@ -16,4 +17,4 @@ add_library(qdblayer
     )
 # Use the Widgets module from Qt 5.
 
-qt5_use_modules(qdblayer Core Network Widgets Xml)
+target_link_libraries(qdblayer Qt::Core Qt::Network Qt::Widgets Qt::Xml)
