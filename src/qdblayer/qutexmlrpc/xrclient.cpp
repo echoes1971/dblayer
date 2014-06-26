@@ -27,22 +27,24 @@ XRClient::XRClient(const QUrl& url, QObject * parent, bool debug, bool use_cooki
     _is_deflated = false;
     _accept_compressed = true;
 
-    this->_http_client = new QHttp(this);
+    this->_http_client = new QNetworkAccessManager(this);
 
-    if( url.port()!=-1 ) {
-        _http_client->setHost(url.host(), url.port());
-    } else {
-        _http_client->setHost(url.host());
-    }
+
+    this->_url = url;
+//    if( url.port()!=-1 ) {
+//        _http_client->connectToHost(url.host(),url.port());
+//    } else {
+//        _http_client->connectToHost(url.host());
+//    }
 
     /*
      * connect some slots to signals!
      */
-    connect( _http_client, SIGNAL(requestFinished(int,bool)),
-           this, SLOT(processHttpResponse(int, bool)));//, Qt::DirectConnection );
-    connect( _http_client,
-          SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
-           this, SLOT(processHeaders(const QHttpResponseHeader &)));//, Qt::QueuedConnection );
+    connect( _http_client, SIGNAL(finished(QNetworkReply*)),
+           this, SLOT(processHttpResponse(QNetworkReply*)));//, Qt::DirectConnection );
+//    connect( _http_client,
+//          SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
+//           this, SLOT(processHeaders(const QHttpResponseHeader &)));//, Qt::QueuedConnection );
 
     // RRA: start.
     this->debug = debug;
@@ -61,7 +63,7 @@ XRClient::~XRClient() {
      * being called for the current request.
      */
     if(this->_http_client!=0) {
-        this->_http_client->abort();
+        this->_http_client->disconnect();//->abort();
         delete this->_http_client;
         this->_http_client = 0;
     }
@@ -78,18 +80,18 @@ XRClient::~XRClient() {
 void XRClient::setUrl(const QUrl& url) {
     this->_url = url;
     if( url.port()!=-1 ) {
-        this->_http_client->setHost(url.host(), url.port());
+        this->_http_client->connectToHost(url.host(), url.port());
     } else {
-        this->_http_client->setHost(url.host());
+        this->_http_client->connectToHost(url.host());
     }
 }
 void XRClient::setUrl(const QString& u) {
     this->_url = u;
-    if( this->_url.port()!=-1 ) {
-        this->_http_client->setHost(this->_url.host(), this->_url.port());
-    } else {
-        this->_http_client->setHost(this->_url.host());
-    }
+//    if( this->_url.port()!=-1 ) {
+//        this->_http_client->connectToHost(this->_url.host(), this->_url.port());
+//    } else {
+//        this->_http_client->connectToHost(this->_url.host());
+//    }
 }
 
 
@@ -103,6 +105,38 @@ int XRClient::call(const QString& method, const QList<QVariant>& params, const c
     payload_stream.setCodec(codecName);
     //don't waste bytes on indenting
     xml_method_call.save( payload_stream, 0, QDomNode::EncodingFromTextStream);
+
+
+    // TODO - make it like this: start.
+    QNetworkRequest request(this->_url); //QUrl(webService() + "/api/v1/login/"));
+
+    QUrl parameters;
+    parameters.addQueryItem("license_string", licenseString());
+    parameters.addQueryItem("project_name", m_params.param().name().c_str());
+    parameters.addQueryItem("vendor", m_params.param().vendor().c_str());
+    parameters.addQueryItem("build_version", m_params.param().version().c_str());
+    parameters.addQueryItem("product", pix4d::productInfo().productType());
+    parameters.addQueryItem("clean_data", m_projectAndImageFiles ? "yes" : "no");
+
+    QEventLoop eLoop;
+    QTimer::singleShot(20000, &eLoop, SLOT(quit())); //max 20 seconds for auth
+    QNetworkReply* userReply = m_nam->post(request, parameters.encodedQuery());
+    connect(userReply, SIGNAL(finished() ), &eLoop, SLOT(quit()));
+    connect(userReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(networkErrorSlot()));
+
+    // NOTE: On some computers the SSL certificates are not installed (?), we ignore SSL errors
+    // every time we communicate with our server except in this class. It is maybe needed to
+    // ignore ssl errors here as well but some customers are able to use the uploader, are we
+    // installing the m_ssl certificates in the product installation? If that is the case we
+    // should remove the ignoreSslErrors from everywhere, otherwise it should be activated here
+    //userReply->ignoreSslErrors();
+
+    eLoop.exec();
+
+    QString reply = userReply->readAll();
+    // TODO - make it like this: end.
+
+
 
     /* make the buffer and make the call */
     QHttpRequestHeader req_head("POST",_url.path());
@@ -141,6 +175,7 @@ int XRClient::call(const QString& method, const QList<QVariant>& params, const c
     return http_req_num;
 }
 
+/*
 void XRClient::processHeaders(const QHttpResponseHeader & resp) {
     if(this->debug) printf("%0ld::XRClient::processHeaders: resp=%s\n", (unsigned long) QThread::currentThread(), resp.toString().toStdString().c_str() );
 //    if(this->debug) printf("%0x::XRClient::processHeaders: resp=%s\n", (unsigned int) QThread::currentThread(), resp.toString().toStdString().c_str() );
@@ -173,7 +208,11 @@ void XRClient::processHeaders(const QHttpResponseHeader & resp) {
     if(this->debug) printf("%0lx::XRClient::processHeaders: end.\n", (unsigned long) QThread::currentThread());
 //    if(this->debug) printf("%0x::XRClient::processHeaders: end.\n", (unsigned int) QThread::currentThread());
 }
-void XRClient::processHttpResponse(int http_resp, bool error) {
+*/
+void XRClient::processHttpResponse(QNetworkReply* reply) {
+    int http_resp;
+    bool error;
+    //reply
     if(this->debug) printf("%0lx::XRClient::processHttpResponse: start.\n",(unsigned long) QThread::currentThread());
     bool receivedSyncResponse = true;
     if( error ) {

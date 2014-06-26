@@ -109,11 +109,11 @@ class XRClient : public QObject {
     /**
      * connected to QHttp methods to handle the Http responses.
      */
-    void processHttpResponse(int http_resp, bool error);
-    void processHeaders(const QHttpResponseHeader & resp);
+    void processHttpResponse(QNetworkReply* reply);
+    //void processHeaders(const QHttpResponseHeader & resp);
 
   protected:
-    QHttp* _http_client;
+    QNetworkAccessManager* _http_client;
     QUrl _url;
 
     bool _is_deflated;
