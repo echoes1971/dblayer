@@ -18,8 +18,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "qutexmlrpc/xrclient.h"
-#include <QTextStream>
 #include <QDebug>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QTextStream>
+#include <QTimer>
+#include <QUrlQuery>
 
 const QString XRClient::USER_AGENT = "QuteXmlRpc/0.0";
 
@@ -94,7 +98,7 @@ void XRClient::setUrl(const QString& u) {
 //    }
 }
 
-
+/*
 int XRClient::call(const QString& method, const QList<QVariant>& params, const char* codecName) {
     if(this->debug) printf("%0ld::XRClient::call: start.\n", (unsigned long) QThread::currentThread());
     XRMethodCall xml_method_call(method,params);
@@ -107,46 +111,15 @@ int XRClient::call(const QString& method, const QList<QVariant>& params, const c
     xml_method_call.save( payload_stream, 0, QDomNode::EncodingFromTextStream);
 
 
-    // TODO - make it like this: start.
-    QNetworkRequest request(this->_url); //QUrl(webService() + "/api/v1/login/"));
-
-    QUrl parameters;
-    parameters.addQueryItem("license_string", licenseString());
-    parameters.addQueryItem("project_name", m_params.param().name().c_str());
-    parameters.addQueryItem("vendor", m_params.param().vendor().c_str());
-    parameters.addQueryItem("build_version", m_params.param().version().c_str());
-    parameters.addQueryItem("product", pix4d::productInfo().productType());
-    parameters.addQueryItem("clean_data", m_projectAndImageFiles ? "yes" : "no");
-
-    QEventLoop eLoop;
-    QTimer::singleShot(20000, &eLoop, SLOT(quit())); //max 20 seconds for auth
-    QNetworkReply* userReply = m_nam->post(request, parameters.encodedQuery());
-    connect(userReply, SIGNAL(finished() ), &eLoop, SLOT(quit()));
-    connect(userReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(networkErrorSlot()));
-
-    // NOTE: On some computers the SSL certificates are not installed (?), we ignore SSL errors
-    // every time we communicate with our server except in this class. It is maybe needed to
-    // ignore ssl errors here as well but some customers are able to use the uploader, are we
-    // installing the m_ssl certificates in the product installation? If that is the case we
-    // should remove the ignoreSslErrors from everywhere, otherwise it should be activated here
-    //userReply->ignoreSslErrors();
-
-    eLoop.exec();
-
-    QString reply = userReply->readAll();
-    // TODO - make it like this: end.
-
-
-
-    /* make the buffer and make the call */
+    // make the buffer and make the call
     QHttpRequestHeader req_head("POST",_url.path());
     req_head.setValue("Host",_url.host());
     req_head.setValue("User-Agent",USER_AGENT);
     if( _accept_compressed ) {
-      /* Accept deflated content */
+      // Accept deflated content
       req_head.setValue("Accept-Encoding","deflate");
     }
-    /* XML-RPC *REQUIRES* the following to be set: */
+    // XML-RPC *REQUIRES* the following to be set:
     req_head.setContentLength( payload.size() );
     req_head.setContentType("text/xml");
     
@@ -162,9 +135,8 @@ int XRClient::call(const QString& method, const QList<QVariant>& params, const c
         }
     // RRA: end.
 
-    /* this buffer will hold all the result.  We don't
-     * care about seeing any data until we have the whole result
-     */
+    // this buffer will hold all the result.  We don't
+    // care about seeing any data until we have the whole result
     QBuffer* this_buffer = new QBuffer();
     int http_req_num = this->_http_client->request(req_head, payload, this_buffer);
 
@@ -174,6 +146,7 @@ int XRClient::call(const QString& method, const QList<QVariant>& params, const c
     if(this->debug) printf("%0ld::XRClient::call: end.\n", (unsigned long) QThread::currentThread());
     return http_req_num;
 }
+*/
 
 /*
 void XRClient::processHeaders(const QHttpResponseHeader & resp) {
@@ -211,67 +184,56 @@ void XRClient::processHeaders(const QHttpResponseHeader & resp) {
 */
 void XRClient::processHttpResponse(QNetworkReply* reply) {
     int http_resp;
-    bool error;
     //reply
     if(this->debug) printf("%0lx::XRClient::processHttpResponse: start.\n",(unsigned long) QThread::currentThread());
     bool receivedSyncResponse = true;
-    if( error ) {
-        /*
-         * Use the standard fault codes at
-         * http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php.
-         */
-        if(this->debug) printf("%0lx::XRClient::processHttpResponse: error=%s\n",(unsigned long) QThread::currentThread(),_http_client->errorString().toStdString().c_str());
-//        if(this->debug) printf("%0x::XRClient::processHttpResponse: error=%s\n",(unsigned int) QThread::currentThread(),_http_client->errorString().toStdString().c_str());
-        emit fault(http_resp, XR_TRANSPORT_ERROR, _http_client->errorString() );
-    } else {
-       if( _buffer_map.contains(http_resp) ) {
-            if(this->debug) printf("%0lx::XRClient::processHttpResponse: resp=%s\n",(unsigned long) QThread::currentThread(), QString(_buffer_map[http_resp]->buffer()).toStdString().c_str() );
-            XRMethodResponse xml_response;
-            QString parse_error_string;
-            bool no_parse_error;
-            if( !_is_deflated ) {
-                no_parse_error = xml_response.setContent( _buffer_map[http_resp]->buffer(), &parse_error_string );
-            } else {
-                /* this is compressed content */
-                no_parse_error = xml_response.setContent( qUncompress( _buffer_map[http_resp]->buffer() ), &parse_error_string );
-            }
-            if(this->debug) printf("%0lx::XRClient::processHttpResponse: no_parse_error=%s\n",(unsigned long) QThread::currentThread(),(no_parse_error?"true":"false"));
-            if( no_parse_error ) {
-                if(this->debug) printf("%0lx::XRClient::processHttpResponse: xml_response.parseXmlRpc...\n",(unsigned long) QThread::currentThread());
-                if( xml_response.parseXmlRpc() ) {
-                    int faultCode;
-                    QString faultString;
-                    if( xml_response.getFault(faultCode,faultString) ) {
-                        if(this->debug) printf("%0lx::XRClient::processHttpResponse: %d faultString=%s\n",(unsigned long) QThread::currentThread(),faultCode,faultString.toStdString().c_str());
-                        emit fault(http_resp, faultCode, faultString);
-                    } else {
-                        /* It looks good! */
-                        // RRA: start.
-                        if(this->syncReq>0) {
-                            this->syncResp = xml_response.getResponse();
-                            //receivedSyncResponse = true;
-                        } else
-                        // RRA: end.
-                            emit methodResponse(http_resp, xml_response.getResponse() );
-                    }
+   if( _buffer_map.contains(http_resp) ) {
+        if(this->debug) printf("%0lx::XRClient::processHttpResponse: resp=%s\n",(unsigned long) QThread::currentThread(), QString(_buffer_map[http_resp]->buffer()).toStdString().c_str() );
+        XRMethodResponse xml_response;
+        QString parse_error_string;
+        bool no_parse_error;
+        if( !_is_deflated ) {
+            no_parse_error = xml_response.setContent( _buffer_map[http_resp]->buffer(), &parse_error_string );
+        } else {
+            /* this is compressed content */
+            no_parse_error = xml_response.setContent( qUncompress( _buffer_map[http_resp]->buffer() ), &parse_error_string );
+        }
+        if(this->debug) printf("%0lx::XRClient::processHttpResponse: no_parse_error=%s\n",(unsigned long) QThread::currentThread(),(no_parse_error?"true":"false"));
+        if( no_parse_error ) {
+            if(this->debug) printf("%0lx::XRClient::processHttpResponse: xml_response.parseXmlRpc...\n",(unsigned long) QThread::currentThread());
+            if( xml_response.parseXmlRpc() ) {
+                int faultCode;
+                QString faultString;
+                if( xml_response.getFault(faultCode,faultString) ) {
+                    if(this->debug) printf("%0lx::XRClient::processHttpResponse: %d faultString=%s\n",(unsigned long) QThread::currentThread(),faultCode,faultString.toStdString().c_str());
+                    emit fault(http_resp, faultCode, faultString);
                 } else {
-                    /*
-                     * Use the standard fault codes at
-                     * http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php.
-                     */
-                    if(this->debug) printf("%0lx::XRClient::processHttpResponse: server error: recieved bad XML-RPC grammar from remote server\n",(unsigned long) QThread::currentThread());
-                    emit fault(http_resp, XR_SERVER_ERROR_INVALID_XMLRPC,
-                        "server error: recieved bad XML-RPC grammar from remote server");
+                    /* It looks good! */
+                    // RRA: start.
+                    if(this->syncReq>0) {
+                        this->syncResp = xml_response.getResponse();
+                        //receivedSyncResponse = true;
+                    } else
+                    // RRA: end.
+                        emit methodResponse(http_resp, xml_response.getResponse() );
                 }
             } else {
-                if(this->debug) printf("%0lx::XRClient::processHttpResponse: parse_error_string=%s\n",(unsigned long) QThread::currentThread(),parse_error_string.toStdString().c_str());
-                emit fault(http_resp, XR_PARSE_ERROR_NOT_WELL_FORMED, parse_error_string);
+                /*
+                 * Use the standard fault codes at
+                 * http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php.
+                 */
+                if(this->debug) printf("%0lx::XRClient::processHttpResponse: server error: recieved bad XML-RPC grammar from remote server\n",(unsigned long) QThread::currentThread());
+                emit fault(http_resp, XR_SERVER_ERROR_INVALID_XMLRPC,
+                    "server error: recieved bad XML-RPC grammar from remote server");
             }
         } else {
-            //QHttp seems to emit a signal as soon as it is created.
-            //So, just ignore it if we didn't make it.
-            receivedSyncResponse = false;
+            if(this->debug) printf("%0lx::XRClient::processHttpResponse: parse_error_string=%s\n",(unsigned long) QThread::currentThread(),parse_error_string.toStdString().c_str());
+            emit fault(http_resp, XR_PARSE_ERROR_NOT_WELL_FORMED, parse_error_string);
         }
+    } else {
+        //QHttp seems to emit a signal as soon as it is created.
+        //So, just ignore it if we didn't make it.
+        receivedSyncResponse = false;
     }
   
     /* clean up the memory for the buffer here */
@@ -280,17 +242,81 @@ void XRClient::processHttpResponse(QNetworkReply* reply) {
         delete _buffer_map[http_resp];
         _buffer_map.remove(http_resp);
     }
-    if(receivedSyncResponse && this->syncReq>0) this->myloop.exit(); // RRA
     if(this->debug) printf("%0lx::XRClient::processHttpResponse: end.\n",(unsigned long) QThread::currentThread());
+}
+
+QString XRClient::waitForNetworkReply(QNetworkReply* reply, int secs) {
+    QEventLoop loop;
+    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    QObject::connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
+    QTimer::singleShot(secs * 1000, &loop, SLOT(quit()));
+    loop.exec();
+
+    if (reply->error()) {
+        if(this->debug) printf("%0lx::XRClient::waitForNetworkReply: error=%s\n",(unsigned long) QThread::currentThread(),reply->errorString().toStdString().c_str());
+        delete reply;
+        return "";
+    }
+
+    QString all = reply->readAll();
+    delete reply;
+
+    if (all.isEmpty()) {
+        if(this->debug) printf("%0lx::XRClient::waitForNetworkReply: all=%s\n",(unsigned long) QThread::currentThread(),all.toStdString().c_str());
+        //m_lastError = pix4ui::makeText(TEXT_LICENSE_SERVERCOMMUN_MSG);
+        return "";
+    }
+
+    return all;
 }
 
 QVariant XRClient::syncCall(const QString& method, const QList<QVariant>& params, const char* codecName) {
     if(this->debug) printf("%0lx::XRClient::syncCall: start.\n",(unsigned long) QThread::currentThread());
 
-    if(this->debug) printf("%0lx::XRClient::syncCall: this->call...\n",(unsigned long) QThread::currentThread());
-    this->syncReq = this->call(method, params, codecName);
-    if(this->debug) printf("%0lx::XRClient::syncCall: this->syncReq=%d\n",(unsigned long) QThread::currentThread(), this->syncReq);
-    this->myloop.exec();
+    //this->syncReq = this->call(method, params, codecName);
+    XRMethodCall xml_method_call(method,params);
+
+    // Serialize the request
+    QByteArray payload;
+    QTextStream payload_stream(&payload, QIODevice::WriteOnly);
+    payload_stream.setCodec(codecName);
+    //don't waste bytes on indenting
+    xml_method_call.save( payload_stream, 0, QDomNode::EncodingFromTextStream);
+
+    // Qt5 stuff :-)
+    QNetworkRequest request(this->_url); //QUrl(webService() + "/api/v1/login/"));
+    request.setRawHeader(QByteArray("Host"),QByteArray(_url.host().toStdString().c_str()));
+    request.setHeader(QNetworkRequest::UserAgentHeader,USER_AGENT);
+    if( _accept_compressed ) {
+      // Accept deflated content
+      request.setRawHeader(QByteArray("Accept-Encoding"),QByteArray("deflate"));
+    }
+    // XML-RPC *REQUIRES* the following to be set:
+    request.setHeader(QNetworkRequest::ContentLengthHeader, payload.size() );
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml" );
+    if(this->cookies!=0) {
+        for(int i=0; i<this->cookies->keys().size(); i++) {
+            request.setRawHeader(QByteArray("Cookie"),
+                QByteArray(
+                    QString("%1=%2").arg(
+                        this->cookies->keys().at(i),
+                        (*this->cookies)[this->cookies->keys().at(i)]
+                    ).toStdString().c_str()
+                )
+            );
+        }
+    }
+
+//    QUrlQuery parameters;
+//    parameters.addQueryItem("license_string", licenseString());
+
+    QNetworkReply* reply = _http_client->post(request,payload);//, parameters.query());
+    //reply->ignoreSslErrors();
+    QString result = waitForNetworkReply(reply, 20);
+
+
+    processHttpResponse(reply);
+    //QString reply = userReply->readAll();
 
     if(this->debug) printf("%0lx::XRClient::syncCall: this->syncReq=-1...\n",(unsigned long) QThread::currentThread());
     this->syncReq=-1;

@@ -12,8 +12,8 @@ add_library(qdblayer
     qutexmlrpc/xrclient.cpp
     qutexmlrpc/xrmethodcall.cpp
     qutexmlrpc/xrmethodresponse.cpp
-    qutexmlrpc/xrserver.cpp
-    qutexmlrpc/xrsyncclient.cpp
+#    qutexmlrpc/xrserver.cpp
+#    qutexmlrpc/xrsyncclient.cpp
     qutexmlrpc/xrvariant.cpp
     )
 # Use the Widgets module from Qt 5.

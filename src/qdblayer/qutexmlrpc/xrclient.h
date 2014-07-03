@@ -78,6 +78,7 @@ class XRClient : public QObject {
     void setCookies(QMap<QString,QString>* cookies);
     void setDebug(bool b);
     bool isDebug();
+    QString waitForNetworkReply(QNetworkReply* reply, int secs);
     // RRA: end.
 
   signals:
@@ -134,7 +135,6 @@ class XRClient : public QObject {
     bool use_cookies;
     int syncReq;
     QVariant syncResp;
-    QEventLoop myloop;
     // RRA: fine.
 };
 
