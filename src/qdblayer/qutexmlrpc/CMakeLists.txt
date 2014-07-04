@@ -59,6 +59,7 @@ add_executable(testqute
     client/test.cpp
 #    ${UIS_HDRS}
     )
+#qt5_use_modules(qutexmlrpc Core Network Widgets Xml)
 target_link_libraries(testqute qutexmlrpc)
 qt5_use_modules(testqute Core Network Widgets Xml)
 

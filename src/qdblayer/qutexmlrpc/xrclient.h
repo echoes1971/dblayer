@@ -62,7 +62,7 @@ class XRClient : public QObject {
      * @param params a list of the parameters
      * @return the identifier for this response
      */
-    int call(const QString& method, const QList<QVariant>& params, const char* codecName="UTF-8");
+//    int call(const QString& method, const QList<QVariant>& params, const char* codecName="UTF-8");
 
     QVariant syncCall(const QString& method, const QList<QVariant>& params, const char* codecName="UTF-8");
 
