@@ -1,15 +1,7 @@
 #ifndef CLIENTIMPL_H
 #define CLIENTIMPL_H
-#include "../ui_client.h"
-#include <xrclient.h>
+#include "../xrclient.h"
 #include <qmap.h>
-#include <qlcdnumber.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qmessagebox.h>
-#include <qtabwidget.h>
-#include <qprogressbar.h>
-#include <qtextedit.h>
 
 class ClientImpl : public QObject
 {
