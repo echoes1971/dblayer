@@ -123,11 +123,6 @@ class XRClient : public QObject {
      * This is the string passed in the User-Agent: header field.
      */
     static const QString USER_AGENT;
-    /**
-     * Stores the buffers for each request.  These buffers
-     * are deleted after the request is handled.
-     */
-    QMap<int, QBuffer*> _buffer_map;
 
     // RRA: inizio.
     QMap<QString,QString>* cookies;

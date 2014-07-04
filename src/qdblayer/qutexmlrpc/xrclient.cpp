@@ -72,12 +72,6 @@ XRClient::~XRClient() {
         this->_http_client = 0;
     }
 
-    /* now we must delete all the buffers */
-    QMap<int,QBuffer*>::iterator it;
-    for(it = this->_buffer_map.begin(); it != this->_buffer_map.end(); it++) {
-        delete it.value();
-    }
-
     if(this->use_cookies) delete this->cookies; // RRA
 }
 
@@ -184,64 +178,53 @@ void XRClient::processHeaders(const QHttpResponseHeader & resp) {
 */
 void XRClient::processHttpResponse(QNetworkReply* reply) {
     int http_resp;
-    //reply
     if(this->debug) printf("%0lx::XRClient::processHttpResponse: start.\n",(unsigned long) QThread::currentThread());
-    bool receivedSyncResponse = true;
-   if( _buffer_map.contains(http_resp) ) {
-        if(this->debug) printf("%0lx::XRClient::processHttpResponse: resp=%s\n",(unsigned long) QThread::currentThread(), QString(_buffer_map[http_resp]->buffer()).toStdString().c_str() );
-        XRMethodResponse xml_response;
-        QString parse_error_string;
-        bool no_parse_error;
-        if( !_is_deflated ) {
-            no_parse_error = xml_response.setContent( _buffer_map[http_resp]->buffer(), &parse_error_string );
-        } else {
-            /* this is compressed content */
-            no_parse_error = xml_response.setContent( qUncompress( _buffer_map[http_resp]->buffer() ), &parse_error_string );
-        }
-        if(this->debug) printf("%0lx::XRClient::processHttpResponse: no_parse_error=%s\n",(unsigned long) QThread::currentThread(),(no_parse_error?"true":"false"));
-        if( no_parse_error ) {
-            if(this->debug) printf("%0lx::XRClient::processHttpResponse: xml_response.parseXmlRpc...\n",(unsigned long) QThread::currentThread());
-            if( xml_response.parseXmlRpc() ) {
-                int faultCode;
-                QString faultString;
-                if( xml_response.getFault(faultCode,faultString) ) {
-                    if(this->debug) printf("%0lx::XRClient::processHttpResponse: %d faultString=%s\n",(unsigned long) QThread::currentThread(),faultCode,faultString.toStdString().c_str());
-                    emit fault(http_resp, faultCode, faultString);
-                } else {
-                    /* It looks good! */
-                    // RRA: start.
-                    if(this->syncReq>0) {
-                        this->syncResp = xml_response.getResponse();
-                        //receivedSyncResponse = true;
-                    } else
-                    // RRA: end.
-                        emit methodResponse(http_resp, xml_response.getResponse() );
-                }
+
+    QByteArray myresp = reply->readAll();
+
+    if(this->debug) printf("%0lx::XRClient::processHttpResponse: resp=%s\n",(unsigned long) QThread::currentThread(), QString(myresp).toStdString().c_str() );
+    XRMethodResponse xml_response;
+    QString parse_error_string;
+    bool no_parse_error;
+    if( !_is_deflated ) {
+        no_parse_error = xml_response.setContent( myresp, &parse_error_string );
+    } else {
+        /* this is compressed content */
+        no_parse_error = xml_response.setContent( qUncompress( myresp ), &parse_error_string );
+    }
+    if(this->debug) printf("%0lx::XRClient::processHttpResponse: no_parse_error=%s\n",(unsigned long) QThread::currentThread(),(no_parse_error?"true":"false"));
+    if( no_parse_error ) {
+        if(this->debug) printf("%0lx::XRClient::processHttpResponse: xml_response.parseXmlRpc...\n",(unsigned long) QThread::currentThread());
+        if( xml_response.parseXmlRpc() ) {
+            int faultCode;
+            QString faultString;
+            if( xml_response.getFault(faultCode,faultString) ) {
+                if(this->debug) printf("%0lx::XRClient::processHttpResponse: %d faultString=%s\n",(unsigned long) QThread::currentThread(),faultCode,faultString.toStdString().c_str());
+                emit fault(http_resp, faultCode, faultString);
             } else {
-                /*
-                 * Use the standard fault codes at
-                 * http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php.
-                 */
-                if(this->debug) printf("%0lx::XRClient::processHttpResponse: server error: recieved bad XML-RPC grammar from remote server\n",(unsigned long) QThread::currentThread());
-                emit fault(http_resp, XR_SERVER_ERROR_INVALID_XMLRPC,
-                    "server error: recieved bad XML-RPC grammar from remote server");
+                /* It looks good! */
+                // RRA: start.
+                if(this->syncReq>0) {
+                    this->syncResp = xml_response.getResponse();
+                    //receivedSyncResponse = true;
+                } else
+                // RRA: end.
+                    emit methodResponse(http_resp, xml_response.getResponse() );
             }
         } else {
-            if(this->debug) printf("%0lx::XRClient::processHttpResponse: parse_error_string=%s\n",(unsigned long) QThread::currentThread(),parse_error_string.toStdString().c_str());
-            emit fault(http_resp, XR_PARSE_ERROR_NOT_WELL_FORMED, parse_error_string);
+            /*
+             * Use the standard fault codes at
+             * http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php.
+             */
+            if(this->debug) printf("%0lx::XRClient::processHttpResponse: server error: recieved bad XML-RPC grammar from remote server\n",(unsigned long) QThread::currentThread());
+            emit fault(http_resp, XR_SERVER_ERROR_INVALID_XMLRPC,
+                "server error: recieved bad XML-RPC grammar from remote server");
         }
     } else {
-        //QHttp seems to emit a signal as soon as it is created.
-        //So, just ignore it if we didn't make it.
-        receivedSyncResponse = false;
+        if(this->debug) printf("%0lx::XRClient::processHttpResponse: parse_error_string=%s\n",(unsigned long) QThread::currentThread(),parse_error_string.toStdString().c_str());
+        emit fault(http_resp, XR_PARSE_ERROR_NOT_WELL_FORMED, parse_error_string);
     }
-  
-    /* clean up the memory for the buffer here */
-    if(this->debug) printf("%0lx::XRClient::processHttpResponse: cleaning up...\n",(unsigned long) QThread::currentThread());
-    if( _buffer_map.contains( http_resp ) ) {
-        delete _buffer_map[http_resp];
-        _buffer_map.remove(http_resp);
-    }
+
     if(this->debug) printf("%0lx::XRClient::processHttpResponse: end.\n",(unsigned long) QThread::currentThread());
 }
 
