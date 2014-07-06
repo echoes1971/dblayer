@@ -2,11 +2,15 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(QuteXmlrpc)
 
-
-# cmake . && make && ./testqute
-
-
+# cmake -DCMAKE_BUILD_TYPE=Debug . && make && ./testqute
 # rm -rf cmake_install.cmake CMakeCache.txt CMakeFiles ; PATH=~/Qt/5.3/gcc_64/bin/:$PATH ; cmake . && make
+
+set(QT5_PATH $ENV{HOME}/Qt/5.3/clang_64/ CACHE PATH "Path to Qt5")
+set(QT5_MODULE_PATH ${QT5_PATH}/lib/cmake)
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT5_MODULE_PATH})
+
+
+message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 message("QT_QMAKE_EXECUTABLE: ${QT_QMAKE_EXECUTABLE}")
 
 find_package(Qt5Core REQUIRED)

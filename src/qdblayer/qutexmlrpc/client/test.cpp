@@ -18,5 +18,5 @@ int main(int argc, char* argv[])
 
 
   //ClientImpl client;
-  return app.exec();
+  return 0; //app.exec();
 }

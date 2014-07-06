@@ -4,6 +4,7 @@
 BUILD_DIR=./build
 SRC_DIR=../src
 PATH=/home/roberto/Qt/5.3/gcc_64/bin/:${PATH}
+PATH=~/Qt/5.3/clang_64/bin/:~/Qt/5.3/gcc_64/bin/:${PATH}
 
 echo "PATH: ${PATH}"
 
