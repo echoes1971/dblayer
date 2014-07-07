@@ -46,12 +46,12 @@ using namespace DBLayer;
 
 #include "dbshell.h"
 
-#ifdef HAVE_CONFIG_H
+//#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
+//#endif
 
-#ifdef HAS_QT5
-#include "qdblayer/qdblayer.h"
+#ifdef USE_QXMLRPC
+#include "qdblayer/qxmlrpcconnection.h"
 #endif
 
 #if defined(WIN32)
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     //string connString("dblayer:pg:host=localhost dbname=roberto user=roberto password=roberto");
     //string connString("dblayer:xmlrpc:http://localhost/~roberto/rproject/xmlrpc_server.php");
 
-#ifdef HAS_QT5
+#ifdef USE_QXMLRPC
     QXmlrpcConnection::registerClass();
     cout << "SUN CHI" << endl;
 #else

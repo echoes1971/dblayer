@@ -11,16 +11,16 @@ ADD_DEFINITIONS(
 
 # The version number.
 set(DBLayer_VERSION_MAJOR 5)
-set(DBLayer_VERSION_MINOR 2)
+set(DBLayer_VERSION_MINOR 3)
 
 # Changing year of copyright:
 # sed -i "s/2012 by /2014 by /g" *.h
 # sed -i "s/2012 by /2014 by /g" *.cpp
 
 # Configuration file
-configure_file(
-        "${CMAKE_SOURCE_DIR}/config.h.in"
-        "${CMAKE_BINARY_DIR}/config.h")
+# configure_file(
+#         "${CMAKE_SOURCE_DIR}/config.h.in"
+#         "${CMAKE_BINARY_DIR}/config.h")
 
 ############################################
 # External libraries
@@ -50,6 +50,9 @@ if(SQLITE3_FOUND)
 endif()
 if(XMLRPCC_FOUND)
  set(USE_LIBXMLRPC TRUE)
+endif()
+if(Qt5Widgets_FOUND)
+ set(USE_QXMLRPC TRUE)
 endif()
 
 message("Configuration")
@@ -102,16 +105,11 @@ if(USE_LIBXMLRPC)
  set(EXTRA_LIBS ${EXTRA_LIBS} xmlrpc_client++ xmlrpc_client xmlrpc++ xmlrpc xmlrpc_util xmlrpc_xmlparse xmlrpc_xmltok)
 endif()
 
-if(Qt5Widgets_FOUND)
- set(HAS_QT5 1)
-endif()
-
 message("EXTRA_LIBS: ${EXTRA_LIBS}")
 
 #include_directories ("${PROJECT_SOURCE_DIR}/dblayer")
 add_subdirectory (schema)
 add_subdirectory (dblayer)
-add_subdirectory (apps)
 
 if(Qt5Widgets_FOUND)
  message("PATH: ${PATH}")
@@ -142,3 +140,4 @@ if(Qt5Widgets_FOUND)
  add_subdirectory (qdblayer)
 endif()
 
+add_subdirectory (apps)

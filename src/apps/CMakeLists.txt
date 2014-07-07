@@ -13,3 +13,7 @@ add_executable(dbshell
     dbshell.cpp
     )
 target_link_libraries(dbshell ${EXTRA_LIBS})
+
+if(Qt5Widgets_FOUND)
+ qt5_use_modules(dbshell qdblayer Core Network Widgets Xml)
+endif()

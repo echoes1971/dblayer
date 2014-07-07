@@ -16,6 +16,6 @@ add_library(qdblayer
 #    qutexmlrpc/xrsyncclient.cpp
     qutexmlrpc/xrvariant.cpp
     )
-# Use the Widgets module from Qt 5.
 
-target_link_libraries(qdblayer Qt::Core Qt::Network Qt::Widgets Qt::Xml)
+#target_link_libraries(qdblayer Qt::Core Qt::Network Qt::Widgets Qt::Xml)
+qt5_use_modules(qdblayer Core Network Widgets Xml)
