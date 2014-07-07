@@ -42,15 +42,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * @see http://www.ietf.org/internet-drafts/draft-megacz-xmc-01.txt
  */
 
-class XRClient : public QObject {
+class XmlRpcClient : public QObject {
    Q_OBJECT
 
   public:
     /**
      * @param server_url the URL to the server for this client
      */
-    XRClient(const QUrl& server_url, QObject * parent = 0, bool debug = false, bool use_cookies = true);
-    ~XRClient();
+    XmlRpcClient(const QUrl& server_url, QObject * parent = 0, bool debug = false, bool use_cookies = true);
+    ~XmlRpcClient();
     /**
      * Allow the server to send us compressed (deflate)
      * responses.  Useful to turn this off if debugging
@@ -65,6 +65,8 @@ class XRClient : public QObject {
     QVariant syncCall(const QString& method, const QList<QVariant>& params, const char* codecName="UTF-8");
 
     static QVariant staticCall(const QUrl& server_url, const QString& method, const QList<QVariant>& params, bool debug = false, const char* codecName="UTF-8");
+
+    static QString variant2string(const QVariant& v, QString prefix="");
 
     // RRA: start.
     QMap<QString,QString>* getCookies();
@@ -113,7 +115,6 @@ class XRClient : public QObject {
     QMap<QString,QString>* cookies;
     bool debug;
     bool use_cookies;
-    int syncReq;
     QVariant syncResp;
     // RRA: fine.
 };

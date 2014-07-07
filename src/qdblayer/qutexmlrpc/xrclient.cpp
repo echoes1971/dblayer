@@ -25,9 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <QTimer>
 #include <QUrlQuery>
 
-const QString XRClient::USER_AGENT = "QuteXmlRpc/0.0";
+const QString XmlRpcClient::USER_AGENT = "QuteXmlRpc/0.0";
 
-XRClient::XRClient(const QUrl& url, QObject * parent, bool debug, bool use_cookies) : QObject(parent),_url(url) {
+XmlRpcClient::XmlRpcClient(const QUrl& url, QObject * parent, bool debug, bool use_cookies) : QObject(parent),_url(url) {
     _is_deflated = false;
     _accept_compressed = true;
 
@@ -38,7 +38,6 @@ XRClient::XRClient(const QUrl& url, QObject * parent, bool debug, bool use_cooki
 
     // RRA: start.
     this->debug = debug;
-    this->syncReq = -1;
     this->use_cookies = use_cookies;
     if(use_cookies) {
         this->cookies = new QMap<QString,QString>();
@@ -47,7 +46,7 @@ XRClient::XRClient(const QUrl& url, QObject * parent, bool debug, bool use_cooki
     }
     // RRA: end.
 }
-XRClient::~XRClient() {
+XmlRpcClient::~XmlRpcClient() {
     if(this->_http_client!=0) {
         this->_http_client->disconnect();//->abort();
         delete this->_http_client;
@@ -58,11 +57,11 @@ XRClient::~XRClient() {
 }
 
 
-void XRClient::processHeaders(QNetworkReply* reply) {
-    if(this->debug) printf("%0lx::XRClient::processHeaders: start.\n", (unsigned long) QThread::currentThread());
+void XmlRpcClient::processHeaders(QNetworkReply* reply) {
+    if(this->debug) printf("%0lx::XmlRpcClient::processHeaders: start.\n", (unsigned long) QThread::currentThread());
     QList<QPair<QByteArray, QByteArray> > headers = reply->rawHeaderPairs();
     for(const QPair<QByteArray, QByteArray>& pair : headers) {
-        if(this->debug) printf("%0lx::XRClient::processHeaders: %s=%s\n",(unsigned long) QThread::currentThread(),pair.first.data(),pair.second.data());
+        if(this->debug) printf("%0lx::XmlRpcClient::processHeaders: %s=%s\n",(unsigned long) QThread::currentThread(),pair.first.data(),pair.second.data());
     }
 
     if(reply->hasRawHeader("Content-Encoding")) {
@@ -77,13 +76,13 @@ void XRClient::processHeaders(QNetworkReply* reply) {
     }
 
     if(this->cookies!=0 && reply->hasRawHeader("Set-Cookie")) {
-        if(this->debug) printf("%0ld::XRClient::processHeaders: Set-Cookie: %s\n", (unsigned long) QThread::currentThread(), reply->rawHeader("Content-Encoding").data() );
+        if(this->debug) printf("%0ld::XmlRpcClient::processHeaders: Set-Cookie: %s\n", (unsigned long) QThread::currentThread(), reply->rawHeader("Content-Encoding").data() );
         QStringList sl = QString(reply->rawHeader("Set-Cookie").data()).split("; ");
         for(int i=0; i<sl.size(); i++) {
             QStringList cookie = sl[i].split("=");
             if(cookie[0]=="path")
                 continue;
-            if(this->debug) printf("%0ld::XRClient::processHeaders: key=%s value=%s\n", (unsigned long) QThread::currentThread(), cookie[0].toStdString().c_str(),cookie[1].toStdString().c_str() );
+            if(this->debug) printf("%0ld::XmlRpcClient::processHeaders: key=%s value=%s\n", (unsigned long) QThread::currentThread(), cookie[0].toStdString().c_str(),cookie[1].toStdString().c_str() );
             if(this->cookies->find(cookie[0])==this->cookies->end())
                 this->cookies->insert(cookie[0],cookie[1]);
             else
@@ -91,74 +90,69 @@ void XRClient::processHeaders(QNetworkReply* reply) {
         }
     }
 
-    if(this->debug) printf("%0lx::XRClient::processHeaders: end.\n", (unsigned long) QThread::currentThread());
+    if(this->debug) printf("%0lx::XmlRpcClient::processHeaders: end.\n", (unsigned long) QThread::currentThread());
 }
 
 
-void XRClient::processHttpResponse(QNetworkReply* reply) {
+void XmlRpcClient::processHttpResponse(QNetworkReply* reply) {
     int http_resp;
-    if(this->debug) printf("%0lx::XRClient::processHttpResponse: start.\n",(unsigned long) QThread::currentThread());
+    if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: start.\n",(unsigned long) QThread::currentThread());
 
     if (reply->error()) {
-        if(this->debug) printf("%0lx::XRClient::processHttpResponse: error=%s\n",(unsigned long) QThread::currentThread(),reply->errorString().toStdString().c_str());
+        if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: error=%s\n",(unsigned long) QThread::currentThread(),reply->errorString().toStdString().c_str());
         delete reply;
         return;
     }
 
     QByteArray myresp = reply->readAll();
 
-    if(this->debug) printf("%0lx::XRClient::processHttpResponse: resp=%s\n",(unsigned long) QThread::currentThread(), QString(myresp).toStdString().c_str() );
+    if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: resp=%s\n",(unsigned long) QThread::currentThread(), QString(myresp).toStdString().c_str() );
     XRMethodResponse xml_response;
     QString parse_error_string;
     bool no_parse_error;
-    if(this->debug) printf("%0lx::XRClient::processHttpResponse: _is_deflated=%s\n",(unsigned long) QThread::currentThread(),(_is_deflated?"true":"false"));
+    if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: _is_deflated=%s\n",(unsigned long) QThread::currentThread(),(_is_deflated?"true":"false"));
     if( !_is_deflated ) {
         no_parse_error = xml_response.setContent( myresp, &parse_error_string );
     } else {
-        if(this->debug) printf("%0lx::XRClient::processHttpResponse: _deflated_size=%li\n",(unsigned long) QThread::currentThread(),_deflated_size);
+        if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: _deflated_size=%li\n",(unsigned long) QThread::currentThread(),_deflated_size);
         myresp.insert(0,(char) _deflated_size & 0x000000ff);
         myresp.insert(0,(char) _deflated_size & 0x0000ff00);
         myresp.insert(0,(char) _deflated_size & 0x00ff0000);
         myresp.insert(0,(char) _deflated_size & 0xff000000);
         no_parse_error = xml_response.setContent( qUncompress( myresp ), &parse_error_string );
     }
-    if(this->debug) printf("%0lx::XRClient::processHttpResponse: no_parse_error=%s\n",(unsigned long) QThread::currentThread(),(no_parse_error?"true":"false"));
+    if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: no_parse_error=%s\n",(unsigned long) QThread::currentThread(),(no_parse_error?"true":"false"));
     if( no_parse_error ) {
-        if(this->debug) printf("%0lx::XRClient::processHttpResponse: xml_response.parseXmlRpc...\n",(unsigned long) QThread::currentThread());
+        if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: xml_response.parseXmlRpc...\n",(unsigned long) QThread::currentThread());
         if( xml_response.parseXmlRpc() ) {
             int faultCode;
             QString faultString;
             if( xml_response.getFault(faultCode,faultString) ) {
-                if(this->debug) printf("%0lx::XRClient::processHttpResponse: %d faultString=%s\n",(unsigned long) QThread::currentThread(),faultCode,faultString.toStdString().c_str());
+                if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: %d faultString=%s\n",(unsigned long) QThread::currentThread(),faultCode,faultString.toStdString().c_str());
                 emit fault(http_resp, faultCode, faultString);
             } else {
-                /* It looks good! */
-                // RRA: start.
-                if(this->syncReq>0) {
-                    this->syncResp = xml_response.getResponse();
-                    //receivedSyncResponse = true;
-                } else
-                // RRA: end.
-                    emit methodResponse(http_resp, xml_response.getResponse() );
+                this->syncResp = xml_response.getResponse();
+                //receivedSyncResponse = true;
+                emit methodResponse(http_resp, xml_response.getResponse() );
             }
         } else {
             /*
              * Use the standard fault codes at
              * http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php.
              */
-            if(this->debug) printf("%0lx::XRClient::processHttpResponse: server error: recieved bad XML-RPC grammar from remote server\n",(unsigned long) QThread::currentThread());
+            if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: server error: recieved bad XML-RPC grammar from remote server\n",(unsigned long) QThread::currentThread());
             emit fault(http_resp, XR_SERVER_ERROR_INVALID_XMLRPC,
                 "server error: recieved bad XML-RPC grammar from remote server");
         }
     } else {
-        if(this->debug) printf("%0lx::XRClient::processHttpResponse: parse_error_string=%s\n",(unsigned long) QThread::currentThread(),parse_error_string.toStdString().c_str());
+        if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: parse_error_string=%s\n",(unsigned long) QThread::currentThread(),parse_error_string.toStdString().c_str());
         emit fault(http_resp, XR_PARSE_ERROR_NOT_WELL_FORMED, parse_error_string);
     }
 
-    if(this->debug) printf("%0lx::XRClient::processHttpResponse: end.\n",(unsigned long) QThread::currentThread());
+    if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: end.\n",(unsigned long) QThread::currentThread());
 }
 
-QNetworkReply* XRClient::waitForNetworkReply(QNetworkReply* reply, int secs) {
+QNetworkReply* XmlRpcClient::waitForNetworkReply(QNetworkReply* reply, int secs) {
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     QObject::connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
@@ -168,7 +162,7 @@ QNetworkReply* XRClient::waitForNetworkReply(QNetworkReply* reply, int secs) {
     return reply;
 
 //    if (reply->error()) {
-//        if(this->debug) printf("%0lx::XRClient::waitForNetworkReply: error=%s\n",(unsigned long) QThread::currentThread(),reply->errorString().toStdString().c_str());
+//        if(this->debug) printf("%0lx::XmlRpcClient::waitForNetworkReply: error=%s\n",(unsigned long) QThread::currentThread(),reply->errorString().toStdString().c_str());
 //        delete reply;
 //        return "";
 //    }
@@ -176,15 +170,15 @@ QNetworkReply* XRClient::waitForNetworkReply(QNetworkReply* reply, int secs) {
 //    QString all = reply->readAll();
 //    delete reply;
 //    if (all.isEmpty()) {
-//        if(this->debug) printf("%0lx::XRClient::waitForNetworkReply: all=%s\n",(unsigned long) QThread::currentThread(),all.toStdString().c_str());
+//        if(this->debug) printf("%0lx::XmlRpcClient::waitForNetworkReply: all=%s\n",(unsigned long) QThread::currentThread(),all.toStdString().c_str());
 //        return "";
 //    }
 
 //    return all;
 }
 
-QVariant XRClient::syncCall(const QString& method, const QList<QVariant>& params, const char* codecName) {
-    if(this->debug) printf("%0lx::XRClient::syncCall: start.\n",(unsigned long) QThread::currentThread());
+QVariant XmlRpcClient::syncCall(const QString& method, const QList<QVariant>& params, const char* codecName) {
+    if(this->debug) printf("%0lx::XmlRpcClient::syncCall: start.\n",(unsigned long) QThread::currentThread());
 
     //this->syncReq = this->call(method, params, codecName);
     XRMethodCall xml_method_call(method,params);
@@ -225,35 +219,69 @@ QVariant XRClient::syncCall(const QString& method, const QList<QVariant>& params
 //    QUrlQuery parameters;
 //    parameters.addQueryItem("license_string", licenseString());
 
-    if(this->debug) printf("%0lx::XRClient::syncCall: posting request...\n",(unsigned long) QThread::currentThread());
+    if(this->debug) printf("%0lx::XmlRpcClient::syncCall: posting request...\n",(unsigned long) QThread::currentThread());
     QNetworkReply* reply = _http_client->post(request,payload);//, parameters.query());
     //reply->ignoreSslErrors();
-    if(this->debug) printf("%0lx::XRClient::syncCall: call waitForNetworkReply...\n",(unsigned long) QThread::currentThread());
+    if(this->debug) printf("%0lx::XmlRpcClient::syncCall: call waitForNetworkReply...\n",(unsigned long) QThread::currentThread());
     reply = waitForNetworkReply(reply, 120);
 
     processHeaders(reply);
     processHttpResponse(reply);
 
-    if(this->debug) printf("%0lx::XRClient::syncCall: this->syncReq=-1...\n",(unsigned long) QThread::currentThread());
-    this->syncReq=-1;
-    if(this->debug) printf("%0lx::XRClient::syncCall: ret = this->syncResp...\n",(unsigned long) QThread::currentThread());
+    if(this->debug) printf("%0lx::XmlRpcClient::syncCall: ret = this->syncResp...\n",(unsigned long) QThread::currentThread());
     QVariant ret = this->syncResp;
 
-    if(this->debug) printf("%0lx::XRClient::syncCall: end.\n",(unsigned long) QThread::currentThread());
+    if(this->debug) printf("%0lx::XmlRpcClient::syncCall: end.\n",(unsigned long) QThread::currentThread());
     return ret;
 }
 
-QMap<QString,QString>* XRClient::getCookies() { return this->cookies; }
-void XRClient::setCookies(QMap<QString,QString>* cookies) { this->cookies=cookies; }
-void XRClient::setDebug(bool b) { this->debug=b; }
-bool XRClient::isDebug() { return this->debug; }
+QMap<QString,QString>* XmlRpcClient::getCookies() { return this->cookies; }
+void XmlRpcClient::setCookies(QMap<QString,QString>* cookies) { this->cookies=cookies; }
+void XmlRpcClient::setDebug(bool b) { this->debug=b; }
+bool XmlRpcClient::isDebug() { return this->debug; }
 
-QVariant XRClient::staticCall(const QUrl& server_url, const QString& method, const QList<QVariant>& params, bool debug, const char* codecName) {
+QVariant XmlRpcClient::staticCall(const QUrl& server_url, const QString& method, const QList<QVariant>& params, bool debug, const char* codecName) {
     static QMap<QString,QString> staticCookies;
-    XRClient* c = new XRClient(server_url, 0, debug);
+    XmlRpcClient* c = new XmlRpcClient(server_url, 0, debug);
     c->acceptCompressed(false);
     c->setCookies(&staticCookies);
     QVariant ret = c->syncCall(method,params,codecName);
     delete c;
+    return ret;
+}
+
+QString XmlRpcClient::variant2string(const QVariant& v, QString prefix) {
+    QString ret;
+    QStringList l;
+    QList<QString> chiavi;
+    switch( v.type() ) {
+        case QVariant::ByteArray:
+            ret = prefix + QString("<value type=\"") + QString(v.typeName()) + QString("\" bytes=\"") + QString("%1").arg(v.toByteArray().size()) + QString("\">") + v.toString() + QString("</value>");
+            break;
+        case QVariant::List:
+            l.clear();
+            for(int i=0; i<v.toList().size(); i++)
+                l.append( variant2string(v.toList().at(i), prefix+QString("  ")) );
+            ret = prefix + QString("<list>")
+                  + l.join(QString())
+                  + prefix + QString("</list>");
+            break;
+        case QVariant::Map:
+            chiavi.clear();
+            chiavi = v.toMap().keys();
+            for(int i=0; i<chiavi.size(); i++)
+                l.append( prefix+QString("  ")+QString("<key>")+chiavi.at(i)+QString("</key>")
+                          +prefix+QString("  ")+QString("<value>")
+                          +variant2string(v.toMap().value(chiavi.at(i)), prefix+QString("  "))
+                          +prefix+QString("  ")+QString("</value>")
+                          );
+            ret = prefix+QString("<map>")
+                  + l.join(QString())
+                  + prefix+QString("</map>");
+            break;
+        default:
+            ret = prefix + QString("<value type=\"") + QString(v.typeName()) + QString("\">") + v.toString() + QString("</value>");
+            break;
+    }
     return ret;
 }
