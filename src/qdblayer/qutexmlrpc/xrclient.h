@@ -62,24 +62,21 @@ class XRClient : public QObject {
      * @param params a list of the parameters
      * @return the identifier for this response
      */
-//    int call(const QString& method, const QList<QVariant>& params, const char* codecName="UTF-8");
-
     QVariant syncCall(const QString& method, const QList<QVariant>& params, const char* codecName="UTF-8");
 
     static QVariant staticCall(const QUrl& server_url, const QString& method, const QList<QVariant>& params, bool debug = false, const char* codecName="UTF-8");
-
-    QVariant threadSafeSyncCall(const QString& method, const QList<QVariant>& params, const char* codecName="UTF-8");
-
-    const QUrl& getUrl() const { return _url; }
-    void setUrl(const QUrl& server_url);
 
     // RRA: start.
     QMap<QString,QString>* getCookies();
     void setCookies(QMap<QString,QString>* cookies);
     void setDebug(bool b);
     bool isDebug();
-    QString waitForNetworkReply(QNetworkReply* reply, int secs);
+    QNetworkReply *waitForNetworkReply(QNetworkReply* reply, int secs);
     // RRA: end.
+
+  private:
+    void processHeaders(QNetworkReply* reply);
+    void processHttpResponse(QNetworkReply* reply);
 
   signals:
     /**
@@ -100,24 +97,12 @@ class XRClient : public QObject {
      */
     void fault(int response_num, int fault_num, const QString& fault_string);
 
-  public slots:
-    /**
-     * this is slot which is useful for some GUI widgets
-     */
-    void setUrl(const QString& u);
-	
-  protected slots:
-    /**
-     * connected to QHttp methods to handle the Http responses.
-     */
-    void processHttpResponse(QNetworkReply* reply);
-    //void processHeaders(const QHttpResponseHeader & resp);
-
   protected:
     QNetworkAccessManager* _http_client;
     QUrl _url;
 
     bool _is_deflated;
+    long _deflated_size;
     bool _accept_compressed;
     /**
      * This is the string passed in the User-Agent: header field.

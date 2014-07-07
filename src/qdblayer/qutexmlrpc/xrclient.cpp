@@ -35,20 +35,6 @@ XRClient::XRClient(const QUrl& url, QObject * parent, bool debug, bool use_cooki
 
 
     this->_url = url;
-//    if( url.port()!=-1 ) {
-//        _http_client->connectToHost(url.host(),url.port());
-//    } else {
-//        _http_client->connectToHost(url.host());
-//    }
-
-    /*
-     * connect some slots to signals!
-     */
-    connect( _http_client, SIGNAL(finished(QNetworkReply*)),
-           this, SLOT(processHttpResponse(QNetworkReply*)));//, Qt::DirectConnection );
-//    connect( _http_client,
-//          SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
-//           this, SLOT(processHeaders(const QHttpResponseHeader &)));//, Qt::QueuedConnection );
 
     // RRA: start.
     this->debug = debug;
@@ -62,10 +48,6 @@ XRClient::XRClient(const QUrl& url, QObject * parent, bool debug, bool use_cooki
     // RRA: end.
 }
 XRClient::~XRClient() {
-    /* tell the http client to abort all on-going requests
-     * this may result in the slot processHttpResponse()
-     * being called for the current request.
-     */
     if(this->_http_client!=0) {
         this->_http_client->disconnect();//->abort();
         delete this->_http_client;
@@ -75,91 +57,28 @@ XRClient::~XRClient() {
     if(this->use_cookies) delete this->cookies; // RRA
 }
 
-void XRClient::setUrl(const QUrl& url) {
-    this->_url = url;
-    if( url.port()!=-1 ) {
-        this->_http_client->connectToHost(url.host(), url.port());
-    } else {
-        this->_http_client->connectToHost(url.host());
+
+void XRClient::processHeaders(QNetworkReply* reply) {
+    if(this->debug) printf("%0lx::XRClient::processHeaders: start.\n", (unsigned long) QThread::currentThread());
+    QList<QPair<QByteArray, QByteArray> > headers = reply->rawHeaderPairs();
+    for(const QPair<QByteArray, QByteArray>& pair : headers) {
+        if(this->debug) printf("%0lx::XRClient::processHeaders: %s=%s\n",(unsigned long) QThread::currentThread(),pair.first.data(),pair.second.data());
     }
-}
-void XRClient::setUrl(const QString& u) {
-    this->_url = u;
-//    if( this->_url.port()!=-1 ) {
-//        this->_http_client->connectToHost(this->_url.host(), this->_url.port());
-//    } else {
-//        this->_http_client->connectToHost(this->_url.host());
-//    }
-}
 
-/*
-int XRClient::call(const QString& method, const QList<QVariant>& params, const char* codecName) {
-    if(this->debug) printf("%0ld::XRClient::call: start.\n", (unsigned long) QThread::currentThread());
-    XRMethodCall xml_method_call(method,params);
-    
-    // Serialize the request
-    QByteArray payload;
-    QTextStream payload_stream(&payload, QIODevice::WriteOnly);
-    payload_stream.setCodec(codecName);
-    //don't waste bytes on indenting
-    xml_method_call.save( payload_stream, 0, QDomNode::EncodingFromTextStream);
-
-
-    // make the buffer and make the call
-    QHttpRequestHeader req_head("POST",_url.path());
-    req_head.setValue("Host",_url.host());
-    req_head.setValue("User-Agent",USER_AGENT);
-    if( _accept_compressed ) {
-      // Accept deflated content
-      req_head.setValue("Accept-Encoding","deflate");
-    }
-    // XML-RPC *REQUIRES* the following to be set:
-    req_head.setContentLength( payload.size() );
-    req_head.setContentType("text/xml");
-    
-    // RRA: start.
-    if(this->cookies!=0)
-        for(int i=0; i<this->cookies->keys().size(); i++) {
-            req_head.setValue("Cookie",
-                              QString("%1=%2").arg(
-                                      this->cookies->keys().at(i),
-                                      (*this->cookies)[this->cookies->keys().at(i)]
-                                      )
-                              );
-        }
-    // RRA: end.
-
-    // this buffer will hold all the result.  We don't
-    // care about seeing any data until we have the whole result
-    QBuffer* this_buffer = new QBuffer();
-    int http_req_num = this->_http_client->request(req_head, payload, this_buffer);
-
-    this->_buffer_map.insert(http_req_num, this_buffer);
-
-    if(this->debug) printf("%0ld::XRClient::call: http_req_num=%d\n", (unsigned long) QThread::currentThread(), http_req_num);
-    if(this->debug) printf("%0ld::XRClient::call: end.\n", (unsigned long) QThread::currentThread());
-    return http_req_num;
-}
-*/
-
-/*
-void XRClient::processHeaders(const QHttpResponseHeader & resp) {
-    if(this->debug) printf("%0ld::XRClient::processHeaders: resp=%s\n", (unsigned long) QThread::currentThread(), resp.toString().toStdString().c_str() );
-//    if(this->debug) printf("%0x::XRClient::processHeaders: resp=%s\n", (unsigned int) QThread::currentThread(), resp.toString().toStdString().c_str() );
-    if( resp.hasKey("Content-Encoding") ) {
-        if( resp.value("Content-Encoding") == "deflate" ) {
+    if(reply->hasRawHeader("Content-Encoding")) {
+        if( QString(reply->rawHeader("Content-Encoding").data()) == "deflate" ) {
             _is_deflated = true;
+            _deflated_size = reply->header(QNetworkRequest::ContentLengthHeader).toInt();
         } else {
             _is_deflated = false;
         }
     } else {
         _is_deflated = false;
     }
-    // RRA: start.
-    if(this->cookies!=0 && resp.hasKey("Set-Cookie")) {
-        if(this->debug) printf("%0ld::XRClient::processHeaders: Set-Cookie: %s\n", (unsigned long) QThread::currentThread(), resp.value("Set-Cookie").toStdString().c_str() );
-//        if(this->debug) printf("%0x::XRClient::processHeaders: Set-Cookie: %s\n", (unsigned int) QThread::currentThread(), resp.value("Set-Cookie").toStdString().c_str() );
-        QStringList sl = resp.value("Set-Cookie").split("; ");
+
+    if(this->cookies!=0 && reply->hasRawHeader("Set-Cookie")) {
+        if(this->debug) printf("%0ld::XRClient::processHeaders: Set-Cookie: %s\n", (unsigned long) QThread::currentThread(), reply->rawHeader("Content-Encoding").data() );
+        QStringList sl = QString(reply->rawHeader("Set-Cookie").data()).split("; ");
         for(int i=0; i<sl.size(); i++) {
             QStringList cookie = sl[i].split("=");
             if(cookie[0]=="path")
@@ -171,14 +90,20 @@ void XRClient::processHeaders(const QHttpResponseHeader & resp) {
                 (*this->cookies)[cookie[0]]=cookie[1];
         }
     }
-    // RRA: end.
+
     if(this->debug) printf("%0lx::XRClient::processHeaders: end.\n", (unsigned long) QThread::currentThread());
-//    if(this->debug) printf("%0x::XRClient::processHeaders: end.\n", (unsigned int) QThread::currentThread());
 }
-*/
+
+
 void XRClient::processHttpResponse(QNetworkReply* reply) {
     int http_resp;
     if(this->debug) printf("%0lx::XRClient::processHttpResponse: start.\n",(unsigned long) QThread::currentThread());
+
+    if (reply->error()) {
+        if(this->debug) printf("%0lx::XRClient::processHttpResponse: error=%s\n",(unsigned long) QThread::currentThread(),reply->errorString().toStdString().c_str());
+        delete reply;
+        return;
+    }
 
     QByteArray myresp = reply->readAll();
 
@@ -186,10 +111,15 @@ void XRClient::processHttpResponse(QNetworkReply* reply) {
     XRMethodResponse xml_response;
     QString parse_error_string;
     bool no_parse_error;
+    if(this->debug) printf("%0lx::XRClient::processHttpResponse: _is_deflated=%s\n",(unsigned long) QThread::currentThread(),(_is_deflated?"true":"false"));
     if( !_is_deflated ) {
         no_parse_error = xml_response.setContent( myresp, &parse_error_string );
     } else {
-        /* this is compressed content */
+        if(this->debug) printf("%0lx::XRClient::processHttpResponse: _deflated_size=%li\n",(unsigned long) QThread::currentThread(),_deflated_size);
+        myresp.insert(0,(char) _deflated_size & 0x000000ff);
+        myresp.insert(0,(char) _deflated_size & 0x0000ff00);
+        myresp.insert(0,(char) _deflated_size & 0x00ff0000);
+        myresp.insert(0,(char) _deflated_size & 0xff000000);
         no_parse_error = xml_response.setContent( qUncompress( myresp ), &parse_error_string );
     }
     if(this->debug) printf("%0lx::XRClient::processHttpResponse: no_parse_error=%s\n",(unsigned long) QThread::currentThread(),(no_parse_error?"true":"false"));
@@ -228,29 +158,29 @@ void XRClient::processHttpResponse(QNetworkReply* reply) {
     if(this->debug) printf("%0lx::XRClient::processHttpResponse: end.\n",(unsigned long) QThread::currentThread());
 }
 
-QString XRClient::waitForNetworkReply(QNetworkReply* reply, int secs) {
+QNetworkReply* XRClient::waitForNetworkReply(QNetworkReply* reply, int secs) {
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     QObject::connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
     QTimer::singleShot(secs * 1000, &loop, SLOT(quit()));
     loop.exec();
 
-    if (reply->error()) {
-        if(this->debug) printf("%0lx::XRClient::waitForNetworkReply: error=%s\n",(unsigned long) QThread::currentThread(),reply->errorString().toStdString().c_str());
-        delete reply;
-        return "";
-    }
+    return reply;
 
-    QString all = reply->readAll();
-    delete reply;
+//    if (reply->error()) {
+//        if(this->debug) printf("%0lx::XRClient::waitForNetworkReply: error=%s\n",(unsigned long) QThread::currentThread(),reply->errorString().toStdString().c_str());
+//        delete reply;
+//        return "";
+//    }
 
-    if (all.isEmpty()) {
-        if(this->debug) printf("%0lx::XRClient::waitForNetworkReply: all=%s\n",(unsigned long) QThread::currentThread(),all.toStdString().c_str());
-        //m_lastError = pix4ui::makeText(TEXT_LICENSE_SERVERCOMMUN_MSG);
-        return "";
-    }
+//    QString all = reply->readAll();
+//    delete reply;
+//    if (all.isEmpty()) {
+//        if(this->debug) printf("%0lx::XRClient::waitForNetworkReply: all=%s\n",(unsigned long) QThread::currentThread(),all.toStdString().c_str());
+//        return "";
+//    }
 
-    return all;
+//    return all;
 }
 
 QVariant XRClient::syncCall(const QString& method, const QList<QVariant>& params, const char* codecName) {
@@ -270,10 +200,12 @@ QVariant XRClient::syncCall(const QString& method, const QList<QVariant>& params
     QNetworkRequest request(this->_url); //QUrl(webService() + "/api/v1/login/"));
     request.setRawHeader(QByteArray("Host"),QByteArray(_url.host().toStdString().c_str()));
     request.setHeader(QNetworkRequest::UserAgentHeader,USER_AGENT);
-    if( _accept_compressed ) {
-      // Accept deflated content
-      request.setRawHeader(QByteArray("Accept-Encoding"),QByteArray("deflate"));
-    }
+
+    // qUncompress doesn't work :-(
+//    if( _accept_compressed ) {
+//      // Accept deflated content
+//      request.setRawHeader(QByteArray("Accept-Encoding"),QByteArray("deflate"));
+//    }
     // XML-RPC *REQUIRES* the following to be set:
     request.setHeader(QNetworkRequest::ContentLengthHeader, payload.size() );
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml" );
@@ -293,13 +225,14 @@ QVariant XRClient::syncCall(const QString& method, const QList<QVariant>& params
 //    QUrlQuery parameters;
 //    parameters.addQueryItem("license_string", licenseString());
 
+    if(this->debug) printf("%0lx::XRClient::syncCall: posting request...\n",(unsigned long) QThread::currentThread());
     QNetworkReply* reply = _http_client->post(request,payload);//, parameters.query());
     //reply->ignoreSslErrors();
-    QString result = waitForNetworkReply(reply, 20);
+    if(this->debug) printf("%0lx::XRClient::syncCall: call waitForNetworkReply...\n",(unsigned long) QThread::currentThread());
+    reply = waitForNetworkReply(reply, 120);
 
-
+    processHeaders(reply);
     processHttpResponse(reply);
-    //QString reply = userReply->readAll();
 
     if(this->debug) printf("%0lx::XRClient::syncCall: this->syncReq=-1...\n",(unsigned long) QThread::currentThread());
     this->syncReq=-1;
@@ -320,16 +253,6 @@ QVariant XRClient::staticCall(const QUrl& server_url, const QString& method, con
     XRClient* c = new XRClient(server_url, 0, debug);
     c->acceptCompressed(false);
     c->setCookies(&staticCookies);
-    QVariant ret = c->syncCall(method,params,codecName);
-    delete c;
-    return ret;
-}
-
-QVariant XRClient::threadSafeSyncCall(const QString& method, const QList<QVariant>& params, const char* codecName) {
-    //XRClient* c = new XRClient(this->_url, this, this->debug, false);
-    XRClient* c = new XRClient(this->_url, 0, this->debug, false);
-    c->acceptCompressed(false);
-    c->setCookies(this->getCookies());
     QVariant ret = c->syncCall(method,params,codecName);
     delete c;
     return ret;
