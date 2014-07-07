@@ -72,7 +72,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *   
  */
 
-class XRVariant : public QVariant
+class XmlRpcVariant : public QVariant
 {
     public:
 	/**
@@ -80,12 +80,12 @@ class XRVariant : public QVariant
 	 *
 	 * This is how we create XRVariants to do serialization
 	 */
-	XRVariant(const QVariant& aqv);
+    XmlRpcVariant(const QVariant& aqv);
 	/**
 	 * read an XML-RPC value from this Dom node.
 	 * Note, this is not const for the QDomNode
 	 */
-        XRVariant(QDomElement& a_xml_rpc_value);
+    XmlRpcVariant(QDomElement& a_xml_rpc_value);
 	/**
 	 * Reinitialize the XRVariant from this dom element
 	 */
@@ -105,8 +105,8 @@ class XRVariant : public QVariant
 	/*
 	 * static private methods:
 	 */
-	static XRVariant arrayFromDomElement(QDomElement& qde);
-	static XRVariant structFromDomElement(QDomElement& qde);
+    static XmlRpcVariant arrayFromDomElement(QDomElement& qde);
+    static XmlRpcVariant structFromDomElement(QDomElement& qde);
 };
 
 #endif

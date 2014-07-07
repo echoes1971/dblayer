@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qutexmlrpc/xrmethodresponse.h"
 #include <QDebug>
 
-XRMethodResponse::XRMethodResponse() : QDomDocument(),
+XmlRpcMethodResponse::XmlRpcMethodResponse() : QDomDocument(),
 	                                    _is_fault(false),
 					    _fault_code(0),
 					    _fault_string(),
@@ -31,7 +31,7 @@ XRMethodResponse::XRMethodResponse() : QDomDocument(),
 
 }
 
-XRMethodResponse::XRMethodResponse(const QVariant& resp) :
+XmlRpcMethodResponse::XmlRpcMethodResponse(const QVariant& resp) :
                     QDomDocument(), _is_fault(false), _fault_code(0),
 		    _fault_string(), _response(resp)
 {
@@ -39,7 +39,7 @@ XRMethodResponse::XRMethodResponse(const QVariant& resp) :
   responseToDomDoc(_response,*this);
 }
 
-XRMethodResponse::XRMethodResponse(int fault_code,
+XmlRpcMethodResponse::XmlRpcMethodResponse(int fault_code,
 		                        const QString& string) :
                           QDomDocument(), _is_fault(true),
 			  _fault_code(fault_code), _fault_string(string),
@@ -48,10 +48,7 @@ XRMethodResponse::XRMethodResponse(int fault_code,
     faultToDomDoc(_fault_code,_fault_string,*this);
 }
 
-void XRMethodResponse::faultToDomDoc(int fault_code,
-			             const QString& fault_string,
-				     QDomDocument& doc)
-{
+void XmlRpcMethodResponse::faultToDomDoc(int fault_code, const QString& fault_string, QDomDocument& doc) {
     QDomElement root = doc.createElement("methodResponse");
     doc.appendChild(root);
     
@@ -62,14 +59,11 @@ void XRMethodResponse::faultToDomDoc(int fault_code,
     fault_map.insert("faultCode",QVariant(fault_code));
     fault_map.insert("faultString", QVariant(fault_string));
     
-    fault.appendChild( XRVariant(fault_map).toDomElement(doc) );
+    fault.appendChild( XmlRpcVariant(fault_map).toDomElement(doc) );
 }
 
-bool XRMethodResponse::fromDomDoc(const QDomDocument& doc,
-			      QVariant& result,
-			      bool& isFault)
-{
-   QDomNodeList nodes;
+bool XmlRpcMethodResponse::fromDomDoc(const QDomDocument& doc, QVariant& result, bool& isFault) {
+//   QDomNodeList nodes;
    QDomElement docElem = doc.documentElement();
    if( docElem.tagName() != "methodResponse" ) {
      return false;
@@ -81,12 +75,10 @@ bool XRMethodResponse::fromDomDoc(const QDomDocument& doc,
        if( e.tagName() == "fault" ) {
          QDomNode fault_value = e.firstChild();
          QDomElement fault_e = fault_value.toElement();
-         XRVariant fault(fault_e);
+         XmlRpcVariant fault(fault_e);
          if( fault.type() == QVariant::Map ) {
            QMap<QString, QVariant> faultMap = fault.toMap();
-           if( faultMap.find("faultCode") != faultMap.end() &&
-                     faultMap.find("faultString") != faultMap.end() )
-           {
+           if( faultMap.find("faultCode") != faultMap.end() && faultMap.find("faultString") != faultMap.end() ) {
                isFault = true;
                result = fault;
                return true;
@@ -105,7 +97,7 @@ bool XRMethodResponse::fromDomDoc(const QDomDocument& doc,
                return false;
              } else {
                QDomElement value_e = value.toElement();
-               result = XRVariant(value_e);
+               result = XmlRpcVariant(value_e);
              }
            }
          } else {
@@ -118,21 +110,17 @@ bool XRMethodResponse::fromDomDoc(const QDomDocument& doc,
    return true;
 }
 
-bool XRMethodResponse::getFault(int& code, QString& string) const
-{
+bool XmlRpcMethodResponse::getFault(int& code, QString& string) const {
   if( _is_fault ) {
     code = _fault_code;
     string = _fault_string;
     return true;
-  }
-  else
-  {
+  } else {
     return false;
   }
 }
 
-bool XRMethodResponse::parseXmlRpc() {
-
+bool XmlRpcMethodResponse::parseXmlRpc() {
    bool result = fromDomDoc(*this,_response,_is_fault);
    if( _is_fault ) {
 	   QMap<QString,QVariant>::ConstIterator it;
@@ -146,13 +134,11 @@ bool XRMethodResponse::parseXmlRpc() {
    return result;
 }
 
-void XRMethodResponse::responseToDomDoc(const QVariant& result,
-			                QDomDocument& doc)
-{
+void XmlRpcMethodResponse::responseToDomDoc(const QVariant& result, QDomDocument& doc) {
     QDomElement root = doc.createElement("methodResponse");
 	QDomElement params_xml = doc.createElement("params");
     QDomElement param_node = doc.createElement("param");
-	param_node.appendChild( XRVariant(result).toDomElement(doc) );
+	param_node.appendChild( XmlRpcVariant(result).toDomElement(doc) );
 	params_xml.appendChild(param_node);	
 	root.appendChild(params_xml);
 	doc.appendChild(root);

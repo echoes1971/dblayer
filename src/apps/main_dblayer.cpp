@@ -13,6 +13,8 @@
 **		dblayer:sqlite:./test.db
 **		dblayer:xmlrpc:http://localhost/~roberto/rproject/xmlrpc_server.php
 **		dblayer:xmlrpc:http://www.roccoangeloni.it/rproject/xmlrpc_server.php
+**      dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php
+**		dblayer:qxmlrpc:http://www.roccoangeloni.it/rproject/xmlrpc_server.php
 **		"dblayer:mysql:host=localhost;dbname=roberto;user=root;password=;"
 **	TODO: - Controllare che tutti i metodi virtual della classe DBConnection abbiano implementazione nelle sottoclassi
 **				PG: OK
@@ -48,6 +50,10 @@ using namespace DBLayer;
 #include <config.h>
 #endif
 
+#ifdef HAS_QT5
+#include "qdblayer/qdblayer.h"
+#endif
+
 #if defined(WIN32)
 # define snprintf _snprintf
 #endif
@@ -75,6 +81,13 @@ int main(int argc, char *argv[]) {
     //string connString("dblayer:mysql:host=localhost;dbname=fav;user=root;password=;");
     //string connString("dblayer:pg:host=localhost dbname=roberto user=roberto password=roberto");
     //string connString("dblayer:xmlrpc:http://localhost/~roberto/rproject/xmlrpc_server.php");
+
+#ifdef HAS_QT5
+    QXmlrpcConnection::registerClass();
+    cout << "SUN CHI" << endl;
+#else
+    cout << "SUN LI" << endl;
+#endif
 
     if(argc!=2 && argc!=5) {
         cerr << "Usage: " << argv[0] << " connect-string" << endl

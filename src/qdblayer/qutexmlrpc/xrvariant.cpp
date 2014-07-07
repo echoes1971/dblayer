@@ -21,15 +21,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "qutexmlrpc/xrvariant.h"
 
-XRVariant::XRVariant(const QVariant& aqv) {
+XmlRpcVariant::XmlRpcVariant(const QVariant& aqv) {
   this->QVariant::operator=(aqv);
 }
 
-XRVariant::XRVariant(QDomElement& xrv) {
+XmlRpcVariant::XmlRpcVariant(QDomElement& xrv) {
   fromDomElement(xrv);
 }
 
-XRVariant XRVariant::arrayFromDomElement(QDomElement& qde) {
+XmlRpcVariant XmlRpcVariant::arrayFromDomElement(QDomElement& qde) {
     QDomNode a_n = qde.firstChild();
     QDomElement tmp_a = a_n.toElement();
     
@@ -40,7 +40,7 @@ XRVariant XRVariant::arrayFromDomElement(QDomElement& qde) {
       bool failed = false;
       while((!a_n.isNull()) && (failed == false)) {
 	    QDomElement a_e = a_n.toElement();
-        XRVariant tmp_xrv(a_e);
+        XmlRpcVariant tmp_xrv(a_e);
 	    if(tmp_xrv.typeName() == 0) {
           //This means it is an invalid variant.
           failed = true;
@@ -56,7 +56,7 @@ XRVariant XRVariant::arrayFromDomElement(QDomElement& qde) {
     return QVariant();
 }
 
-void XRVariant::fromDomElement(QDomElement& xrv) {
+void XmlRpcVariant::fromDomElement(QDomElement& xrv) {
     if( !xrv.isNull() ) {
       //xrv should be a dom node which
       //holds a value.  Check to see:
@@ -113,7 +113,7 @@ void XRVariant::fromDomElement(QDomElement& xrv) {
     }
 }
 
-bool XRVariant::isXmlRpcType(const QVariant& qv) {
+bool XmlRpcVariant::isXmlRpcType(const QVariant& qv) {
   if( (qv.type() == QVariant::String) ||
       (qv.type() == QVariant::Int) ||
       (qv.type() == QVariant::Bool) ||
@@ -141,7 +141,7 @@ bool XRVariant::isXmlRpcType(const QVariant& qv) {
   return false;
 }
 
-XRVariant XRVariant::structFromDomElement(QDomElement& qde) {
+XmlRpcVariant XmlRpcVariant::structFromDomElement(QDomElement& qde) {
   QMap<QString, QVariant> tmp_map;
 	      
   QDomNode a_n = qde.firstChild();
@@ -162,7 +162,7 @@ XRVariant XRVariant::structFromDomElement(QDomElement& qde) {
           member_name = member_e.text();
         } else if( member_e.tagName() == "value") {
           have_value=true;
-          member_value = XRVariant(member_e);
+          member_value = XmlRpcVariant(member_e);
 		}
 		if( have_name && have_value ) {
           tmp_map.insert(member_name, member_value);
@@ -177,7 +177,7 @@ XRVariant XRVariant::structFromDomElement(QDomElement& qde) {
   return QVariant(tmp_map);
 }
 
-QDomElement XRVariant::toDomElement(QDomDocument& doc) const {
+QDomElement XmlRpcVariant::toDomElement(QDomDocument& doc) const {
     QDomElement ret_el = doc.createElement("value");
     QDomElement type_el;
     QDomText t;
@@ -227,7 +227,7 @@ QDomElement XRVariant::toDomElement(QDomDocument& doc) const {
       type_el.appendChild(t);
     } else if( this_type == QVariant::ByteArray ) {
       type_el = doc.createElement("base64");
-      t = doc.createTextNode( XRBase64::encode( toByteArray() ));
+      t = doc.createTextNode( XmlRpcBase64::encode( toByteArray() ));
       type_el.appendChild(t);
     } else if( this_type == QVariant::List || this_type == QVariant::StringList) {
       type_el = doc.createElement("array");
@@ -235,7 +235,7 @@ QDomElement XRVariant::toDomElement(QDomDocument& doc) const {
       type_el.appendChild(data_el);
 
       foreach (QVariant v, toList()) {
-	    data_el.appendChild( XRVariant(v).toDomElement(doc) );
+	    data_el.appendChild( XmlRpcVariant(v).toDomElement(doc) );
       }
     } else if( this_type == QVariant::Map ) {
       type_el = doc.createElement("struct");
@@ -249,7 +249,7 @@ QDomElement XRVariant::toDomElement(QDomDocument& doc) const {
 	    name_el.appendChild(t);
 	    mem_el.appendChild(name_el);
 	    //Add the value:
-	    mem_el.appendChild( XRVariant(it.value()).toDomElement(doc) );
+	    mem_el.appendChild( XmlRpcVariant(it.value()).toDomElement(doc) );
 	    //Put the member into the struct:
 	    type_el.appendChild(mem_el);
       }

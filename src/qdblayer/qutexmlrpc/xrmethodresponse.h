@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
 
-class XRMethodResponse : public QDomDocument {
+class XmlRpcMethodResponse : public QDomDocument {
 
     public:
 	/**
@@ -42,26 +42,26 @@ class XRMethodResponse : public QDomDocument {
 	 * with the QDomDocument methods for initializing from
 	 * XML, particularly QDomDocument::setContent.
 	 */
-	XRMethodResponse();
+    XmlRpcMethodResponse();
 	/**
 	 * Creates a non-fault result.
 	 * @param result the param for this result
 	 */
-	XRMethodResponse(const QVariant& result);
+    XmlRpcMethodResponse(const QVariant& result);
 	/**
 	 * Create a fault result
 	 * @param faultCode the code for the fault.
 	 * @param faultString the string for the fault.
 	 * @see http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
 	 */
-	XRMethodResponse(int faultCode, const QString& faultString);
+    XmlRpcMethodResponse(int faultCode, const QString& faultString);
 	
 	/**
 	 * This must be called after using any QDomDocument setting
 	 * methods.
 	 * @return true if the underlying QDomDocument is a valid xmlrpc message
 	 */
-        bool parseXmlRpc();
+    bool parseXmlRpc();
 	
 	/**
 	  * @param faultCode gets set to the fault code if return is true
@@ -74,7 +74,7 @@ class XRMethodResponse : public QDomDocument {
 	 * @return the NON-FAULT response.  If this is a fault, this
 	 * returns the null QVariant.
 	 */
-        const QVariant& getResponse() const { return _response; }
+    const QVariant& getResponse() const { return _response; }
     protected:
 	
 	static void faultToDomDoc(int fault_code,

@@ -25,13 +25,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * this code is adapted from Wei Dai's public domain base64.cpp
  */
 
-const int XRBase64::MAX_LINE_LENGTH = 76;
-const char XRBase64::vec[] =
+const int XmlRpcBase64::MAX_LINE_LENGTH = 76;
+const char XmlRpcBase64::vec[] =
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 ;
-const char XRBase64::padding = '=';
+const char XmlRpcBase64::padding = '=';
 
-int XRBase64::convertToNumber(char inByte) {
+int XmlRpcBase64::convertToNumber(char inByte) {
 
     if (inByte >= 'A' && inByte <= 'Z')
         return (inByte - 'A');
@@ -51,7 +51,7 @@ int XRBase64::convertToNumber(char inByte) {
     return (-1);
 }
 
-QByteArray XRBase64::decode(QString ascii)
+QByteArray XmlRpcBase64::decode(QString ascii)
 {
   uint j;
   int i;
@@ -99,7 +99,7 @@ QByteArray XRBase64::decode(QString ascii)
   return result;
 }
 
-QString XRBase64::encode(const QByteArray& bin)
+QString XmlRpcBase64::encode(const QByteArray& bin)
 {
   int i;
   QString result;

@@ -107,7 +107,7 @@ void XmlRpcClient::processHttpResponse(QNetworkReply* reply) {
     QByteArray myresp = reply->readAll();
 
     if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: resp=%s\n",(unsigned long) QThread::currentThread(), QString(myresp).toStdString().c_str() );
-    XRMethodResponse xml_response;
+    XmlRpcMethodResponse xml_response;
     QString parse_error_string;
     bool no_parse_error;
     if(this->debug) printf("%0lx::XmlRpcClient::processHttpResponse: _is_deflated=%s\n",(unsigned long) QThread::currentThread(),(_is_deflated?"true":"false"));
@@ -181,7 +181,7 @@ QVariant XmlRpcClient::syncCall(const QString& method, const QList<QVariant>& pa
     if(this->debug) printf("%0lx::XmlRpcClient::syncCall: start.\n",(unsigned long) QThread::currentThread());
 
     //this->syncReq = this->call(method, params, codecName);
-    XRMethodCall xml_method_call(method,params);
+    XmlRpcMethodCall xml_method_call(method,params);
 
     // Serialize the request
     QByteArray payload;

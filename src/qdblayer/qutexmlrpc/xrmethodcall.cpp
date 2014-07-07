@@ -21,14 +21,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "qutexmlrpc/xrmethodcall.h"
 
-XRMethodCall::XRMethodCall() : QDomDocument(),
+XmlRpcMethodCall::XmlRpcMethodCall() : QDomDocument(),
                                 _method_name(),
 				_params()
 {
 
 }
 
-XRMethodCall::XRMethodCall(const QString& methodname,
+XmlRpcMethodCall::XmlRpcMethodCall(const QString& methodname,
 		       const QList<QVariant>& params)
                                    : QDomDocument(),
                                      _method_name(methodname),
@@ -37,55 +37,54 @@ XRMethodCall::XRMethodCall(const QString& methodname,
    toDomDoc(_method_name, _params, *this);
 }
 
-bool XRMethodCall::parseXmlRpc()
+bool XmlRpcMethodCall::parseXmlRpc()
 {
     return fromDomDoc(*this, _method_name, _params);
 }
 
-bool XRMethodCall::fromDomDoc(const QDomDocument& doc,
+bool XmlRpcMethodCall::fromDomDoc(const QDomDocument& doc,
 			      QString& method_name,
 			      QList<QVariant>& params)
 {
-   //Reset method name and params:
-   method_name = "";
-   params.clear();
-	   
-   QDomNodeList nodes;
-   QDomElement docElem = doc.documentElement();
-   if( docElem.tagName() != "methodCall" ) {
-     return false;
-   }
-   QDomNode n = docElem.firstChild();
-   while( !n.isNull() ) {
-     QDomElement e = n.toElement();
-     if( !e.isNull() ) {
-       if( e.tagName() == "methodName" ) {
-         method_name = e.text();
-       }
-       if( e.tagName() == "params") {
-         QDomNode p = e.firstChild();
-	 while( !p.isNull() ) {
-           QDomElement param = p.toElement();
-	   if( param.tagName() == "param") {
-             QDomNode value = param.firstChild();
-	     if( value.isNull() ) {
-                 return false;
-	     }
-	     else {
-		 QDomElement value_e = value.toElement();
-                 params.push_back( XRVariant(value_e) );
-	     }
-	   }
-           p = p.nextSibling();
-	 }
-       }
-     }
-     n = n.nextSibling();
-   }
-   return true;
+    //Reset method name and params:
+    method_name = "";
+    params.clear();
+
+    QDomNodeList nodes;
+    QDomElement docElem = doc.documentElement();
+    if( docElem.tagName() != "methodCall" ) {
+        return false;
+    }
+    QDomNode n = docElem.firstChild();
+    while( !n.isNull() ) {
+        QDomElement e = n.toElement();
+        if( !e.isNull() ) {
+            if( e.tagName() == "methodName" ) {
+                method_name = e.text();
+            }
+            if( e.tagName() == "params") {
+                QDomNode p = e.firstChild();
+                while( !p.isNull() ) {
+                    QDomElement param = p.toElement();
+                    if( param.tagName() == "param") {
+                        QDomNode value = param.firstChild();
+                        if( value.isNull() ) {
+                            return false;
+                        } else {
+                            QDomElement value_e = value.toElement();
+                            params.push_back( XmlRpcVariant(value_e) );
+                        }
+                    }
+                    p = p.nextSibling();
+                }
+            }
+        }
+        n = n.nextSibling();
+    }
+    return true;
 }
 
-void XRMethodCall::toDomDoc(const QString& method,
+void XmlRpcMethodCall::toDomDoc(const QString& method,
 			    const QList<QVariant>& params,
 			    QDomDocument& xml_method_call)
 {
@@ -103,7 +102,7 @@ void XRMethodCall::toDomDoc(const QString& method,
     QDomElement param_node;
     foreach (QVariant v, params) {
       param_node = xml_method_call.createElement("param");
-      param_node.appendChild( XRVariant(v).toDomElement(xml_method_call) );
+      param_node.appendChild( XmlRpcVariant(v).toDomElement(xml_method_call) );
       params_xml.appendChild(param_node);
     }
 }

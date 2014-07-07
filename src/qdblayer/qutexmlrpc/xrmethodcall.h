@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * Handles serialization and deserialization through QDomDocument.
  */
 
-class XRMethodCall : public QDomDocument {
+class XmlRpcMethodCall : public QDomDocument {
 	
     public:
 	/**
@@ -43,13 +43,13 @@ class XRMethodCall : public QDomDocument {
 	 * call parseXmlRpc, which will make sure the xml has a valid
 	 * grammar.
 	 */
-	XRMethodCall();
+    XmlRpcMethodCall();
 
 	/**
 	 * @param name the method name for this call.
 	 * @param params The array of parameters for the call
 	 */
-        XRMethodCall(const QString& name, const QList<QVariant>& params);
+        XmlRpcMethodCall(const QString& name, const QList<QVariant>& params);
 	/**
 	 * This method MUST be called each time and QDomDocument
 	 * method is used to change the document.

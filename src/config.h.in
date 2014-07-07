@@ -37,5 +37,8 @@
 /* Enables ODBC specific driver. */
 #cmakedefine USE_ODBCPP
 
+/* Enables QXmlrpc driver */
+#cmakedefine HAS_QT5
+
 /* Version number of package */
 #define VERSION "0.@DBLayer_VERSION_MAJOR@.@DBLayer_VERSION_MINOR@"

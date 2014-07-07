@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * code.  Here is something simple.
  */
 
-class XRBase64 {
+class XmlRpcBase64 {
 
     public:
 	static QByteArray decode(QString ascii);

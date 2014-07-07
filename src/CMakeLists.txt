@@ -102,6 +102,10 @@ if(USE_LIBXMLRPC)
  set(EXTRA_LIBS ${EXTRA_LIBS} xmlrpc_client++ xmlrpc_client xmlrpc++ xmlrpc xmlrpc_util xmlrpc_xmlparse xmlrpc_xmltok)
 endif()
 
+if(Qt5Widgets_FOUND)
+ set(HAS_QT5 1)
+endif()
+
 message("EXTRA_LIBS: ${EXTRA_LIBS}")
 
 #include_directories ("${PROJECT_SOURCE_DIR}/dblayer")
@@ -110,33 +114,30 @@ add_subdirectory (dblayer)
 add_subdirectory (apps)
 
 if(Qt5Widgets_FOUND)
+ message("PATH: ${PATH}")
 
-message("PATH: ${PATH}")
+ find_package(Qt5Core REQUIRED)
+ message("Qt5Core_INCLUDE_DIRS: ${Qt5Core_INCLUDE_DIRS}")
+ include_directories(${Qt5Core_INCLUDE_DIRS})
 
-find_package(Qt5Core REQUIRED)
-message("Qt5Core_INCLUDE_DIRS: ${Qt5Core_INCLUDE_DIRS}")
-include_directories(${Qt5Core_INCLUDE_DIRS})
+ include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
-include_directories(${Qt5Widgets_INCLUDE_DIRS})
+ find_package(Qt5Xml REQUIRED)
+ include_directories(${Qt5Xml_INCLUDE_DIRS})
+ find_package(Qt5Network REQUIRED)
+ include_directories(${Qt5Network_INCLUDE_DIRS})
 
-find_package(Qt5Xml REQUIRED)
-include_directories(${Qt5Xml_INCLUDE_DIRS})
-find_package(Qt5Network REQUIRED)
-include_directories(${Qt5Network_INCLUDE_DIRS})
+ #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
+ #    ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
-#    ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+ #set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Network Qt5::Widgets Qt5::Xml)
 
-#set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Network Qt5::Widgets Qt5::Xml)
+ # Find includes in corresponding build directories
+ #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# Find includes in corresponding build directories
-#set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-# Instruct CMake to run moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
-
-
+ # Instruct CMake to run moc automatically when needed.
+ set(CMAKE_AUTOMOC ON)
 
  add_subdirectory (qdblayer)
 endif()

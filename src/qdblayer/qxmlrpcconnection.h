@@ -14,7 +14,7 @@
 using namespace DBLayer;
 
 //#include <xrclient.h>
-class XRClient;
+class XmlRpcClient;
 namespace DBLayer {
 
 class QXmlrpcConnection : public QObject , public Connection {
@@ -49,7 +49,7 @@ class QXmlrpcConnection : public QObject , public Connection {
         per questo ritorno lo stesso resultset passato in argomento */
     static QXmlrpcResultSet* list2resultset(QList<QVariant>* iLista, QXmlrpcResultSet* ioResultSet);
 
-    XRClient* getXmlrpcClient();
+    XmlRpcClient* getXmlrpcClient();
     //void setXmlrpcClient(XRClient* c); // RRA - NO!
 
     // **************** Proxy Connections :: 20091015: start. *********************
@@ -72,7 +72,7 @@ class QXmlrpcConnection : public QObject , public Connection {
   private:
     // XmlRpc
     string myUrl;
-    XRClient* myClient;
+    XmlRpcClient* myClient;
 
     QMap<int, QString> _req_to_method;
     QMap<int, QVariant*> _request_responses;

@@ -29,12 +29,12 @@ QXmlrpcConnection::~QXmlrpcConnection() {
     if(this->myClient!=0) delete this->myClient;
 }
 
-XRClient* QXmlrpcConnection::getXmlrpcClient() { return this->myClient; }
+XmlRpcClient* QXmlrpcConnection::getXmlrpcClient() { return this->myClient; }
 
 bool QXmlrpcConnection::connect() {
     //printf("%0x::QXmlrpcConnection::connect: start.\n",(int) QThread::currentThread());
     if(this->myClient==0) {
-        this->myClient = new XRClient(QUrl(QString(this->myUrl.c_str())),0,this->verbose);
+        this->myClient = new XmlRpcClient(QUrl(QString(this->myUrl.c_str())),0,this->verbose);
         this->myClient->acceptCompressed(false);
     }
 
@@ -46,7 +46,7 @@ bool QXmlrpcConnection::connect() {
     QString method = "ping";
 
     this->connected=false;
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
     //printf("%0x::QXmlrpcConnection::connect: %s\n",(int) QThread::currentThread(), this->variant2string( resp, "\n").toStdString().c_str());
     this->connected=true;
 
@@ -90,7 +90,7 @@ ResultSet* QXmlrpcConnection::login(string user, string pwd) {
     params.push_back(QString(pwd.c_str()));
 
     //printf("%0x::QXmlrpcConnection::login: calling myClient %0x...\n",(int) QThread::currentThread(), (int) this->myClient);
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
     //printf("%0x::QXmlrpcConnection::login: calling myClient... OK\n",(int) QThread::currentThread());
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
@@ -113,7 +113,7 @@ string QXmlrpcConnection::getFormSchema(string language) {
     QString method = "getFormSchema";
     params.push_back(QString(language.c_str()));
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>0) {
         QString qret = resp.toList().at(0).toString();
@@ -134,7 +134,7 @@ string QXmlrpcConnection::getDBSchema(string language) {
     QString method = "getDBSchema";
     params.push_back(QString(language.c_str()));
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>0) {
         QString qret = resp.toList().at(0).toString();
@@ -155,7 +155,7 @@ string QXmlrpcConnection::getSchemaName() {
     QString method = "getSchemaName";
     //params.push_back(QString(language.c_str()));
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>0) {
         QString qret = resp.toList().at(0).toString();
@@ -178,7 +178,7 @@ ResultSet* QXmlrpcConnection::exec(const string s) {
     params.push_back(QString("nometabella"));
     params.push_back(QString(s.c_str()));
 
-    QVariant v = this->myClient->threadSafeSyncCall(method,params);
+    QVariant v = this->myClient->syncCall(method,params);
 //    if(this->verbose) printf("QXmlrpcConnection::exec: %s\n", this->variant2string( v, "\n").toStdString().c_str());
 
     if(!v.canConvert(QVariant::List)) {
@@ -220,7 +220,7 @@ int QXmlrpcConnection::getColumnSize(string* relname) {
     QString method = "getColumnSize";
     params.push_back(QString(relname->c_str()));
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         ret = resp.toList().at(1).toList().at(0).toInt();
@@ -240,7 +240,7 @@ string QXmlrpcConnection::getColumnName(string* relname, int column) {
     params.push_back(QString(relname->c_str()));
     params.push_back(column);
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         ret = resp.toList().at(1).toList().at(0).toString().toStdString();
@@ -259,7 +259,7 @@ DBLayer::IntegerVector QXmlrpcConnection::getKeys(string* relname) {
     QString method = "getKeys";
     params.push_back(QString(relname->c_str()));
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         for(int i=0; i<resp.toList().at(1).toList().size(); i++) {
@@ -280,7 +280,7 @@ DBLayer::IntegerVector QXmlrpcConnection::getForeignKeys(string* relname) {
     QString method = "getForeignKeys";
     params.push_back(QString(relname->c_str()));
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         for(int i=0; i<resp.toList().at(1).toList().size(); i++) {
@@ -398,7 +398,7 @@ DBEntity* QXmlrpcConnection::Insert(DBEntity *dbe) {
     params.push_back(v);
     QString method = "insert";
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1
        && resp.toList().at(1).canConvert(QVariant::List) && resp.toList().at(1).toList().size()>0) {
         dbe = this->_variantToDBE( (QVariant*) &(resp.toList().at(1).toList().at(0)), dbe);
@@ -421,7 +421,7 @@ DBEntity* QXmlrpcConnection::Update(DBEntity *dbe) {
     params.push_back(v);
     QString method = "update";
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1
        && resp.toList().at(1).canConvert(QVariant::List) && resp.toList().at(1).toList().size()>0) {
         dbe = this->_variantToDBE( (QVariant*) &(resp.toList().at(1).toList().at(0)), dbe);
@@ -442,7 +442,7 @@ DBEntity* QXmlrpcConnection::Delete(DBEntity *dbe) {
     params.push_back(v);
     QString method = "delete";
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1
        && resp.toList().at(1).canConvert(QVariant::List) && resp.toList().at(1).toList().size()>0) {
         dbe = this->_variantToDBE( (QVariant*) &(resp.toList().at(1).toList().at(0)), dbe);
@@ -461,7 +461,7 @@ DBEntityVector* QXmlrpcConnection::Select(DBEntity* dbe, const string* tableName
     params.push_back(QString(searchString->c_str()));
     QString method = "select";
 
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
     DBEntityVector* ret = new DBEntityVector;
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
@@ -491,7 +491,7 @@ DBEntityVector* QXmlrpcConnection::Search(DBEntity* dbe, bool uselike, bool case
     QString method = "search";
 
     //printf("%0x::QXmlrpcConnection::Search: invoking remote method...\n",(int) QThread::currentThread());
-    QVariant resp = this->myClient->threadSafeSyncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params);
     DBEntityVector* ret = new DBEntityVector;
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
