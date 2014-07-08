@@ -179,7 +179,7 @@ ResultSet* QXmlrpcConnection::exec(const string s) {
     params.push_back(QString(s.c_str()));
 
     QVariant v = this->myClient->syncCall(method,params);
-//    if(this->verbose) printf("QXmlrpcConnection::exec: %s\n", this->variant2string( v, "\n").toStdString().c_str());
+    if(this->verbose) printf("QXmlrpcConnection::exec: %s\n", this->variant2string( v, "\n").toStdString().c_str());
 
     if(!v.canConvert(QVariant::List)) {
         this->errorMessage.append( "Server returned a wrong type : "

@@ -4,7 +4,7 @@
 **
 **	Author:		Roberto Rocco Angeloni.
 **	E-mail:			roberto@roccoangeloni.it
-**	Copyright:	(c) 2011 by Roberto Rocco Angeloni.
+**	Copyright:	(c) 2011-2014 by Roberto Rocco Angeloni.
 **	Comment:
 **		dblayer:odbc:roberto
 **		dblayer:odbc:test_dblayer
@@ -14,6 +14,7 @@
 **		dblayer:xmlrpc:http://localhost/~roberto/rproject/xmlrpc_server.php
 **		dblayer:xmlrpc:http://www.roccoangeloni.it/rproject/xmlrpc_server.php
 **		"dblayer:mysql:host=localhost;dbname=roberto;user=root;password=;"
+**      dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php
 **
 **
 ** cmake . ; make && ./src/dblayer_test dblayer:sqlite:./test.db
@@ -50,8 +51,11 @@ using namespace DBLayer;
 #include "dbschema.h"
 using namespace MySchema;
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
+
+#ifdef USE_QXMLRPC
+#include <QApplication>
+#include "qdblayer/qxmlrpcconnection.h"
 #endif
 
 #if defined(WIN32)
@@ -61,14 +65,6 @@ using namespace MySchema;
 #include <iostream>
 #include <stdlib.h>
 #include <typeinfo>
-
-#define ASSERT(x) \
-do { \
-  if(!(x)) { \
-    cerr << "Assertion \"" << #x << "\" failed" << endl; \
-    assertionsFailed++; \
-  } \
-} while(false)
 
 using namespace std;
 
@@ -597,7 +593,8 @@ void testGetColumnsForTable(string host,string dbname,string usr,string pwd, str
 
 int main(int argc, char *argv[]) {
     string host,dbname,usr,pwd;
-    string connString("dblayer:sqlite:./examples/test.db");
+    //string connString("dblayer:sqlite:./examples/test.db");
+    string connString("dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php");
     //string connString("dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;");
     //string connString("dblayer:pg:host=localhost dbname=roberto user=roberto password=roberto");
     //cout << "Content-type: text/html" << endl << endl;
@@ -618,6 +615,11 @@ int main(int argc, char *argv[]) {
         connString = string( argv[1] );
     }
     cout << "connString: " << connString << endl;
+
+#ifdef USE_QXMLRPC
+    QApplication a(argc, argv);
+    QXmlrpcConnection::registerClass();
+#endif
 
     cout << "---------------->>  testDBConnection" << endl;
     if( argc==5 ) {

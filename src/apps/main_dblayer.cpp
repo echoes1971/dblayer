@@ -46,11 +46,10 @@ using namespace DBLayer;
 
 #include "dbshell.h"
 
-//#ifdef HAVE_CONFIG_H
 #include <config.h>
-//#endif
 
 #ifdef USE_QXMLRPC
+#include <QApplication>
 #include "qdblayer/qxmlrpcconnection.h"
 #endif
 
@@ -62,14 +61,6 @@ using namespace DBLayer;
 #include <map>
 #include <stdlib.h>
 #include <typeinfo>
-
-#define ASSERT(x) \
-do { \
-  if(!(x)) { \
-    cerr << "Assertion \"" << #x << "\" failed" << endl; \
-    assertionsFailed++; \
-  } \
-} while(false)
 
 using namespace std;
 
@@ -83,10 +74,8 @@ int main(int argc, char *argv[]) {
     //string connString("dblayer:xmlrpc:http://localhost/~roberto/rproject/xmlrpc_server.php");
 
 #ifdef USE_QXMLRPC
+    QApplication a(argc, argv);
     QXmlrpcConnection::registerClass();
-    cout << "SUN CHI" << endl;
-#else
-    cout << "SUN LI" << endl;
 #endif
 
     if(argc!=2 && argc!=5) {
