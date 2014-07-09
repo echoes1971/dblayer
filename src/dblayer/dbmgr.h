@@ -55,6 +55,9 @@ class DECLSPECIFIER DBMgr {
         DBEFactory* dbeFactory;
         string _schema;
         DBEntity* _dbeuser;
+        vector<long> _user_groups_list;
+
+        void _loadUserGroups();
 
         string _buildTableName(DBEntity* dbe);
         string _buildKeysCondition(DBEntity* dbe);
@@ -97,7 +100,7 @@ class DECLSPECIFIER DBMgr {
         DBEntityVector getRegisteredTypes();
         /** get clazz by table name */
         DBEntity* getClazz(string* typeName);
-        DBEntity* getClazzByTypeName(string* typeName);
+        DBEntity* getClazzByTypeName(const string *typeName);
 
         DBEntity* getDBEUser();
         void setDBEUser(DBEntity* dbe);
@@ -118,7 +121,7 @@ class DECLSPECIFIER DBMgr {
 
         string ping();
 
-        /** Distrugge le DBEntity della lista ed anche la lista stessa!	*/
+        /** Destroy the DBEntity of the list and the list itself! */
         static void Destroy(DBEntityVector* lista);
 
         void setConnection( Connection* _newVal);

@@ -47,7 +47,7 @@ namespace DBLayer {
         void registerClass(string* tablename, DBEntity* clazz);
         DBEntityVector getRegisteredTypes();
         DBEntity* getClazz(const string* tablename);
-        DBEntity* getClazzByTypeName(string* typeName, bool caseSensitive=true);
+        DBEntity* getClazzByTypeName(const string *typeName, bool caseSensitive=true);
         DBEntity* call(string* tablename, StringVector names, StringVector values);
 
         string toString(string prefix="\n");

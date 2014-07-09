@@ -81,7 +81,7 @@ DBEntity* DBMgr::getClazz(string* typeName) {
         return this->dbeFactory->getClazz(typeName);
     return new DBEntity(typeName);
 }
-DBEntity* DBMgr::getClazzByTypeName(string* typeName) {
+DBEntity* DBMgr::getClazzByTypeName(const string* typeName) {
     if(this->dbeFactory!=0)
         return this->dbeFactory->getClazzByTypeName(typeName);
     return new DBEntity(typeName);
@@ -527,6 +527,33 @@ string DBMgr::ping() {
         return this->con->ping();
     return "pong";
 }
+
+void DBMgr::_loadUserGroups() {
+    if(this->_dbeuser==0)
+        return;
+
+    string mytypename("DBEUserGroup");
+    DBEntity* cerca = this->getClazzByTypeName(&mytypename);
+    cerca->readFKFrom(this->_dbeuser);
+
+    DBEntityVector* lista = this->Search(cerca,false);
+
+    this->_user_groups_list.clear();
+    string group_id("group_id");
+    for(const DBEntity* g : (*lista)) {
+        this->_user_groups_list.push_back(g->getField(&group_id)->getIntegerValue());
+    }
+
+    long user_group_id = this->_dbeuser->getField(&group_id)->getIntegerValue();
+    vector<long>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), user_group_id);
+    if(i==this->_user_groups_list.end()) {
+        this->_user_groups_list.push_back(user_group_id);
+    }
+
+    this->Destroy(lista);
+    delete cerca;
+}
+
 
 void DBMgr::Destroy(DBEntityVector* lista) {
     if(lista==0) return;

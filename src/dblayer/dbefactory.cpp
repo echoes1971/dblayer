@@ -62,7 +62,7 @@ DBEntity* DBEFactory::getClazz(const string* tablename) {
     return new DBEntity(tablename);
 }
 
-DBEntity* DBEFactory::getClazzByTypeName(string* typeName, bool caseSensitive) {
+DBEntity* DBEFactory::getClazzByTypeName(const string* typeName, bool caseSensitive) {
     for(const auto& elem : this->_cache) {
         if (caseSensitive && elem.second->name()== (*typeName) ) {
             return elem.second->createNewInstance();
