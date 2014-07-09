@@ -116,6 +116,8 @@ class DECLSPECIFIER DBMgr {
         DBEntityVector* searchByKeys(DBEntity* dbe);
         bool exists(DBEntity* dbe);
 
+        string ping();
+
         /** Distrugge le DBEntity della lista ed anche la lista stessa!	*/
         static void Destroy(DBEntityVector* lista);
 

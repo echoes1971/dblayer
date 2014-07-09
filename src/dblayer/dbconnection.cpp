@@ -182,6 +182,7 @@ DBEntity* Connection::Update(DBEntity *dbe) { return dbe; }
 DBEntity* Connection::Delete(DBEntity *dbe) { return dbe; }
 DBEntityVector* Connection::Select(DBEntity* dbe, const string* tableName, const string* searchString) { return (DBEntityVector*) (0 & (long)dbe & (long)tableName & (long)searchString); }
 DBEntityVector* Connection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string* orderBy ) { return (DBEntityVector*) (0 & (long)dbe & (long)uselike & (long)caseSensitive & (long)orderBy); }
+string Connection::ping() { return "pong"; }
 // **************** Proxy Connections: end. *********************
 
 

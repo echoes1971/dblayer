@@ -47,8 +47,21 @@ bool QXmlrpcConnection::connect() {
 
     this->connected=false;
     QVariant resp = this->myClient->syncCall(method,params);
-    //printf("%0x::QXmlrpcConnection::connect: %s\n",(int) QThread::currentThread(), this->variant2string( resp, "\n").toStdString().c_str());
-    this->connected=true;
+    //printf("%0lx::QXmlrpcConnection::connect: resp=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(resp,"\n").toStdString().c_str());
+    QString s_resp;
+    if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
+        QList<QVariant> lista = resp.toList().at(1).toList();
+        //printf("%0lx::QXmlrpcConnection::login: lista=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(lista,"\n").toStdString().c_str());
+        if(lista.size()>0) {
+            //printf("%0lx::QXmlrpcConnection::login: lista[0]=%s\n",(unsigned long) QThread::currentThread(),this->variant2string(lista.at(0).toByteArray().data(),"\n").toStdString().c_str());
+            s_resp = QString( lista.at(0).toByteArray().data() );
+            //ret = QXmlrpcConnection::list2resultset( &lista, new QXmlrpcResultSet() );
+        } else {
+            //this->errorMessage = "Authentication failed!";
+        }
+    }
+    //printf("%0lx::QXmlrpcConnection::connect: s_resp=%s\n",(unsigned long) QThread::currentThread(), s_resp.toStdString().c_str());
+    this->connected = s_resp=="pong"; //true;
 
     //printf("%0x::QXmlrpcConnection::connect: end.\n",(int) QThread::currentThread());
     return true;
@@ -62,7 +75,6 @@ bool QXmlrpcConnection::disconnect() {
         delete this->myClient;
     this->myClient = 0;
     */
-    //this->mutexClient.unlock();
     return true;
 }
 bool QXmlrpcConnection::reconnect() {
@@ -76,7 +88,6 @@ bool debugQXmlrpcExec = false;
 
 ResultSet* QXmlrpcConnection::login(string user, string pwd) {
     //printf("%0x::QXmlrpcConnection::login: start.\n",(int) QThread::currentThread());
-    //this->mutexClient.lock();
 
     ResultSet* ret=0;
 
@@ -91,20 +102,25 @@ ResultSet* QXmlrpcConnection::login(string user, string pwd) {
 
     //printf("%0x::QXmlrpcConnection::login: calling myClient %0x...\n",(int) QThread::currentThread(), (int) this->myClient);
     QVariant resp = this->myClient->syncCall(method,params);
-    //printf("%0x::QXmlrpcConnection::login: calling myClient... OK\n",(int) QThread::currentThread());
+    //printf("%0lx::QXmlrpcConnection::login: resp=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(resp,"\n").toStdString().c_str());
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         QList<QVariant> lista = resp.toList().at(1).toList();
-        ret = QXmlrpcConnection::list2resultset( &lista, new QXmlrpcResultSet() );
-    } else
-        printf("%0lx::QXmlrpcConnection::login: %s\n",(unsigned long) QThread::currentThread(), this->variant2string( resp, "\n").toStdString().c_str());
+        if(lista.size()>0) {
+            ret = QXmlrpcConnection::list2resultset( &lista, new QXmlrpcResultSet() );
+        } else {
+            this->errorMessage = "Authentication failed!";
+            //printf("%0lx::QXmlrpcConnection::login: lista=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(lista,"\n").toStdString().c_str());
+        }
+    } else {
+        this->errorMessage = "Authentication failed!";
+        //printf("%0lx::QXmlrpcConnection::login: %s\n",(unsigned long) QThread::currentThread(), this->variant2string( resp, "\n").toStdString().c_str());
+    }
 
-    //this->mutexClient.unlock();
     //printf("%0lx::QXmlrpcConnection::login: end.\n",(unsigned long) QThread::currentThread());
     return ret;
 }
 string QXmlrpcConnection::getFormSchema(string language) {
-    //this->mutexClient.lock();
     string ret;
 
     this->errorMessage.clear();
@@ -121,11 +137,9 @@ string QXmlrpcConnection::getFormSchema(string language) {
     } else
         printf("QXmlrpcConnection::getFormSchema: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return ret;
 }
 string QXmlrpcConnection::getDBSchema(string language) {
-    //this->mutexClient.lock();
     string ret;
 
     this->errorMessage.clear();
@@ -142,11 +156,9 @@ string QXmlrpcConnection::getDBSchema(string language) {
     } else
         printf("QXmlrpcConnection::getDBSchema: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return ret;
 }
 string QXmlrpcConnection::getSchemaName() {
-    //this->mutexClient.lock();
     string ret;
 
     this->errorMessage.clear();
@@ -163,13 +175,10 @@ string QXmlrpcConnection::getSchemaName() {
     } else
         printf("QXmlrpcConnection::getSchemaName: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return ret;
 }
 
 ResultSet* QXmlrpcConnection::exec(const string s) {
-    //this->mutexClient.lock();
-
     QXmlrpcResultSet* rs = new QXmlrpcResultSet();
     this->errorMessage.clear();
 
@@ -203,7 +212,6 @@ ResultSet* QXmlrpcConnection::exec(const string s) {
         QList<QVariant> lista = v.toList().at(1).toList();
         rs = QXmlrpcConnection::list2resultset( &lista, rs );
     }
-    //this->mutexClient.unlock();
     return rs;
 }
 string QXmlrpcConnection::escapeString(string s) {
@@ -212,7 +220,6 @@ string QXmlrpcConnection::escapeString(string s) {
     return DBLayer::replaceAll(s, fromQuote, toQuote);
 }
 int QXmlrpcConnection::getColumnSize(string* relname) {
-    //this->mutexClient.lock();
     int ret = -1;
     this->errorMessage.clear();
 
@@ -227,11 +234,9 @@ int QXmlrpcConnection::getColumnSize(string* relname) {
     } else
         printf("QXmlrpcConnection::getColumnSize: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return ret;
 }
 string QXmlrpcConnection::getColumnName(string* relname, int column) {
-    //this->mutexClient.lock();
     string ret="";
     this->errorMessage.clear();
 
@@ -247,11 +252,9 @@ string QXmlrpcConnection::getColumnName(string* relname, int column) {
     } else
         printf("QXmlrpcConnection::getColumnName: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return ret;
 }
 DBLayer::IntegerVector QXmlrpcConnection::getKeys(string* relname) {
-    //this->mutexClient.lock();
     IntegerVector ret;
     this->errorMessage.clear();
 
@@ -268,11 +271,9 @@ DBLayer::IntegerVector QXmlrpcConnection::getKeys(string* relname) {
     } else
         printf("QXmlrpcConnection::getKeys: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return ret;
 }
 DBLayer::IntegerVector QXmlrpcConnection::getForeignKeys(string* relname) {
-    //this->mutexClient.lock();
     IntegerVector ret;
     this->errorMessage.clear();
 
@@ -289,7 +290,6 @@ DBLayer::IntegerVector QXmlrpcConnection::getForeignKeys(string* relname) {
     } else
         printf("QXmlrpcConnection::getForeignKeys: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return ret;
 }
 QString QXmlrpcConnection::variant2string(const QVariant& v, QString prefix) {
@@ -388,7 +388,6 @@ QXmlrpcResultSet* QXmlrpcConnection::list2resultset(QList<QVariant>* iLista, QXm
 bool QXmlrpcConnection::isProxy() { return true; }
 DBEntity* QXmlrpcConnection::Insert(DBEntity *dbe) {
     //printf("%0x::QXmlrpcConnection::Insert: start.\n",(int) QThread::currentThread());
-    //this->mutexClient.lock();
     this->errorMessage.clear();
 
     QList<QVariant> v;
@@ -406,12 +405,10 @@ DBEntity* QXmlrpcConnection::Insert(DBEntity *dbe) {
         printf("QXmlrpcConnection::Insert: v=%s\n", this->variant2string( v, "\n").toStdString().c_str());
         printf("QXmlrpcConnection::Insert: resp=%s\n", this->variant2string( resp, "\n").toStdString().c_str());
     }
-    //this->mutexClient.unlock();
     //printf("%0x::QXmlrpcConnection::Insert: end.\n",(int) QThread::currentThread());
     return dbe;
 }
 DBEntity* QXmlrpcConnection::Update(DBEntity *dbe) {
-    //this->mutexClient.lock();
     this->errorMessage.clear();
 
     QList<QVariant> v;
@@ -428,11 +425,9 @@ DBEntity* QXmlrpcConnection::Update(DBEntity *dbe) {
     } else
         printf("QXmlrpcConnection::Update: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return dbe;
 }
 DBEntity* QXmlrpcConnection::Delete(DBEntity *dbe) {
-    //this->mutexClient.lock();
     this->errorMessage.clear();
 
     QList<QVariant> v;
@@ -449,11 +444,9 @@ DBEntity* QXmlrpcConnection::Delete(DBEntity *dbe) {
     } else
         printf("QXmlrpcConnection::Delete: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return dbe;
 }
 DBEntityVector* QXmlrpcConnection::Select(DBEntity* dbe, const string* tableName, const string* searchString) {
-    //this->mutexClient.lock();
     this->errorMessage.clear();
 
     QList<QVariant> params;
@@ -473,12 +466,10 @@ DBEntityVector* QXmlrpcConnection::Select(DBEntity* dbe, const string* tableName
     } else
         printf("QXmlrpcConnection::Select: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     return ret;
 }
 DBEntityVector* QXmlrpcConnection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string* orderBy ) {
     //printf("%0x::QXmlrpcConnection::Search: start.\n",(int) QThread::currentThread());
-    //this->mutexClient.lock();
     this->errorMessage.clear();
     QList<QVariant> cerca;
     this->_dbeToVariant(dbe,&cerca);
@@ -502,10 +493,36 @@ DBEntityVector* QXmlrpcConnection::Search(DBEntity* dbe, bool uselike, bool case
     } else
         printf("%0lx::QXmlrpcConnection::Search: %s\n",(unsigned long) QThread::currentThread(), this->variant2string( resp, "\n").toStdString().c_str());
 
-    //this->mutexClient.unlock();
     //printf("%0x::QXmlrpcConnection::Search: end.\n",(int) QThread::currentThread());
     return ret;
 }
+string QXmlrpcConnection::ping() {
+    this->errorMessage.clear();
+
+    this->myClient->setDebug(this->verbose);
+
+    QList<QVariant> params;
+    QString method = "ping";
+
+    this->connected=false;
+    QVariant resp = this->myClient->syncCall(method,params);
+    //printf("%0lx::QXmlrpcConnection::connect: resp=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(resp,"\n").toStdString().c_str());
+    QString ret;
+    if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
+        QList<QVariant> lista = resp.toList().at(1).toList();
+        //printf("%0lx::QXmlrpcConnection::login: lista=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(lista,"\n").toStdString().c_str());
+        if(lista.size()>0) {
+            //printf("%0lx::QXmlrpcConnection::login: lista[0]=%s\n",(unsigned long) QThread::currentThread(),this->variant2string(lista.at(0).toByteArray().data(),"\n").toStdString().c_str());
+            ret = QString( lista.at(0).toByteArray().data() );
+            //ret = QXmlrpcConnection::list2resultset( &lista, new QXmlrpcResultSet() );
+        } else {
+            //this->errorMessage = "Authentication failed!";
+        }
+    }
+    //printf("%0lx::QXmlrpcConnection::connect: s_resp=%s\n",(unsigned long) QThread::currentThread(), s_resp.toStdString().c_str());
+    return ret.toStdString();
+}
+
 QList<QVariant>* QXmlrpcConnection::_dbeToVariant(DBEntity* dbe, QList<QVariant>* ioVariant) {
     QMap<QString,QVariant>* d = new QMap<QString,QVariant>();
     ioVariant->push_back( QVariant(dbe->name().c_str()) );

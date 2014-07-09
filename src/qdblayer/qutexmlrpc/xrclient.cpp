@@ -190,7 +190,7 @@ QVariant XmlRpcClient::syncCall(const QString& method, const QList<QVariant>& pa
     xml_method_call.save( payload_stream, 0, QDomNode::EncodingFromTextStream);
 
     // Qt5 stuff :-)
-    QNetworkRequest request(this->_url); //QUrl(webService() + "/api/v1/login/"));
+    QNetworkRequest request(this->_url);
     request.setRawHeader(QByteArray("Host"),QByteArray(_url.host().toStdString().c_str()));
     request.setHeader(QNetworkRequest::UserAgentHeader,USER_AGENT);
 

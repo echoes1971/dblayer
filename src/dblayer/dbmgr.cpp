@@ -522,6 +522,12 @@ bool DBMgr::exists(DBEntity* dbe) {
     return count>0;
 }
 
+string DBMgr::ping() {
+    if(this->con->isProxy())
+        return this->con->ping();
+    return "pong";
+}
+
 void DBMgr::Destroy(DBEntityVector* lista) {
     if(lista==0) return;
     for(DBEntity* elem : (*lista) ) {

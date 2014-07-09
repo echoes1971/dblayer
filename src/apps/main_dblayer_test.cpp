@@ -68,12 +68,16 @@ using namespace MySchema;
 
 using namespace std;
 
-void testDBConnection(string& connString) {
+void testDBConnection(string& connString, string& loginUser, string& loginPwd) {
     DBLayer::Connection* con;
     DBLayer::ResultSet* res;
 
     con = DBLayer::createConnection( connString.c_str() );
     con->connect();
+
+    if(loginUser.length()>0 && loginPwd.length()>0) {
+        con->login(loginUser,loginPwd);
+    }
 
     if ( !con->hasErrors() ) {
         string myquery("select * from rra_users order by id desc");
@@ -120,9 +124,9 @@ void testDBConnection(string& connString) {
     //con->disconnect();
     delete con;
 }
-void testDBConnection(string host,string dbname,string usr,string pwd) {
+void testDBConnection(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testDBConnection( connString );
+    testDBConnection( connString, loginUser, loginPwd );
 }
 
 void testDateField() {
@@ -147,11 +151,15 @@ void testDateField() {
     delete tmpNome;
 }
 
-void testGetKeys(string connString, string relname) {
+void testGetKeys(string connString, string& loginUser, string& loginPwd, string relname) {
     DBLayer::Connection* con;
 
     con = DBLayer::createConnection( connString.c_str() );
     con->connect();
+
+    if(loginUser.length()>0 && loginPwd.length()>0) {
+        con->login(loginUser,loginPwd);
+    }
 
     if ( !con->hasErrors() ) {
         cout << "Tabella: " << relname << endl;
@@ -177,15 +185,20 @@ void testGetKeys(string connString, string relname) {
     }
     delete con;
 }
-void testGetKeys(string host,string dbname,string usr,string pwd, string relname) {
+void testGetKeys(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
     string connString( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testGetKeys(connString, relname);
+    testGetKeys(connString, loginUser, loginPwd, relname);
 }
 
-void testGetForeignKeys(string connString, string relname) {
+void testGetForeignKeys(string connString, string& loginUser, string& loginPwd, string relname) {
     DBLayer::Connection* con;
     con = DBLayer::createConnection( connString.c_str() );
     con->connect();
+
+    if(loginUser.length()>0 && loginPwd.length()>0) {
+        con->login(loginUser,loginPwd);
+    }
+
     if ( !con->hasErrors() ) {
         cout << "Tabella: " << relname << endl;
         int numColonne = con->getColumnSize( &relname );
@@ -208,12 +221,12 @@ void testGetForeignKeys(string connString, string relname) {
     }
     delete con;
 }
-void testGetForeignKeys(string host,string dbname,string usr,string pwd, string relname) {
+void testGetForeignKeys(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
     string connString( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testGetForeignKeys(connString, relname);
+    testGetForeignKeys(connString, loginUser, loginPwd, relname);
 }
 
-void testDBMgr(string connString) {
+void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     DBLayer::Connection* con;
     DBMgr* dbmgr;
 
@@ -221,6 +234,11 @@ void testDBMgr(string connString) {
     dbmgr = new DBLayer::DBMgr(con, false);
 
     if ( dbmgr->connect() ) {
+
+//        if(loginUser.length()>0 && loginPwd.length()>0) {
+//            dbmgr->login(loginUser,loginPwd); //con->login(loginUser,loginPwd);
+//        }
+
         string nomeTabella = string("test_dblayer");
         string myQuery = string("select * from test_dblayer");
         DBEntityVector* lista = dbmgr->Select( &nomeTabella, &myQuery );
@@ -244,12 +262,12 @@ void testDBMgr(string connString) {
     delete dbmgr;
     delete con;
 }
-void testDBMgr(string host,string dbname,string usr,string pwd) {
+void testDBMgr(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testDBMgr( connString );
+    testDBMgr( connString, loginUser, loginPwd );
 }
 
-void testSearch(string connString) {
+void testSearch(string connString, string& loginUser, string& loginPwd) {
     Connection* mycon;
     DBMgr* dbmgr;
 
@@ -301,12 +319,12 @@ void testSearch(string connString) {
     delete dbmgr;
     delete mycon;
 }
-void testSearch(string host,string dbname,string usr,string pwd) {
+void testSearch(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testSearch(connString);
+    testSearch(connString, loginUser, loginPwd);
 }
 
-void testDBE(string connString) {
+void testDBE(string connString, string& loginUser, string& loginPwd) {
     Connection* con;
     DBMgr* dbmgr;
     DBEFactory* dbeFactory;
@@ -375,12 +393,12 @@ void testDBE(string connString) {
     delete dbmgr;
     delete con;
 }
-void testDBE(string host,string dbname,string usr,string pwd) {
+void testDBE(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testDBE(connString);
+    testDBE(connString, loginUser, loginPwd);
 }
 
-void testCRUD(string connString) {
+void testCRUD(string connString, string& loginUser, string& loginPwd) {
     Connection* con;
     DBMgr* dbmgr;
     DBEFactory* dbeFactory;
@@ -536,12 +554,12 @@ void testCRUD(string connString) {
     printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
     delete con;
 }
-void testCRUD(string host,string dbname,string usr,string pwd) {
+void testCRUD(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testCRUD( connString );
+    testCRUD( connString, loginUser, loginPwd );
 }
 
-void testGetColumnsForTable(string connString, string relname) {
+void testGetColumnsForTable(string connString, string& loginUser, string& loginPwd, string relname) {
     Connection* con;
     DBMgr* dbmgr;
     DBEFactory* dbeFactory;
@@ -584,34 +602,40 @@ void testGetColumnsForTable(string connString, string relname) {
     printf("::testGetColumnsForTable: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
     delete con;
 }
-void testGetColumnsForTable(string host,string dbname,string usr,string pwd, string relname) {
+void testGetColumnsForTable(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testGetColumnsForTable( connString, relname );
+    testGetColumnsForTable( connString, loginUser, loginPwd, relname );
 }
 
 
 
 int main(int argc, char *argv[]) {
-    string host,dbname,usr,pwd;
+    string host,dbname,usr,pwd,login_user,login_password;
     //string connString("dblayer:sqlite:./examples/test.db");
     string connString("dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php");
     //string connString("dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;");
     //string connString("dblayer:pg:host=localhost dbname=roberto user=roberto password=roberto");
     //cout << "Content-type: text/html" << endl << endl;
 
-    if(argc!=2 && argc!=5) {
+    if(argc!=2 && argc!=4 && argc!=5) {
         cerr << "Usage: " << argv[0] << " connect-string" << endl
+               << "or     " << argv[0] << " connect-string login_user login_password" << endl
                << "or     " << argv[0] << " dsn username password" << endl;
         host = string("localhost");
         dbname = string("roberto");
         usr = string("roberto");
         pwd = string("echoestrade");
+        return 1;
     } else if (argc==5) {
         host = string( argv[1] );
         dbname = string( argv[2] );
         usr = string( argv[3] );
         pwd = string( argv[4] );
-    } else {
+    } else if (argc==4) {
+        connString = string( argv[1] );
+        login_user = string( argv[2] );
+        login_password = string( argv[3] );
+    } else if (argc==2) {
         connString = string( argv[1] );
     }
     cout << "connString: " << connString << endl;
@@ -623,9 +647,9 @@ int main(int argc, char *argv[]) {
 
     cout << "---------------->>  testDBConnection" << endl;
     if( argc==5 ) {
-        testDBConnection( host, dbname, usr, pwd );
+        testDBConnection( host, dbname, usr, pwd, login_user, login_password );
     } else {
-        testDBConnection( connString );
+        testDBConnection( connString, login_user, login_password );
     }
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
@@ -634,29 +658,31 @@ int main(int argc, char *argv[]) {
 
     cout << "---------------->>  testGetKeys" << endl;
     if(argc==5) {
-        testGetKeys( host, dbname, usr, pwd, string("societa") );
+        testGetKeys( host, dbname, usr, pwd, login_user, login_password, string("societa") );
     } else {
-        testGetKeys( connString, string("societa") );
+        testGetKeys( connString, login_user, login_password, string("societa") );
     }
 
     testDateField();
 
     cout << "---------------->>  testDBMgr" << endl;
     if ( argc==5 ) {
-        testDBMgr( host, dbname, usr, pwd );
+        testDBMgr( host, dbname, usr, pwd, login_user, login_password );
     } else {
-        testDBMgr( connString );
+        testDBMgr( connString, login_user, login_password );
     }
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
 
+    return 0;
+
     cout << "---------------->>  testSearch" << endl;
     if(argc==5) {
-        testSearch( host, dbname, usr, pwd );
+        testSearch( host, dbname, usr, pwd, login_user, login_password );
     } else {
-        testSearch( connString );
+        testSearch( connString, login_user, login_password );
     }
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
@@ -665,9 +691,9 @@ int main(int argc, char *argv[]) {
 
     cout << "---------------->>  testDBE" << endl;
     if(argc==5) {
-        testDBE( host, dbname, usr, pwd );
+        testDBE( host, dbname, usr, pwd, login_user, login_password );
     } else {
-        testDBE( connString );
+        testDBE( connString, login_user, login_password );
     }
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
@@ -676,9 +702,9 @@ int main(int argc, char *argv[]) {
 
     cout << "---------------->>  testCRUD" << endl;
     if(argc==5) {
-        testCRUD( host, dbname, usr, pwd );
+        testCRUD( host, dbname, usr, pwd, login_user, login_password );
     } else {
-        testCRUD( connString );
+        testCRUD( connString, login_user, login_password );
     }
 
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
@@ -688,32 +714,32 @@ int main(int argc, char *argv[]) {
 
     cout << "---------------->>  testGetKeys" << endl;
     if( argc==5 ) {
-        testGetKeys( host, dbname, usr, pwd, "test_dblayer" );
-        testGetKeys( host, dbname, usr, pwd, "societa" );
+        testGetKeys( host, dbname, usr, pwd, login_user, login_password, "test_dblayer" );
+        testGetKeys( host, dbname, usr, pwd, login_user, login_password, "societa" );
     } else {
-        testGetKeys( connString, "test_dblayer" );
-        testGetKeys( connString, "societa" );
+        testGetKeys( connString, login_user, login_password, "test_dblayer" );
+        testGetKeys( connString, login_user, login_password, "societa" );
     }
 
     cout << "---------------->>  testGetForeignKeys" << endl;
     if( argc==5 ) {
-        testGetForeignKeys( host, dbname, usr, pwd, "test_dblayer" );
-        testGetForeignKeys( host, dbname, usr, pwd, "societa" );
+        testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_dblayer" );
+        testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "societa" );
     } else {
-        testGetForeignKeys( connString, "test_dblayer" );
-        testGetForeignKeys( connString, "societa" );
+        testGetForeignKeys( connString, login_user, login_password, "test_dblayer" );
+        testGetForeignKeys( connString, login_user, login_password, "societa" );
     }
 
     cout << "---------------->>  testGetColumnsForTable" << endl;
     if( argc==5 ) {
-        testGetColumnsForTable( host, dbname, usr, pwd, "test_dblayer" );
-        testGetColumnsForTable( host, dbname, usr, pwd, "societa" );
-        testGetColumnsForTable( host, dbname, usr, pwd, "rra_users" );
+        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_dblayer" );
+        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "societa" );
+        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "rra_users" );
     } else {
-        testGetColumnsForTable( connString, "test_dblayer" );
-        testGetColumnsForTable( connString, "societa" );
-        testGetColumnsForTable( connString, "rra_users" );
-        //testGetColumnsForTable( connString, "rra_people" );
+        testGetColumnsForTable( connString, login_user, login_password, "test_dblayer" );
+        testGetColumnsForTable( connString, login_user, login_password, "societa" );
+        testGetColumnsForTable( connString, login_user, login_password, "rra_users" );
+        //testGetColumnsForTable( connString, login_user, login_password, "rra_people" );
     }
 
     return EXIT_SUCCESS;
