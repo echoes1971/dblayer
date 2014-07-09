@@ -108,6 +108,7 @@ ResultSet* QXmlrpcConnection::login(string user, string pwd) {
         QList<QVariant> lista = resp.toList().at(1).toList();
         if(lista.size()>0) {
             ret = QXmlrpcConnection::list2resultset( &lista, new QXmlrpcResultSet() );
+            printf("%0lx::QXmlrpcConnection::login: ret=%s\n",(unsigned long) QThread::currentThread(), ret->toString("\n").c_str());
         } else {
             this->errorMessage = "Authentication failed!";
             //printf("%0lx::QXmlrpcConnection::login: lista=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(lista,"\n").toStdString().c_str());
@@ -116,6 +117,8 @@ ResultSet* QXmlrpcConnection::login(string user, string pwd) {
         this->errorMessage = "Authentication failed!";
         //printf("%0lx::QXmlrpcConnection::login: %s\n",(unsigned long) QThread::currentThread(), this->variant2string( resp, "\n").toStdString().c_str());
     }
+    if(this->errorMessage.length()>0)
+        printf("%0lx::QXmlrpcConnection::login: errorMessage=%s\n",(unsigned long) QThread::currentThread(), this->errorMessage.c_str());
 
     //printf("%0lx::QXmlrpcConnection::login: end.\n",(unsigned long) QThread::currentThread());
     return ret;
@@ -188,7 +191,7 @@ ResultSet* QXmlrpcConnection::exec(const string s) {
     params.push_back(QString(s.c_str()));
 
     QVariant v = this->myClient->syncCall(method,params);
-    if(this->verbose) printf("QXmlrpcConnection::exec: %s\n", this->variant2string( v, "\n").toStdString().c_str());
+    //if(this->verbose) printf("QXmlrpcConnection::exec: %s\n", this->variant2string( v, "\n").toStdString().c_str());
 
     if(!v.canConvert(QVariant::List)) {
         this->errorMessage.append( "Server returned a wrong type : "
@@ -208,7 +211,7 @@ ResultSet* QXmlrpcConnection::exec(const string s) {
         this->errorMessage.append( "Server returned a wrong type at return[1]: " + string(v.toList().at(1).typeName())
             + " instead of QVariant::List");
     } else {
-        if(this->verbose) printf("QXmlrpcConnection::exec: %s\n", v.toList().at(0).toString().toStdString().c_str());
+        //if(this->verbose) printf("QXmlrpcConnection::exec: %s\n", v.toList().at(0).toString().toStdString().c_str());
         QList<QVariant> lista = v.toList().at(1).toList();
         rs = QXmlrpcConnection::list2resultset( &lista, rs );
     }
