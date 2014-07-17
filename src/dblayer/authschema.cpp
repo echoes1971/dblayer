@@ -13,12 +13,35 @@ const string DBEDBVersion::nomiCampiChiave[] = { string("version") };
 IntegerField DBEDBVersion::chiave1( (const string*)&DBEDBVersion::nomiCampiChiave[0] );
 DBFieldVector DBEDBVersion::chiavi = DBEDBVersion::___init_keys();
 DBFieldVector DBEDBVersion::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEDBVersion::chiave1 ); return ret; }
-DBEDBVersion::DBEDBVersion() { this->tableName.clear(); }
+DBEDBVersion::DBEDBVersion() {
+    this->tableName.clear();
+
+    /*
+    if len(DBEDBVersion.__columns.keys())==0:
+        parentcols = self.getColumns()
+        for k in parentcols.keys():
+            DBEDBVersion.__columns[k] = parentcols[k]
+        DBEDBVersion.__columns['version'] = ["int","not null"]
+    self._columns=DBEDBVersion.__columns
+    */
+}
 DBEDBVersion::~DBEDBVersion() {}
 string DBEDBVersion::name() { return "DBEDBVersion"; }
 string DBEDBVersion::getTableName() { return "dbversion"; }
 DBFieldVector* DBEDBVersion::getKeys() { return &DBEDBVersion::chiavi; }
 DBEDBVersion* DBEDBVersion::createNewInstance() { return new DBEDBVersion(); }
+
+DBLayer::StringVector DBEDBVersion::getOrderBy() const {
+    DBLayer::StringVector ret;
+    ret.push_back("version");
+    return ret;
+}
+
+int DBEDBVersion::version() {
+    string field_name("version");
+    return this->getField(&field_name)->getIntegerValue();
+}
+
 //*********************** DBEDBVersion: end.
 
 //*********************** DBEUser: start.

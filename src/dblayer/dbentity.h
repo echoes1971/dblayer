@@ -65,7 +65,7 @@ namespace DBLayer {
         virtual ~DBEntity();
 
         string getColumnType(const string& column_name);
-        ColumnDefinitions getColumns();
+        virtual ColumnDefinitions getColumns();
         static string dbeType2dbType(const string& dbetype);
         static string dbType2dbeType(const string& dbtype);
         static string dbConstraints2dbeConstraints(map<string,string>& def);
@@ -146,9 +146,12 @@ namespace DBLayer {
         string tableName;
 
         /* column_name => array('type','constraints', ...) */
-        static ColumnDefinitions _columns;
+        // MOVED TO PRIVATE static ColumnDefinitions _columns;
 
       private:
+        /* column_name => array('type','constraints', ...) */
+        static ColumnDefinitions _columns;
+
         string toString_nodes(string prefix);
 
     };

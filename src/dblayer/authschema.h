@@ -17,12 +17,15 @@ namespace AuthSchema {
 
   class DBEDBVersion : public DBEntity {
     public:
-    DBEDBVersion();
+      DBEDBVersion();
       virtual ~DBEDBVersion();
       virtual string name();
       virtual string getTableName();
       virtual DBFieldVector* getKeys();
       virtual DBEDBVersion* createNewInstance();
+      virtual DBLayer::StringVector getOrderBy() const;
+
+      int version();
     private:
       static const string nomiCampiChiave[];
       static IntegerField chiave1; // int
