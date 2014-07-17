@@ -419,6 +419,45 @@ DBEntity* DBMgr::Copy(DBEntity* dbe) {
 }
 
 
+void DBMgr::rs2dbelist(ResultSet* res,string* nomeTabella,DBEntityVector* ret) {
+    int nColonne = res->getNumColumns();
+    int nRighe = res->getNumRows();
+    for(int r=0; r<nRighe; r++) {
+        DBEntity* dbe = this->getClazz(nomeTabella);
+        for(int c=0; c<nColonne; c++) {
+            DBField* dbfield = 0;
+            if ( res->isNull( r, c ) ) {
+                continue;
+            }
+            string columnName = res->getColumnName(c);
+            if ( res->getColumnType(c)==DBLayer::type_boolean ) {
+                bool valore = false;
+                valore = res->getValue( r, c ) == string("t");
+                dbfield = new BooleanField( &columnName );
+                dbfield->setBooleanValue( valore );
+            } else if ( res->getColumnType(c)==DBLayer::type_integer ) {
+                long valore = 0;
+                valore = atoi( res->getValue( r, c ).c_str() );
+                dbfield = new IntegerField( &columnName, valore );
+            } else if ( res->getColumnType(c)==DBLayer::type_double ) {
+                float valore = 0;
+                valore = (float) atof( res->getValue( r, c ).c_str() );
+                dbfield = new FloatField( &columnName, valore );
+            } else if ( res->getColumnType(c)==DBLayer::type_string ) {
+                string valore = res->getValue( r, c );
+                dbfield = new StringField( &columnName, &valore );
+            } else if ( res->getColumnType(c)==DBLayer::type_datetime ) {
+                string valore = res->getValue( r, c );
+                dbfield = new DateField( &columnName, &valore );
+            }
+            if(dbfield!=0) {
+                dbe->addField(dbfield);
+            }
+        }
+        ret->push_back( dbe );
+    }
+}
+
 DBEntityVector* DBMgr::Select(const string* tableName, const string* searchString) {
 #ifdef WITH_PROXY_CONNECTIONS
     if(this->con->isProxy()) {
@@ -437,42 +476,7 @@ DBEntityVector* DBMgr::Select(const string* tableName, const string* searchStrin
     string* nomeTabella = new string( tableName->c_str() );
 
     if (!con->hasErrors() ) {
-        int nColonne = res->getNumColumns();
-        int nRighe = res->getNumRows();
-        for(int r=0; r<nRighe; r++) {
-            DBEntity* dbe = this->getClazz(nomeTabella);
-            for(int c=0; c<nColonne; c++) {
-                DBField* dbfield = 0;
-                if ( res->isNull( r, c ) ) {
-                    continue;
-                }
-                string columnName = res->getColumnName(c);
-                if ( res->getColumnType(c)==DBLayer::type_boolean ) {
-                    bool valore = false;
-                    valore = res->getValue( r, c ) == string("t");
-                    dbfield = new BooleanField( &columnName );
-                    dbfield->setBooleanValue( valore );
-                } else if ( res->getColumnType(c)==DBLayer::type_integer ) {
-                    long valore = 0;
-                    valore = atoi( res->getValue( r, c ).c_str() );
-                    dbfield = new IntegerField( &columnName, valore );
-                } else if ( res->getColumnType(c)==DBLayer::type_double ) {
-                    float valore = 0;
-                    valore = (float) atof( res->getValue( r, c ).c_str() );
-                    dbfield = new FloatField( &columnName, valore );
-                } else if ( res->getColumnType(c)==DBLayer::type_string ) {
-                    string valore = res->getValue( r, c );
-                    dbfield = new StringField( &columnName, &valore );
-                } else if ( res->getColumnType(c)==DBLayer::type_datetime ) {
-                    string valore = res->getValue( r, c );
-                    dbfield = new DateField( &columnName, &valore );
-                }
-                if(dbfield!=0) {
-                    dbe->addField(dbfield);
-                }
-            }
-            ret->push_back( dbe );
-        }
+        rs2dbelist(res, nomeTabella, ret);
     } else {
         if( this->verbose ) cout << "DBMgr::Select: error = " << con->getErrorMessage() << endl;
     }
@@ -558,7 +562,7 @@ DBEntity* DBMgr::login(string user,string pwd) {
     if(this->con->isProxy()) {
         ResultSet* userRs = this->con->login(user,pwd);
 
-        qDebug() << userRs;
+        //qDebug() << userRs;
 
         //this->_dbeuser = ... ;
     }
