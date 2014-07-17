@@ -23,6 +23,8 @@ class DBShell {
     static void cmdExec(DBShell* dbShell, string s);
     static void cmdLogin(DBShell* dbShell, string s);
 
+    static void cmdFormSchema(DBShell* dbShell, string s);
+    static void cmdDBSchema(DBShell* dbShell, string s);
     static void cmdTable2Cpp(DBShell* dbShell, string s);
 
     static void cmdHelp(DBShell* dbShell, string s);

@@ -10,7 +10,9 @@ DBShell::DBShell(string connString): connString(connString), exitLoop(false),con
     this->commands["login"]=&cmdLogin;    this->cmdsHelp["login"]=" Syntax: login user pwd\n Logs into the remote xmlrpc server.";
     this->commands["exec"]=&cmdExec;    this->cmdsHelp["exec"]=" Syntax: exec sql\n Exec an sql statement";
 
-    this->commands["table2cpp"]=&cmdTable2Cpp;    this->cmdsHelp["table2cpp"]=" Syntax: table2cpp table1 [table2] ...\n Generate code for the tables in the list.";
+    this->commands["formschema"]=&cmdFormSchema; this->cmdsHelp["formschema"]=" Syntax: formschema language...\n Generate Form code for the tables in the given language.";
+    this->commands["dbschema"]=&cmdDBSchema;     this->cmdsHelp["dbschema"]=" Syntax: dbschema language...\n Generate DB code for the tables in the given language.";
+    this->commands["table2cpp"]=&cmdTable2Cpp;   this->cmdsHelp["table2cpp"]=" Syntax: table2cpp table1 [table2] ...\n Generate code for the tables in the list.";
 
     this->commands["help"]=&cmdHelp;    this->cmdsHelp["help"]=" Syntax: help\n Show available commands";
     this->commands["quit"]=&cmdQuit;    this->cmdsHelp["quit"]=" Syntax: quit\n Quit the shell";
@@ -90,6 +92,24 @@ void DBShell::cmdExec(DBShell* dbShell, string s) {
         dbShell->cmdOut = "Error executing \"" + s + "\": " + dbShell->con->getErrorMessage();
     }
     delete res;
+}
+
+void DBShell::cmdFormSchema(DBShell* dbShell, string s) {
+    if(dbShell->con==0 || !dbShell->con->isConnected()) {
+        dbShell->cmdOut = "Not connected!";
+        return;
+    }
+
+    dbShell->cmdOut = dbShell->con->getFormSchema(s);
+}
+
+void DBShell::cmdDBSchema(DBShell* dbShell, string s) {
+    if(dbShell->con==0 || !dbShell->con->isConnected()) {
+        dbShell->cmdOut = "Not connected!";
+        return;
+    }
+
+    dbShell->cmdOut = dbShell->con->getDBSchema(s);
 }
 
 void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
