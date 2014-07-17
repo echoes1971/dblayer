@@ -18,4 +18,9 @@ add_library(dblayer
 	mysqlconnection.cpp
 	sqliteconnection.cpp
 	xmlrpcconnection.cpp
+
+        #Default User Management
+        authschema.cpp
+        # Default Content Management
+        cmschema.cpp
 	)

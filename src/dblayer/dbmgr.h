@@ -59,7 +59,7 @@ class DECLSPECIFIER DBMgr {
 
         void _loadUserGroups();
 
-        void rs2dbelist(ResultSet* res,string* nomeTabella,DBEntityVector* ret);
+        void rs2dbelist(ResultSet* res, string *nomeTabella, DBEntityVector* ret);
 
         string _buildTableName(DBEntity* dbe);
         string _buildKeysCondition(DBEntity* dbe);

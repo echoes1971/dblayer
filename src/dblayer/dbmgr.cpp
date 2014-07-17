@@ -561,7 +561,10 @@ void DBMgr::_loadUserGroups() {
 DBEntity* DBMgr::login(string user,string pwd) {
     if(this->con->isProxy()) {
         ResultSet* userRs = this->con->login(user,pwd);
+        string nome_tabella("users");
+        DBEntityVector list;
 
+        this->rs2dbelist(userRs,&nome_tabella,&list);
         //qDebug() << userRs;
 
         //this->_dbeuser = ... ;
