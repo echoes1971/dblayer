@@ -121,6 +121,8 @@ class DECLSPECIFIER DBMgr {
 
         string ping();
 
+        DBEntity* login(string user,string pwd);
+
         /** Destroy the DBEntity of the list and the list itself! */
         static void Destroy(DBEntityVector* lista);
 

@@ -235,9 +235,9 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
 
     if ( dbmgr->connect() ) {
 
-//        if(loginUser.length()>0 && loginPwd.length()>0) {
-//            dbmgr->login(loginUser,loginPwd); //con->login(loginUser,loginPwd);
-//        }
+        if(loginUser.length()>0 && loginPwd.length()>0) {
+            dbmgr->login(loginUser,loginPwd); //con->login(loginUser,loginPwd);
+        }
 
         string nomeTabella = string("test_dblayer");
         string myQuery = string("select * from test_dblayer");

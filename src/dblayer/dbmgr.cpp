@@ -554,6 +554,15 @@ void DBMgr::_loadUserGroups() {
     delete cerca;
 }
 
+DBEntity* DBMgr::login(string user,string pwd) {
+    if(this->con->isProxy()) {
+        ResultSet* userRs = this->con->login(user,pwd);
+
+        qDebug() << userRs;
+
+        //this->_dbeuser = ... ;
+    }
+}
 
 void DBMgr::Destroy(DBEntityVector* lista) {
     if(lista==0) return;
