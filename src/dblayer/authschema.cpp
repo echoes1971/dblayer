@@ -44,15 +44,55 @@ int DBEDBVersion::version() {
 
 //*********************** DBEUser: start.
 const string DBEUser::nomiCampiChiave[] = { string("id") };
+ColumnDefinitions DBEUser::_columns;
+ForeignKeyVector DBEUser::_fkv;
+ColumnDefinitions DBEUser::getColumns() { return DBEUser::_columns; }
 StringField DBEUser::chiave1( (const string*)&DBEUser::nomiCampiChiave[0] );
 DBFieldVector DBEUser::chiavi = DBEUser::___init_keys();
 DBFieldVector DBEUser::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEUser::chiave1 ); return ret; }
-DBEUser::DBEUser() { this->tableName.clear(); }
+DBEUser::DBEUser() {
+    this->tableName.clear();
+    if(DBEUser::_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            DBEUser::_columns[pair.first] = pair.second;
+        }
+        DBEUser::_columns["id"] = vector<string> {"uuid","not null"};
+        DBEUser::_columns["login"] = vector<string> {"varchar(255)","not null"};
+        DBEUser::_columns["pwd"] = vector<string> {"varchar(255)","not null"};
+        DBEUser::_columns["pwd_salt"] = vector<string> {"varchar(4)","default ''"};
+        DBEUser::_columns["fullname"] = vector<string> {"text","default null"};
+        DBEUser::_columns["group_id"] = vector<string> {"uuid","not null"};
+    }
+}
 DBEUser::~DBEUser() {}
 string DBEUser::name() { return "DBEUser"; }
 string DBEUser::getTableName() { return "users"; }
 DBFieldVector* DBEUser::getKeys() { return &DBEUser::chiavi; }
+ForeignKeyVector& DBEUser::getFK() {
+    if(_fkv.size()==0) {
+        for(const auto& fk : DBEntity::getFK()) {
+            _fkv.push_back(fk);
+        }
+        _fkv.push_back(ForeignKey("group_id","groups","id"));
+    }
+    return _fkv;
+}
 DBEUser* DBEUser::createNewInstance() { return new DBEUser(); }
+DBLayer::StringVector DBEUser::getOrderBy() const {
+    static DBLayer::StringVector ret({"fullname"});
+    return ret;
+}
+vector<map<string,string> > DBEUser::getDefaultEntries() const {
+    static vector<map<string,string> > ret;
+    if(ret.size()==0) {
+        int i=0;
+        ret.push_back( map<string,string>() );
+        ret.at(i)["id"]="-1"; ret.at(i)["login"]="adm"; ret.at(i)["pwd"]="adm";
+        ret.at(i)["pwd_salt"]=""; ret.at(i)["fullname"]="Administrator"; ret.at(i)["group_id"]="-2";
+        i++;
+    }
+    return ret;
+}
 //*********************** DBEUser: end.
 
 //*********************** DBEGroup: start.
@@ -195,16 +235,36 @@ vector<map<string,string> > DBEUserGroup::getDefaultEntries() const {
 
 //*********************** DBELog: start.
 const string DBELog::nomiCampiChiave[] = { string("ip"), string("data") };
+ColumnDefinitions DBELog::_columns;
+ColumnDefinitions DBELog::getColumns() { return DBELog::_columns; }
 StringField DBELog::chiave1( (const string*)&DBELog::nomiCampiChiave[0] );
 StringField DBELog::chiave2( (const string*)&DBELog::nomiCampiChiave[1] );
 DBFieldVector DBELog::chiavi = DBELog::___init_keys();
 DBFieldVector DBELog::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBELog::chiave1 ); ret.push_back( &DBELog::chiave2 ); return ret; }
-DBELog::DBELog() { this->tableName.clear(); }
+DBELog::DBELog() {
+    this->tableName.clear();
+    if(DBELog::_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            DBELog::_columns[pair.first] = pair.second;
+        }
+        DBELog::_columns["ip"] = vector<string> {"varchar(16)","not null"};
+        DBELog::_columns["data"] = vector<string> {"date","not null default '0000-00-00'"};
+        DBELog::_columns["ora"] = vector<string> {"time","not null default '00:00:00'"};
+        DBELog::_columns["count"] = vector<string> {"int","not null default 0"};
+        DBELog::_columns["url"] = vector<string> {"varchar(255)","default null"};
+        DBELog::_columns["note"] = vector<string> {"varchar(255)","not null default ''"};
+        DBELog::_columns["note2"] = vector<string> {"text","not null"};
+    }
+}
 DBELog::~DBELog() {}
 string DBELog::name() { return "DBELog"; }
 string DBELog::getTableName() { return "log"; }
 DBFieldVector* DBELog::getKeys() { return &DBELog::chiavi; }
 DBELog* DBELog::createNewInstance() { return new DBELog(); }
+DBLayer::StringVector DBELog::getOrderBy() const {
+    static DBLayer::StringVector ret({"data desc", "ora desc"});
+    return ret;
+}
 //*********************** DBELog: end.
 
 

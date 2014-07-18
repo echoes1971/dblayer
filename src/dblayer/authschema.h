@@ -39,15 +39,61 @@ namespace AuthSchema {
 
   class DBEUser : public DBEntity {
     public:
-    DBEUser();
+      DBEUser();
       virtual ~DBEUser();
-      //virtual ColumnDefinitions getColumns();
+      virtual ColumnDefinitions getColumns();
       virtual string name();
       virtual string getTableName();
       virtual DBFieldVector* getKeys();
+      virtual ForeignKeyVector& getFK();
       virtual DBEUser* createNewInstance();
+      virtual DBLayer::StringVector getOrderBy() const;
+
+      // Custom methods
+      vector<map<string,string> > getDefaultEntries() const;
+
+      inline bool checkNewPassword() { return true; }
+//      def _before_insert(self,dbmgr=None):
+//          if self.getValue('id') is None:
+//              myid = dbmgr.getNextUuid(self)
+//              self.setValue('id',myid)
+//          self.checkNewPassword()
+//          if self.checkNewPassword():
+//              self._createGroup(dbmgr)
+//      def _after_insert(self,dbmgr=None):
+//          self._checkGroupAssociation(dbmgr)
+//      def _after_update(self,dbmgr=None):
+//          self._checkGroupAssociation(dbmgr)
+//      def _after_delete(self,dbmgr=None):
+//          cerca = DBEUserGroup()
+//          cerca.setValue('user_id',self.getValue('id'))
+//          lista = dbmgr.search(cerca, uselike = False)
+//          for ass in lista:
+//              dbmgr.delete(ass)
+//          self._deleteGroup(dbmgr)
+//      def _createGroup(self,dbmgr):
+//          if not self.getValue('group_id') is None: return
+//          dbe = DBEGroup()
+//          dbe.setValue('name', self.getValue('login'))
+//          dbe.setValue('description', "Private group for %s-%s" % (self.getValue('id'),self.getValue('login')) )
+//          dbe = dbmgr.insert(dbe)
+//          self.setValue('group_id', dbe.getValue('id'))
+//      def _deleteGroup(self,dbmgr):
+//          dbe = DBEGroup()
+//          dbe.setValue('id', self.getValue('group_id'))
+//          dbe = dbmgr.delete(dbe)
+//      def _checkGroupAssociation(self,dbmgr):
+//          ug = DBEUserGroup()
+//          ug.setValue('user_id',self.getValue('id'))
+//          ug.setValue('group_id',self.getValue('group_id'))
+//          exists = dbmgr.exists(ug)
+//          if not exists:
+//              dbmgr.insert(ug)
+//      def isRoot(self):
+//          return self.getValue('id')==-1 or self.getValue('id')=='-1'
     private:
       static ColumnDefinitions _columns;
+      static ForeignKeyVector _fkv;
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
       static DBFieldVector chiavi;
@@ -109,11 +155,12 @@ namespace AuthSchema {
     public:
     DBELog();
       virtual ~DBELog();
-      //virtual ColumnDefinitions getColumns();
+      virtual ColumnDefinitions getColumns();
       virtual string name();
       virtual string getTableName();
       virtual DBFieldVector* getKeys();
       virtual DBELog* createNewInstance();
+      virtual DBLayer::StringVector getOrderBy() const;
     private:
       static ColumnDefinitions _columns;
       static const string nomiCampiChiave[];
