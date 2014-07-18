@@ -645,8 +645,7 @@ int main(int argc, char *argv[]) {
 
 
     testThis();
-    if(true)
-        return 0;
+    if(false) return 0;
 
     if(argc!=2 && argc!=4 && argc!=5) {
         cerr << "Usage: " << argv[0] << " connect-string" << endl
