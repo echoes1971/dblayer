@@ -49,7 +49,7 @@ namespace DBLayer {
     typedef DECLSPECIFIER map<string,DBField*>  DBFieldMap;
     typedef DECLSPECIFIER vector<DBEntity*>     DBEntityVector;
     typedef DECLSPECIFIER map<string,DBEntity*> DBEntityMap;
-    typedef DECLSPECIFIER vector<ForeignKey*>   ForeignKeyVector;
+    typedef DECLSPECIFIER vector<ForeignKey>   ForeignKeyVector;
 
     typedef DECLSPECIFIER vector<int>    IntegerVector;
     typedef DECLSPECIFIER vector<string> StringVector;

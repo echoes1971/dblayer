@@ -10,20 +10,19 @@ using namespace std;
 
 //*********************** DBEDBVersion: start.
 const string DBEDBVersion::nomiCampiChiave[] = { string("version") };
+ColumnDefinitions DBEDBVersion::_columns;
+ColumnDefinitions DBEDBVersion::getColumns() { return DBEDBVersion::_columns; }
 IntegerField DBEDBVersion::chiave1( (const string*)&DBEDBVersion::nomiCampiChiave[0] );
 DBFieldVector DBEDBVersion::chiavi = DBEDBVersion::___init_keys();
 DBFieldVector DBEDBVersion::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEDBVersion::chiave1 ); return ret; }
 DBEDBVersion::DBEDBVersion() {
     this->tableName.clear();
-
-    /*
-    if len(DBEDBVersion.__columns.keys())==0:
-        parentcols = self.getColumns()
-        for k in parentcols.keys():
-            DBEDBVersion.__columns[k] = parentcols[k]
-        DBEDBVersion.__columns['version'] = ["int","not null"]
-    self._columns=DBEDBVersion.__columns
-    */
+    if(DBEDBVersion::_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            DBEDBVersion::_columns[pair.first] = pair.second;
+        }
+        DBEDBVersion::_columns["version"] = vector<string>({"int","not null"});
+    }
 }
 DBEDBVersion::~DBEDBVersion() {}
 string DBEDBVersion::name() { return "DBEDBVersion"; }
@@ -72,15 +71,38 @@ DBEGroup* DBEGroup::createNewInstance() { return new DBEGroup(); }
 
 //*********************** DBEUserGroup: start.
 const string DBEUserGroup::nomiCampiChiave[] = { string("user_id"), string("group_id") };
+ColumnDefinitions DBEUserGroup::_columns;
+ForeignKeyVector DBEUserGroup::_fkv;
+ColumnDefinitions DBEUserGroup::getColumns() { return DBEUserGroup::_columns; }
 StringField DBEUserGroup::chiave1( (const string*)&DBEUserGroup::nomiCampiChiave[0] );
 StringField DBEUserGroup::chiave2( (const string*)&DBEUserGroup::nomiCampiChiave[1] );
 DBFieldVector DBEUserGroup::chiavi = DBEUserGroup::___init_keys();
 DBFieldVector DBEUserGroup::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEUserGroup::chiave1 ); ret.push_back( &DBEUserGroup::chiave2 ); return ret; }
-DBEUserGroup::DBEUserGroup() { this->tableName.clear(); }
+DBEUserGroup::DBEUserGroup() {
+    this->tableName.clear();
+    if(DBEUserGroup::_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            DBEUserGroup::_columns[pair.first] = pair.second;
+        }
+        DBEUserGroup::_columns["user_id"] = vector<string>({"uuid","not null"});
+        DBEUserGroup::_columns["group_id"] = vector<string>({"uuid","not null"});
+    }
+}
 DBEUserGroup::~DBEUserGroup() {}
 string DBEUserGroup::name() { return "DBEUserGroup"; }
 string DBEUserGroup::getTableName() { return "users_groups"; }
 DBFieldVector* DBEUserGroup::getKeys() { return &DBEUserGroup::chiavi; }
+ForeignKeyVector& DBEUserGroup::getFK() {
+    if(_fkv.size()==0) {
+        for(const auto& fk : DBEntity::getFK()) {
+            _fkv.push_back(fk);
+        }
+        _fkv.push_back(ForeignKey("user_id","users","id"));
+        _fkv.push_back(ForeignKey("group_id","groups","id"));
+    }
+    return _fkv;
+}
+
 DBEUserGroup* DBEUserGroup::createNewInstance() { return new DBEUserGroup(); }
 //*********************** DBEUserGroup: end.
 

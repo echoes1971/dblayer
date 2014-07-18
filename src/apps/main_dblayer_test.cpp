@@ -51,11 +51,15 @@ using namespace DBLayer;
 #include "dbschema.h"
 using namespace MySchema;
 
+#include "dblayer/authschema.h"
+using namespace AuthSchema;
+
 #include <config.h>
 
 #ifdef USE_QXMLRPC
 #include <QApplication>
 #include "qdblayer/qxmlrpcconnection.h"
+#include <QDebug>
 #endif
 
 #if defined(WIN32)
@@ -609,6 +613,19 @@ void testGetColumnsForTable(string host,string dbname,string usr,string pwd, str
 
 
 
+void testThis() {
+    DBEntity dbe;
+    cout << dbe.toString("\n") << endl;
+
+    DBEDBVersion dbversion;
+    cout << dbversion.toString("\n") << endl;
+
+    DBEUserGroup dbeug;
+    cout << dbeug.toString("\n") << endl;
+}
+
+
+
 int main(int argc, char *argv[]) {
     string host,dbname,usr,pwd,login_user,login_password;
     //string connString("dblayer:sqlite:./examples/test.db");
@@ -616,6 +633,11 @@ int main(int argc, char *argv[]) {
     //string connString("dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;");
     //string connString("dblayer:pg:host=localhost dbname=roberto user=roberto password=roberto");
     //cout << "Content-type: text/html" << endl << endl;
+
+
+    testThis();
+    if(true)
+        return 0;
 
     if(argc!=2 && argc!=4 && argc!=5) {
         cerr << "Usage: " << argv[0] << " connect-string" << endl

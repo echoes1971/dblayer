@@ -112,7 +112,7 @@ namespace DBLayer {
         /** @return true if the field name is key */
         bool isKey(string fieldName);
         /** @return the foreign keys */
-        virtual ForeignKeyVector* getFK();
+        virtual ForeignKeyVector& getFK();
         ForeignKeyVector getFKForTable(string tablename);
         /**	Reads the content of the referenced columns in the referenced table
         mapped in the given dbe	*/
@@ -151,6 +151,7 @@ namespace DBLayer {
       private:
         /* column_name => array('type','constraints', ...) */
         static ColumnDefinitions _columns;
+        static ForeignKeyVector _fkv;
 
         string toString_nodes(string prefix);
 

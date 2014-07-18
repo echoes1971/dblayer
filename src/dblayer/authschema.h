@@ -19,6 +19,9 @@ namespace AuthSchema {
     public:
       DBEDBVersion();
       virtual ~DBEDBVersion();
+
+      virtual ColumnDefinitions getColumns();
+
       virtual string name();
       virtual string getTableName();
       virtual DBFieldVector* getKeys();
@@ -27,6 +30,7 @@ namespace AuthSchema {
 
       int version();
     private:
+      static ColumnDefinitions _columns;
       static const string nomiCampiChiave[];
       static IntegerField chiave1; // int
       static DBFieldVector chiavi;
@@ -37,11 +41,13 @@ namespace AuthSchema {
     public:
     DBEUser();
       virtual ~DBEUser();
+      //virtual ColumnDefinitions getColumns();
       virtual string name();
       virtual string getTableName();
       virtual DBFieldVector* getKeys();
       virtual DBEUser* createNewInstance();
     private:
+      static ColumnDefinitions _columns;
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
       static DBFieldVector chiavi;
@@ -52,11 +58,13 @@ namespace AuthSchema {
     public:
     DBEGroup();
       virtual ~DBEGroup();
+      //virtual ColumnDefinitions getColumns();
       virtual string name();
       virtual string getTableName();
       virtual DBFieldVector* getKeys();
       virtual DBEGroup* createNewInstance();
     private:
+      static ColumnDefinitions _columns;
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
       static DBFieldVector chiavi;
@@ -67,11 +75,24 @@ namespace AuthSchema {
     public:
     DBEUserGroup();
       virtual ~DBEUserGroup();
+      virtual ColumnDefinitions getColumns();
       virtual string name();
       virtual string getTableName();
       virtual DBFieldVector* getKeys();
+      virtual ForeignKeyVector& getFK();
       virtual DBEUserGroup* createNewInstance();
+
+//    def getOrderBy(self):
+//        return [ "user_id", "group_id" ]
+//    def getDefaultEntries(self):
+//        return [\
+//            {'user_id':'-1','group_id':'-2',},\
+//            {'user_id':'-1','group_id':'-5',},\
+//            {'user_id':'-1','group_id':'-6',},\
+//        ]
     private:
+      static ColumnDefinitions _columns;
+      static ForeignKeyVector _fkv;
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
       static StringField chiave2; // uuid
@@ -83,11 +104,13 @@ namespace AuthSchema {
     public:
     DBELog();
       virtual ~DBELog();
+      //virtual ColumnDefinitions getColumns();
       virtual string name();
       virtual string getTableName();
       virtual DBFieldVector* getKeys();
       virtual DBELog* createNewInstance();
     private:
+      static ColumnDefinitions _columns;
       static const string nomiCampiChiave[];
       static StringField chiave1; // varchar(16)
       static StringField chiave2; // date

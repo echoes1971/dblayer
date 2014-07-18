@@ -36,6 +36,7 @@
 using namespace DBLayer;
 
 ColumnDefinitions DBEntity::_columns;
+ForeignKeyVector DBEntity::_fkv;
 
 DBEntity::DBEntity() {
     this->tableName = this->tableName.append( "no table name" );
@@ -115,6 +116,39 @@ string DBEntity::toString_nodes(string prefix) {
         }
         ret.append( "</" + fields[i]->getName() + ">" );
     }
+
+    ret.append(prefix+"<!--");
+
+    ret.append(prefix+"{");
+    // Table Columns
+    if(this->getColumns().size()>0) {
+        ret.append(prefix+" 'columns': {");
+        for(const pair<string,vector<string> > pair : this->getColumns()) {
+            ret.append(prefix+"  '").append(pair.first).append("': [");
+            for(const string s : pair.second) {
+                ret.append("'").append(s).append("',");
+            }
+            ret.append("],");
+        }
+        ret.append(prefix+" },");
+    }
+    // Foreign Keys
+    if(this->getFK().size()>0) {
+        ret.append(prefix+" 'foreignkeys': [");
+        for(const ForeignKey fk : this->getFK()) {
+            ret.append(prefix+"  {");
+            ret.append(prefix+"   'fk_column':'"+fk.colonna_fk+"',");
+            ret.append(prefix+"   'referred_table':'"+fk.tabella_riferita+"',");
+            ret.append(prefix+"   'referred_column':'"+fk.colonna_riferita+"',");
+            ret.append(prefix+"  },");
+            //colonna_fk, string tabella_riferita, string colonna_riferita
+        }
+        ret.append(prefix+" ],");
+    }
+
+    ret.append(prefix+"}");
+    ret.append(prefix+"-->");
+
     ret.append( prefix + "</" + this->name() + ">" );
     return ret;
 }
@@ -240,16 +274,13 @@ Field* DBEntity::createNewField(const string* fieldName, long valore) { return n
 Field* DBEntity::createNewField(const string* fieldName, const string* valore) { return new StringField(fieldName, valore); }
 Field* DBEntity::createNewDateField(const string* fieldName, const string* valore) { return new DateField(fieldName, valore); }
 
-ForeignKeyVector* DBEntity::getFK() {
-    static ForeignKeyVector vuoto;
-    return &vuoto;
-}
+ForeignKeyVector& DBEntity::getFK() { return DBEntity::_fkv; }
 ForeignKeyVector DBEntity::getFKForTable(string tablename) {
-    ForeignKeyVector* fks = this->getFK();
+    ForeignKeyVector& fks = this->getFK();
     ForeignKeyVector ret;
-    for(unsigned int i=0; i<fks->size(); i++) {
-        ForeignKey* f = fks->at(i);
-        string tabella_riferita = f->tabella_riferita;
+    for(unsigned int i=0; i<fks.size(); i++) {
+        ForeignKey& f = fks.at(i);
+        string tabella_riferita = f.tabella_riferita;
         if( tabella_riferita == tablename ) {
             ret.push_back( f );
         }
@@ -259,8 +290,8 @@ ForeignKeyVector DBEntity::getFKForTable(string tablename) {
 void DBEntity::readFKFrom(DBEntity* dbe) {
     ForeignKeyVector fks = this->getFKForTable( dbe->getTableName() );
     for(unsigned int i=0; i<fks.size(); i++) {
-        ForeignKey* f = fks.at(i);
-        DBField* myfield = (DBField*) dbe->getField( &f->colonna_riferita );
+        ForeignKey& f = fks.at(i);
+        DBField* myfield = (DBField*) dbe->getField( &f.colonna_riferita );
         if( myfield!=0 && !myfield->isNull() ) {
             string nomeField = myfield->getName();
             if ( myfield->isBoolean() ) {
@@ -280,8 +311,8 @@ void DBEntity::readFKFrom(DBEntity* dbe) {
 DBEntity* DBEntity::writeFKTo(DBEntity* dbemaster) {
     ForeignKeyVector fks = this->getFKForTable( dbemaster->getTableName() );
     for(unsigned int i=0; i<fks.size(); i++) {
-        ForeignKey* f = fks.at(i);
-        DBField* myfield = (DBField*) this->getField( &f->colonna_fk );
+        ForeignKey& f = fks.at(i);
+        DBField* myfield = (DBField*) this->getField( &f.colonna_fk );
         if( myfield!=0 && !myfield->isNull() ) {
             string nomeField = myfield->getName();
             if ( myfield->isBoolean() ) {
@@ -301,17 +332,13 @@ DBEntity* DBEntity::writeFKTo(DBEntity* dbemaster) {
 }
 bool DBEntity::isFK(string field_name, string referred_table) {
     bool found = false;
-    ForeignKeyVector myfks;
-    ForeignKeyVector* fks;
+    ForeignKeyVector& fks = this->getFK();
     if( referred_table.length()>0 ) {
-        myfks = this->getFKForTable( referred_table );
-        fks = &myfks;
-    } else {
-        fks = this->getFK();
+        fks = this->getFKForTable( referred_table );
     }
-    for(unsigned int i=0; i<fks->size() && !found; i++) {
-        ForeignKey* f = fks->at(i);
-        found = ( f->colonna_fk == field_name );
+    for(unsigned int i=0; i<fks.size() && !found; i++) {
+        ForeignKey& f = fks.at(i);
+        found = ( f.colonna_fk == field_name );
     }
     return found;
 }
@@ -360,7 +387,7 @@ string DBEntity::getColumnType(const string& column_name) {
         return "";
     }
 }
-ColumnDefinitions DBEntity::getColumns() { return this->_columns; }
+ColumnDefinitions DBEntity::getColumns() { return DBEntity::_columns; }
 string DBEntity::dbeType2dbType(const string& dbetype) {
     string ret = dbetype;
     if(dbetype=="int")
