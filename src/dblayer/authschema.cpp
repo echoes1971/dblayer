@@ -93,6 +93,45 @@ vector<map<string,string> > DBEUser::getDefaultEntries() const {
     }
     return ret;
 }
+bool DBEUser::isRoot() {
+    static string id("id");
+    return string(this->getField(&id)->getStringValue()->c_str())=="-1";
+}
+
+void DBEUser::_createGroup(DBMgr* dbmgr) {
+    static string name("name");
+    static string description("description");
+    static string login("login");
+    static string group_id("group_id");
+    static string id("id");
+    if(!this->getField(&group_id)->isNull())
+        return;
+    DBEGroup* dbe = new DBEGroup();
+    dbe->getField(&name)->setStringValue(string(this->getStringValue(&login).c_str()));
+    dbe->getField(&description)->setStringValue("Private group for "+string(this->getStringValue(&id).c_str())+"-"+string(this->getStringValue(&login).c_str()));
+    dbe = (DBEGroup*) dbmgr->Insert(dbe);
+    this->getField(&group_id)->setStringValue(string(dbe->getStringValue(&id).c_str()));
+    delete dbe;
+}
+void DBEUser::_deleteGroup(DBMgr* dbmgr) {
+    static string group_id("group_id");
+    static string id("id");
+    DBEGroup dbe;
+    dbe.getField(&id)->setStringValue(string(this->getField(&group_id)->getStringValue()->c_str()));
+    dbmgr->Delete(&dbe);
+}
+void DBEUser::_checkGroupAssociation(DBMgr* dbmgr) {
+    static string user_id("user_id");
+    static string group_id("group_id");
+    static string id("id");
+    DBEUserGroup ug;
+    ug.getField(&user_id)->setStringValue(this->getField(&id)->getStringValue());
+    ug.getField(&group_id)->setStringValue(this->getField(&group_id)->getStringValue());
+    bool exists = dbmgr->exists(&ug);
+    if(!exists) {
+        dbmgr->Insert(&ug);
+    }
+}
 //*********************** DBEUser: end.
 
 //*********************** DBEGroup: start.

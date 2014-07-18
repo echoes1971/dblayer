@@ -53,6 +53,9 @@ namespace AuthSchema {
       vector<map<string,string> > getDefaultEntries() const;
 
       inline bool checkNewPassword() { return true; }
+
+      bool isRoot();
+
 //      def _before_insert(self,dbmgr=None):
 //          if self.getValue('id') is None:
 //              myid = dbmgr.getNextUuid(self)
@@ -71,26 +74,9 @@ namespace AuthSchema {
 //          for ass in lista:
 //              dbmgr.delete(ass)
 //          self._deleteGroup(dbmgr)
-//      def _createGroup(self,dbmgr):
-//          if not self.getValue('group_id') is None: return
-//          dbe = DBEGroup()
-//          dbe.setValue('name', self.getValue('login'))
-//          dbe.setValue('description', "Private group for %s-%s" % (self.getValue('id'),self.getValue('login')) )
-//          dbe = dbmgr.insert(dbe)
-//          self.setValue('group_id', dbe.getValue('id'))
-//      def _deleteGroup(self,dbmgr):
-//          dbe = DBEGroup()
-//          dbe.setValue('id', self.getValue('group_id'))
-//          dbe = dbmgr.delete(dbe)
-//      def _checkGroupAssociation(self,dbmgr):
-//          ug = DBEUserGroup()
-//          ug.setValue('user_id',self.getValue('id'))
-//          ug.setValue('group_id',self.getValue('group_id'))
-//          exists = dbmgr.exists(ug)
-//          if not exists:
-//              dbmgr.insert(ug)
-//      def isRoot(self):
-//          return self.getValue('id')==-1 or self.getValue('id')=='-1'
+      void _createGroup(DBMgr* dbmgr=0);
+      void _deleteGroup(DBMgr* dbmgr=0);
+      void _checkGroupAssociation(DBMgr* dbmgr=0);
     private:
       static ColumnDefinitions _columns;
       static ForeignKeyVector _fkv;
