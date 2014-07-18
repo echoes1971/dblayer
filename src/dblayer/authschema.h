@@ -56,13 +56,37 @@ namespace AuthSchema {
 
   class DBEGroup : public DBEntity {
     public:
-    DBEGroup();
+      DBEGroup();
       virtual ~DBEGroup();
-      //virtual ColumnDefinitions getColumns();
+      virtual ColumnDefinitions getColumns();
       virtual string name();
       virtual string getTableName();
       virtual DBFieldVector* getKeys();
       virtual DBEGroup* createNewInstance();
+      virtual DBLayer::StringVector getOrderBy() const;
+
+      // Custom methods
+      vector<map<string,string> > getDefaultEntries() const;
+
+//    def _before_insert(self,dbmgr=None):
+//        if self.getValue('id') is None:
+//            myid = dbmgr.getNextUuid(self)
+//            self.setValue( 'id', myid )
+//    def _after_insert(self,dbmgr=None):
+//        if dbmgr.getDBEUser() is None:
+//            return
+//        dbe = DBEUserGroup()
+//        dbe.setValue('group_id',self.getValue('id'))
+//        dbe.setValue('user_id', dbmgr.getDBEUser().getValue('id'))
+//        dbmgr.insert(dbe)
+//        dbmgr.addGroup( self.getValue('id') )
+//    def _after_delete(self,dbmgr=None):
+//        cerca = DBEUserGroup()
+//        cerca.setValue('group_id', self.getValue('id'))
+//        lista = dbmgr.search(cerca, uselike=0)
+//        for ass in lista:
+//            dbmgr.delete(ass)
+
     private:
       static ColumnDefinitions _columns;
       static const string nomiCampiChiave[];
@@ -73,7 +97,7 @@ namespace AuthSchema {
 
   class DBEUserGroup : public DBEntity {
     public:
-    DBEUserGroup();
+      DBEUserGroup();
       virtual ~DBEUserGroup();
       virtual ColumnDefinitions getColumns();
       virtual string name();
@@ -81,15 +105,11 @@ namespace AuthSchema {
       virtual DBFieldVector* getKeys();
       virtual ForeignKeyVector& getFK();
       virtual DBEUserGroup* createNewInstance();
+      virtual DBLayer::StringVector getOrderBy() const;
 
-//    def getOrderBy(self):
-//        return [ "user_id", "group_id" ]
-//    def getDefaultEntries(self):
-//        return [\
-//            {'user_id':'-1','group_id':'-2',},\
-//            {'user_id':'-1','group_id':'-5',},\
-//            {'user_id':'-1','group_id':'-6',},\
-//        ]
+      // Custom methods
+      vector<map<string,string> > getDefaultEntries() const;
+
     private:
       static ColumnDefinitions _columns;
       static ForeignKeyVector _fkv;

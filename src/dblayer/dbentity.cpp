@@ -145,6 +145,13 @@ string DBEntity::toString_nodes(string prefix) {
         }
         ret.append(prefix+" ],");
     }
+    // Order by
+    if(this->getOrderBy().size()>0) {
+        ret.append(prefix+" 'order_by': [");
+        for(const string& s : this->getOrderBy())
+            ret.append("'").append(s).append("',");
+        ret.append("],");
+    }
 
     ret.append(prefix+"}");
     ret.append(prefix+"-->");

@@ -622,6 +622,9 @@ void testThis() {
 
     DBEUserGroup dbeug;
     cout << dbeug.toString("\n") << endl;
+
+    DBEGroup dbeg;
+    cout << dbeg.toString("\n") << endl;
 }
 
 

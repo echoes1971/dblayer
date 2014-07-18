@@ -21,7 +21,7 @@ DBEDBVersion::DBEDBVersion() {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBEDBVersion::_columns[pair.first] = pair.second;
         }
-        DBEDBVersion::_columns["version"] = vector<string>({"int","not null"});
+        DBEDBVersion::_columns["version"] = vector<string> {"int","not null"};
     }
 }
 DBEDBVersion::~DBEDBVersion() {}
@@ -31,8 +31,7 @@ DBFieldVector* DBEDBVersion::getKeys() { return &DBEDBVersion::chiavi; }
 DBEDBVersion* DBEDBVersion::createNewInstance() { return new DBEDBVersion(); }
 
 DBLayer::StringVector DBEDBVersion::getOrderBy() const {
-    DBLayer::StringVector ret;
-    ret.push_back("version");
+    static DBLayer::StringVector ret({"version"});
     return ret;
 }
 
@@ -58,15 +57,51 @@ DBEUser* DBEUser::createNewInstance() { return new DBEUser(); }
 
 //*********************** DBEGroup: start.
 const string DBEGroup::nomiCampiChiave[] = { string("id") };
+ColumnDefinitions DBEGroup::_columns;
+ColumnDefinitions DBEGroup::getColumns() { return DBEGroup::_columns; }
 StringField DBEGroup::chiave1( (const string*)&DBEGroup::nomiCampiChiave[0] );
 DBFieldVector DBEGroup::chiavi = DBEGroup::___init_keys();
 DBFieldVector DBEGroup::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEGroup::chiave1 ); return ret; }
-DBEGroup::DBEGroup() { this->tableName.clear(); }
+DBEGroup::DBEGroup() {
+    this->tableName.clear();
+    if(DBEGroup::_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            DBEGroup::_columns[pair.first] = pair.second;
+        }
+        DBEGroup::_columns["id"] = vector<string> {"uuid","not null"};
+        DBEGroup::_columns["name"] = vector<string> {"varchar(255)","not null"};
+        DBEGroup::_columns["description"] = vector<string> {"text","default null"};
+    }
+}
 DBEGroup::~DBEGroup() {}
 string DBEGroup::name() { return "DBEGroup"; }
 string DBEGroup::getTableName() { return "groups"; }
 DBFieldVector* DBEGroup::getKeys() { return &DBEGroup::chiavi; }
 DBEGroup* DBEGroup::createNewInstance() { return new DBEGroup(); }
+
+DBLayer::StringVector DBEGroup::getOrderBy() const {
+    static DBLayer::StringVector ret({"name"});
+    return ret;
+}
+
+vector<map<string,string> > DBEGroup::getDefaultEntries() const {
+    static vector<map<string,string> > ret;
+    if(ret.size()==0) {
+        int i=0;
+        ret.push_back( map<string,string>() );
+        ret.at(i)["id"]="-2"; ret.at(i)["name"]="Admin"; ret.at(i)["description"]="System admins"; i++;
+        ret.push_back( map<string,string>() );
+        ret.at(i)["id"]="-3"; ret.at(i)["name"]="Users"; ret.at(i)["description"]="System users"; i++;
+        ret.push_back( map<string,string>() );
+        ret.at(i)["id"]="-4"; ret.at(i)["name"]="Guests"; ret.at(i)["description"]="System guests (read only)"; i++;
+//         ret.push_back( map<string,string>() );
+//         ret.at(i)["id"]="-5"; ret.at(i)["name"]="Project"; ret.at(i)["description"]="R-Project user"; i++;
+//         ret.push_back( map<string,string>() );
+//         ret.at(i)["id"]="-6"; ret.at(i)["name"]="Webmaster"; ret.at(i)["description"]="Web content creators"; i++;
+    }
+    return ret;
+}
+
 //*********************** DBEGroup: end.
 
 //*********************** DBEUserGroup: start.
@@ -84,8 +119,8 @@ DBEUserGroup::DBEUserGroup() {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBEUserGroup::_columns[pair.first] = pair.second;
         }
-        DBEUserGroup::_columns["user_id"] = vector<string>({"uuid","not null"});
-        DBEUserGroup::_columns["group_id"] = vector<string>({"uuid","not null"});
+        DBEUserGroup::_columns["user_id"] = vector<string> {"uuid","not null"};
+        DBEUserGroup::_columns["group_id"] = vector<string> {"uuid","not null"};
     }
 }
 DBEUserGroup::~DBEUserGroup() {}
@@ -104,6 +139,23 @@ ForeignKeyVector& DBEUserGroup::getFK() {
 }
 
 DBEUserGroup* DBEUserGroup::createNewInstance() { return new DBEUserGroup(); }
+
+DBLayer::StringVector DBEUserGroup::getOrderBy() const {
+    static DBLayer::StringVector ret({"user_id","group_id"});
+    return ret;
+}
+
+
+vector<map<string,string> > DBEUserGroup::getDefaultEntries() const {
+    static vector<map<string,string> > ret;
+    if(ret.size()==0) {
+        int i=0;
+        ret.push_back( map<string,string>() ); ret.at(i)["user_id"]="-1"; ret.at(i)["group_id"]="-2"; i++;
+        ret.push_back( map<string,string>() ); ret.at(i)["user_id"]="-1"; ret.at(i)["group_id"]="-5"; i++;
+        ret.push_back( map<string,string>() ); ret.at(i)["user_id"]="-1"; ret.at(i)["group_id"]="-6"; i++;
+    }
+    return ret;
+}
 //*********************** DBEUserGroup: end.
 
 //*********************** DBELog: start.
