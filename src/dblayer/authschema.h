@@ -56,24 +56,11 @@ namespace AuthSchema {
 
       bool isRoot();
 
-//      def _before_insert(self,dbmgr=None):
-//          if self.getValue('id') is None:
-//              myid = dbmgr.getNextUuid(self)
-//              self.setValue('id',myid)
-//          self.checkNewPassword()
-//          if self.checkNewPassword():
-//              self._createGroup(dbmgr)
-//      def _after_insert(self,dbmgr=None):
-//          self._checkGroupAssociation(dbmgr)
-//      def _after_update(self,dbmgr=None):
-//          self._checkGroupAssociation(dbmgr)
-//      def _after_delete(self,dbmgr=None):
-//          cerca = DBEUserGroup()
-//          cerca.setValue('user_id',self.getValue('id'))
-//          lista = dbmgr.search(cerca, uselike = False)
-//          for ass in lista:
-//              dbmgr.delete(ass)
-//          self._deleteGroup(dbmgr)
+      virtual void _before_insert(DBMgr* dbmgr=0);
+      virtual void _after_insert(DBMgr* dbmgr=0);
+      virtual void _after_update(DBMgr* dbmgr=0);
+      virtual void _after_delete(DBMgr* dbmgr=0);
+
       void _createGroup(DBMgr* dbmgr=0);
       void _deleteGroup(DBMgr* dbmgr=0);
       void _checkGroupAssociation(DBMgr* dbmgr=0);

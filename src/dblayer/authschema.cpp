@@ -98,6 +98,33 @@ bool DBEUser::isRoot() {
     return string(this->getField(&id)->getStringValue()->c_str())=="-1";
 }
 
+void DBEUser::_before_insert(DBMgr* dbmgr) {
+    static string id("id");
+    if(this->isNull(&id)) {
+        this->getField(&id)->setStringValue(dbmgr->getNextUuid(this));
+    }
+    if(this->checkNewPassword()) {
+        this->_createGroup(dbmgr);
+    }
+}
+void DBEUser::_after_insert(DBMgr* dbmgr) {
+    this->_checkGroupAssociation(dbmgr);
+}
+void DBEUser::_after_update(DBMgr* dbmgr) {
+    this->_checkGroupAssociation(dbmgr);
+}
+void DBEUser::_after_delete(DBMgr* dbmgr) {
+    static string user_id("user_id");
+    static string id("id");
+    DBEUserGroup search;
+    search.getField(&user_id)->setStringValue(string(this->getStringValue(&id).c_str()));
+    DBEntityVector* list = dbmgr->Search(&search,false);
+    for(DBEntity* dbe : (*list)) {
+        dbmgr->Delete(dbe);
+    }
+    dbmgr->Destroy(list);
+    this->_deleteGroup(dbmgr);
+}
 void DBEUser::_createGroup(DBMgr* dbmgr) {
     static string name("name");
     static string description("description");
