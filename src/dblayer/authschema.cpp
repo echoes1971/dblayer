@@ -126,6 +126,15 @@ void DBEGroup::_after_insert(DBMgr* dbmgr) {
     dbmgr->addGroup(this_id);
 }
 void DBEGroup::_after_delete(DBMgr* dbmgr) {
+    static const string group_id("group_id");
+    static const string id("id");
+    DBEUserGroup search;
+    search.getField(&group_id)->setStringValue(this->getField(&id)->getStringValue());
+    DBEntityVector* list = dbmgr->Search(&search,false);
+    for(DBEntity* dbe : (*list)) {
+        dbmgr->Delete(dbe);
+    }
+    dbmgr->Destroy(list);
 }
 
 //*********************** DBEGroup: end.

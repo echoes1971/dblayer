@@ -71,12 +71,6 @@ namespace AuthSchema {
       virtual void _before_insert(DBMgr* dbmgr=0);
       virtual void _after_insert(DBMgr* dbmgr=0);
       virtual void _after_delete(DBMgr* dbmgr=0);
-//    def _after_delete(self,dbmgr=None):
-//        cerca = DBEUserGroup()
-//        cerca.setValue('group_id', self.getValue('id'))
-//        lista = dbmgr.search(cerca, uselike=0)
-//        for ass in lista:
-//            dbmgr.delete(ass)
 
     private:
       static ColumnDefinitions _columns;

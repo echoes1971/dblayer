@@ -534,6 +534,7 @@ bool DBMgr::exists(DBEntity* dbe) {
 string DBMgr::getNextUuid(DBEntity* dbe) {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
     string ret = boost::uuids::to_string(uuid);
+    replaceAll(ret,"-","");
 //        def getNextUuid(self, dbe, length=16):
 //            return ( ("%s" % uuid.uuid4()).replace('-','') )[:16]
     return ret;
