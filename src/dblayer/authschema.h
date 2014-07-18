@@ -68,18 +68,9 @@ namespace AuthSchema {
       // Custom methods
       vector<map<string,string> > getDefaultEntries() const;
 
-//    def _before_insert(self,dbmgr=None):
-//        if self.getValue('id') is None:
-//            myid = dbmgr.getNextUuid(self)
-//            self.setValue( 'id', myid )
-//    def _after_insert(self,dbmgr=None):
-//        if dbmgr.getDBEUser() is None:
-//            return
-//        dbe = DBEUserGroup()
-//        dbe.setValue('group_id',self.getValue('id'))
-//        dbe.setValue('user_id', dbmgr.getDBEUser().getValue('id'))
-//        dbmgr.insert(dbe)
-//        dbmgr.addGroup( self.getValue('id') )
+      virtual void _before_insert(DBMgr* dbmgr=0);
+      virtual void _after_insert(DBMgr* dbmgr=0);
+      virtual void _after_delete(DBMgr* dbmgr=0);
 //    def _after_delete(self,dbmgr=None):
 //        cerca = DBEUserGroup()
 //        cerca.setValue('group_id', self.getValue('id'))

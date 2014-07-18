@@ -102,6 +102,32 @@ vector<map<string,string> > DBEGroup::getDefaultEntries() const {
     return ret;
 }
 
+void DBEGroup::_before_insert(DBMgr* dbmgr) {
+    static const string id_field_name;
+    Field* id_field = this->getField(&id_field_name);
+    if(id_field->isNull()) {
+        string uuid = dbmgr->getNextUuid(this);
+        id_field->setStringValue(uuid);
+    }
+}
+void DBEGroup::_after_insert(DBMgr* dbmgr) {
+    if(dbmgr->getDBEUser()==0)
+        return;
+    DBEUserGroup dbe;
+    static string group_id("group_id");
+    static string user_id("user_id");
+    static string id("id");
+
+    string this_id = string(this->getField(&id)->getStringValue()->c_str());
+
+    dbe.getField(&group_id),this_id;
+    dbe.getField(&user_id),dbmgr->getDBEUser()->getField(&id)->getStringValue();
+    dbmgr->Insert(&dbe);
+    dbmgr->addGroup(this_id);
+}
+void DBEGroup::_after_delete(DBMgr* dbmgr) {
+}
+
 //*********************** DBEGroup: end.
 
 //*********************** DBEUserGroup: start.

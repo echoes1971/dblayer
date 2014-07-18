@@ -34,6 +34,11 @@
 #include <new>
 using namespace DBLayer;
 
+// for DBMgr.getNextUuid
+#include <boost/uuid/uuid.hpp>            // uuid class
+#include <boost/uuid/uuid_generators.hpp> // generators
+#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
+
 DBLayer::DBMgr::DBMgr() {
     this->setConnection(0);
     this->dbeFactory = 0;
@@ -526,6 +531,14 @@ bool DBMgr::exists(DBEntity* dbe) {
     return count>0;
 }
 
+string DBMgr::getNextUuid(DBEntity* dbe) {
+    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+    string ret = boost::uuids::to_string(uuid);
+//        def getNextUuid(self, dbe, length=16):
+//            return ( ("%s" % uuid.uuid4()).replace('-','') )[:16]
+    return ret;
+}
+
 string DBMgr::ping() {
     if(this->con->isProxy())
         return this->con->ping();
@@ -545,11 +558,11 @@ void DBMgr::_loadUserGroups() {
     this->_user_groups_list.clear();
     string group_id("group_id");
     for(const DBEntity* g : (*lista)) {
-        this->_user_groups_list.push_back(g->getField(&group_id)->getIntegerValue());
+        this->_user_groups_list.push_back(string(g->getField(&group_id)->getStringValue()->c_str()));
     }
 
-    long user_group_id = this->_dbeuser->getField(&group_id)->getIntegerValue();
-    vector<long>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), user_group_id);
+    string user_group_id = string(this->_dbeuser->getField(&group_id)->getStringValue()->c_str());
+    vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), user_group_id);
     if(i==this->_user_groups_list.end()) {
         this->_user_groups_list.push_back(user_group_id);
     }
@@ -568,6 +581,13 @@ DBEntity* DBMgr::login(string user,string pwd) {
         //qDebug() << userRs;
 
         //this->_dbeuser = ... ;
+    }
+}
+
+void DBMgr::addGroup(const string& group_id) {
+    vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), group_id);
+    if(i==this->_user_groups_list.end()) {
+        this->_user_groups_list.push_back(group_id);
     }
 }
 

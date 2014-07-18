@@ -55,7 +55,7 @@ class DECLSPECIFIER DBMgr {
         DBEFactory* dbeFactory;
         string _schema;
         DBEntity* _dbeuser;
-        vector<long> _user_groups_list;
+        vector<string> _user_groups_list;
 
         void _loadUserGroups();
 
@@ -121,9 +121,32 @@ class DECLSPECIFIER DBMgr {
         DBEntityVector* searchByKeys(DBEntity* dbe);
         bool exists(DBEntity* dbe);
 
+//        def getNextId(self, dbe):
+//            nomeTabella = "%s_seq_id" % ( self._schema )
+//            tmp = self.select(nomeTabella, "select id from %s where name=''" % ( nomeTabella ) )
+//            myid = 1
+//            if len(tmp)>0:
+//                myid = tmp[0].getValue('id') + 1
+//                self.select(nomeTabella, "insert into %s (id,name) values (%s,'')" % (nomeTabella,myid) )
+//            else:
+//                self.select(nomeTabella, "update %s set id=%s where name=''" % (nomeTabella,myid) )
+//            return myid
+        string getNextUuid(DBEntity* dbe);
+
         string ping();
 
         DBEntity* login(string user,string pwd);
+//        def getUserGroupsList(self):
+//            return self.user_groups_list
+//        def setUserGroupsList(self,user_groups_list):
+//            self.user_groups_list = user_groups_list
+//        def hasGroup(self,group_id):
+//            """ The logged user has the requested group_id ? """
+//            return "%s"%group_id in self.user_groups_list
+        void addGroup(const string& group_id);
+//        def addGroup(self,group_id):
+//            if not group_id in self.user_groups_list:
+//                self.user_groups_list.append(group_id)
 
         /** Destroy the DBEntity of the list and the list itself! */
         static void Destroy(DBEntityVector* lista);
