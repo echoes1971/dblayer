@@ -644,8 +644,8 @@ int main(int argc, char *argv[]) {
     //cout << "Content-type: text/html" << endl << endl;
 
 
-    testThis();
-    if(false) return 0;
+//    testThis();
+//    if(false) return 0;
 
     if(argc!=2 && argc!=4 && argc!=5) {
         cerr << "Usage: " << argv[0] << " connect-string" << endl
@@ -695,7 +695,7 @@ int main(int argc, char *argv[]) {
 
     testDateField();
 
-    cout << "---------------->>  testDBMgr" << endl;
+    cout << "---------------->>  testDBMgr: start." << endl;
     if ( argc==5 ) {
         testDBMgr( host, dbname, usr, pwd, login_user, login_password );
     } else {
@@ -705,6 +705,8 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    cout << "---------------->>  testDBMgr: end." << endl;
+    cout << endl;
 
     return 0;
 

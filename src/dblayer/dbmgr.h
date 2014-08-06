@@ -100,7 +100,8 @@ class DECLSPECIFIER DBMgr {
 
         string ping();
 
-        DBEntity* login(string user,string pwd);
+        DBEntity* login(const string user,const string pwd);
+        DBEntity* relogin();
 //        def getUserGroupsList(self):
 //            return self.user_groups_list
 //        def setUserGroupsList(self,user_groups_list):

@@ -575,7 +575,7 @@ void DBMgr::_loadUserGroups() {
     delete cerca;
 }
 
-DBEntity* DBMgr::login(string user,string pwd) {
+DBEntity* DBMgr::login(const string user, const string pwd) {
     if(this->con->isProxy()) {
         ResultSet* userRs = this->con->login(user,pwd);
         string nome_tabella("users");
@@ -605,6 +605,27 @@ DBEntity* DBMgr::login(string user,string pwd) {
 
     DBEntityVector* lista = this->Search(cerca,false);
 
+    // TODO: how to handle this in C++?
+    //try:
+    //    ret = self.search(cerca,uselike=False)
+    //except Exception,e:
+    //    try:
+    //        self.initDB()
+    //        newuser = self.getClazzByTypeName('DBEUser')(attrs={'login':user,'pwd':pwd})
+    //        newuser = self.insert(newuser)
+    //        searchGroup = self.getClazzByTypeName('DBEGroup')(attrs={'name':user})
+    //        newgroup = self.search(searchGroup,uselike=False)[0]
+    //        if self._verbose: print "DBMgr.login: newuser=%s" % ( newuser )
+    //        newfolder = self.getClazzByTypeName('DBEFolder')(attrs={\
+    //            'owner':newuser.getValue('id'),\
+    //            'group_id':newgroup.getValue('id'),\
+    //            'creator':newuser.getValue('id'),\
+    //            'last_modify':newuser.getValue('id'),\
+    //            'name':user})
+    //        newfolder = self.insert(newfolder)
+    //        if self._verbose: print "DBMgr.login: newfolder=%s" % ( newfolder )
+    //        ret = self.search(cerca,uselike=False)
+
     if(lista->size()!=1) {
         if( this->verbose ) { cout << "DBMgr::login: ERROR - lista.size=" << lista->size() << endl; }
         return 0;
@@ -615,29 +636,20 @@ DBEntity* DBMgr::login(string user,string pwd) {
 
     this->_loadUserGroups();
     return this->_dbeuser;
-//    cerca = self.getClazzByTypeName('DBEUser')(attrs={'login':user,'pwd':pwd})
-//    ret = []
-//    try:
-//        ret = self.search(cerca,uselike=False)
-//    except Exception,e:
-//        try:
-//            self.initDB()
-//            newuser = self.getClazzByTypeName('DBEUser')(attrs={'login':user,'pwd':pwd})
-//            newuser = self.insert(newuser)
-//            searchGroup = self.getClazzByTypeName('DBEGroup')(attrs={'name':user})
-//            newgroup = self.search(searchGroup,uselike=False)[0]
-//            if self._verbose: print "DBMgr.login: newuser=%s" % ( newuser )
-//            newfolder = self.getClazzByTypeName('DBEFolder')(attrs={\
-//                'owner':newuser.getValue('id'),\
-//                'group_id':newgroup.getValue('id'),\
-//                'creator':newuser.getValue('id'),\
-//                'last_modify':newuser.getValue('id'),\
-//                'name':user})
-//            newfolder = self.insert(newfolder)
-//            if self._verbose: print "DBMgr.login: newfolder=%s" % ( newfolder )
-//            ret = self.search(cerca,uselike=False)
 }
 
+DBEntity* DBMgr::relogin() {
+    if(this->_dbeuser==0)
+        return 0;
+    string login_field("login"); string pwd_field("pwd");
+    string login(this->_dbeuser->getField(&login_field)->getStringValue()->c_str());
+    string pwd(this->_dbeuser->getField(&pwd_field)->getStringValue()->c_str());
+    return this->login(login,pwd);
+//    myuser = self.getDBEUser()
+//    if myuser is None:
+//        return False
+//    return self.login( myuser.getValue('login'), myuser.getValue('pwd') )
+}
 void DBMgr::addGroup(const string& group_id) {
     vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), group_id);
     if(i==this->_user_groups_list.end()) {
