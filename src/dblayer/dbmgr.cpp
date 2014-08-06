@@ -57,6 +57,9 @@ DBMgr::DBMgr(Connection* con, bool verbose) {
 
 DBMgr::~DBMgr() {
     if( this->verbose ) { cout << "DBMgr::~DBMgr: inizio." << endl; }
+    if(this->_dbeuser!=0) {
+        delete this->_dbeuser;
+    }
     this->disconnect();
     if( this->verbose ) { cout << "DBMgr::~DBMgr: fine." << endl; }
 }
@@ -581,8 +584,58 @@ DBEntity* DBMgr::login(string user,string pwd) {
         this->rs2dbelist(userRs,&nome_tabella,&list);
         //qDebug() << userRs;
 
-        //this->_dbeuser = ... ;
+        if(list.size()!=1) {
+            if( this->verbose ) { cout << "DBMgr::login: ERROR - list.size=" << list.size() << endl; }
+            return 0;
+        }
+        this->_dbeuser = list.at(0);
+        list.clear();
+
+        this->_loadUserGroups();
+        return this->_dbeuser;
     }
+    if(pwd.length()==0 || user.length()==0) {
+        if( this->verbose ) { cout << "DBMgr::login: ERROR - Missing username or password" << endl; }
+        return this->_dbeuser;
+    }
+    string mytypename("DBEUser"); string login_field("login"); string pwd_field("pwd");
+    DBEntity* cerca = this->getClazzByTypeName(&mytypename);
+    cerca->setValue(&login_field,&user);
+    cerca->setValue(&pwd_field,&pwd);
+
+    DBEntityVector* lista = this->Search(cerca,false);
+
+    if(lista->size()!=1) {
+        if( this->verbose ) { cout << "DBMgr::login: ERROR - lista.size=" << lista->size() << endl; }
+        return 0;
+    }
+    this->_dbeuser = lista->at(0);
+    lista->clear();
+    this->Destroy(lista);
+
+    this->_loadUserGroups();
+    return this->_dbeuser;
+//    cerca = self.getClazzByTypeName('DBEUser')(attrs={'login':user,'pwd':pwd})
+//    ret = []
+//    try:
+//        ret = self.search(cerca,uselike=False)
+//    except Exception,e:
+//        try:
+//            self.initDB()
+//            newuser = self.getClazzByTypeName('DBEUser')(attrs={'login':user,'pwd':pwd})
+//            newuser = self.insert(newuser)
+//            searchGroup = self.getClazzByTypeName('DBEGroup')(attrs={'name':user})
+//            newgroup = self.search(searchGroup,uselike=False)[0]
+//            if self._verbose: print "DBMgr.login: newuser=%s" % ( newuser )
+//            newfolder = self.getClazzByTypeName('DBEFolder')(attrs={\
+//                'owner':newuser.getValue('id'),\
+//                'group_id':newgroup.getValue('id'),\
+//                'creator':newuser.getValue('id'),\
+//                'last_modify':newuser.getValue('id'),\
+//                'name':user})
+//            newfolder = self.insert(newfolder)
+//            if self._verbose: print "DBMgr.login: newfolder=%s" % ( newfolder )
+//            ret = self.search(cerca,uselike=False)
 }
 
 void DBMgr::addGroup(const string& group_id) {

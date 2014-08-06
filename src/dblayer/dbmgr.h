@@ -49,41 +49,6 @@
 namespace DBLayer {
 
 class DECLSPECIFIER DBMgr {
-    private:
-        Connection* con;
-        bool verbose;
-        DBEFactory* dbeFactory;
-        string _schema;
-        DBEntity* _dbeuser;
-        vector<string> _user_groups_list;
-
-        void _loadUserGroups();
-
-        void rs2dbelist(ResultSet* res, string *nomeTabella, DBEntityVector* ret);
-
-        string _buildTableName(DBEntity* dbe);
-        string _buildKeysCondition(DBEntity* dbe);
-        string _buildInsertString(DBEntity* dbe);
-        string _buildUpdateString(DBEntity* dbe);
-        string _buildDeleteString(DBEntity* dbe);
-        string _buildSelectString(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
-        StringVector _buildWhereCondition(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
-
-    protected:
-        string name;
-        string errorMessage;
-
-        virtual string escapeString(string s);
-        virtual string quoteDate(string s);
-        virtual DBEntity* _before_insert(DBEntity* dbe);
-        virtual DBEntity* _after_insert(DBEntity* dbe);
-        virtual DBEntity* _before_update(DBEntity* dbe);
-        virtual DBEntity* _after_update(DBEntity* dbe);
-        virtual DBEntity* _before_delete(DBEntity* dbe);
-        virtual DBEntity* _after_delete(DBEntity* dbe);
-        virtual DBEntity* _before_copy(DBEntity* dbe);
-        virtual DBEntity* _after_copy(DBEntity* dbe);
-
     public:
         static const int MAX_ENTITY = 100;
 
@@ -156,6 +121,42 @@ class DECLSPECIFIER DBMgr {
 
         void setSchema(string schema);
         string getSchema();
+
+  protected:
+    string name;
+    string errorMessage;
+
+    virtual string escapeString(string s);
+    virtual string quoteDate(string s);
+    virtual DBEntity* _before_insert(DBEntity* dbe);
+    virtual DBEntity* _after_insert(DBEntity* dbe);
+    virtual DBEntity* _before_update(DBEntity* dbe);
+    virtual DBEntity* _after_update(DBEntity* dbe);
+    virtual DBEntity* _before_delete(DBEntity* dbe);
+    virtual DBEntity* _after_delete(DBEntity* dbe);
+    virtual DBEntity* _before_copy(DBEntity* dbe);
+    virtual DBEntity* _after_copy(DBEntity* dbe);
+
+  private:
+    Connection* con;
+    bool verbose;
+    DBEFactory* dbeFactory;
+    string _schema;
+    DBEntity* _dbeuser;
+    vector<string> _user_groups_list;
+
+    void _loadUserGroups();
+
+    void rs2dbelist(ResultSet* res, string *nomeTabella, DBEntityVector* ret);
+
+    string _buildTableName(DBEntity* dbe);
+    string _buildKeysCondition(DBEntity* dbe);
+    string _buildInsertString(DBEntity* dbe);
+    string _buildUpdateString(DBEntity* dbe);
+    string _buildDeleteString(DBEntity* dbe);
+    string _buildSelectString(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
+    StringVector _buildWhereCondition(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
+
 };
 
 }
