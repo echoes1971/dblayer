@@ -576,8 +576,11 @@ void DBMgr::_loadUserGroups() {
 }
 
 DBEntity* DBMgr::login(const string user, const string pwd) {
+    this->errorMessage.clear();
+
     if(this->con->isProxy()) {
         ResultSet* userRs = this->con->login(user,pwd);
+        this->errorMessage = this->con->getErrorMessage();
         string nome_tabella("users");
         DBEntityVector list;
 
@@ -596,6 +599,7 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
     }
     if(pwd.length()==0 || user.length()==0) {
         if( this->verbose ) { cout << "DBMgr::login: ERROR - Missing username or password" << endl; }
+        this->errorMessage = "Missing username or password";
         return this->_dbeuser;
     }
     string mytypename("DBEUser"); string login_field("login"); string pwd_field("pwd");
@@ -627,6 +631,7 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
     //        ret = self.search(cerca,uselike=False)
 
     if(lista->size()!=1) {
+        this->errorMessage = "Wrong user or password";
         if( this->verbose ) { cout << "DBMgr::login: ERROR - lista.size=" << lista->size() << endl; }
         return 0;
     }
@@ -646,6 +651,8 @@ DBEntity* DBMgr::relogin() {
     string pwd(this->_dbeuser->getField(&pwd_field)->getStringValue()->c_str());
     return this->login(login,pwd);
 }
+
+bool DBMgr::isLoggedIn() { return this->_dbeuser!=0; }
 
 string DBMgr::getServerIDString() {
     string d(this->getConnection()->getDBType());

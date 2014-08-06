@@ -234,8 +234,10 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     DBLayer::Connection* con;
     DBMgr* dbmgr;
 
+    cout << "connString: " << connString << endl;
     con = DBLayer::createConnection( connString.c_str() );
-    dbmgr = new DBLayer::DBMgr(con, false);
+    cout << "con.dbtype: " << con->getDBType() << "; con.isProxy=" << (con->isProxy()?"true":"false") << endl;
+    dbmgr = new DBLayer::DBMgr(con, true);
 
     if ( dbmgr->connect() ) {
 
@@ -243,23 +245,27 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
             dbmgr->login(loginUser,loginPwd); //con->login(loginUser,loginPwd);
         }
 
-        string nomeTabella = string("test_dblayer");
-        string myQuery = string("select * from test_dblayer");
-        DBEntityVector* lista = dbmgr->Select( &nomeTabella, &myQuery );
+        if(dbmgr->isLoggedIn()) {
+            string nomeTabella = string("test_dblayer");
+            string myQuery = string("select * from test_dblayer");
+            DBEntityVector* lista = dbmgr->Select( &nomeTabella, &myQuery );
 
-        if ( lista->size()>0 ) {
-            cout << "Lista (" << typeid(lista).name() << ") di " << lista->size() << " elementi:" << endl;
-            for(const auto& elem : (*lista)) {
-                cout << "- " << elem->toString() << endl;
+            if ( lista->size()>0 ) {
+                cout << "Lista (" << typeid(lista).name() << ") di " << lista->size() << " elementi:" << endl;
+                for(const auto& elem : (*lista)) {
+                    cout << "- " << elem->toString() << endl;
+                }
+                cout << "====" << endl;
+            } else {
+                cout << "testDBMgr: LISTA VUOTA!!!" << endl;
             }
-            cout << "====" << endl;
-        } else {
-            cout << "testDBMgr: LISTA VUOTA!!!" << endl;
-        }
 
-        cout << "testDBMgr: destroying lista..." << endl;
-        DBMgr::Destroy(lista);
-        cout << "OK!" << endl;
+            cout << "testDBMgr: destroying lista..." << endl;
+            DBMgr::Destroy(lista);
+            cout << "OK!" << endl;
+        } else {
+            cout << "Errore: " << dbmgr->getErrorMessage() << endl;
+        }
     } else {
         cout << "Errore: " << dbmgr->getErrorMessage() << endl;
     }
@@ -701,6 +707,7 @@ int main(int argc, char *argv[]) {
     } else {
         testDBMgr( connString, login_user, login_password );
     }
+    printf("\n");
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );

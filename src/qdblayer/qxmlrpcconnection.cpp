@@ -388,7 +388,7 @@ QXmlrpcResultSet* QXmlrpcConnection::list2resultset(QList<QVariant>* iLista, QXm
 
 // **************** Proxy Connections *********************
 // The proxy connections are used by DBMgr to execute the following methods
-bool QXmlrpcConnection::isProxy() { return true; }
+bool QXmlrpcConnection::isProxy() const { return true; }
 DBEntity* QXmlrpcConnection::Insert(DBEntity *dbe) {
     //printf("%0x::QXmlrpcConnection::Insert: start.\n",(int) QThread::currentThread());
     this->errorMessage.clear();

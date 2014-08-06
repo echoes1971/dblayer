@@ -101,8 +101,8 @@ class DECLSPECIFIER DBMgr {
         string ping();
 
         DBEntity* login(const string user,const string pwd);
-
         DBEntity* relogin();
+        bool isLoggedIn();
 
         /** Returns a string uniquely identifying the user and the connection */
         string getServerIDString();

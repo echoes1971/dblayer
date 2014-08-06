@@ -55,7 +55,7 @@ class QXmlrpcConnection : public QObject , public Connection {
 
     // **************** Proxy Connections :: 20091015: start. *********************
     // The proxy connections are used by DBMgr to execute the following methods
-    virtual bool isProxy();
+    virtual bool isProxy() const;
     virtual DBEntity* Insert(DBEntity *dbe);
     virtual DBEntity* Update(DBEntity *dbe);
     virtual DBEntity* Delete(DBEntity *dbe);
