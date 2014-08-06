@@ -645,11 +645,28 @@ DBEntity* DBMgr::relogin() {
     string login(this->_dbeuser->getField(&login_field)->getStringValue()->c_str());
     string pwd(this->_dbeuser->getField(&pwd_field)->getStringValue()->c_str());
     return this->login(login,pwd);
-//    myuser = self.getDBEUser()
-//    if myuser is None:
-//        return False
-//    return self.login( myuser.getValue('login'), myuser.getValue('pwd') )
 }
+
+string DBMgr::getServerIDString() {
+    string d(this->getConnection()->getDBType());
+    string u("nobody");
+    if(this->_dbeuser!=0) {
+        string login_field("login");
+        u = string(this->_dbeuser->getField(&login_field)->getStringValue()->c_str());
+    }
+    string h(this->getConnection()->getConnectionString());
+    // TODO
+//    if d=="SQLite":
+//        h = ( "%s" % self.getConnectionProvider().getDB() ).split( os.path.sep )[-1]
+//    if h.find("://")>0:
+//        _url = h.split("://")
+//        if len(_url)>1:
+//            h = "%s:%s" % ( _url[0],_url[1].split("/")[0] )
+    string ret("");
+    ret.append(u.c_str()); ret.append("@"); ret.append(h.c_str());
+    return ret;
+}
+
 void DBMgr::addGroup(const string& group_id) {
     vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), group_id);
     if(i==this->_user_groups_list.end()) {

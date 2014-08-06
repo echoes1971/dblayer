@@ -37,6 +37,7 @@ class QXmlrpcConnection : public QObject , public Connection {
     virtual string getColumnName(string* relname, int column);
     virtual IntegerVector getKeys(string* relname);
     virtual IntegerVector getForeignKeys(string* relname);
+    inline string getDBType() { return "QXmlrpc"; }
 
     virtual ResultSet* login(string user, string pwd);
 

@@ -101,7 +101,12 @@ class DECLSPECIFIER DBMgr {
         string ping();
 
         DBEntity* login(const string user,const string pwd);
+
         DBEntity* relogin();
+
+        /** Returns a string uniquely identifying the user and the connection */
+        string getServerIDString();
+
 //        def getUserGroupsList(self):
 //            return self.user_groups_list
 //        def setUserGroupsList(self,user_groups_list):

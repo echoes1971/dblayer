@@ -61,6 +61,8 @@ namespace DBLayer {
 
 		virtual string quoteDate(string s);
 
+        inline string getDBType() { return "ODBC"; }
+
 	  private:
 		RETCODE rc;		// ODBC return code
 		SQLHENV henv;	// Environment

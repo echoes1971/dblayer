@@ -60,6 +60,7 @@ namespace DBLayer {
         virtual string getColumnName(string* relname, int column);
         virtual IntegerVector getKeys(string* relname);
         virtual IntegerVector getForeignKeys(string* relname);
+        inline string getDBType() { return "MYSQL"; }
 
     private:
         MYSQL* db;

@@ -61,6 +61,8 @@ class DECLSPECIFIER XmlrpcConnection : public Connection {
     virtual IntegerVector getKeys(string* relname);
     virtual IntegerVector getForeignKeys(string* relname);
 
+    inline string getDBType() { return "Xmlrpc"; }
+
     virtual ResultSet* login(string user, string pwd);
 
     static XmlrpcResultSet* list2resultset(xmlrpc_c::value_array* iLista, XmlrpcResultSet* ioResultSet);

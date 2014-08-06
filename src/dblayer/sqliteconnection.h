@@ -61,6 +61,7 @@ namespace DBLayer {
     string getColumnName(string* relname, int column);
     IntegerVector getKeys(string* relname);
     IntegerVector getForeignKeys(string* relname);
+    inline string getDBType() { return "SQLite"; }
     // Override: end.
 
 	  private:

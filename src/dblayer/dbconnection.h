@@ -133,6 +133,8 @@ namespace DBLayer {
             virtual bool disconnect();
             bool isConnected() const;
 
+            inline const string getConnectionString() { return this->connectionString; }
+
             virtual ResultSet* login(string user, string pwd);
 
             virtual ResultSet* exec(const string s);
@@ -159,8 +161,8 @@ namespace DBLayer {
             virtual string getFormSchema(string language="python");
             virtual string getDBSchema(string language="python");
             virtual string getSchemaName();
+            virtual string getDBType();
 
-            
             // **************** Proxy Connections: start. *********************
             // The proxy connections are used by DBMgr to execute the following methods
             virtual bool isProxy() const;
@@ -198,6 +200,8 @@ namespace DBLayer {
         int getColumnSize(string* relname);
         string getColumnName(string* relname, int column);
         IntegerVector getKeys(string* relname);
+
+        inline string getDBType() { return "POSTGRESQL"; }
         // Overridden: end.
 
                 // PG Functions

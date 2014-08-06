@@ -132,6 +132,7 @@ ResultSet* Connection::login(string user, string pwd) { return new ResultSet(); 
 string Connection::getFormSchema(string language) { return "Connection::getFormSchema: NOT SUPPORTED - " + language; }
 string Connection::getDBSchema(string language) { return "Connection::getDBSchema: NOT SUPPORTED - " + language; }
 string Connection::getSchemaName() { return "Connection::getSchemaName: NOT SUPPORTED"; }
+string Connection::getDBType() { return "generic"; }
 
 ResultSet* Connection::exec(const string s) { return new ResultSet(); }
 
