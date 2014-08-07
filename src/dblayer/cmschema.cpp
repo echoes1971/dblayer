@@ -15,10 +15,10 @@ DBFieldVector DBEObject::chiavi = DBEObject::___init_keys();
 DBFieldVector DBEObject::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEObject::chiave1 ); return ret; }
 DBEObject::DBEObject() { this->tableName.clear(); }
 DBEObject::~DBEObject() {}
-string DBEObject::name() { return "DBEObject"; }
-string DBEObject::getTableName() { return "objects"; }
-DBFieldVector* DBEObject::getKeys() { return &DBEObject::chiavi; }
-DBEObject* DBEObject::createNewInstance() { return new DBEObject(); }
+string DBEObject::name() const { return "DBEObject"; }
+string DBEObject::getTableName() const { return "objects"; }
+DBFieldVector* DBEObject::getKeys() const { return &DBEObject::chiavi; }
+DBEObject* DBEObject::createNewInstance() const { return new DBEObject(); }
 //*********************** DBEObject: end.
 
 //*********************** DBECountry: start.
@@ -28,10 +28,10 @@ DBFieldVector DBECountry::chiavi = DBECountry::___init_keys();
 DBFieldVector DBECountry::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBECountry::chiave1 ); return ret; }
 DBECountry::DBECountry() { this->tableName.clear(); }
 DBECountry::~DBECountry() {}
-string DBECountry::name() { return "DBECountry"; }
-string DBECountry::getTableName() { return "countrylist"; }
-DBFieldVector* DBECountry::getKeys() { return &DBECountry::chiavi; }
-DBECountry* DBECountry::createNewInstance() { return new DBECountry(); }
+string DBECountry::name() const { return "DBECountry"; }
+string DBECountry::getTableName() const { return "countrylist"; }
+DBFieldVector* DBECountry::getKeys() const { return &DBECountry::chiavi; }
+DBECountry* DBECountry::createNewInstance() const { return new DBECountry(); }
 //*********************** DBECountry: end.
 
 //*********************** DBECompany: start.
@@ -41,10 +41,10 @@ DBFieldVector DBECompany::chiavi = DBECompany::___init_keys();
 DBFieldVector DBECompany::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBECompany::chiave1 ); return ret; }
 DBECompany::DBECompany() { this->tableName.clear(); }
 DBECompany::~DBECompany() {}
-string DBECompany::name() { return "DBECompany"; }
-string DBECompany::getTableName() { return "companies"; }
-DBFieldVector* DBECompany::getKeys() { return &DBECompany::chiavi; }
-DBECompany* DBECompany::createNewInstance() { return new DBECompany(); }
+string DBECompany::name() const { return "DBECompany"; }
+string DBECompany::getTableName() const { return "companies"; }
+DBFieldVector* DBECompany::getKeys() const { return &DBECompany::chiavi; }
+DBECompany* DBECompany::createNewInstance() const { return new DBECompany(); }
 //*********************** DBECompany: end.
 
 //*********************** DBEPeople: start.
@@ -54,10 +54,10 @@ DBFieldVector DBEPeople::chiavi = DBEPeople::___init_keys();
 DBFieldVector DBEPeople::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEPeople::chiave1 ); return ret; }
 DBEPeople::DBEPeople() { this->tableName.clear(); }
 DBEPeople::~DBEPeople() {}
-string DBEPeople::name() { return "DBEPeople"; }
-string DBEPeople::getTableName() { return "people"; }
-DBFieldVector* DBEPeople::getKeys() { return &DBEPeople::chiavi; }
-DBEPeople* DBEPeople::createNewInstance() { return new DBEPeople(); }
+string DBEPeople::name() const { return "DBEPeople"; }
+string DBEPeople::getTableName() const { return "people"; }
+DBFieldVector* DBEPeople::getKeys() const { return &DBEPeople::chiavi; }
+DBEPeople* DBEPeople::createNewInstance() const { return new DBEPeople(); }
 //*********************** DBEPeople: end.
 
 
@@ -70,10 +70,10 @@ DBFieldVector DBEFile::chiavi = DBEFile::___init_keys();
 DBFieldVector DBEFile::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEFile::chiave1 ); return ret; }
 DBEFile::DBEFile() { this->tableName.clear(); }
 DBEFile::~DBEFile() {}
-string DBEFile::name() { return "DBEFile"; }
-string DBEFile::getTableName() { return "files"; }
-DBFieldVector* DBEFile::getKeys() { return &DBEFile::chiavi; }
-DBEFile* DBEFile::createNewInstance() { return new DBEFile(); }
+string DBEFile::name() const { return "DBEFile"; }
+string DBEFile::getTableName() const { return "files"; }
+DBFieldVector* DBEFile::getKeys() const { return &DBEFile::chiavi; }
+DBEFile* DBEFile::createNewInstance() const { return new DBEFile(); }
 //*********************** DBEFile: end.
 
 //*********************** DBEFolder: start.
@@ -83,10 +83,10 @@ DBFieldVector DBEFolder::chiavi = DBEFolder::___init_keys();
 DBFieldVector DBEFolder::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEFolder::chiave1 ); return ret; }
 DBEFolder::DBEFolder() { this->tableName.clear(); }
 DBEFolder::~DBEFolder() {}
-string DBEFolder::name() { return "DBEFolder"; }
-string DBEFolder::getTableName() { return "folders"; }
-DBFieldVector* DBEFolder::getKeys() { return &DBEFolder::chiavi; }
-DBEFolder* DBEFolder::createNewInstance() { return new DBEFolder(); }
+string DBEFolder::name() const { return "DBEFolder"; }
+string DBEFolder::getTableName() const { return "folders"; }
+DBFieldVector* DBEFolder::getKeys() const { return &DBEFolder::chiavi; }
+DBEFolder* DBEFolder::createNewInstance() const { return new DBEFolder(); }
 //*********************** DBEFolder: end.
 
 //*********************** DBELink: start.
@@ -96,10 +96,10 @@ DBFieldVector DBELink::chiavi = DBELink::___init_keys();
 DBFieldVector DBELink::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBELink::chiave1 ); return ret; }
 DBELink::DBELink() { this->tableName.clear(); }
 DBELink::~DBELink() {}
-string DBELink::name() { return "DBELink"; }
-string DBELink::getTableName() { return "links"; }
-DBFieldVector* DBELink::getKeys() { return &DBELink::chiavi; }
-DBELink* DBELink::createNewInstance() { return new DBELink(); }
+string DBELink::name() const { return "DBELink"; }
+string DBELink::getTableName() const { return "links"; }
+DBFieldVector* DBELink::getKeys() const { return &DBELink::chiavi; }
+DBELink* DBELink::createNewInstance() const { return new DBELink(); }
 //*********************** DBELink: end.
 
 //*********************** DBENote: start.
@@ -109,10 +109,10 @@ DBFieldVector DBENote::chiavi = DBENote::___init_keys();
 DBFieldVector DBENote::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBENote::chiave1 ); return ret; }
 DBENote::DBENote() { this->tableName.clear(); }
 DBENote::~DBENote() {}
-string DBENote::name() { return "DBENote"; }
-string DBENote::getTableName() { return "notes"; }
-DBFieldVector* DBENote::getKeys() { return &DBENote::chiavi; }
-DBENote* DBENote::createNewInstance() { return new DBENote(); }
+string DBENote::name() const { return "DBENote"; }
+string DBENote::getTableName() const { return "notes"; }
+DBFieldVector* DBENote::getKeys() const { return &DBENote::chiavi; }
+DBENote* DBENote::createNewInstance() const { return new DBENote(); }
 //*********************** DBENote: end.
 
 //*********************** DBEPage: start.
@@ -122,10 +122,10 @@ DBFieldVector DBEPage::chiavi = DBEPage::___init_keys();
 DBFieldVector DBEPage::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEPage::chiave1 ); return ret; }
 DBEPage::DBEPage() { this->tableName.clear(); }
 DBEPage::~DBEPage() {}
-string DBEPage::name() { return "DBEPage"; }
-string DBEPage::getTableName() { return "pages"; }
-DBFieldVector* DBEPage::getKeys() { return &DBEPage::chiavi; }
-DBEPage* DBEPage::createNewInstance() { return new DBEPage(); }
+string DBEPage::name() const { return "DBEPage"; }
+string DBEPage::getTableName() const { return "pages"; }
+DBFieldVector* DBEPage::getKeys() const { return &DBEPage::chiavi; }
+DBEPage* DBEPage::createNewInstance() const { return new DBEPage(); }
 //*********************** DBEPage: end.
 
 string CMSchema::getSchema() { return "cm"; }

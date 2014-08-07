@@ -19,10 +19,10 @@ namespace CMSchema {
     public:
     DBEObject();
       virtual ~DBEObject();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBEObject* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBEObject* createNewInstance() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
@@ -34,10 +34,10 @@ namespace CMSchema {
     public:
     DBECountry();
       virtual ~DBECountry();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBECountry* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBECountry* createNewInstance() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
@@ -49,10 +49,10 @@ namespace CMSchema {
     public:
     DBECompany();
       virtual ~DBECompany();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBECompany* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBECompany* createNewInstance() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
@@ -64,10 +64,10 @@ namespace CMSchema {
     public:
     DBEPeople();
       virtual ~DBEPeople();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBEPeople* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBEPeople* createNewInstance() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
@@ -79,10 +79,10 @@ namespace CMSchema {
     public:
     DBEFile();
       virtual ~DBEFile();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBEFile* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBEFile* createNewInstance() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
@@ -94,10 +94,10 @@ namespace CMSchema {
     public:
     DBEFolder();
       virtual ~DBEFolder();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBEFolder* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBEFolder* createNewInstance() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
@@ -109,10 +109,10 @@ namespace CMSchema {
     public:
     DBELink();
       virtual ~DBELink();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBELink* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBELink* createNewInstance() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
@@ -124,10 +124,10 @@ namespace CMSchema {
     public:
     DBENote();
       virtual ~DBENote();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBENote* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBENote* createNewInstance() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
@@ -139,10 +139,10 @@ namespace CMSchema {
     public:
     DBEPage();
       virtual ~DBEPage();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBEPage* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBEPage* createNewInstance() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
