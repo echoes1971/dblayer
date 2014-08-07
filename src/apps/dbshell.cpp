@@ -170,11 +170,11 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
             dbShell->cmdOut.append("    public:\n");
             dbShell->cmdOut.append("    ").append(typeName).append("();\n");
             dbShell->cmdOut.append("      virtual ~").append(typeName).append("();\n");
-            dbShell->cmdOut.append("      virtual string name();\n");
+            dbShell->cmdOut.append("      virtual string name() const;\n");
             if(schemaName.length()>0) dbShell->cmdOut.append("      virtual const string* getSchemaName();\n");
-            dbShell->cmdOut.append("      virtual string getTableName();\n");
-            dbShell->cmdOut.append("      virtual DBFieldVector* getKeys();\n");
-            dbShell->cmdOut.append("      virtual ").append(typeName).append("* createNewInstance();\n");
+            dbShell->cmdOut.append("      virtual string getTableName() const;\n");
+            dbShell->cmdOut.append("      virtual DBFieldVector* getKeys() const;\n");
+            dbShell->cmdOut.append("      virtual ").append(typeName).append("* createNewInstance() const;\n");
             dbShell->cmdOut.append("    private:\n");
             dbShell->cmdOut.append("      static const string nomiCampiChiave[];\n");
             DBLayer::IntegerVector chiavi = dbShell->con->getKeys( &fullTableName );
@@ -275,15 +275,15 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
             dbShell->cmdOut.append(" return ret; }\n");
             dbShell->cmdOut.append("").append(typeName).append("::").append(typeName).append("() { this->tableName.clear(); }\n");
             dbShell->cmdOut.append("").append(typeName).append("::~").append(typeName).append("() {}\n");
-            dbShell->cmdOut.append("string ").append(typeName).append("::name() { return \"").append(typeName).append("\"; }\n");
-            dbShell->cmdOut.append("string ").append(typeName).append("::getTableName() { return \"").append(tableName).append("\"; }\n");
+            dbShell->cmdOut.append("string ").append(typeName).append("::name() const { return \"").append(typeName).append("\"; }\n");
+            dbShell->cmdOut.append("string ").append(typeName).append("::getTableName() const { return \"").append(tableName).append("\"; }\n");
 
             if(schemaName.length()>0)
                     dbShell->cmdOut.append("const string* ").append(typeName).append("::getSchemaName() { static const string __myschema=\"")
                             .append(schemaName)
                             .append("\"; return &__myschema; }\n");
-            dbShell->cmdOut.append("DBFieldVector* ").append(typeName).append("::getKeys() { return &").append(typeName).append("::chiavi; }\n");
-            dbShell->cmdOut.append("").append(typeName).append("* ").append(typeName).append("::createNewInstance() { return new ").append(typeName).append("(); }\n");
+            dbShell->cmdOut.append("DBFieldVector* ").append(typeName).append("::getKeys() const { return &").append(typeName).append("::chiavi; }\n");
+            dbShell->cmdOut.append("").append(typeName).append("* ").append(typeName).append("::createNewInstance() const { return new ").append(typeName).append("(); }\n");
             dbShell->cmdOut.append("//*********************** ").append(typeName).append(": end.\n");
             dbShell->cmdOut.append("\n");
             myRegisterClasses.push_back(
