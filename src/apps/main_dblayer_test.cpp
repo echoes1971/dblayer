@@ -239,6 +239,10 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     cout << "con.dbtype: " << con->getDBType() << "; con.isProxy=" << (con->isProxy()?"true":"false") << endl;
     dbmgr = new DBLayer::DBMgr(con, true);
 
+    DBEFactory dbeFactory(true);
+    AuthSchema::registerClasses(&dbeFactory);
+    dbmgr->setDBEFactory(&dbeFactory);
+
     if ( dbmgr->connect() ) {
 
         if(loginUser.length()>0 && loginPwd.length()>0) {
@@ -246,14 +250,14 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
         }
 
         if(dbmgr->isLoggedIn()) {
-            string nomeTabella = string("test_dblayer");
-            string myQuery = string("select * from test_dblayer");
+            string nomeTabella = string("users"); //test_dblayer");
+            string myQuery = string("select * from rra_users"); //test_dblaye
             DBEntityVector* lista = dbmgr->Select( &nomeTabella, &myQuery );
 
-            if ( lista->size()>0 ) {
+            if(lista->size()>0) {
                 cout << "Lista (" << typeid(lista).name() << ") di " << lista->size() << " elementi:" << endl;
                 for(const auto& elem : (*lista)) {
-                    cout << "- " << elem->toString() << endl;
+                    cout << "- " << elem->toString("\n") << endl;
                 }
                 cout << "====" << endl;
             } else {

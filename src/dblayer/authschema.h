@@ -20,12 +20,12 @@ namespace AuthSchema {
       DBEDBVersion();
       virtual ~DBEDBVersion();
 
-      virtual ColumnDefinitions getColumns();
+      virtual ColumnDefinitions getColumns() const;
 
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBEDBVersion* createNewInstance();
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBEDBVersion* createNewInstance() const;
       virtual DBLayer::StringVector getOrderBy() const;
 
       int version();
@@ -41,12 +41,12 @@ namespace AuthSchema {
     public:
       DBEUser();
       virtual ~DBEUser();
-      virtual ColumnDefinitions getColumns();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual ForeignKeyVector& getFK();
-      virtual DBEUser* createNewInstance();
+      virtual ColumnDefinitions getColumns() const;
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual ForeignKeyVector& getFK() const;
+      virtual DBEUser* createNewInstance() const;
       virtual DBLayer::StringVector getOrderBy() const;
 
       // Custom methods
@@ -77,11 +77,11 @@ namespace AuthSchema {
     public:
       DBEGroup();
       virtual ~DBEGroup();
-      virtual ColumnDefinitions getColumns();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBEGroup* createNewInstance();
+      virtual ColumnDefinitions getColumns() const;
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBEGroup* createNewInstance() const;
       virtual DBLayer::StringVector getOrderBy() const;
 
       // Custom methods
@@ -103,12 +103,12 @@ namespace AuthSchema {
     public:
       DBEUserGroup();
       virtual ~DBEUserGroup();
-      virtual ColumnDefinitions getColumns();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual ForeignKeyVector& getFK();
-      virtual DBEUserGroup* createNewInstance();
+      virtual ColumnDefinitions getColumns() const;
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual ForeignKeyVector& getFK() const;
+      virtual DBEUserGroup* createNewInstance() const;
       virtual DBLayer::StringVector getOrderBy() const;
 
       // Custom methods
@@ -128,11 +128,11 @@ namespace AuthSchema {
     public:
     DBELog();
       virtual ~DBELog();
-      virtual ColumnDefinitions getColumns();
-      virtual string name();
-      virtual string getTableName();
-      virtual DBFieldVector* getKeys();
-      virtual DBELog* createNewInstance();
+      virtual ColumnDefinitions getColumns() const;
+      virtual string name() const;
+      virtual string getTableName() const;
+      virtual DBFieldVector* getKeys() const;
+      virtual DBELog* createNewInstance() const;
       virtual DBLayer::StringVector getOrderBy() const;
     private:
       static ColumnDefinitions _columns;

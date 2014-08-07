@@ -65,7 +65,7 @@ namespace DBLayer {
         virtual ~DBEntity();
 
         string getColumnType(const string& column_name);
-        virtual ColumnDefinitions getColumns();
+        virtual ColumnDefinitions getColumns() const;
         static string dbeType2dbType(const string& dbetype);
         static string dbType2dbeType(const string& dbtype);
         static string dbConstraints2dbeConstraints(map<string,string>& def);
@@ -80,23 +80,23 @@ namespace DBLayer {
 
         /** Returns the table's own schema */
         virtual const string* getSchemaName();
-        virtual string getTableName();
+        virtual string getTableName() const;
         /** Class name */
-        virtual string name();
+        virtual string name() const;
         /**
          * @param valuesAsAttributes
          *  if true, values are represented as attributes
          *  if false, values are represented as nodes
          */
-        virtual string toString(string prefix="", bool valuesAsAttributes=false);
+        virtual string toString(string prefix="", bool valuesAsAttributes=false) const;
 
         /** @return a new DBE instance */
-        virtual DBEntity* createNewInstance();
-        virtual Field* createNewField(const string* fieldName, bool valore);
-        virtual Field* createNewField(const string* fieldName, float valore);
-        virtual Field* createNewField(const string* fieldName, long valore);
-        virtual Field* createNewField(const string* fieldName, const string* valore);
-        virtual Field* createNewDateField(const string* fieldName, const string* valore);
+        virtual DBEntity* createNewInstance() const;
+        virtual Field* createNewField(const string* fieldName, bool valore) const;
+        virtual Field* createNewField(const string* fieldName, float valore) const;
+        virtual Field* createNewField(const string* fieldName, long valore) const;
+        virtual Field* createNewField(const string* fieldName, const string* valore) const;
+        virtual Field* createNewDateField(const string* fieldName, const string* valore) const;
 
         /**	TODO: DEPRECARE?	*/
         void* getValue(string* field);
@@ -110,9 +110,9 @@ namespace DBLayer {
         /** @return the key fields NAMES */
         StringVector getKeyNames() const;
         /** @return true if the field name is key */
-        bool isKey(string fieldName);
+        bool isKey(string fieldName) const;
         /** @return the foreign keys */
-        virtual ForeignKeyVector& getFK();
+        virtual ForeignKeyVector& getFK() const;
         ForeignKeyVector getFKForTable(string tablename);
         /**	Reads the content of the referenced columns in the referenced table
         mapped in the given dbe	*/
@@ -153,7 +153,7 @@ namespace DBLayer {
         static ColumnDefinitions _columns;
         static ForeignKeyVector _fkv;
 
-        string toString_nodes(string prefix);
+        string toString_nodes(string prefix) const;
 
     };
 

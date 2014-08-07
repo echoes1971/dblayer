@@ -56,7 +56,9 @@ void DBEFactory::registerClass(string* tablename, DBEntity* clazz) {
 
 DBEntity* DBEFactory::getClazz(const string* tablename) {
     string nomeTabella(tablename->c_str());
+    if(this->_verbose) cout << "DBEFactory::getClazz: nomeTabella=" << nomeTabella << endl;
     if( this->_cache.find(nomeTabella) != this->_cache.end() ) {
+        if(this->_verbose) cout << "DBEFactory::getClazz: found!" << endl;
         return this->_cache[nomeTabella]->createNewInstance();
     }
     return new DBEntity(tablename);

@@ -11,7 +11,7 @@ using namespace std;
 //*********************** DBEDBVersion: start.
 const string DBEDBVersion::nomiCampiChiave[] = { string("version") };
 ColumnDefinitions DBEDBVersion::_columns;
-ColumnDefinitions DBEDBVersion::getColumns() { return DBEDBVersion::_columns; }
+ColumnDefinitions DBEDBVersion::getColumns() const { return DBEDBVersion::_columns; }
 IntegerField DBEDBVersion::chiave1( (const string*)&DBEDBVersion::nomiCampiChiave[0] );
 DBFieldVector DBEDBVersion::chiavi = DBEDBVersion::___init_keys();
 DBFieldVector DBEDBVersion::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEDBVersion::chiave1 ); return ret; }
@@ -25,10 +25,10 @@ DBEDBVersion::DBEDBVersion() {
     }
 }
 DBEDBVersion::~DBEDBVersion() {}
-string DBEDBVersion::name() { return "DBEDBVersion"; }
-string DBEDBVersion::getTableName() { return "dbversion"; }
-DBFieldVector* DBEDBVersion::getKeys() { return &DBEDBVersion::chiavi; }
-DBEDBVersion* DBEDBVersion::createNewInstance() { return new DBEDBVersion(); }
+string DBEDBVersion::name() const { return "DBEDBVersion"; }
+string DBEDBVersion::getTableName() const { return "dbversion"; }
+DBFieldVector* DBEDBVersion::getKeys() const { return &DBEDBVersion::chiavi; }
+DBEDBVersion* DBEDBVersion::createNewInstance() const { return new DBEDBVersion(); }
 
 DBLayer::StringVector DBEDBVersion::getOrderBy() const {
     static DBLayer::StringVector ret({"version"});
@@ -46,7 +46,7 @@ int DBEDBVersion::version() {
 const string DBEUser::nomiCampiChiave[] = { string("id") };
 ColumnDefinitions DBEUser::_columns;
 ForeignKeyVector DBEUser::_fkv;
-ColumnDefinitions DBEUser::getColumns() { return DBEUser::_columns; }
+ColumnDefinitions DBEUser::getColumns() const { return DBEUser::_columns; }
 StringField DBEUser::chiave1( (const string*)&DBEUser::nomiCampiChiave[0] );
 DBFieldVector DBEUser::chiavi = DBEUser::___init_keys();
 DBFieldVector DBEUser::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEUser::chiave1 ); return ret; }
@@ -65,10 +65,10 @@ DBEUser::DBEUser() {
     }
 }
 DBEUser::~DBEUser() {}
-string DBEUser::name() { return "DBEUser"; }
-string DBEUser::getTableName() { return "users"; }
-DBFieldVector* DBEUser::getKeys() { return &DBEUser::chiavi; }
-ForeignKeyVector& DBEUser::getFK() {
+string DBEUser::name() const { return "DBEUser"; }
+string DBEUser::getTableName() const { return "users"; }
+DBFieldVector* DBEUser::getKeys() const { return &DBEUser::chiavi; }
+ForeignKeyVector& DBEUser::getFK() const {
     if(_fkv.size()==0) {
         for(const auto& fk : DBEntity::getFK()) {
             _fkv.push_back(fk);
@@ -77,7 +77,7 @@ ForeignKeyVector& DBEUser::getFK() {
     }
     return _fkv;
 }
-DBEUser* DBEUser::createNewInstance() { return new DBEUser(); }
+DBEUser* DBEUser::createNewInstance() const { return new DBEUser(); }
 DBLayer::StringVector DBEUser::getOrderBy() const {
     static DBLayer::StringVector ret({"fullname"});
     return ret;
@@ -164,7 +164,7 @@ void DBEUser::_checkGroupAssociation(DBMgr* dbmgr) {
 //*********************** DBEGroup: start.
 const string DBEGroup::nomiCampiChiave[] = { string("id") };
 ColumnDefinitions DBEGroup::_columns;
-ColumnDefinitions DBEGroup::getColumns() { return DBEGroup::_columns; }
+ColumnDefinitions DBEGroup::getColumns() const { return DBEGroup::_columns; }
 StringField DBEGroup::chiave1( (const string*)&DBEGroup::nomiCampiChiave[0] );
 DBFieldVector DBEGroup::chiavi = DBEGroup::___init_keys();
 DBFieldVector DBEGroup::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEGroup::chiave1 ); return ret; }
@@ -180,10 +180,10 @@ DBEGroup::DBEGroup() {
     }
 }
 DBEGroup::~DBEGroup() {}
-string DBEGroup::name() { return "DBEGroup"; }
-string DBEGroup::getTableName() { return "groups"; }
-DBFieldVector* DBEGroup::getKeys() { return &DBEGroup::chiavi; }
-DBEGroup* DBEGroup::createNewInstance() { return new DBEGroup(); }
+string DBEGroup::name() const { return "DBEGroup"; }
+string DBEGroup::getTableName() const { return "groups"; }
+DBFieldVector* DBEGroup::getKeys() const { return &DBEGroup::chiavi; }
+DBEGroup* DBEGroup::createNewInstance() const { return new DBEGroup(); }
 
 DBLayer::StringVector DBEGroup::getOrderBy() const {
     static DBLayer::StringVector ret({"name"});
@@ -249,7 +249,7 @@ void DBEGroup::_after_delete(DBMgr* dbmgr) {
 const string DBEUserGroup::nomiCampiChiave[] = { string("user_id"), string("group_id") };
 ColumnDefinitions DBEUserGroup::_columns;
 ForeignKeyVector DBEUserGroup::_fkv;
-ColumnDefinitions DBEUserGroup::getColumns() { return DBEUserGroup::_columns; }
+ColumnDefinitions DBEUserGroup::getColumns() const { return DBEUserGroup::_columns; }
 StringField DBEUserGroup::chiave1( (const string*)&DBEUserGroup::nomiCampiChiave[0] );
 StringField DBEUserGroup::chiave2( (const string*)&DBEUserGroup::nomiCampiChiave[1] );
 DBFieldVector DBEUserGroup::chiavi = DBEUserGroup::___init_keys();
@@ -265,10 +265,10 @@ DBEUserGroup::DBEUserGroup() {
     }
 }
 DBEUserGroup::~DBEUserGroup() {}
-string DBEUserGroup::name() { return "DBEUserGroup"; }
-string DBEUserGroup::getTableName() { return "users_groups"; }
-DBFieldVector* DBEUserGroup::getKeys() { return &DBEUserGroup::chiavi; }
-ForeignKeyVector& DBEUserGroup::getFK() {
+string DBEUserGroup::name() const { return "DBEUserGroup"; }
+string DBEUserGroup::getTableName() const { return "users_groups"; }
+DBFieldVector* DBEUserGroup::getKeys() const { return &DBEUserGroup::chiavi; }
+ForeignKeyVector& DBEUserGroup::getFK() const {
     if(_fkv.size()==0) {
         for(const auto& fk : DBEntity::getFK()) {
             _fkv.push_back(fk);
@@ -279,7 +279,7 @@ ForeignKeyVector& DBEUserGroup::getFK() {
     return _fkv;
 }
 
-DBEUserGroup* DBEUserGroup::createNewInstance() { return new DBEUserGroup(); }
+DBEUserGroup* DBEUserGroup::createNewInstance() const { return new DBEUserGroup(); }
 
 DBLayer::StringVector DBEUserGroup::getOrderBy() const {
     static DBLayer::StringVector ret({"user_id","group_id"});
@@ -302,7 +302,7 @@ vector<map<string,string> > DBEUserGroup::getDefaultEntries() const {
 //*********************** DBELog: start.
 const string DBELog::nomiCampiChiave[] = { string("ip"), string("data") };
 ColumnDefinitions DBELog::_columns;
-ColumnDefinitions DBELog::getColumns() { return DBELog::_columns; }
+ColumnDefinitions DBELog::getColumns() const { return DBELog::_columns; }
 StringField DBELog::chiave1( (const string*)&DBELog::nomiCampiChiave[0] );
 StringField DBELog::chiave2( (const string*)&DBELog::nomiCampiChiave[1] );
 DBFieldVector DBELog::chiavi = DBELog::___init_keys();
@@ -323,10 +323,10 @@ DBELog::DBELog() {
     }
 }
 DBELog::~DBELog() {}
-string DBELog::name() { return "DBELog"; }
-string DBELog::getTableName() { return "log"; }
-DBFieldVector* DBELog::getKeys() { return &DBELog::chiavi; }
-DBELog* DBELog::createNewInstance() { return new DBELog(); }
+string DBELog::name() const { return "DBELog"; }
+string DBELog::getTableName() const { return "log"; }
+DBFieldVector* DBELog::getKeys() const { return &DBELog::chiavi; }
+DBELog* DBELog::createNewInstance() const { return new DBELog(); }
 DBLayer::StringVector DBELog::getOrderBy() const {
     static DBLayer::StringVector ret({"data desc", "ora desc"});
     return ret;

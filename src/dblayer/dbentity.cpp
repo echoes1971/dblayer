@@ -47,11 +47,11 @@ DBEntity::DBEntity(const string* tableName) {
 }
 DBEntity::~DBEntity() {}
 const string* DBEntity::getSchemaName() { return 0; }
-string DBEntity::getTableName() { return string(tableName); }
+string DBEntity::getTableName() const { return string(tableName); }
 
-string DBEntity::name() { return "DBEntity"; }
+string DBEntity::name() const { return "DBEntity"; }
 
-string DBEntity::toString_nodes(string prefix) {
+string DBEntity::toString_nodes(string prefix) const {
     string ret( prefix + "<" );
     ret.append( this->name() ); ret.append( " " );
     // Keys
@@ -160,7 +160,7 @@ string DBEntity::toString_nodes(string prefix) {
     return ret;
 }
 
-string DBEntity::toString(string prefix, bool valuesAsAttributes) {
+string DBEntity::toString(string prefix, bool valuesAsAttributes) const {
     if ( !valuesAsAttributes) {
         return toString_nodes(prefix);
     }
@@ -265,7 +265,7 @@ DBLayer::StringVector DBEntity::getKeyNames() const {
     }
     return ret;
 }
-bool DBEntity::isKey(string fieldName) {
+bool DBEntity::isKey(string fieldName) const {
     StringVector chiavi = this->getKeyNames();
     bool found = false;
     for(unsigned int i=0; i<chiavi.size() && !found; i++) {
@@ -274,14 +274,14 @@ bool DBEntity::isKey(string fieldName) {
     return found;
 }
 
-DBEntity* DBEntity::createNewInstance() { return new DBEntity(); }
-Field* DBEntity::createNewField(const string* fieldName, bool valore) { return new BooleanField(fieldName, valore); }
-Field* DBEntity::createNewField(const string* fieldName, float valore) { return new FloatField(fieldName, valore); }
-Field* DBEntity::createNewField(const string* fieldName, long valore) { return new IntegerField(fieldName, valore); }
-Field* DBEntity::createNewField(const string* fieldName, const string* valore) { return new StringField(fieldName, valore); }
-Field* DBEntity::createNewDateField(const string* fieldName, const string* valore) { return new DateField(fieldName, valore); }
+DBEntity* DBEntity::createNewInstance() const { return new DBEntity(); }
+Field* DBEntity::createNewField(const string* fieldName, bool valore) const { return new BooleanField(fieldName, valore); }
+Field* DBEntity::createNewField(const string* fieldName, float valore) const { return new FloatField(fieldName, valore); }
+Field* DBEntity::createNewField(const string* fieldName, long valore) const { return new IntegerField(fieldName, valore); }
+Field* DBEntity::createNewField(const string* fieldName, const string* valore) const { return new StringField(fieldName, valore); }
+Field* DBEntity::createNewDateField(const string* fieldName, const string* valore) const { return new DateField(fieldName, valore); }
 
-ForeignKeyVector& DBEntity::getFK() { return DBEntity::_fkv; }
+ForeignKeyVector& DBEntity::getFK() const { return DBEntity::_fkv; }
 ForeignKeyVector DBEntity::getFKForTable(string tablename) {
     ForeignKeyVector& fks = this->getFK();
     ForeignKeyVector ret;
@@ -394,7 +394,7 @@ string DBEntity::getColumnType(const string& column_name) {
         return "";
     }
 }
-ColumnDefinitions DBEntity::getColumns() { return DBEntity::_columns; }
+ColumnDefinitions DBEntity::getColumns() const { return DBEntity::_columns; }
 string DBEntity::dbeType2dbType(const string& dbetype) {
     string ret = dbetype;
     if(dbetype=="int")

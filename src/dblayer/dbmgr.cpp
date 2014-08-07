@@ -458,8 +458,11 @@ DBEntityVector* DBMgr::Select(const string* tableName, const string* searchStrin
     if(this->con->isProxy()) {
         DBEntityVector* ret = 0;
         string* nomeTabella = new string( tableName->c_str() );
+        if( this->verbose ) cout << "DBMgr::Select: nomeTabella=" << *nomeTabella << endl;
         DBEntity* dbe = this->getClazz(nomeTabella);
+        if( this->verbose ) cout << "DBMgr::Select: dbe=" << dbe->toString() << endl;
         string myTableName = this->_buildTableName(dbe);
+        if( this->verbose ) cout << "DBMgr::Select: myTableName=" << myTableName << endl;
         ret = this->con->Select(dbe,&myTableName,searchString);
         delete dbe;
         delete nomeTabella;
@@ -484,6 +487,7 @@ DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, c
     if(this->verbose) cout << "DBMgr::Search: start." << endl;
     if(this->con->isProxy()) {
         if( this->verbose ) cout << "DBMgr::Search: calling con->Search()" << endl;
+        //if( this->verbose ) cout << "DBMgr::Search: dbe=" << dbe->toString() << endl;
         return this->con->Search(dbe, uselike, caseSensitive, orderBy);
     }
     string myquery = this->_buildSelectString( dbe, uselike, caseSensitive );
@@ -556,6 +560,8 @@ void DBMgr::_loadUserGroups() {
     if(i==this->_user_groups_list.end()) {
         this->_user_groups_list.push_back(user_group_id);
     }
+
+    if(this->verbose) cout << "DBMgr::_loadUserGroups: loaded " << this->_user_groups_list.size() << " groups." << endl;
 
     this->Destroy(lista);
     delete cerca;
