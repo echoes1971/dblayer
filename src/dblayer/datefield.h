@@ -31,10 +31,6 @@
 namespace DBLayer {
 
     class DECLSPECIFIER DateField : public DBField  {
-	  private:
-		long year,month,day,hour,minute,seconds, millis;
-		bool isValidDate(long y, long m, long d);
-		bool isValidHour(long h, long m, long s, long millis);
       public:
 		/** YYYY-MM-DD HH:MM:SS mmm */
     	DateField(const string* nome, const string* valore);
@@ -55,7 +51,11 @@ namespace DBLayer {
         long to_seconds() const;
 		/** Convert to days since 01/01/1970 */
         long to_days() const;
-        virtual Field* createNewInstance(const char* aName=0);
+        virtual Field* createNewInstance(const char* aName=0) const;
+      private:
+        long year,month,day,hour,minute,seconds, millis;
+        bool isValidDate(long y, long m, long d);
+        bool isValidHour(long h, long m, long s, long millis);
     };
 }
 

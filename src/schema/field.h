@@ -142,6 +142,7 @@ namespace SchemaNS {
       private:
         static int fieldCreati;
         static int fieldDistrutti;
+        static string nullString;
     };
 
     DECLSPECIFIER bool operator==(const Field& left, const Field& right);

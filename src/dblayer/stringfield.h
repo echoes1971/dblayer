@@ -34,7 +34,7 @@ namespace DBLayer {
         void setValue(const string* valore);
         const string* getValue();
         string toString();
-        virtual Field* createNewInstance(const char* aName=0);
+        virtual Field* createNewInstance(const char* aName=0) const;
     };
 
 }

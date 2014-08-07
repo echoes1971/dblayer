@@ -324,13 +324,11 @@ DBEntity* DBMgr::Insert(DBEntity* dbe) {
     // Before Insert
     dbe->_before_insert(this);
     dbe = this->_before_insert(dbe);
-#ifdef WITH_PROXY_CONNECTIONS
     if(this->con->isProxy()) {
         dbe = this->con->Insert(dbe);
         this->errorMessage.clear();
         this->errorMessage.append(this->con->getErrorMessage());
     } else {
-#endif
         if( this->verbose ) cout << "DBMgr::Insert: dbe before insert = " << dbe->toString() << endl;
         // Insert
         string query = this->_buildInsertString(dbe);
@@ -339,9 +337,7 @@ DBEntity* DBMgr::Insert(DBEntity* dbe) {
         ResultSet* rs = this->con->exec( query );
         if( this->verbose ) cout << "DBMgr::Insert: status = " << rs->getStatus() << endl;
         delete rs;
-#ifdef WITH_PROXY_CONNECTIONS
     }
-#endif
     // After Insert
     dbe = this->_after_insert(dbe);
     dbe->_after_insert(this);
@@ -351,13 +347,11 @@ DBEntity* DBMgr::Update(DBEntity* dbe) {
     // Before Update
     dbe->_before_update(this);
     dbe = this->_before_update(dbe);
-#ifdef WITH_PROXY_CONNECTIONS
     if(this->con->isProxy()) {
         dbe = this->con->Update(dbe);
         this->errorMessage.clear();
         this->errorMessage.append(this->con->getErrorMessage());
     } else {
-#endif
         if( this->verbose ) cout << "DBMgr::Update: dbe before update = " << dbe->toString() << endl;
         // Update
         string query = this->_buildUpdateString(dbe);
@@ -366,9 +360,7 @@ DBEntity* DBMgr::Update(DBEntity* dbe) {
         ResultSet* rs = this->con->exec( query );
         if( this->verbose ) cout << "DBMgr::Update: status = " << rs->getStatus() << endl;
         delete rs;
-#ifdef WITH_PROXY_CONNECTIONS
     }
-#endif
     // After Update
     dbe = this->_after_update(dbe);
     dbe->_after_update(this);
@@ -378,13 +370,11 @@ DBEntity* DBMgr::Delete(DBEntity* dbe) {
     // Before Delete
     dbe->_before_delete(this);
     dbe = this->_before_delete(dbe);
-#ifdef WITH_PROXY_CONNECTIONS
     if(this->con->isProxy()) {
         dbe = this->con->Delete(dbe);
         this->errorMessage.clear();
         this->errorMessage.append(this->con->getErrorMessage());
     } else {
-#endif
         if( this->verbose ) cout << "DBMgr::Delete: dbe before delete = " << dbe->toString() << endl;
         // Delete
         string query = this->_buildDeleteString(dbe);
@@ -393,9 +383,7 @@ DBEntity* DBMgr::Delete(DBEntity* dbe) {
         ResultSet* rs = this->con->exec( query );
         if( this->verbose ) cout << "DBMgr::Delete: status = " << rs->getStatus() << endl;
         delete rs;
-#ifdef WITH_PROXY_CONNECTIONS
     }
-#endif
     // After Delete
     dbe = this->_after_delete(dbe);
     dbe->_after_delete(this);
@@ -467,7 +455,6 @@ void DBMgr::rs2dbelist(ResultSet* res,string* nomeTabella,DBEntityVector* ret) {
 }
 
 DBEntityVector* DBMgr::Select(const string* tableName, const string* searchString) {
-#ifdef WITH_PROXY_CONNECTIONS
     if(this->con->isProxy()) {
         DBEntityVector* ret = 0;
         string* nomeTabella = new string( tableName->c_str() );
@@ -478,7 +465,6 @@ DBEntityVector* DBMgr::Select(const string* tableName, const string* searchStrin
         delete nomeTabella;
         return ret;
     }
-#endif
     DBEntityVector* ret = new DBEntityVector;
     ResultSet* res = this->con->exec( string(searchString->c_str()) );
     string* nomeTabella = new string( tableName->c_str() );
@@ -495,12 +481,11 @@ DBEntityVector* DBMgr::Select(const string* tableName, const string* searchStrin
 }
 
 DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string* orderBy ) {
-#ifdef WITH_PROXY_CONNECTIONS
+    if(this->verbose) cout << "DBMgr::Search: start." << endl;
     if(this->con->isProxy()) {
-        //if( this->verbose ) cout << "DBMgr::Search: calling con->Search()" << endl;
+        if( this->verbose ) cout << "DBMgr::Search: calling con->Search()" << endl;
         return this->con->Search(dbe, uselike, caseSensitive, orderBy);
     }
-#endif
     string myquery = this->_buildSelectString( dbe, uselike, caseSensitive );
     if( orderBy->size()!=0 ) {
         myquery.append( " ORDER BY " );
@@ -508,6 +493,7 @@ DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, c
     }
     if( this->verbose ) cout << "DBMgr::Search: myquery = " << myquery << endl;
     string tableName = dbe->getTableName();
+    if(this->verbose) cout << "DBMgr::Search: end." << endl;
     return this->Select( &tableName, &myquery );
 }
 
@@ -552,7 +538,7 @@ string DBMgr::ping() {
 void DBMgr::_loadUserGroups() {
     if(this->_dbeuser==0)
         return;
-
+    if(this->verbose) cout << "DBMgr::_loadUserGroups: start." << endl;
     string mytypename("DBEUserGroup");
     DBEntity* cerca = this->getClazzByTypeName(&mytypename);
     cerca->readFKFrom(this->_dbeuser);
@@ -573,6 +559,7 @@ void DBMgr::_loadUserGroups() {
 
     this->Destroy(lista);
     delete cerca;
+    if(this->verbose) cout << "DBMgr::_loadUserGroups: end." << endl;
 }
 
 DBEntity* DBMgr::login(const string user, const string pwd) {
@@ -585,7 +572,6 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
         DBEntityVector list;
 
         this->rs2dbelist(userRs,&nome_tabella,&list);
-        //qDebug() << userRs;
 
         if(list.size()!=1) {
             if( this->verbose ) { cout << "DBMgr::login: ERROR - list.size=" << list.size() << endl; }

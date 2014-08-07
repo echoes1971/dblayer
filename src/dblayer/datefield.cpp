@@ -49,7 +49,7 @@ DateField::DateField(const string* nome,
 DateField::~DateField() {
 }
 
-Field* DateField::createNewInstance(const char* aName) {
+Field* DateField::createNewInstance(const char* aName) const {
     Field* ret=0;
     string myName=string();
     if( aName==0 ) {

@@ -16,7 +16,7 @@ QXmlrpcResultSet::~QXmlrpcResultSet() {
     //cout << "QXmlrpcResultSet::~QXmlrpcResultSet: fine." << endl;
 }
 
-int QXmlrpcResultSet::getColumnSize(int i) {
+int QXmlrpcResultSet::getColumnSize(int i) const {
     // Non significativo per Xmlrpc
     return -i;
 }
@@ -31,7 +31,7 @@ int QXmlrpcResultSet::getColumnSize(int i) {
 //	return ret;
 //}
 
-string QXmlrpcResultSet::toString(string prefix) {
+string QXmlrpcResultSet::toString(string prefix) const {
         string ret;
         ret.append(prefix+"<QXmlrpcResultSet>");
         ret.append(prefix+" <req>"+DBLayer::integer2string((long)this->req)+"</req>" );

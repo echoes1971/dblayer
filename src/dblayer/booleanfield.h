@@ -42,7 +42,7 @@ namespace DBLayer {
         BooleanField(const string* nome, bool valore);
         virtual ~BooleanField();
 
-        virtual Field* createNewInstance(const char* aName=0);
+        virtual Field* createNewInstance(const char* aName=0) const;
 
         string toString() const;
 	};

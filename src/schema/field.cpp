@@ -37,6 +37,7 @@ using namespace SchemaNS;
 
 int Field::fieldCreati = 0;
 int Field::fieldDistrutti = 0;
+string Field::nullString = "";
 
 Field::Field() {
   this->nullo = true;
@@ -128,7 +129,14 @@ bool Field::isDouble() const { return type==Field::FLOAT; }
 
 long Field::getIntegerValue() const { return this->longValue; }
 float Field::getFloatValue() const { return this->floatValue; }
-const string* Field::getStringValue() const { return this->stringValue; }
+const string* Field::getStringValue() const {
+    if(this->stringValue==0) {
+        if(this->nullString.length()==0) { this->nullString.clear(); }
+        return &this->nullString;
+    } else {
+        return this->stringValue;
+    }
+}
 bool Field::getBooleanValue() const { return this->boolValue; }
 
 void Field::setStringValue(const string* valore) {

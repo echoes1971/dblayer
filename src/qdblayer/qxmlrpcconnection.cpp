@@ -217,7 +217,7 @@ ResultSet* QXmlrpcConnection::exec(const string s) {
     }
     return rs;
 }
-string QXmlrpcConnection::escapeString(string s) {
+string QXmlrpcConnection::escapeString(string s) const {
     static string fromQuote("\'");
     static string   toQuote("\'\'");
     return DBLayer::replaceAll(s, fromQuote, toQuote);

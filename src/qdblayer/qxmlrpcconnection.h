@@ -31,19 +31,19 @@ class QXmlrpcConnection : public QObject , public Connection {
     /** Chiude la connessione corrente e la riapre */
     virtual bool reconnect();
 
-    virtual string escapeString(string s);
+    virtual string escapeString(string s) const;
 
     virtual int getColumnSize(string* relname);
     virtual string getColumnName(string* relname, int column);
     virtual IntegerVector getKeys(string* relname);
     virtual IntegerVector getForeignKeys(string* relname);
-    inline string getDBType() { return "QXmlrpc"; }
 
     virtual ResultSet* login(string user, string pwd);
 
     virtual string getFormSchema(string language="python");
     virtual string getDBSchema(string language="python");
     virtual string getSchemaName();
+    inline string getDBType() { return "QXmlrpc"; }
 
     static QString variant2string(const QVariant& v, QString prefix="");
     /* Non mi piacciono i parametri in input usati anche per l'output,

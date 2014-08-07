@@ -1,23 +1,23 @@
 /***************************************************************************
-**	dbconnection.h  v0.1.2 - 2012.03.19
-**	-----------------------------------
+**    dbconnection.h  v0.1.2 - 2012.03.19
+**    -----------------------------------
 **
-**	Author:		Roberto Rocco Angeloni.
-**	E-mail:		roberto@roccoangeloni.it
-**	Comment:	Implementazione di connection e resultset
-**	To Do:		- getForeignKeys
-**	Future:
-**	History:
-**		v0.1.0 - 2006.05.09 Prima versione stabile
-**		v0.1.1 - 2006.05.13 Modificata la createConnection, ora e' possibile
-**					passare una stringa di connessione del tipo
-**					"dblayer:sqlite3:c:\tmp\test.db"
-**					"dblayer:pg:host=localhost dbname=roberto user=roberto password="
-**					:-) :-) :-) :-) :-) :-) :-) :-) :-) :-) :-) :-) :-) :-)
-**		v0.1.2 - 2006.05.22 Implementato ResultSet come SQLiteResultSet, ovvero con
-**					l'utilizzo di vettori di stringhe per memorizzare i risultati
-**					Aggiunto -quoteDate-
-**		v0.1.3 - 2007.04.20 Implementato MySQLResultSet e MySQLConnection
+**    Author:        Roberto Rocco Angeloni.
+**    E-mail:        roberto@roccoangeloni.it
+**    Comment:    Implementazione di connection e resultset
+**    To Do:        - getForeignKeys
+**    Future:
+**    History:
+**        v0.1.0 - 2006.05.09 Prima versione stabile
+**        v0.1.1 - 2006.05.13 Modificata la createConnection, ora e' possibile
+**                    passare una stringa di connessione del tipo
+**                    "dblayer:sqlite3:c:\tmp\test.db"
+**                    "dblayer:pg:host=localhost dbname=roberto user=roberto password="
+**                    :-) :-) :-) :-) :-) :-) :-) :-) :-) :-) :-) :-) :-) :-)
+**        v0.1.2 - 2006.05.22 Implementato ResultSet come SQLiteResultSet, ovvero con
+**                    l'utilizzo di vettori di stringhe per memorizzare i risultati
+**                    Aggiunto -quoteDate-
+**        v0.1.3 - 2007.04.20 Implementato MySQLResultSet e MySQLConnection
 **
 ** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
@@ -82,7 +82,7 @@ namespace DBLayer {
             virtual string getErrorMessage() const;
             bool hasErrors() const;
             virtual string getStatus() const;
-            /**	A scopo di debug...	*/
+            /**    A scopo di debug...    */
             virtual string toString(string prefix="\n") const;
     };
 
@@ -175,10 +175,10 @@ namespace DBLayer {
             virtual string ping();
             // **************** Proxy Connections: end. *********************
 
-	};
+    };
 
 #ifdef USE_LIBPQ
-	class DECLSPECIFIER PGConnection : public Connection {
+    class DECLSPECIFIER PGConnection : public Connection {
             private:
                 PGconn* conn;
             public:
@@ -208,21 +208,21 @@ namespace DBLayer {
         static string pgtype2string(int t);
                 int clientEncoding();
                 int setClientEncoding(string s);
-	};
+    };
 #endif
 
     /**
-     *	Parameters: connection string
-     *	The connection string could be the normal connection string for
-     *	the default database or can contain the prefix of the desided dbms
-     *	with the following syntax:
-     *		[dblayer:<dbmsprefix>:]connectionString
-     *	dbmsprefix available: sqlite, pg
+     *    Parameters: connection string
+     *    The connection string could be the normal connection string for
+     *    the default database or can contain the prefix of the desided dbms
+     *    with the following syntax:
+     *        [dblayer:<dbmsprefix>:]connectionString
+     *    dbmsprefix available: sqlite, pg
      *
-     *	Examples:
-     *		"dblayer:odbc:mydnsstring"
-     *		"dblayer:sqlite3:c:\tmp\test.db"
-     *		"dblayer:pg:host=localhost dbname=roberto user=roberto password="
+     *    Examples:
+     *        "dblayer:odbc:mydnsstring"
+     *        "dblayer:sqlite3:c:\tmp\test.db"
+     *        "dblayer:pg:host=localhost dbname=roberto user=roberto password="
      */
     DECLSPECIFIER Connection* createConnection(string s);
 

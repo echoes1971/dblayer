@@ -51,7 +51,7 @@ string IntegerField::toString() {
 	return string( (char*)&tmp );
 }
 
-Field* IntegerField::createNewInstance(const char* aName) {
+Field* IntegerField::createNewInstance(const char* aName) const {
     Field* ret=0;
     string myName=string();
     if( aName==0 ) {

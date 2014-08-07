@@ -43,7 +43,7 @@ string DBLayer::StringField::toString() {
     return ret;
 }
 
-Field* StringField::createNewInstance(const char* aName) {
+Field* StringField::createNewInstance(const char* aName) const {
     Field* ret=0;
     string myName=string();
     if( aName==0 ) {

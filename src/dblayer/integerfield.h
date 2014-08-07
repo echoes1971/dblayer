@@ -50,7 +50,7 @@ namespace DBLayer {
 		long getValue();
 		string toString();
 
-        virtual Field* createNewInstance(const char* aName=0);
+        virtual Field* createNewInstance(const char* aName=0) const;
     };
 
 }
