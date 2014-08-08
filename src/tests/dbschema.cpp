@@ -28,9 +28,9 @@ DBETestDBLayer::DBETestDBLayer() {
 	this->tableName.append( "test_dblayer" );
 }
 DBETestDBLayer::~DBETestDBLayer() {}
-string DBETestDBLayer::name() { return "DBETestDBLayer"; }
-DBFieldVector* DBETestDBLayer::getKeys() { return &DBETestDBLayer::chiavi; }
-DBETestDBLayer* DBETestDBLayer::createNewInstance() { return new DBETestDBLayer(); }
+string DBETestDBLayer::name() const { return "DBETestDBLayer"; }
+DBFieldVector* DBETestDBLayer::getKeys() const { return &DBETestDBLayer::chiavi; }
+DBETestDBLayer* DBETestDBLayer::createNewInstance() const { return new DBETestDBLayer(); }
 //***********************	DBETestDBLayer: end.
 
 
@@ -46,9 +46,9 @@ DBESocieta::DBESocieta() {
     this->tableName.append( "societa" );
 }
 DBESocieta::~DBESocieta() {}
-string DBESocieta::name() { return "DBESocieta"; }
-DBFieldVector* DBESocieta::getKeys() { return &DBESocieta::chiavi; }
-DBESocieta* DBESocieta::createNewInstance() { return new DBESocieta(); }
+string DBESocieta::name() const { return "DBESocieta"; }
+DBFieldVector* DBESocieta::getKeys() const { return &DBESocieta::chiavi; }
+DBESocieta* DBESocieta::createNewInstance() const { return new DBESocieta(); }
 
 void DBESocieta::_before_insert(DBMgr* dbmgr) {
     string query("select max(id) as max_id from societa");
@@ -79,3 +79,9 @@ void DBESocieta::_before_copy(DBMgr* dbmgr) {
     if(dbmgr==0) return;
 }
 //***********************	DBESocieta: end.
+
+string MySchema::getSchema() { return "auth"; }
+void MySchema::registerClasses(DBEFactory* dbeFactory) {
+  dbeFactory->registerClass("test_dblayer", new DBETestDBLayer() );
+  dbeFactory->registerClass("societa", new DBESocieta() );
+}

@@ -31,9 +31,9 @@ namespace MySchema {
 		DBETestDBLayer();
 		virtual ~DBETestDBLayer();
 
-		virtual string name();
-		virtual DBFieldVector* getKeys();
-		virtual DBETestDBLayer* createNewInstance();
+        virtual string name() const;
+        virtual DBFieldVector* getKeys() const;
+        virtual DBETestDBLayer* createNewInstance() const;
 
 	  private:
 		static const string nomiCampiChiave[];
@@ -46,9 +46,9 @@ namespace MySchema {
 		DBESocieta();
 		virtual ~DBESocieta();
 
-		virtual string name();
-		virtual DBFieldVector* getKeys();
-		virtual DBESocieta* createNewInstance();
+        virtual string name() const;
+        virtual DBFieldVector* getKeys() const;
+        virtual DBESocieta* createNewInstance() const;
 
         virtual void _before_insert(DBMgr* dbmgr=0);
         virtual void _before_copy(DBMgr* dbmgr=0);
@@ -58,6 +58,8 @@ namespace MySchema {
 		static DBFieldVector chiavi;
 	};
 
+    string getSchema();
+    void registerClasses(DBEFactory* dbeFactory);
 }
 
 #endif

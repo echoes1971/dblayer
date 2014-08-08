@@ -38,7 +38,7 @@ DBEFactory::~DBEFactory() {
     if(this->_verbose) printf("DBEFactory::~DBEFactory: start.\n");
     // Cleaning the cache
     for(const auto& elem : this->_cache) {
-        if(this->_verbose) printf("DBEFactory::~DBEFactory: cancello %s => %s\n",elem.first.c_str(), elem.second->name().c_str() );
+        if(this->_verbose) printf("DBEFactory::~DBEFactory: deleting %s => %s\n",elem.first.c_str(), elem.second->name().c_str() );
         delete elem.second;
     }
     this->_cache.clear();

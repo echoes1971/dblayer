@@ -234,19 +234,17 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     DBLayer::Connection* con;
     DBMgr* dbmgr;
 
-    cout << "connString: " << connString << endl;
     con = DBLayer::createConnection( connString.c_str() );
-    cout << "con.dbtype: " << con->getDBType() << "; con.isProxy=" << (con->isProxy()?"true":"false") << endl;
-    dbmgr = new DBLayer::DBMgr(con, true);
+    dbmgr = new DBLayer::DBMgr(con, false);
 
-    DBEFactory dbeFactory(true);
+    DBEFactory dbeFactory(false);
     AuthSchema::registerClasses(&dbeFactory);
     dbmgr->setDBEFactory(&dbeFactory);
 
     if ( dbmgr->connect() ) {
 
         if(loginUser.length()>0 && loginPwd.length()>0) {
-            dbmgr->login(loginUser,loginPwd); //con->login(loginUser,loginPwd);
+            dbmgr->login(loginUser,loginPwd);
         }
 
         if(dbmgr->isLoggedIn()) {
@@ -286,11 +284,15 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
     DBMgr* dbmgr;
 
     mycon = DBLayer::createConnection( connString.c_str() );
-    dbmgr = new DBLayer::DBMgr(mycon, false);
+    dbmgr = new DBLayer::DBMgr(mycon, true);
+
+    DBEFactory dbeFactory(false);
+    AuthSchema::registerClasses(&dbeFactory);
+    MySchema::registerClasses(&dbeFactory);
+    dbmgr->setDBEFactory(&dbeFactory);
 
     if ( dbmgr->connect() ) {
-        string nomeTabella = string("test_dblayer");
-        DBEntity* cerca = new DBEntity( &nomeTabella );
+        DBETestDBLayer* cerca = new DBETestDBLayer();
 
 //        string nomeCampo("nome");
 //        string valoreStringa("la");
@@ -719,8 +721,6 @@ int main(int argc, char *argv[]) {
     cout << "---------------->>  testDBMgr: end." << endl;
     cout << endl;
 
-    return 0;
-
     cout << "---------------->>  testSearch" << endl;
     if(argc==5) {
         testSearch( host, dbname, usr, pwd, login_user, login_password );
@@ -731,6 +731,8 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+
+    return 0;
 
     cout << "---------------->>  testDBE" << endl;
     if(argc==5) {

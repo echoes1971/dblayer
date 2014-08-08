@@ -56,12 +56,12 @@ DBMgr::DBMgr(Connection* con, bool verbose) {
 }
 
 DBMgr::~DBMgr() {
-    if( this->verbose ) { cout << "DBMgr::~DBMgr: inizio." << endl; }
+    if( this->verbose ) { cout << "DBMgr::~DBMgr: start." << endl; }
     if(this->_dbeuser!=0) {
         delete this->_dbeuser;
     }
     this->disconnect();
-    if( this->verbose ) { cout << "DBMgr::~DBMgr: fine." << endl; }
+    if( this->verbose ) { cout << "DBMgr::~DBMgr: end." << endl; }
 }
 
 bool DBMgr::connect() {
