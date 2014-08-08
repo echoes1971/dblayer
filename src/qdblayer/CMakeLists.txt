@@ -6,7 +6,6 @@ message("############### PATCH OSX: start. ##############")
 set(QT5_PATH $ENV{HOME}/Qt/5.3/clang_64/ CACHE PATH "Path to Qt5")
 set(QT5_MODULE_PATH ${QT5_PATH}/lib/cmake)
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT5_MODULE_PATH})
-
 message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 message("QT_QMAKE_EXECUTABLE: ${QT_QMAKE_EXECUTABLE}")
 
