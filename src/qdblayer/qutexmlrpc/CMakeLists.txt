@@ -44,6 +44,7 @@ set(CMAKE_AUTOMOC ON)
 
 
 include_directories("../")
+#include_directories("../..")
 
 add_library(qutexmlrpc
     xrbase64.cpp
@@ -53,6 +54,7 @@ add_library(qutexmlrpc
 #    xrserver.cpp
 #    xrsyncclient.cpp
     xrvariant.cpp
+#../qdblayer.cpp
     )
 #target_link_libraries(qutexmlrpc Qt::Core Qt::Network Qt::Widgets Qt::Xml)
 qt5_use_modules(qutexmlrpc Core Network Widgets Xml)

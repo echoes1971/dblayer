@@ -1,6 +1,8 @@
 #ifndef QDBLAYER_H
 #define QDBLAYER_H
 
+#include <QtCore/qglobal.h>
+//#include <qglobal.h>
 #include <QMetaType>
 
 #include <dblayer/dbconnection.h>

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.11)
 
 project(DBLayer)
 
@@ -53,6 +53,35 @@ if(XMLRPCC_FOUND)
 endif()
 if(Qt5Widgets_FOUND)
  set(USE_QXMLRPC TRUE)
+ message("PATH: ${PATH}")
+
+ find_package(Qt5Core REQUIRED)
+ message("Qt5Core_INCLUDE_DIRS: ${Qt5Core_INCLUDE_DIRS}")
+ include_directories(${Qt5Core_INCLUDE_DIRS})
+
+ find_package(Qt5Network REQUIRED)
+ include_directories(${Qt5Network_INCLUDE_DIRS})
+
+ include_directories(${Qt5Widgets_INCLUDE_DIRS})
+
+ find_package(Qt5Gui REQUIRED)
+ include_directories(${Qt5Gui_INCLUDE_DIRS})
+
+ find_package(Qt5Xml REQUIRED)
+ include_directories(${Qt5Xml_INCLUDE_DIRS})
+
+ #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
+ #    ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+
+ #set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Network Qt5::Widgets Qt5::Xml)
+
+ # Find includes in corresponding build directories
+ #set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+ # Instruct CMake to run moc automatically when needed.
+ set(CMAKE_AUTOMOC ON)
+
 endif()
 
 message("Configuration")
@@ -112,31 +141,6 @@ add_subdirectory (schema)
 add_subdirectory (dblayer)
 
 if(Qt5Widgets_FOUND)
- message("PATH: ${PATH}")
-
- find_package(Qt5Core REQUIRED)
- message("Qt5Core_INCLUDE_DIRS: ${Qt5Core_INCLUDE_DIRS}")
- include_directories(${Qt5Core_INCLUDE_DIRS})
-
- include_directories(${Qt5Widgets_INCLUDE_DIRS})
-
- find_package(Qt5Xml REQUIRED)
- include_directories(${Qt5Xml_INCLUDE_DIRS})
- find_package(Qt5Network REQUIRED)
- include_directories(${Qt5Network_INCLUDE_DIRS})
-
- #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
- #    ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
- set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-
- #set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Network Qt5::Widgets Qt5::Xml)
-
- # Find includes in corresponding build directories
- #set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
- # Instruct CMake to run moc automatically when needed.
- set(CMAKE_AUTOMOC ON)
-
  add_subdirectory (qdblayer)
 endif()
 

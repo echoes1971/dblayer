@@ -10,6 +10,7 @@ echo "PATH: ${PATH}"
 
 cmake_params="-DPROJECT_SOURCE_DIR=${SRC_DIR}"
 cmake_params="${cmake_params} -DCMAKE_BUILD_TYPE=Debug "
+cmake_params="${cmake_params} -DCMAKE_VERBOSE_MAKEFILE=ON "
 #cmake_params="${cmake_params} -DCMAKE_BUILD_TYPE=Release "
 #cmake_params="${cmake_params} -DHAVE_CONFIG_H=true "
 

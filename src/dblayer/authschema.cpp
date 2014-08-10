@@ -226,7 +226,7 @@ void DBEGroup::_after_insert(DBMgr* dbmgr) {
 
     string this_id = string(this->getField(&id)->getStringValue()->c_str());
 
-    dbe.getField(&group_id),this_id;
+    dbe.getField(&group_id);
     dbe.getField(&user_id),dbmgr->getDBEUser()->getField(&id)->getStringValue();
     dbmgr->Insert(&dbe);
     dbmgr->addGroup(this_id);

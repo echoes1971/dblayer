@@ -119,11 +119,11 @@ void testDBConnection(string& connString, string& loginUser, string& loginPwd) {
                 cout << endl;
             }
         } else {
-            cout << "Errori: " << con->getErrorMessage() << endl;
+            cout << "Errors: " << con->getErrorMessage() << endl;
         }
         delete res;
     } else {
-        cout << "(testDBConnection) Errori: " << con->getErrorMessage() << endl;
+        cout << "(testDBConnection) Errors: " << con->getErrorMessage() << endl;
     }
     //con->disconnect();
     delete con;
@@ -182,10 +182,10 @@ void testGetKeys(string connString, string& loginUser, string& loginPwd, string 
                      << con->getColumnName( &relname, chiavi[i] ) << endl;
             }
         } else {
-            cout << "Errori: " << con->getErrorMessage() << endl;
+            cout << "Errors: " << con->getErrorMessage() << endl;
         }
     } else {
-        cout << "Errori: " << con->getErrorMessage() << endl;
+        cout << "Errors: " << con->getErrorMessage() << endl;
     }
     delete con;
 }
@@ -218,10 +218,10 @@ void testGetForeignKeys(string connString, string& loginUser, string& loginPwd, 
                      << con->getColumnName( &relname, chiavi[i] ) << endl;
             }
         } else {
-            cout << "Errori: " << con->getErrorMessage() << endl;
+            cout << "Errors: " << con->getErrorMessage() << endl;
         }
     } else {
-        cout << "Errori: " << con->getErrorMessage() << endl;
+        cout << "Errors: " << con->getErrorMessage() << endl;
     }
     delete con;
 }
