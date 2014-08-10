@@ -55,6 +55,9 @@ if(Qt5Widgets_FOUND)
  set(USE_QXMLRPC TRUE)
  message("PATH: ${PATH}")
 
+ # NOTE: this MUST be before the SQLite include, because it will add
+ # the path /opt/local/include with the old and wrong qt5 includes
+
  find_package(Qt5Core REQUIRED)
  message("Qt5Core_INCLUDE_DIRS: ${Qt5Core_INCLUDE_DIRS}")
  include_directories(${Qt5Core_INCLUDE_DIRS})
