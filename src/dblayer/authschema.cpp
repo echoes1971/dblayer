@@ -9,7 +9,7 @@ using namespace AuthSchema;
 using namespace std;
 
 //*********************** DBEDBVersion: start.
-const string DBEDBVersion::nomiCampiChiave[] = { string("version") };
+const string DBEDBVersion::nomiCampiChiave[] = { string("model_name") };
 ColumnDefinitions DBEDBVersion::_columns;
 ColumnDefinitions DBEDBVersion::getColumns() const { return DBEDBVersion::_columns; }
 IntegerField DBEDBVersion::chiave1( (const string*)&DBEDBVersion::nomiCampiChiave[0] );
@@ -21,6 +21,7 @@ DBEDBVersion::DBEDBVersion() {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBEDBVersion::_columns[pair.first] = pair.second;
         }
+        DBEDBVersion::_columns["model_name"] = vector<string> {"varchar(255)","not null"};
         DBEDBVersion::_columns["version"] = vector<string> {"int","not null"};
     }
 }
@@ -341,4 +342,8 @@ void AuthSchema::registerClasses(DBEFactory* dbeFactory) {
   dbeFactory->registerClass("groups", new DBEGroup() );
   dbeFactory->registerClass("users_groups", new DBEUserGroup() );
   dbeFactory->registerClass("log", new DBELog() );
+}
+
+void AuthSchema::checkDB(DBMgr& dbmgr) {
+    cout << "AuthSchema::checkDB: TODO" << endl;
 }
