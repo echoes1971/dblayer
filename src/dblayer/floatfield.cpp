@@ -35,7 +35,7 @@ void DBLayer::FloatField::setValue(float valore){
     nullo = false;
 }
 
-string DBLayer::FloatField::toString() {
+string DBLayer::FloatField::toString() const {
 	char tmp[50];
 #if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
     sprintf_s(

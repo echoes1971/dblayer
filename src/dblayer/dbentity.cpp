@@ -300,7 +300,7 @@ void DBEntity::readFKFrom(DBEntity* dbe) {
         ForeignKey& f = fks.at(i);
         DBField* myfield = (DBField*) dbe->getField( &f.colonna_riferita );
         if( myfield!=0 && !myfield->isNull() ) {
-            string nomeField = myfield->getName();
+            string nomeField = f.colonna_fk;
             if ( myfield->isBoolean() ) {
                     this->setValue( &nomeField, myfield->getBooleanValue() );
             } else if ( myfield->isInteger() ) {

@@ -48,7 +48,7 @@ namespace DBLayer {
 		virtual ~IntegerField();
 		void setValue(long valore);
 		long getValue();
-		string toString();
+        string toString() const;
 
         virtual Field* createNewInstance(const char* aName=0) const;
     };

@@ -239,6 +239,7 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
 
     DBEFactory dbeFactory(false);
     dbmgr->setDBEFactory(&dbeFactory);
+    dbmgr->setSchema("rra");
     AuthSchema::registerClasses(&dbeFactory);
     AuthSchema::checkDB(*dbmgr);
 

@@ -37,7 +37,7 @@ public:
     virtual ~FloatField();
     float getValue();
     void setValue(float valore);
-    string toString();
+    string toString() const;
     virtual Field* createNewInstance(const char* aName=0) const;
 };
 

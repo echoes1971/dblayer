@@ -38,7 +38,7 @@ void IntegerField::setValue(long valore){
 }
 
 
-string IntegerField::toString() {
+string IntegerField::toString() const {
 	char tmp[50];
 #if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
     sprintf_s(

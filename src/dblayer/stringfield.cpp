@@ -36,9 +36,9 @@ void StringField::setValue(const string* valore) {
     if ( ((long)valore!=0) && valore->size()>0 )
         nullo = false;
 }
-const string* DBLayer::StringField::getValue(){ return this->stringValue; }
+string* DBLayer::StringField::getValue() const { return this->stringValue; }
 
-string DBLayer::StringField::toString() {
+string DBLayer::StringField::toString() const {
     string ret( this->getValue()->c_str() );
     return ret;
 }

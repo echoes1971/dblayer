@@ -32,8 +32,8 @@ namespace DBLayer {
         StringField(const string* nome,const string* valore );
         virtual ~StringField();
         void setValue(const string* valore);
-        const string* getValue();
-        string toString();
+        string* getValue() const;
+        string toString() const;
         virtual Field* createNewInstance(const char* aName=0) const;
     };
 
