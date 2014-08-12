@@ -131,7 +131,7 @@ long Field::getIntegerValue() const { return this->longValue; }
 float Field::getFloatValue() const { return this->floatValue; }
 const string* Field::getStringValue() const {
     if(this->stringValue==0) {
-        if(this->nullString.length()==0) { this->nullString.clear(); }
+        if(!this->nullString.length()==0) { this->nullString.clear(); }
         return &this->nullString;
     } else {
         return this->stringValue;

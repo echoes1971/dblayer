@@ -119,9 +119,13 @@ DBLayer::StringVector DBMgr::_buildWhereCondition(DBEntity* dbe, bool uselike, b
         }
         if( field==0 || field->isNull() )
             continue;
+//        cout << "DBMgr::_buildWhereCondition: field=" << valore << endl;
+
         string clausola;
         string nome = field->getName();
         string valore = field->toString();
+        cout << "DBMgr::_buildWhereCondition: valore=" << valore << endl;
+
         if( field->isString() ) {
             valore = this->escapeString(valore);
             if(uselike) {
@@ -598,7 +602,7 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
     DBEntity* cerca = this->getClazzByTypeName(&mytypename);
     cerca->setValue(&login_field,&user);
     cerca->setValue(&pwd_field,&pwd);
-
+cout << "DBMgr::login: cerca=" << cerca->toString() << endl;
     DBEntityVector* lista = this->Search(cerca,false);
 
     // TODO: how to handle this in C++?

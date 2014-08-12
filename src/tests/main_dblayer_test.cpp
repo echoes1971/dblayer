@@ -235,13 +235,14 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     DBMgr* dbmgr;
 
     con = DBLayer::createConnection( connString.c_str() );
-    dbmgr = new DBLayer::DBMgr(con, false);
+    dbmgr = new DBLayer::DBMgr(con, true);
 
     DBEFactory dbeFactory(false);
-    AuthSchema::registerClasses(&dbeFactory);
     dbmgr->setDBEFactory(&dbeFactory);
+    AuthSchema::registerClasses(&dbeFactory);
+    AuthSchema::checkDB(*dbmgr);
 
-    if ( dbmgr->connect() ) {
+    if(dbmgr->connect()) {
 
         if(loginUser.length()>0 && loginPwd.length()>0) {
             dbmgr->login(loginUser,loginPwd);
@@ -266,10 +267,10 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
             DBMgr::Destroy(lista);
             cout << "OK!" << endl;
         } else {
-            cout << "Errore: " << dbmgr->getErrorMessage() << endl;
+            cout << "Login Error: " << dbmgr->getErrorMessage() << "." << endl;
         }
     } else {
-        cout << "Errore: " << dbmgr->getErrorMessage() << endl;
+        cout << "Connection Error: " << dbmgr->getErrorMessage() << endl;
     }
     delete dbmgr;
     delete con;
