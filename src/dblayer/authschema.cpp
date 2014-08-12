@@ -346,4 +346,8 @@ void AuthSchema::registerClasses(DBEFactory* dbeFactory) {
 
 void AuthSchema::checkDB(DBMgr& dbmgr) {
     cout << "AuthSchema::checkDB: TODO" << endl;
+
+    DBEDBVersion dbversion;
+    dbversion.setSchemaName(dbmgr.getSchema());
+    cout << "AuthSchema::checkDB: " << dbversion.toSql("\n") << endl;
 }

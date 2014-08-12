@@ -46,7 +46,8 @@ DBEntity::DBEntity(const string* tableName) {
     this->tableName.append( tableName->c_str() );
 }
 DBEntity::~DBEntity() {}
-const string* DBEntity::getSchemaName() { return 0; }
+void DBEntity::setSchemaName(string s) { this->schemaName=s; }
+string DBEntity::getSchemaName() { return this->schemaName; }
 string DBEntity::getTableName() const { return string(tableName); }
 
 string DBEntity::name() const { return "DBEntity"; }
@@ -157,6 +158,40 @@ string DBEntity::toString_nodes(string prefix) const {
     ret.append(prefix+"-->");
 
     ret.append( prefix + "</" + this->name() + ">" );
+    return ret;
+}
+
+string DBEntity::toSql(string prefix) {
+    string ret;
+    ret.append(prefix+"create table ");//.append(string(this->getSchemaName()->c_str())).append("_").append(string(this->getTableName().c_str())).append(" (");
+    if(this->getSchemaName().length()>0) {
+        ret.append(this->getSchemaName());
+        ret.append("_");
+    }
+    ret.append(this->getTableName());
+    ret.append(" (");
+    // Table Columns
+    if(this->getColumns().size()>0) {
+        ColumnDefinitions defs = this->getColumns();
+        int cols_length = defs.size();
+        int cols_counter=0;
+        for(const pair<string,vector<string> > pair : defs) {
+            ret.append(prefix+" ").append(pair.first).append(" ");
+            for(const string s : pair.second) {
+                ret.append(s).append(" ");
+                if(this->isKey(pair.first)) {
+                    ret.append("primary key ");
+                }
+                // Foreign Key: TODO
+                // TODO     product_no integer REFERENCES products (product_no),
+            }
+            if(cols_counter<(cols_length-1)) {
+                ret.append(",");
+            }
+            cols_counter++;
+        }
+    }
+    ret.append(prefix+");");
     return ret;
 }
 

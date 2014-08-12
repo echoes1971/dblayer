@@ -289,9 +289,11 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
     dbmgr = new DBLayer::DBMgr(mycon, true);
 
     DBEFactory dbeFactory(false);
-    AuthSchema::registerClasses(&dbeFactory);
-    MySchema::registerClasses(&dbeFactory);
     dbmgr->setDBEFactory(&dbeFactory);
+    dbmgr->setSchema("rra");
+    AuthSchema::registerClasses(&dbeFactory);
+    AuthSchema::checkDB(*dbmgr);
+    MySchema::registerClasses(&dbeFactory);
 
     if ( dbmgr->connect() ) {
         DBETestDBLayer* cerca = new DBETestDBLayer();

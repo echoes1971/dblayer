@@ -78,8 +78,9 @@ namespace DBLayer {
         static string uuid2hex(const string& str);
         static string hex2uuid(const string& a_str);
 
+        void setSchemaName(string s);
         /** Returns the table's own schema */
-        virtual const string* getSchemaName();
+        virtual string getSchemaName();
         virtual string getTableName() const;
         /** Class name */
         virtual string name() const;
@@ -89,6 +90,8 @@ namespace DBLayer {
          *  if false, values are represented as nodes
          */
         virtual string toString(string prefix="", bool valuesAsAttributes=false) const;
+
+        string toSql(string prefix="");
 
         /** @return a new DBE instance */
         virtual DBEntity* createNewInstance() const;
@@ -144,6 +147,7 @@ namespace DBLayer {
 
       protected:
         string tableName;
+        string schemaName;
 
         /* column_name => array('type','constraints', ...) */
         // MOVED TO PRIVATE static ColumnDefinitions _columns;
