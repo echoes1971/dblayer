@@ -273,15 +273,19 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
             dbShell->cmdOut.append(" DBFieldVector ret;"); //ret = DBFieldVector();");
             string myglue2(" "); dbShell->cmdOut.append(" ").append(DBLayer::joinString(&append_chiavi,&myglue2));
             dbShell->cmdOut.append(" return ret; }\n");
-            dbShell->cmdOut.append("").append(typeName).append("::").append(typeName).append("() { this->tableName.clear(); }\n");
+            dbShell->cmdOut.append("").append(typeName).append("::").append(typeName).append("() { this->tableName.clear();");
+            if(schemaName.length()>0) {
+                dbShell->cmdOut.append(" this->schemaName = "+mySchemaName+"::getSchema();");
+            }
+            dbShell->cmdOut.append(" }\n");
             dbShell->cmdOut.append("").append(typeName).append("::~").append(typeName).append("() {}\n");
             dbShell->cmdOut.append("string ").append(typeName).append("::name() const { return \"").append(typeName).append("\"; }\n");
             dbShell->cmdOut.append("string ").append(typeName).append("::getTableName() const { return \"").append(tableName).append("\"; }\n");
 
             if(schemaName.length()>0)
-                    dbShell->cmdOut.append("const string* ").append(typeName).append("::getSchemaName() { static const string __myschema=\"")
+                    dbShell->cmdOut.append("string ").append(typeName).append("::getSchemaName() { return \"")
                             .append(schemaName)
-                            .append("\"; return &__myschema; }\n");
+                            .append("\"; }\n");
             dbShell->cmdOut.append("DBFieldVector* ").append(typeName).append("::getKeys() const { return &").append(typeName).append("::chiavi; }\n");
             dbShell->cmdOut.append("").append(typeName).append("* ").append(typeName).append("::createNewInstance() const { return new ").append(typeName).append("(); }\n");
             dbShell->cmdOut.append("//*********************** ").append(typeName).append(": end.\n");

@@ -17,6 +17,7 @@ DBFieldVector DBEDBVersion::chiavi = DBEDBVersion::___init_keys();
 DBFieldVector DBEDBVersion::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEDBVersion::chiave1 ); return ret; }
 DBEDBVersion::DBEDBVersion() {
     this->tableName.clear();
+    this->schemaName = AuthSchema::getSchema();
     if(DBEDBVersion::_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBEDBVersion::_columns[pair.first] = pair.second;
@@ -52,6 +53,7 @@ DBFieldVector DBEUser::chiavi = DBEUser::___init_keys();
 DBFieldVector DBEUser::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEUser::chiave1 ); return ret; }
 DBEUser::DBEUser() {
     this->tableName.clear();
+    this->schemaName = AuthSchema::getSchema();
     if(DBEUser::_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBEUser::_columns[pair.first] = pair.second;
@@ -156,6 +158,7 @@ DBFieldVector DBEGroup::chiavi = DBEGroup::___init_keys();
 DBFieldVector DBEGroup::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEGroup::chiave1 ); return ret; }
 DBEGroup::DBEGroup() {
     this->tableName.clear();
+    this->schemaName = AuthSchema::getSchema();
     if(DBEGroup::_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBEGroup::_columns[pair.first] = pair.second;
@@ -236,6 +239,7 @@ DBFieldVector DBEUserGroup::chiavi = DBEUserGroup::___init_keys();
 DBFieldVector DBEUserGroup::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEUserGroup::chiave1 ); ret.push_back( &DBEUserGroup::chiave2 ); return ret; }
 DBEUserGroup::DBEUserGroup() {
     this->tableName.clear();
+    this->schemaName = AuthSchema::getSchema();
     if(DBEUserGroup::_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBEUserGroup::_columns[pair.first] = pair.second;
@@ -289,11 +293,12 @@ DBFieldVector DBELog::chiavi = DBELog::___init_keys();
 DBFieldVector DBELog::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBELog::chiave1 ); ret.push_back( &DBELog::chiave2 ); return ret; }
 DBELog::DBELog() {
     this->tableName.clear();
+    this->schemaName = AuthSchema::getSchema();
     if(DBELog::_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBELog::_columns[pair.first] = pair.second;
         }
-        DBELog::_columns["ip"] = vector<string> {"varchar(16)","not null"};
+        DBELog::_columns["ip"] = vector<string> {"uuid","not null"};
         DBELog::_columns["data"] = vector<string> {"date","not null default '0000-00-00'"};
         DBELog::_columns["ora"] = vector<string> {"time","not null default '00:00:00'"};
         DBELog::_columns["count"] = vector<string> {"int","not null default 0"};
@@ -332,7 +337,7 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     }
 
     // 1. Check app version
-    int current_db_version = -1;
+    long current_db_version = -1;
     DBEDBVersion* dbecurrentversion;
     DBEDBVersion* cerca = new DBEDBVersion();
     cerca->setValue("model_name", AuthSchema::getSchema());
@@ -343,8 +348,10 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
             cout << "- " << elem->toString() << endl;
         }
     } else {
-        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("dbversion");
+        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
         dbecurrentversion->setValue("model_name", AuthSchema::getSchema());
+        dbecurrentversion->setValue("version",current_db_version);
+        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
     }
     dbmgr.Destroy(res);
     delete cerca;
@@ -352,30 +359,30 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     cout << dbecurrentversion->toString("\n") << endl;
 
     // 2. Do the DB migration
-    int current_migration = -1;
+    long current_migration = -1;
     if(current_db_version<0) {
         DBEDBVersion dbversion;
-        dbversion.setSchemaName(dbmgr.getSchema());
         cout << dbversion.toSql("\n") << endl;
 
-        DBEUser dbeuser;
-        dbeuser.setSchemaName(dbmgr.getSchema());
-        cout << dbeuser.toSql("\n") << endl;
-
         DBEGroup dbegroup;
-        dbegroup.setSchemaName(dbmgr.getSchema());
         cout << dbegroup.toSql("\n") << endl;
 
+        DBEUser dbeuser;
+        cout << dbeuser.toSql("\n") << endl;
+
         DBEUserGroup dbeusergroup;
-        dbeusergroup.setSchemaName(dbmgr.getSchema());
         cout << dbeusergroup.toSql("\n") << endl;
 
         DBELog dbelog;
-        dbelog.setSchemaName(dbmgr.getSchema());
         cout << dbelog.toSql("\n") << endl;
 
         current_migration++;
     }
+
+    // 3. Write version to DB
+    dbecurrentversion->setValue("version",current_migration);
+    cout << dbecurrentversion->toString("\n") << endl;
+    dbmgr.Update(dbecurrentversion);
 
     //dbecurrentversion->setValue("");
     delete dbecurrentversion;

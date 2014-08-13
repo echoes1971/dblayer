@@ -179,7 +179,7 @@ string DBEntity::toSql(string prefix) {
         for(const pair<string,vector<string> > pair : defs) {
             ret.append(prefix+" ").append(pair.first).append(" ");
             for(const string s : pair.second) {
-                ret.append(s).append(" ");
+                ret.append( DBEntity::dbeType2dbType(s) ).append(" ");
             }
             //if(this->isKey(pair.first)) {
             //    ret.append("primary key ");
@@ -461,14 +461,14 @@ string DBEntity::dbeType2dbType(const string& dbetype) {
     if(dbetype=="int")
         ret = "int(11)";
     else if(dbetype=="uuid")
-        ret = "varchar(16)";
+        ret = "char(40)";
     return ret;
 }
 string DBEntity::dbType2dbeType(const string& dbtype) {
     string ret = dbtype;
     if(dbtype=="int(11)")
         ret = "int";
-    else if(dbtype=="varchar(16)")
+    else if(dbtype=="char(40)")
         ret = "uuid";
     return ret;
 }

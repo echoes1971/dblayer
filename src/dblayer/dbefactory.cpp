@@ -64,7 +64,9 @@ DBEntity* DBEFactory::getClazz(const string& tablename) {
 }
 
 DBEntity* DBEFactory::getClazzByTypeName(const string& typeName, bool caseSensitive) {
+    if(this->_verbose) cout << "DBEFactory::getClazzByTypeName: typeName=" << typeName << endl;
     for(const auto& elem : this->_cache) {
+        if(this->_verbose) cout << " " << elem.first << ": " << elem.second->name() << endl;
         if(caseSensitive && elem.second->name()==typeName) {
             return elem.second->createNewInstance();
         }
