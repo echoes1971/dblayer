@@ -179,12 +179,22 @@ string DBEntity::toSql(string prefix) {
             ret.append(prefix+" ").append(pair.first).append(" ");
             for(const string s : pair.second) {
                 ret.append(s).append(" ");
-                if(this->isKey(pair.first)) {
-                    ret.append("primary key ");
-                }
-                // Foreign Key: TODO
-                // TODO     product_no integer REFERENCES products (product_no),
             }
+            if(this->isKey(pair.first)) {
+                ret.append("primary key ");
+            }
+            // Foreign Key: TODO
+            //if(this->isFK(pair.first)) {
+                ForeignKeyVector& fks = this->getFK();
+                for(unsigned int i=0; i<fks.size(); i++) {
+                    ForeignKey& f = fks.at(i);
+                    if(f.colonna_fk == pair.first) {
+                        ret.append("REFERENCES ").append(f.tabella_riferita).append(" (").append(f.colonna_riferita).append(") ");
+                        break;
+                    }
+                }
+            //}
+            // TODO     product_no integer REFERENCES products (product_no),
             if(cols_counter<(cols_length-1)) {
                 ret.append(",");
             }

@@ -345,9 +345,29 @@ void AuthSchema::registerClasses(DBEFactory* dbeFactory) {
 }
 
 void AuthSchema::checkDB(DBMgr& dbmgr) {
-    cout << "AuthSchema::checkDB: TODO" << endl;
+    cout << "AuthSchema::checkDB: start." << endl;
 
     DBEDBVersion dbversion;
     dbversion.setSchemaName(dbmgr.getSchema());
-    cout << "AuthSchema::checkDB: " << dbversion.toSql("\n") << endl;
+    cout << dbversion.toSql("\n") << endl;
+
+    DBEUser dbeuser;
+    dbeuser.setSchemaName(dbmgr.getSchema());
+    cout << dbeuser.toSql("\n") << endl;
+
+    DBEGroup dbegroup;
+    dbegroup.setSchemaName(dbmgr.getSchema());
+    cout << dbegroup.toSql("\n") << endl;
+
+    DBEUserGroup dbeusergroup;
+    dbeusergroup.setSchemaName(dbmgr.getSchema());
+    cout << dbeusergroup.toSql("\n") << endl;
+
+    DBELog dbelog;
+    dbelog.setSchemaName(dbmgr.getSchema());
+    cout << dbelog.toSql("\n") << endl;
+
+    cout << "AuthSchema::checkDB: TODO" << endl;
+
+    cout << "AuthSchema::checkDB: start." << endl;
 }
