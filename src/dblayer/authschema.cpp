@@ -365,7 +365,7 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     long current_migration = -1;
     if(current_db_version<0) {
         string sql;
-        bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL";
+        bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL" && dbmgr.getConnection()->getDBType()!="SQLite";
         DBEDBVersion dbversion;
         sql = dbversion.toSql("\n",use_fk);
         dbmgr.getConnection()->exec(sql);
