@@ -275,6 +275,9 @@ string DBMgr::_buildTableName(DBEntity* dbe) {
     if(this->_schema.length()>0) {
         ret.append(this->_schema);
         ret.append("_");
+    } else if(dbe->getSchemaName().length()>0) {
+        ret.append(dbe->getSchemaName());
+        ret.append("_");
     }
     ret.append( dbe->getTableName() );
     return ret;
@@ -497,6 +500,7 @@ DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, c
         myquery.append( " ORDER BY " );
         myquery.append( orderBy.c_str() );
     }
+    myquery.append(";");
     if( this->verbose ) cout << "DBMgr::Search: myquery = " << myquery << endl;
     string tableName = dbe->getTableName();
     if(this->verbose) cout << "DBMgr::Search: end." << endl;

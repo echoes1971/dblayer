@@ -17,7 +17,7 @@ DBFieldVector DBEDBVersion::chiavi = DBEDBVersion::___init_keys();
 DBFieldVector DBEDBVersion::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEDBVersion::chiave1 ); return ret; }
 DBEDBVersion::DBEDBVersion() {
     this->tableName.clear();
-    this->schemaName = AuthSchema::getSchema();
+    this->schemaName = "dblayer";
     if(DBEDBVersion::_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBEDBVersion::_columns[pair.first] = pair.second;
@@ -342,39 +342,74 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     DBEDBVersion* cerca = new DBEDBVersion();
     cerca->setValue("model_name", AuthSchema::getSchema());
     DBEntityVector* res = dbmgr.Search(cerca,false);
-    if(!dbmgr.getErrorMessage().length()==0 && res->size()>0) {
-        cout << "Results (" << typeid(res).name() << "):" << endl;
-        for(const auto& elem : (*res)) {
-            cout << "- " << elem->toString() << endl;
-        }
-    } else {
-        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
-        dbecurrentversion->setValue("model_name", AuthSchema::getSchema());
-        dbecurrentversion->setValue("version",current_db_version);
-        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
+    cout << "AuthSchema::checkDB: res.size=" << res->size() << endl;
+    if(dbmgr.getErrorMessage().length()==0 && res->size()>0) {
+//        cout << "Results (" << typeid(res).name() << "):" << endl;
+//        for(const auto& elem : (*res)) {
+//            cout << "- " << elem->toString() << endl;
+//        }
+        dbecurrentversion = (DBEDBVersion*) res->at(0);
+        cout << "AuthSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;
+        current_db_version = dbecurrentversion->getIntegerValue("version");
+    } else if(dbmgr.getErrorMessage().length()>0) {
+        cout << "AuthSchema::checkDB: " << dbmgr.getErrorMessage() << endl;
     }
     dbmgr.Destroy(res);
     delete cerca;
 
-    cout << dbecurrentversion->toString("\n") << endl;
+    cerr << "AuthSchema::checkDB: current_db_version=" << current_db_version << endl;
+
+    // drop table dblayer_dbversion,auth_groups,auth_log,auth_users,auth_users_groups;
 
     // 2. Do the DB migration
     long current_migration = -1;
     if(current_db_version<0) {
+        string sql;
+        bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL";
         DBEDBVersion dbversion;
-        cout << dbversion.toSql("\n") << endl;
+        sql = dbversion.toSql("\n",use_fk);
+        dbmgr.getConnection()->exec(sql);
+        cout << sql << endl;
+
+        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
+        dbecurrentversion->setValue("model_name", AuthSchema::getSchema());
+        dbecurrentversion->setValue("version",current_db_version);
+        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
+        cout << dbecurrentversion->toString("\n") << endl;
 
         DBEGroup dbegroup;
-        cout << dbegroup.toSql("\n") << endl;
+        sql = dbegroup.toSql("\n",use_fk);
+        dbmgr.getConnection()->exec(sql);
+        cout << sql << endl;
 
         DBEUser dbeuser;
-        cout << dbeuser.toSql("\n") << endl;
+        sql = dbeuser.toSql("\n",use_fk);
+        dbmgr.getConnection()->exec(sql);
+        cout << sql << endl;
 
         DBEUserGroup dbeusergroup;
-        cout << dbeusergroup.toSql("\n") << endl;
+        sql = dbeusergroup.toSql("\n",use_fk);
+        dbmgr.getConnection()->exec(sql);
+        cout << sql << endl;
 
         DBELog dbelog;
-        cout << dbelog.toSql("\n") << endl;
+        sql = dbelog.toSql("\n",use_fk);
+        dbmgr.getConnection()->exec(sql);
+        cout << sql << endl;
+
+        dbegroup.setValue("id","-2")->setValue("name","Admin")->setValue("description","System admins");
+        dbmgr.Insert(&dbegroup);
+        /*
+        "insert into _groups values ( -2, 'Admin','System admins' )",
+        "insert into _groups values ( -3, 'Users','System users' )",
+        "insert into _groups values ( -4, 'Guests','System guests (read only)' )",
+        "insert into _groups values ( -5, 'Project','R-Project user' )",
+        "insert into _groups values ( -6, 'Webmaster','Web content creators' )",
+        "insert into _users values ( -1, 'adm','adm','','Administrator',-2 )",
+        "insert into _users_groups ( user_id, group_id ) values( -1, -2 )",
+        "insert into _users_groups ( user_id, group_id ) values( -1, -5 )",
+        "insert into _users_groups ( user_id, group_id ) values( -1, -6 )",
+        */
 
         current_migration++;
     }
@@ -382,7 +417,7 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     // 3. Write version to DB
     dbecurrentversion->setValue("version",current_migration);
     cout << dbecurrentversion->toString("\n") << endl;
-    dbmgr.Update(dbecurrentversion);
+    //dbmgr.Update(dbecurrentversion);
 
     //dbecurrentversion->setValue("");
     delete dbecurrentversion;

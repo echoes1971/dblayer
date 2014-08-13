@@ -1,15 +1,15 @@
 /***************************************************************************
-**	dbentity.cpp  v0.1.0 - 2012.03.19
-**	-----------------------------------
+**    dbentity.cpp  v0.1.0 - 2012.03.19
+**    -----------------------------------
 **
-**	Author:		Roberto Rocco Angeloni.
-**	E-mail:		roberto@roccoangeloni.it
-**	Comment:
-**	To Do:
-**	Future:
-**	History:
-**		v0.0.1 - 2002.10.20	First Old Version
-**		v0.1.0 - 2006.05.04 Rewritten for the new framework
+**    Author:        Roberto Rocco Angeloni.
+**    E-mail:        roberto@roccoangeloni.it
+**    Comment:
+**    To Do:
+**    Future:
+**    History:
+**        v0.0.1 - 2002.10.20    First Old Version
+**        v0.1.0 - 2006.05.04 Rewritten for the new framework
 **
 ** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
@@ -119,50 +119,49 @@ string DBEntity::toString_nodes(string prefix) const {
         ret.append( "</" + fields[i]->getName() + ">" );
     }
 
-    ret.append(prefix+"<!--");
-
-    ret.append(prefix+"{");
-    // Table Columns
-    if(this->getColumns().size()>0) {
-        ret.append(prefix+" 'columns': {");
-        for(const pair<string,vector<string> > pair : this->getColumns()) {
-            ret.append(prefix+"  '").append(pair.first).append("': [");
-            for(const string s : pair.second) {
-                ret.append("'").append(s).append("',");
+    if(prefix.length()>0) {
+        ret.append(prefix+"<!--");
+        ret.append(prefix+"{");
+        // Table Columns
+        if(this->getColumns().size()>0) {
+            ret.append(prefix+" 'columns': {");
+            for(const pair<string,vector<string> > pair : this->getColumns()) {
+                ret.append(prefix+"  '").append(pair.first).append("': [");
+                for(const string s : pair.second) {
+                    ret.append("'").append(s).append("',");
+                }
+                ret.append("],");
             }
+            ret.append(prefix+" },");
+        }
+        // Foreign Keys
+        if(this->getFK().size()>0) {
+            ret.append(prefix+" 'foreignkeys': [");
+            for(const ForeignKey fk : this->getFK()) {
+                ret.append(prefix+"  {");
+                ret.append(prefix+"   'fk_column':'"+fk.colonna_fk+"',");
+                ret.append(prefix+"   'referred_table':'"+fk.tabella_riferita+"',");
+                ret.append(prefix+"   'referred_column':'"+fk.colonna_riferita+"',");
+                ret.append(prefix+"  },");
+                //colonna_fk, string tabella_riferita, string colonna_riferita
+            }
+            ret.append(prefix+" ],");
+        }
+        // Order by
+        if(this->getOrderBy().size()>0) {
+            ret.append(prefix+" 'order_by': [");
+            for(const string& s : this->getOrderBy())
+                ret.append("'").append(s).append("',");
             ret.append("],");
         }
-        ret.append(prefix+" },");
+        ret.append(prefix+"}");
+        ret.append(prefix+"-->");
     }
-    // Foreign Keys
-    if(this->getFK().size()>0) {
-        ret.append(prefix+" 'foreignkeys': [");
-        for(const ForeignKey fk : this->getFK()) {
-            ret.append(prefix+"  {");
-            ret.append(prefix+"   'fk_column':'"+fk.colonna_fk+"',");
-            ret.append(prefix+"   'referred_table':'"+fk.tabella_riferita+"',");
-            ret.append(prefix+"   'referred_column':'"+fk.colonna_riferita+"',");
-            ret.append(prefix+"  },");
-            //colonna_fk, string tabella_riferita, string colonna_riferita
-        }
-        ret.append(prefix+" ],");
-    }
-    // Order by
-    if(this->getOrderBy().size()>0) {
-        ret.append(prefix+" 'order_by': [");
-        for(const string& s : this->getOrderBy())
-            ret.append("'").append(s).append("',");
-        ret.append("],");
-    }
-
-    ret.append(prefix+"}");
-    ret.append(prefix+"-->");
-
     ret.append( prefix + "</" + this->name() + ">" );
     return ret;
 }
 
-string DBEntity::toSql(string prefix) {
+string DBEntity::toSql(string prefix,bool use_fk) {
     string ret;
     ret.append(prefix+"CREATE TABLE ");//.append(string(this->getSchemaName()->c_str())).append("_").append(string(this->getTableName().c_str())).append(" (");
     if(this->getSchemaName().length()>0) {
@@ -181,11 +180,8 @@ string DBEntity::toSql(string prefix) {
             for(const string s : pair.second) {
                 ret.append( DBEntity::dbeType2dbType(s) ).append(" ");
             }
-            //if(this->isKey(pair.first)) {
-            //    ret.append("primary key ");
-            //}
-            // Foreign Key: TODO
-            //if(this->isFK(pair.first)) {
+            // Foreign Key
+            if(use_fk) {
                 ForeignKeyVector& fks = this->getFK();
                 for(unsigned int i=0; i<fks.size(); i++) {
                     ForeignKey& f = fks.at(i);
@@ -194,8 +190,7 @@ string DBEntity::toSql(string prefix) {
                         break;
                     }
                 }
-            //}
-            // TODO     product_no integer REFERENCES products (product_no),
+            }
             if(cols_counter<(cols_length-1)) {
                 ret.append(",");
             }

@@ -91,7 +91,7 @@ namespace DBLayer {
          */
         virtual string toString(string prefix="", bool valuesAsAttributes=false) const;
 
-        string toSql(string prefix="");
+        string toSql(string prefix="",bool use_fk=true);
 
         /** @return a new DBE instance */
         virtual DBEntity* createNewInstance() const;

@@ -86,7 +86,7 @@ namespace SchemaNS {
         virtual Field* createNewField(const string& fieldName, const string& valore) const;
         virtual Field* createNewDateField(const string& fieldName, const string& valore) const;
 
-        void addField( Field* field );
+        Schema* addField( Field* field );
         Field* getField(string& field) const;
         Field* getField(const string &field) const;
         Field* getField(int i) const;
@@ -101,29 +101,31 @@ namespace SchemaNS {
         FieldMap getValuesDictionary() const;
 
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setValue(const string& fieldName, bool valore);
+        Schema* setValue(const string& fieldName, bool valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setValue(const string& fieldName, float valore);
+        Schema* setValue(const string& fieldName, float valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setValue(const string& fieldName, long valore);
+        Schema* setValue(const string& fieldName, long valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setValue(const string& fieldName, const string& valore);
+        Schema* setValue(const string& fieldName, const string& valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setDateValue(const string& fieldName, const string& valore);
+        Schema* setDateValue(const string& fieldName, const string& valore);
 
         /**
          * Ritorna il valore del field in argomento
          * L'esistenza del field deve essere prima testata con la funzione isNull
          */
         string getValue(const string& fieldName) const;
+        long getIntegerValue(const string& fieldName) const;
+        bool getBooleanValue(const string& fieldName) const;
         string getDateValue(const string& fieldName) const;
 
         /**
          * Ritorna true se il field non è presente oppure se è presente ma ha valore nullo
          */
         bool isNull(const string& fieldName) const;
-        void setNull(const string& fieldName);
-        void setNull(const string& fieldName, bool valore);
+        Schema* setNull(const string& fieldName);
+        Schema* setNull(const string& fieldName, bool valore);
 
         static int getSchemiCreati();
         static int getSchemiDistrutti();
