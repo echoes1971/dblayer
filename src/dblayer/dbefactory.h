@@ -43,12 +43,11 @@ namespace DBLayer {
         DBEFactory(bool verbose=false);
         virtual ~DBEFactory();
 
-        void registerClass(string tablename, DBEntity* clazz);
-        void registerClass(string* tablename, DBEntity* clazz);
+        void registerClass(const string &tablename, DBEntity* clazz);
         DBEntityVector getRegisteredTypes();
-        DBEntity* getClazz(const string* tablename);
-        DBEntity* getClazzByTypeName(const string *typeName, bool caseSensitive=true);
-        DBEntity* call(string* tablename, StringVector names, StringVector values);
+        DBEntity* getClazz(const string& tablename);
+        DBEntity* getClazzByTypeName(const string& typeName, bool caseSensitive=true);
+        //DBEntity* call(const string& tablename, StringVector names, StringVector values);
 
         string toString(string prefix="\n");
 

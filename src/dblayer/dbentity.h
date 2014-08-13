@@ -61,7 +61,7 @@ namespace DBLayer {
         friend class DBMgr;
       public:
         DBEntity();
-        DBEntity(const string* tableName);
+        DBEntity(const string& tableName);
         virtual ~DBEntity();
 
         string getColumnType(const string& column_name);

@@ -343,8 +343,7 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
             cout << "- " << elem->toString() << endl;
         }
     } else {
-        static const string dbversion("dbversion");
-        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName(&dbversion);
+        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("dbversion");
         dbecurrentversion->setValue("model_name", AuthSchema::getSchema());
     }
     dbmgr.Destroy(res);

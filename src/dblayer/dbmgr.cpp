@@ -84,12 +84,12 @@ void DBMgr::setDBEFactory(DBEFactory* dbeFactory) { this->dbeFactory=dbeFactory;
 DBEFactory* DBMgr::getDBEFactory() { return this->dbeFactory; }
 void DBMgr::setVerbose(bool b) { this->verbose=b; }
 DBEntityVector DBMgr::getRegisteredTypes() { return this->dbeFactory->getRegisteredTypes(); }
-DBEntity* DBMgr::getClazz(string* typeName) {
+DBEntity* DBMgr::getClazz(const string& typeName) {
     if(this->dbeFactory!=0)
         return this->dbeFactory->getClazz(typeName);
     return new DBEntity(typeName);
 }
-DBEntity* DBMgr::getClazzByTypeName(const string* typeName) {
+DBEntity* DBMgr::getClazzByTypeName(const string& typeName) {
     if(this->dbeFactory!=0)
         return this->dbeFactory->getClazzByTypeName(typeName);
     return new DBEntity(typeName);
@@ -419,7 +419,7 @@ DBEntity* DBMgr::Copy(DBEntity* dbe) {
 }
 
 
-void DBMgr::rs2dbelist(ResultSet* res,string* nomeTabella,DBEntityVector* ret) {
+void DBMgr::rs2dbelist(ResultSet* res,string& nomeTabella,DBEntityVector* ret) {
     int nColonne = res->getNumColumns();
     int nRighe = res->getNumRows();
     for(int r=0; r<nRighe; r++) {
@@ -458,23 +458,22 @@ void DBMgr::rs2dbelist(ResultSet* res,string* nomeTabella,DBEntityVector* ret) {
     }
 }
 
-DBEntityVector* DBMgr::Select(const string* tableName, const string* searchString) {
+DBEntityVector* DBMgr::Select(const string& tableName, const string& searchString) {
     if(this->con->isProxy()) {
         DBEntityVector* ret = 0;
-        string* nomeTabella = new string( tableName->c_str() );
-        if( this->verbose ) cout << "DBMgr::Select: nomeTabella=" << *nomeTabella << endl;
+        string nomeTabella = tableName;
+        if( this->verbose ) cout << "DBMgr::Select: nomeTabella=" << nomeTabella << endl;
         DBEntity* dbe = this->getClazz(nomeTabella);
         if( this->verbose ) cout << "DBMgr::Select: dbe=" << dbe->toString() << endl;
         string myTableName = this->_buildTableName(dbe);
         if( this->verbose ) cout << "DBMgr::Select: myTableName=" << myTableName << endl;
-        ret = this->con->Select(dbe,&myTableName,searchString);
+        ret = this->con->Select(dbe,myTableName,searchString);
         delete dbe;
-        delete nomeTabella;
         return ret;
     }
     DBEntityVector* ret = new DBEntityVector;
-    ResultSet* res = this->con->exec( string(searchString->c_str()) );
-    string* nomeTabella = new string( tableName->c_str() );
+    ResultSet* res = this->con->exec(searchString);
+    string nomeTabella = tableName;
 
     if (!con->hasErrors() ) {
         rs2dbelist(res, nomeTabella, ret);
@@ -482,12 +481,11 @@ DBEntityVector* DBMgr::Select(const string* tableName, const string* searchStrin
         if( this->verbose ) cout << "DBMgr::Select: error = " << con->getErrorMessage() << endl;
     }
 
-    delete nomeTabella;
     delete res;
     return ret;
 }
 
-DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string* orderBy ) {
+DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string &orderBy ) {
     if(this->verbose) cout << "DBMgr::Search: start." << endl;
     if(this->con->isProxy()) {
         if( this->verbose ) cout << "DBMgr::Search: calling con->Search()" << endl;
@@ -495,14 +493,14 @@ DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, c
         return this->con->Search(dbe, uselike, caseSensitive, orderBy);
     }
     string myquery = this->_buildSelectString( dbe, uselike, caseSensitive );
-    if( orderBy->size()!=0 ) {
+    if( orderBy.size()!=0 ) {
         myquery.append( " ORDER BY " );
-        myquery.append( orderBy->c_str() );
+        myquery.append( orderBy.c_str() );
     }
     if( this->verbose ) cout << "DBMgr::Search: myquery = " << myquery << endl;
     string tableName = dbe->getTableName();
     if(this->verbose) cout << "DBMgr::Search: end." << endl;
-    return this->Select( &tableName, &myquery );
+    return this->Select(tableName,myquery);
 }
 
 DBEntityVector* DBMgr::searchByKeys(DBEntity* dbe) {
@@ -547,8 +545,7 @@ void DBMgr::_loadUserGroups() {
     if(this->_dbeuser==0)
         return;
     if(this->verbose) cout << "DBMgr::_loadUserGroups: start." << endl;
-    string mytypename("DBEUserGroup");
-    DBEntity* cerca = this->getClazzByTypeName(&mytypename);
+    DBEntity* cerca = this->getClazzByTypeName("DBEUserGroup");
     cerca->readFKFrom(this->_dbeuser);
 
     DBEntityVector* lista = this->Search(cerca,false);
@@ -580,7 +577,7 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
         string nome_tabella("users");
         DBEntityVector list;
 
-        this->rs2dbelist(userRs,&nome_tabella,&list);
+        this->rs2dbelist(userRs,nome_tabella,&list);
 
         if(list.size()!=1) {
             if( this->verbose ) { cout << "DBMgr::login: ERROR - list.size=" << list.size() << endl; }
@@ -597,8 +594,7 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
         this->errorMessage = "Missing username or password";
         return this->_dbeuser;
     }
-    string mytypename("DBEUser");
-    DBEntity* cerca = this->getClazzByTypeName(&mytypename);
+    DBEntity* cerca = this->getClazzByTypeName("DBEUser");
     cerca->setValue("login",user);
     cerca->setValue("pwd",pwd);
 cout << "DBMgr::login: cerca=" << cerca->toString() << endl;

@@ -181,8 +181,8 @@ bool Connection::isProxy() const { return false; }
 DBEntity* Connection::Insert(DBEntity *dbe) { return dbe; }
 DBEntity* Connection::Update(DBEntity *dbe) { return dbe; }
 DBEntity* Connection::Delete(DBEntity *dbe) { return dbe; }
-DBEntityVector* Connection::Select(DBEntity* dbe, const string* tableName, const string* searchString) { return (DBEntityVector*) (0 & (long)dbe & (long)tableName & (long)searchString); }
-DBEntityVector* Connection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string* orderBy ) { return (DBEntityVector*) (0 & (long)dbe & (long)uselike & (long)caseSensitive & (long)orderBy); }
+DBEntityVector* Connection::Select(DBEntity* dbe, const string &tableName, const string& searchString) { return (DBEntityVector*) (0 & (long)dbe & (long)tableName.size() & (long)searchString.size()); }
+DBEntityVector* Connection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string& orderBy ) { return (DBEntityVector*) (0 & (long)dbe & (long)uselike & (long)caseSensitive & (long)orderBy.size()); }
 string Connection::ping() { return "pong"; }
 // **************** Proxy Connections: end. *********************
 

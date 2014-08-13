@@ -66,8 +66,8 @@ class DECLSPECIFIER DBMgr {
         DBEFactory* getDBEFactory();
         DBEntityVector getRegisteredTypes();
         /** get clazz by table name */
-        DBEntity* getClazz(string* typeName);
-        DBEntity* getClazzByTypeName(const string *typeName);
+        DBEntity* getClazz(const string &typeName);
+        DBEntity* getClazzByTypeName(const string& typeName);
 
         DBEntity* getDBEUser();
         void setDBEUser(DBEntity* dbe);
@@ -79,10 +79,10 @@ class DECLSPECIFIER DBMgr {
         DBEntity* Delete(DBEntity *dbe);
         DBEntity* Copy(DBEntity *dbe);
 
-        DBEntityVector* Select(const string* tableName, const string* searchString);
+        DBEntityVector* Select(const string &tableName, const string &searchString);
 
         DBEntityVector* Search(DBEntity* dbe, bool uselike=true,
-                                                        bool caseSensitive=true, const string* orderBy=new string("") );
+                                bool caseSensitive=true, const string& orderBy="" );
         DBEntityVector* searchByKeys(DBEntity* dbe);
         bool exists(DBEntity* dbe);
 
@@ -122,7 +122,7 @@ class DECLSPECIFIER DBMgr {
         /** Destroy the DBEntity of the list and the list itself! */
         static void Destroy(DBEntityVector* lista);
 
-        void setConnection( Connection* _newVal);
+        void setConnection(Connection* _newVal);
         Connection* getConnection();
 
         void setSchema(string schema);
@@ -153,7 +153,7 @@ class DECLSPECIFIER DBMgr {
 
     void _loadUserGroups();
 
-    void rs2dbelist(ResultSet* res, string *nomeTabella, DBEntityVector* ret);
+    void rs2dbelist(ResultSet* res, string& nomeTabella, DBEntityVector* ret);
 
     string _buildTableName(DBEntity* dbe);
     string _buildKeysCondition(DBEntity* dbe);

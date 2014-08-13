@@ -243,9 +243,8 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
         }
 
         if(dbmgr->isLoggedIn()) {
-            string nomeTabella = string("users"); //test_dblayer");
-            string myQuery = string("select * from rra_users"); //test_dblaye
-            DBEntityVector* lista = dbmgr->Select( &nomeTabella, &myQuery );
+            DBEntityVector* lista = dbmgr->Select("users","select * from rra_users");
+            //DBEntityVector* lista = dbmgr->Select("test_dblayer","select * from test_dblayer");
 
             if(lista->size()>0) {
                 cout << "Lista (" << typeid(lista).name() << ") di " << lista->size() << " elementi:" << endl;
@@ -310,8 +309,7 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
 
         cout << "testSearch: cerca = " << cerca->toString() << endl;
 
-        string orderBy("nome");
-        DBEntityVector* lista = dbmgr->Search(cerca, true, true, &orderBy );
+        DBEntityVector* lista = dbmgr->Search(cerca,true,true,"nome");
 
         if ( lista->size()>0 ) {
             cout << "Lista (" << typeid(lista).name() << "):" << endl;
@@ -360,8 +358,7 @@ void testDBE(string connString, string& loginUser, string& loginPwd) {
     }
 
     if ( dbmgr->connect() ) {
-        string mytypename("DBESocieta");
-        DBEntity* cerca = dbmgr->getClazzByTypeName(&mytypename);
+        DBEntity* cerca = dbmgr->getClazzByTypeName("DBESocieta");
 
         cerca->setValue("ragione_sociale","a");
 
@@ -380,8 +377,7 @@ void testDBE(string connString, string& loginUser, string& loginPwd) {
         }
         cout << " }" << endl;
 
-        string orderBy = string("ragione_sociale");
-        DBEntityVector* lista = dbmgr->Search(cerca, true, true, &orderBy );
+        DBEntityVector* lista = dbmgr->Search(cerca,true,true,"ragione_sociale");
         cout << "testDBE: ricerca completata." << endl;
 
         if ( lista->size()>0 ) {
@@ -428,8 +424,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
     printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
     if ( dbmgr->connect() ) {
-        string myclazzname("societa");
-        DBEntity* nuova = dbmgr->getClazz(&myclazzname);
+        DBEntity* nuova = dbmgr->getClazz("societa");
         string valoreStringa("Nuova Societa S.r.l.");
         nuova->setValue("ragione_sociale","Nuova Societa S.r.l.");
         valoreStringa="1970-02-01 00:00:00";
@@ -445,22 +440,21 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
         cout << "testCRUD: inserita nuova dbe " << nuova->toString() << endl;
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
-        DBEntity* cerca = dbmgr->getClazz(&myclazzname);
+        DBEntity* cerca = dbmgr->getClazz("societa");
         DBField* idField = (DBField*) nuova->getField("id");
         cerca->setValue("id", idField!=0 ? idField->getIntegerValue() : -1 );
-        string orderBy = string("id");
         cout << "testCRUD: cerca=" << cerca->toString() << endl;
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         cout << endl;
-        DBEntityVector* lista = dbmgr->Search(cerca, true, true, &orderBy );
+        DBEntityVector* lista = dbmgr->Search(cerca,true,true,"id");
         if ( lista->size()>0 ) {
             cout << "Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
         } else {
-            cout << "testCRUD: LISTA VUOTA!!!" << endl;
+            cout << "testCRUD: EMPTY LIST!!!" << endl;
         }
         dbmgr->Destroy(lista);
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
@@ -475,7 +469,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         cout << endl;
-        lista = dbmgr->Search(cerca, true, true, &orderBy );
+        lista = dbmgr->Search(cerca,true,true,"id");
         if ( lista->size()>0 ) {
             cout << "Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
             for(const auto& elem : (*lista)) {
@@ -498,9 +492,9 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         cout << endl;
-        DBEntity* cercaCopia = dbmgr->getClazz(&myclazzname);
+        DBEntity* cercaCopia = dbmgr->getClazz("societa");
         cercaCopia->setValue("ragione_sociale","Societa");
-        lista = dbmgr->Search(cercaCopia, true, true, &orderBy );
+        lista = dbmgr->Search(cercaCopia, true, true,"id");
         if ( lista->size()>0 ) {
             cout << "Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
             for(const auto& elem : (*lista)) {
@@ -525,7 +519,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         cout << endl;
-        lista = dbmgr->Search(cercaCopia, true, true, &orderBy );
+        lista = dbmgr->Search(cercaCopia,true,true,"id");
         if ( lista->size()>0 ) {
             cout << "Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
             for(const auto& elem : (*lista)) {
@@ -704,6 +698,8 @@ int main(int argc, char *argv[]) {
     cout << "---------------->>  testDBMgr: end." << endl;
     cout << endl;
 
+    return 0;
+
     cout << "---------------->>  testSearch" << endl;
     if(argc==5) {
         testSearch( host, dbname, usr, pwd, login_user, login_password );
@@ -714,8 +710,6 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-
-    return 0;
 
     cout << "---------------->>  testDBE" << endl;
     if(argc==5) {

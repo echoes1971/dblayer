@@ -45,17 +45,16 @@ DBEFactory::~DBEFactory() {
     if(this->_verbose) printf("DBEFactory::~DBEFactory: end.\n");
 }
 
-void DBEFactory::registerClass(string tablename, DBEntity* clazz) { this->registerClass(&tablename, clazz); }
-void DBEFactory::registerClass(string* tablename, DBEntity* clazz) {
-    string tmpIndex=(*tablename);
+void DBEFactory::registerClass(const string& tablename, DBEntity* clazz) {
+    string tmpIndex=tablename;
     // IF exists => delete the old definition
     if(this->_cache.find(tmpIndex)!=this->_cache.end())
         delete this->_cache[tmpIndex];
     this->_cache[tmpIndex] = clazz;
 }
 
-DBEntity* DBEFactory::getClazz(const string* tablename) {
-    string nomeTabella(tablename->c_str());
+DBEntity* DBEFactory::getClazz(const string& tablename) {
+    string nomeTabella(tablename.c_str());
     if(this->_verbose) cout << "DBEFactory::getClazz: nomeTabella=" << nomeTabella << endl;
     if( this->_cache.find(nomeTabella) != this->_cache.end() ) {
         if(this->_verbose) cout << "DBEFactory::getClazz: found!" << endl;
@@ -64,9 +63,9 @@ DBEntity* DBEFactory::getClazz(const string* tablename) {
     return new DBEntity(tablename);
 }
 
-DBEntity* DBEFactory::getClazzByTypeName(const string* typeName, bool caseSensitive) {
+DBEntity* DBEFactory::getClazzByTypeName(const string& typeName, bool caseSensitive) {
     for(const auto& elem : this->_cache) {
-        if (caseSensitive && elem.second->name()== (*typeName) ) {
+        if(caseSensitive && elem.second->name()==typeName) {
             return elem.second->createNewInstance();
         }
     }

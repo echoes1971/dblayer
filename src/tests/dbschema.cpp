@@ -51,9 +51,7 @@ DBFieldVector* DBESocieta::getKeys() const { return &DBESocieta::chiavi; }
 DBESocieta* DBESocieta::createNewInstance() const { return new DBESocieta(); }
 
 void DBESocieta::_before_insert(DBMgr* dbmgr) {
-    string query("select max(id) as max_id from societa");
-    string nomeTabella = this->name();
-    DBEntityVector* lista = dbmgr->Select( &nomeTabella, &query );
+    DBEntityVector* lista = dbmgr->Select(this->name(),"select max(id) as max_id from societa");
     if( lista!=0 && lista->size()==1 ) {
         long maxId = 0;
         if(lista->at(0)->getFieldSize()>0) {
@@ -61,7 +59,6 @@ void DBESocieta::_before_insert(DBMgr* dbmgr) {
             maxId = field->getIntegerValue();
         }
         this->setValue("id", maxId+1 );
-
         dbmgr->Destroy(lista);
     }
     if(dbmgr==0) return;

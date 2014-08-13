@@ -41,9 +41,10 @@ ForeignKeyVector DBEntity::_fkv;
 DBEntity::DBEntity() {
     this->tableName = this->tableName.append( "no table name" );
 }
-DBEntity::DBEntity(const string* tableName) {
-    this->tableName.clear();
-    this->tableName.append( tableName->c_str() );
+DBEntity::DBEntity(const string& tableName) {
+    this->tableName = tableName;
+//    this->tableName.clear();
+//    this->tableName.append( tableName.c_str() );
 }
 DBEntity::~DBEntity() {}
 void DBEntity::setSchemaName(string s) { this->schemaName=s; }
