@@ -36,10 +36,10 @@ BooleanField::BooleanField() : DBField() {
   this->type = DBField::BOOLEAN;
   this->nullo = true;
 }
-BooleanField::BooleanField(const string* nome) : DBField(nome) {
+BooleanField::BooleanField(const string &nome) : DBField(nome) {
   this->type = DBField::BOOLEAN;
 }
-BooleanField::BooleanField(const string* nome, bool valore) : DBField(nome) {
+BooleanField::BooleanField(const string &nome, bool valore) : DBField(nome) {
   this->type = DBField::BOOLEAN;
   this->setBooleanValue(valore);
 }
@@ -53,7 +53,7 @@ Field* BooleanField::createNewInstance(const char* aName) const {
     } else {
         myName.append( aName );
     }
-    ret = (Field*) new BooleanField(&myName);
+    ret = (Field*) new BooleanField(myName);
     return ret;
 }
 

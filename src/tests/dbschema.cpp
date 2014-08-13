@@ -20,7 +20,7 @@ using namespace std;
 
 //***********************	DBETestDBLayer: start.
 const string DBETestDBLayer::nomiCampiChiave[] = { string("id") };
-IntegerField DBETestDBLayer::chiave1( (const string*)&DBETestDBLayer::nomiCampiChiave[0] );
+IntegerField DBETestDBLayer::chiave1( DBETestDBLayer::nomiCampiChiave[0] );
 DBFieldVector DBETestDBLayer::chiavi( 1, &DBETestDBLayer::chiave1 );
 
 DBETestDBLayer::DBETestDBLayer() {
@@ -37,7 +37,7 @@ DBETestDBLayer* DBETestDBLayer::createNewInstance() const { return new DBETestDB
 //***********************	DBESocieta: start.
 
 const string DBESocieta::nomiCampiChiave[] = { string("id") };
-IntegerField DBESocieta::chiave1( (const string*)&DBESocieta::nomiCampiChiave[0] );
+IntegerField DBESocieta::chiave1( DBESocieta::nomiCampiChiave[0] );
 DBFieldVector DBESocieta::chiavi( 1, &DBESocieta::chiave1 );
 
 
@@ -52,7 +52,6 @@ DBESocieta* DBESocieta::createNewInstance() const { return new DBESocieta(); }
 
 void DBESocieta::_before_insert(DBMgr* dbmgr) {
     string query("select max(id) as max_id from societa");
-    string nomeCampoDestinazione("id");
     string nomeTabella = this->name();
     DBEntityVector* lista = dbmgr->Select( &nomeTabella, &query );
     if( lista!=0 && lista->size()==1 ) {
@@ -61,15 +60,14 @@ void DBESocieta::_before_insert(DBMgr* dbmgr) {
             DBField* field = (DBField*) lista->at(0)->getField(0);
             maxId = field->getIntegerValue();
         }
-        this->setValue( &nomeCampoDestinazione, maxId+1 );
+        this->setValue("id", maxId+1 );
 
         dbmgr->Destroy(lista);
     }
     if(dbmgr==0) return;
 }
 void DBESocieta::_before_copy(DBMgr* dbmgr) {
-	static string nomeCampo("ragione_sociale");
-	DBField* campo = (DBField*) this->getField( &nomeCampo );
+    DBField* campo = (DBField*) this->getField("ragione_sociale");
 	if( campo==0 || campo->isNull() )
 		return;
 	string nuovoValore("Copy of ");
@@ -80,7 +78,7 @@ void DBESocieta::_before_copy(DBMgr* dbmgr) {
 }
 //***********************	DBESocieta: end.
 
-string MySchema::getSchema() { return "auth"; }
+string MySchema::getSchema() { return "test"; }
 void MySchema::registerClasses(DBEFactory* dbeFactory) {
   dbeFactory->registerClass("test_dblayer", new DBETestDBLayer() );
   dbeFactory->registerClass("societa", new DBESocieta() );

@@ -259,7 +259,7 @@ void DBShell::cmdTable2Cpp(DBShell* dbShell, string s) {
                 dbShell->cmdOut
                         .append(tipoField)
                         .append(" ").append(typeName).append("::chiave").append(DBLayer::integer2string(num_chiave+1))
-                        .append("( (const string*)&")
+                        .append("( ")
                         .append(typeName)
                         .append("::nomiCampiChiave[")
                         .append(DBLayer::integer2string(num_chiave))

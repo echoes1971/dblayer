@@ -32,5 +32,5 @@
 using namespace DBLayer;
 
 DBField::DBField() : Field() {}
-DBField::DBField(const string* nome) : Field(nome) {}
+DBField::DBField(const string& nome) : Field(nome) {}
 DBField::~DBField() {}

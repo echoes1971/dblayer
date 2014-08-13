@@ -22,8 +22,8 @@
 #include "integerfield.h"
 using namespace DBLayer;
 
-IntegerField::IntegerField(const string* nome) : DBField(nome) { type = DBField::INTEGER; }
-IntegerField::IntegerField(const string* nome, long valore) : DBField(nome) {
+IntegerField::IntegerField(const string &nome) : DBField(nome) { type = DBField::INTEGER; }
+IntegerField::IntegerField(const string &nome, long valore) : DBField(nome) {
     type = DBField::INTEGER;
     this->setValue(valore);
 }
@@ -59,6 +59,6 @@ Field* IntegerField::createNewInstance(const char* aName) const {
     } else {
         myName.append( aName );
     }
-    ret = (Field*) new IntegerField(&myName);
+    ret = (Field*) new IntegerField(myName);
     return ret;
 }

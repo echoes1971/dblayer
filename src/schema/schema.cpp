@@ -177,12 +177,12 @@ bool Schema::equals(Schema* right) const {
 #endif
 
 #endif
-        Field* otherfield = right->getField( &nomi[i] );
+        Field* otherfield = right->getField(nomi[i]);
         if(otherfield==0) {
             ret=false;
             continue;
         }
-        Field* myfield = this->getField( &nomi[i] );
+        Field* myfield = this->getField(nomi[i]);
         if(myfield==0) {
             ret=false;
             continue;
@@ -198,20 +198,20 @@ DECLSPECIFIER bool SchemaNS::operator==(const Schema& left, const Schema& right)
     return left_pointer->equals( right_pointer );
 }
 
-Field* Schema::createNewField(const string* fieldName, bool valore) const { return new BooleanField(fieldName, valore); }
-Field* Schema::createNewField(const string* fieldName, float valore) const { return new FloatField(fieldName, valore); }
-Field* Schema::createNewField(const string* fieldName, long valore) const { return new IntegerField(fieldName, valore); }
-Field* Schema::createNewField(const string* fieldName, const string* valore) const { return new StringField(fieldName, valore); }
-Field* Schema::createNewDateField(const string* fieldName, const string* valore) const { return new DateField(fieldName, valore); }
+Field* Schema::createNewField(const string& fieldName, bool valore) const { return new BooleanField(fieldName, valore); }
+Field* Schema::createNewField(const string& fieldName, float valore) const { return new FloatField(fieldName, valore); }
+Field* Schema::createNewField(const string& fieldName, long valore) const { return new IntegerField(fieldName, valore); }
+Field* Schema::createNewField(const string& fieldName, const string& valore) const { return new StringField(fieldName, valore); }
+Field* Schema::createNewDateField(const string& fieldName, const string& valore) const { return new DateField(fieldName, valore); }
 void Schema::addField( Field* field ) { this->fields.push_back( field ); }
-Field* Schema::getField(const string* field) const {
+Field* Schema::getField(const string& field) const {
     Field* ret = (Field*)0;
     int indice = this->getFieldIndex(field);
     if( indice>=0 )
         ret = this->getField( indice );
     return ret;
 }
-Field* Schema::getField(string* field) const {
+Field* Schema::getField(string &field) const {
     Field* ret = (Field*)0;
     int indice = this->getFieldIndex(field);
     if( indice>=0 )
@@ -219,9 +219,9 @@ Field* Schema::getField(string* field) const {
     return ret;
 }
 Field* Schema::getField(int i) const { return i>=0 && i<((int)this->fields.size()) ? this->fields[i] : 0; }
-int Schema::getFieldIndex(const string* field) const {
+int Schema::getFieldIndex(const string& field) const {
     int ret = -1;
-    const char* fieldCstr = field->c_str();
+    const char* fieldCstr = field.c_str();
 #ifdef WIN32
     size_t fieldsSize = fields.size();
     for(size_t i=0; i<fieldsSize && ret<0 ; i++) {
@@ -286,7 +286,7 @@ FieldMap Schema::getValuesDictionary() const {
     return ret;
 }
 
-void Schema::setDateValue(const string* fieldName, const string* valore) {
+void Schema::setDateValue(const string& fieldName, const string& valore) {
     Field* field = this->getField(fieldName);
     if(field==0) {
         field = this->createNewDateField(fieldName, valore);
@@ -295,7 +295,7 @@ void Schema::setDateValue(const string* fieldName, const string* valore) {
         ((DateField*)field)->setValue(valore);
     }
 }
-void Schema::setValue(const string* fieldName, const string* valore) {
+void Schema::setValue(const string& fieldName, const string& valore) {
     Field* field = this->getField(fieldName);
     if(field==0) {
         field = this->createNewField(fieldName, valore);
@@ -304,7 +304,7 @@ void Schema::setValue(const string* fieldName, const string* valore) {
         field->setStringValue(valore);
     }
 }
-void Schema::setValue(const string* fieldName, bool valore) {
+void Schema::setValue(const string& fieldName, bool valore) {
     Field* field = this->getField(fieldName);
     if(field==0) {
         field =  this->createNewField(fieldName, valore);
@@ -318,10 +318,10 @@ void Schema::setValue(const string* fieldName, bool valore) {
         field->setBooleanValue(valore);
     }
 }
-void Schema::setValue(const string* fieldName, float valore) {
+void Schema::setValue(const string& fieldName, float valore) {
 	Field* field = this->getField(fieldName);
     if(field==0) {
-		field =  this->createNewField(fieldName, valore);
+        field =  this->createNewField(fieldName, valore);
 		this->addField(field);
     } else if(!field->isFloat()) {
         int indice = this->getFieldIndex(fieldName);
@@ -332,10 +332,10 @@ void Schema::setValue(const string* fieldName, float valore) {
 		field->setFloatValue(valore);
 	}
 }
-void Schema::setValue(const string* fieldName, long valore) {
+void Schema::setValue(const string& fieldName, long valore) {
 	Field* field = this->getField(fieldName);
     if(field==0) {
-		field =  this->createNewField(fieldName, valore);
+        field =  this->createNewField(fieldName, valore);
 		this->addField(field);
     } else if(!field->isInteger()) {
         int indice = this->getFieldIndex(fieldName);
@@ -347,24 +347,24 @@ void Schema::setValue(const string* fieldName, long valore) {
 	}
 }
 
-string Schema::getValue(const string* fieldName) const {
+string Schema::getValue(const string& fieldName) const {
     Field* field = this->getField(fieldName);
     return field==0 ? "" : field->toString();
 }
-string Schema::getDateValue(const string* fieldName) const {
+string Schema::getDateValue(const string& fieldName) const {
     Field* field = this->getField(fieldName);
     return field==0 ? "" : field->toString();
 }
 
-bool Schema::isNull(const string* fieldName) const {
+bool Schema::isNull(const string &fieldName) const {
 	Field* field = this->getField(fieldName);
 	return field==0 ? true : field->isNull();
 }
-void Schema::setNull(const string* fieldName) {
+void Schema::setNull(const string& fieldName) {
 	Field* field = this->getField(fieldName);
 	if( field!=0 ) field->setNull();
 }
-void Schema::setNull(const string* fieldName, bool valore) {
+void Schema::setNull(const string& fieldName, bool valore) {
 	Field* field = this->getField(fieldName);
 	if( field!=0 ) field->setNull(valore);
 }

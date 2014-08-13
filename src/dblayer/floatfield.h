@@ -32,8 +32,8 @@ namespace DBLayer {
 
 class DECLSPECIFIER FloatField : public DBField  {
 public:
-    FloatField(const string* nome);
-    FloatField(const string* nome, float valore);
+    FloatField(const string& nome);
+    FloatField(const string& nome, float valore);
     virtual ~FloatField();
     float getValue();
     void setValue(float valore);

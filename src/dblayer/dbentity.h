@@ -95,18 +95,18 @@ namespace DBLayer {
 
         /** @return a new DBE instance */
         virtual DBEntity* createNewInstance() const;
-        virtual Field* createNewField(const string* fieldName, bool valore) const;
-        virtual Field* createNewField(const string* fieldName, float valore) const;
-        virtual Field* createNewField(const string* fieldName, long valore) const;
-        virtual Field* createNewField(const string* fieldName, const string* valore) const;
-        virtual Field* createNewDateField(const string* fieldName, const string* valore) const;
+        virtual Field* createNewField(const string& fieldName, bool valore) const;
+        virtual Field* createNewField(const string& fieldName, float valore) const;
+        virtual Field* createNewField(const string& fieldName, long valore) const;
+        virtual Field* createNewField(const string& fieldName, const string& valore) const;
+        virtual Field* createNewDateField(const string& fieldName, const string& valore) const;
 
         /**	TODO: DEPRECARE?	*/
         void* getValue(string* field);
         /**	TODO: DEPRECARE?	*/
         void* getValue(const string& field);
 
-        string getStringValue(const string* fieldName);
+        string getStringValue(const string& fieldName);
 
         /** @return the key fields */
         virtual DBFieldVector* getKeys() const;

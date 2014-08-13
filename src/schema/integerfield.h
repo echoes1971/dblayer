@@ -37,8 +37,8 @@ namespace SchemaNS {
 
 	class DECLSPECIFIER IntegerField : public Field  {
       public:
-		IntegerField(const string* nome);
-		IntegerField(const string* nome, long valore);
+        IntegerField(const string &nome);
+        IntegerField(const string &nome, long valore);
 		virtual ~IntegerField();
 		
         virtual Field* createNewInstance(const char* aName=0) const;

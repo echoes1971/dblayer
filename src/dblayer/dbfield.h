@@ -41,7 +41,7 @@ namespace DBLayer {
 class DECLSPECIFIER DBField : public Field {
   public:
     DBField();
-    DBField(const string* nome);
+    DBField(const string &nome);
     virtual ~DBField();
 };
 

@@ -31,23 +31,24 @@
 #include "stringfield.h"
 using namespace SchemaNS;
 
-StringField::StringField(const string* nome) : Field(nome){
+StringField::StringField(const string& nome) : Field(nome){
     type = Field::STRING;
 }
-StringField::StringField(const string* nome,const string* valore) : Field(nome){
+StringField::StringField(const string& nome, const string& valore) : Field(nome) {
     type = Field::STRING;
-    this->setValue( valore);
+    this->setValue(valore);
 }
 StringField::~StringField() {}
 
 Field* StringField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
-    return (Field*) new StringField(&myName);
+    return (Field*) new StringField(myName);
 }
 
-void StringField::setValue(const string* valore){
-    this->stringValue= new string(valore->c_str());
-    if ( ((unsigned long)valore!=0) && valore->size()>0 )
+void StringField::setValue(const string& valore){
+    this->stringValue= new string(valore.c_str());
+    if ( valore.size()>0 )
+    //if ( ((unsigned long)valore!=0) && valore.size()>0 )
         nullo = false;
 }
 const string* StringField::getValue() const{ return this->stringValue; }

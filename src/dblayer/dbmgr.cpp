@@ -202,7 +202,7 @@ string DBMgr::_buildInsertString(DBEntity* dbe) {
     StringVector tmpValori;
     for(unsigned int i=0; i<nomiCampi.size(); i++) {
         string nomeCampo = nomiCampi[i];
-        DBField* valore = (DBField*) dbe->getField( &nomeCampo );
+        DBField* valore = (DBField*) dbe->getField( nomeCampo );
         if( valore==0 || valore->isNull() )
             continue;
         tmpNomi.push_back( nomeCampo );
@@ -287,7 +287,7 @@ string DBMgr::_buildKeysCondition(DBEntity* dbe) {
     for(unsigned int i=0; i<chiaviSize; i++) {
         DBField* chiave = chiavi->at(i);
         string nomeChiave = chiave->getName();
-        DBField* valore = (DBField*) dbe->getField(&nomeChiave);
+        DBField* valore = (DBField*) dbe->getField(nomeChiave);
         if( valore!=0 && !valore->isNull() ) {
             string valoreChiave = valore->toString();
             string clausola;
@@ -433,22 +433,22 @@ void DBMgr::rs2dbelist(ResultSet* res,string* nomeTabella,DBEntityVector* ret) {
             if ( res->getColumnType(c)==DBLayer::type_boolean ) {
                 bool valore = false;
                 valore = res->getValue( r, c ) == string("t");
-                dbfield = new BooleanField( &columnName );
+                dbfield = new BooleanField( columnName );
                 dbfield->setBooleanValue( valore );
             } else if ( res->getColumnType(c)==DBLayer::type_integer ) {
                 long valore = 0;
                 valore = atoi( res->getValue( r, c ).c_str() );
-                dbfield = new IntegerField( &columnName, valore );
+                dbfield = new IntegerField( columnName, valore );
             } else if ( res->getColumnType(c)==DBLayer::type_double ) {
                 float valore = 0;
                 valore = (float) atof( res->getValue( r, c ).c_str() );
-                dbfield = new FloatField( &columnName, valore );
+                dbfield = new FloatField( columnName, valore );
             } else if ( res->getColumnType(c)==DBLayer::type_string ) {
                 string valore = res->getValue( r, c );
-                dbfield = new StringField( &columnName, &valore );
+                dbfield = new StringField( columnName, valore );
             } else if ( res->getColumnType(c)==DBLayer::type_datetime ) {
                 string valore = res->getValue( r, c );
-                dbfield = new DateField( &columnName, &valore );
+                dbfield = new DateField( columnName, valore );
             }
             if(dbfield!=0) {
                 dbe->addField(dbfield);
@@ -510,12 +510,12 @@ DBEntityVector* DBMgr::searchByKeys(DBEntity* dbe) {
     StringVector chiavi = dbe->getKeyNames();
     unsigned int chiaviSize = chiavi.size();
     for(unsigned int i=0; i<chiaviSize; i++) {
-        Field* field = dbe->getField(&chiavi[i]);
+        Field* field = dbe->getField(chiavi[i]);
         string v = field->toString();
         if(field->isDate())
-            cerca->setDateValue(&chiavi[i],&v);
+            cerca->setDateValue(chiavi[i],v);
         else
-            cerca->setValue(&chiavi[i],&v);
+            cerca->setValue(chiavi[i],v);
     }
     return this->Search(cerca,false,false);
 }
@@ -554,12 +554,11 @@ void DBMgr::_loadUserGroups() {
     DBEntityVector* lista = this->Search(cerca,false);
 
     this->_user_groups_list.clear();
-    string group_id("group_id");
     for(const DBEntity* g : (*lista)) {
-        this->_user_groups_list.push_back(string(g->getField(&group_id)->getStringValue()->c_str()));
+        this->_user_groups_list.push_back(string(g->getField("group_id")->getStringValue()->c_str()));
     }
 
-    string user_group_id = string(this->_dbeuser->getField(&group_id)->getStringValue()->c_str());
+    string user_group_id = string(this->_dbeuser->getField("group_id")->getStringValue()->c_str());
     vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), user_group_id);
     if(i==this->_user_groups_list.end()) {
         this->_user_groups_list.push_back(user_group_id);
@@ -598,10 +597,10 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
         this->errorMessage = "Missing username or password";
         return this->_dbeuser;
     }
-    string mytypename("DBEUser"); string login_field("login"); string pwd_field("pwd");
+    string mytypename("DBEUser");
     DBEntity* cerca = this->getClazzByTypeName(&mytypename);
-    cerca->setValue(&login_field,&user);
-    cerca->setValue(&pwd_field,&pwd);
+    cerca->setValue("login",user);
+    cerca->setValue("pwd",pwd);
 cout << "DBMgr::login: cerca=" << cerca->toString() << endl;
     DBEntityVector* lista = this->Search(cerca,false);
 
@@ -642,9 +641,8 @@ cout << "DBMgr::login: cerca=" << cerca->toString() << endl;
 DBEntity* DBMgr::relogin() {
     if(this->_dbeuser==0)
         return 0;
-    string login_field("login"); string pwd_field("pwd");
-    string login(this->_dbeuser->getField(&login_field)->getStringValue()->c_str());
-    string pwd(this->_dbeuser->getField(&pwd_field)->getStringValue()->c_str());
+    string login(this->_dbeuser->getField("login")->getStringValue()->c_str());
+    string pwd(this->_dbeuser->getField("pwd")->getStringValue()->c_str());
     return this->login(login,pwd);
 }
 
@@ -654,8 +652,7 @@ string DBMgr::getServerIDString() {
     string d(this->getConnection()->getDBType());
     string u("nobody");
     if(this->_dbeuser!=0) {
-        string login_field("login");
-        u = string(this->_dbeuser->getField(&login_field)->getStringValue()->c_str());
+        u = string(this->_dbeuser->getField("login")->getStringValue()->c_str());
     }
     string h(this->getConnection()->getConnectionString());
     // TODO

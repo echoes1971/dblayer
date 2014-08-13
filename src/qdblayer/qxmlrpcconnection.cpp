@@ -531,7 +531,7 @@ QList<QVariant>* QXmlrpcConnection::_dbeToVariant(DBEntity* dbe, QList<QVariant>
     ioVariant->push_back( QVariant(dbe->name().c_str()) );
     StringVector names = dbe->getNames();
     for(StringVector::iterator it=names.begin(); it!=names.end(); it++) {
-        Field* field = dbe->getField(&(*it));
+        Field* field = dbe->getField(*it);
         //printf("QXmlrpcConnection::_dbeToVariant: %s type=%d  - is %s null\n", (*it).c_str(), field->getType(), field->isNull()?"":"not");
         if(field->isNull()) continue;
         //if(field->getStringValue()!=0) printf("QXmlrpcConnection::_dbeToVariant: %s=>%s\n", (*it).c_str(), field->getStringValue()->c_str());
@@ -563,24 +563,24 @@ DBEntity* QXmlrpcConnection::_variantToDBE(QVariant* v, DBEntity* ioDbe) {
         string value = v->toMap()[ qkey ].toString().toStdString();
         switch(v->toMap()[ qkey ].type()) {
             case QVariant::Bool:
-                ioDbe->setValue(&key, (bool) v->toMap()[ qkey ].toBool());
+                ioDbe->setValue(key, (bool) v->toMap()[ qkey ].toBool());
                 break;
             case QVariant::Int:
             case QVariant::LongLong:
             case QVariant::UInt:
             case QVariant::ULongLong:
-                ioDbe->setValue(&key, (long) v->toMap()[ qkey ].toLongLong());
+                ioDbe->setValue(key, (long) v->toMap()[ qkey ].toLongLong());
                 break;
             case QVariant::Double:
-                ioDbe->setValue(&key, (float) v->toMap()[ qkey ].toDouble());
+                ioDbe->setValue(key, (float) v->toMap()[ qkey ].toDouble());
                 break;
             case QVariant::Date:
             case QVariant::DateTime:
             case QVariant::Time:
-                ioDbe->setDateValue(&key, &value);
+                ioDbe->setDateValue(key, value);
                 break;
             default:
-                ioDbe->setValue(&key, &value);
+                ioDbe->setValue(key, value);
                 break;
         }
         //printf("QXmlrpcConnection::_variantToDBE: %s=>%s (%d::%s)\n", key.c_str(), value.c_str(), v->toMap()[ qkey ].type(), v->toMap()[ qkey ].typeName());

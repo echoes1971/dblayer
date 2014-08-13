@@ -44,12 +44,13 @@ Field::Field() {
   this->stringValue=0;
   fieldCreati++;
 }
-Field::Field(const string* nome) {
-    this->name=*nome;
+Field::Field(const string& nome) {
+    this->name=nome;
     this->nullo = true;
     this->stringValue=0;
     fieldCreati++;
 }
+
 Field::~Field() {
     if( this->stringValue!=0 ) delete this->stringValue;
     fieldDistrutti++;
@@ -58,7 +59,7 @@ Field::~Field() {
 Field* Field::createNewInstance(const char* aName) const {
     Field* ret=0;
     string myName = aName==0 ? this->name : aName ;
-    ret = new Field(&myName);
+    ret = new Field(myName);
     ret->type = this->type;
     return ret;
 }
@@ -186,7 +187,7 @@ void Field::setDateValue(const string* valore) {
     this->setNull(false);
 }
 
-void Field::setValue(string valore) {
+void Field::setValue(const string& valore) {
 	if(this->stringValue!=0) delete this->stringValue;
 	this->stringValue = new string( valore.c_str() );
     if(this->nullo) {

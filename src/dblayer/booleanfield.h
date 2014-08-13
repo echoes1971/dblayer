@@ -38,8 +38,8 @@ namespace DBLayer {
 	class DECLSPECIFIER BooleanField : public DBField {
 	  public:
         BooleanField();
-        BooleanField(const string* nome);
-        BooleanField(const string* nome, bool valore);
+        BooleanField(const string& nome);
+        BooleanField(const string& nome, bool valore);
         virtual ~BooleanField();
 
         virtual Field* createNewInstance(const char* aName=0) const;

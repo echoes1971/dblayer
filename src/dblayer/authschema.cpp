@@ -12,7 +12,7 @@ using namespace std;
 const string DBEDBVersion::nomiCampiChiave[] = { string("model_name") };
 ColumnDefinitions DBEDBVersion::_columns;
 ColumnDefinitions DBEDBVersion::getColumns() const { return DBEDBVersion::_columns; }
-IntegerField DBEDBVersion::chiave1( (const string*)&DBEDBVersion::nomiCampiChiave[0] );
+IntegerField DBEDBVersion::chiave1( DBEDBVersion::nomiCampiChiave[0] );
 DBFieldVector DBEDBVersion::chiavi = DBEDBVersion::___init_keys();
 DBFieldVector DBEDBVersion::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEDBVersion::chiave1 ); return ret; }
 DBEDBVersion::DBEDBVersion() {
@@ -37,8 +37,7 @@ DBLayer::StringVector DBEDBVersion::getOrderBy() const {
 }
 
 int DBEDBVersion::version() {
-    string field_name("version");
-    return this->getField(&field_name)->getIntegerValue();
+    return this->getField("version")->getIntegerValue();
 }
 
 //*********************** DBEDBVersion: end.
@@ -48,7 +47,7 @@ const string DBEUser::nomiCampiChiave[] = { string("id") };
 ColumnDefinitions DBEUser::_columns;
 ForeignKeyVector DBEUser::_fkv;
 ColumnDefinitions DBEUser::getColumns() const { return DBEUser::_columns; }
-StringField DBEUser::chiave1( (const string*)&DBEUser::nomiCampiChiave[0] );
+StringField DBEUser::chiave1( DBEUser::nomiCampiChiave[0] );
 DBFieldVector DBEUser::chiavi = DBEUser::___init_keys();
 DBFieldVector DBEUser::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEUser::chiave1 ); return ret; }
 DBEUser::DBEUser() {
@@ -95,14 +94,12 @@ vector<map<string,string> > DBEUser::getDefaultEntries() const {
     return ret;
 }
 bool DBEUser::isRoot() {
-    static string id("id");
-    return string(this->getField(&id)->getStringValue()->c_str())=="-1";
+    return string(this->getField("id")->getStringValue()->c_str())=="-1";
 }
 
 void DBEUser::_before_insert(DBMgr* dbmgr) {
-    static string id("id");
-    if(this->isNull(&id)) {
-        this->getField(&id)->setStringValue(dbmgr->getNextUuid(this));
+    if(this->isNull("id")) {
+        this->getField("id")->setStringValue(dbmgr->getNextUuid(this));
     }
     if(this->checkNewPassword()) {
         this->_createGroup(dbmgr);
@@ -115,10 +112,8 @@ void DBEUser::_after_update(DBMgr* dbmgr) {
     this->_checkGroupAssociation(dbmgr);
 }
 void DBEUser::_after_delete(DBMgr* dbmgr) {
-    static string user_id("user_id");
-    static string id("id");
     DBEUserGroup search;
-    search.getField(&user_id)->setStringValue(string(this->getStringValue(&id).c_str()));
+    search.getField("user_id")->setStringValue(string(this->getStringValue("id").c_str()));
     DBEntityVector* list = dbmgr->Search(&search,false);
     for(DBEntity* dbe : (*list)) {
         dbmgr->Delete(dbe);
@@ -127,34 +122,24 @@ void DBEUser::_after_delete(DBMgr* dbmgr) {
     this->_deleteGroup(dbmgr);
 }
 void DBEUser::_createGroup(DBMgr* dbmgr) {
-    static string name("name");
-    static string description("description");
-    static string login("login");
-    static string group_id("group_id");
-    static string id("id");
-    if(!this->getField(&group_id)->isNull())
+    if(!this->getField("group_id")->isNull())
         return;
     DBEGroup* dbe = new DBEGroup();
-    dbe->getField(&name)->setStringValue(string(this->getStringValue(&login).c_str()));
-    dbe->getField(&description)->setStringValue("Private group for "+string(this->getStringValue(&id).c_str())+"-"+string(this->getStringValue(&login).c_str()));
+    dbe->getField("name")->setStringValue(string(this->getStringValue("login").c_str()));
+    dbe->getField("description")->setStringValue("Private group for "+string(this->getStringValue("id").c_str())+"-"+string(this->getStringValue("login").c_str()));
     dbe = (DBEGroup*) dbmgr->Insert(dbe);
-    this->getField(&group_id)->setStringValue(string(dbe->getStringValue(&id).c_str()));
+    this->getField("group_id")->setStringValue(string(dbe->getStringValue("id").c_str()));
     delete dbe;
 }
 void DBEUser::_deleteGroup(DBMgr* dbmgr) {
-    static string group_id("group_id");
-    static string id("id");
     DBEGroup dbe;
-    dbe.getField(&id)->setStringValue(string(this->getField(&group_id)->getStringValue()->c_str()));
+    dbe.getField("id")->setStringValue(string(this->getField("group_id")->getStringValue()->c_str()));
     dbmgr->Delete(&dbe);
 }
 void DBEUser::_checkGroupAssociation(DBMgr* dbmgr) {
-    static string user_id("user_id");
-    static string group_id("group_id");
-    static string id("id");
     DBEUserGroup ug;
-    ug.getField(&user_id)->setStringValue(this->getField(&id)->getStringValue());
-    ug.getField(&group_id)->setStringValue(this->getField(&group_id)->getStringValue());
+    ug.getField("user_id")->setStringValue(this->getField("id")->getStringValue());
+    ug.getField("group_id")->setStringValue(this->getField("group_id")->getStringValue());
     bool exists = dbmgr->exists(&ug);
     if(!exists) {
         dbmgr->Insert(&ug);
@@ -166,7 +151,7 @@ void DBEUser::_checkGroupAssociation(DBMgr* dbmgr) {
 const string DBEGroup::nomiCampiChiave[] = { string("id") };
 ColumnDefinitions DBEGroup::_columns;
 ColumnDefinitions DBEGroup::getColumns() const { return DBEGroup::_columns; }
-StringField DBEGroup::chiave1( (const string*)&DBEGroup::nomiCampiChiave[0] );
+StringField DBEGroup::chiave1( DBEGroup::nomiCampiChiave[0] );
 DBFieldVector DBEGroup::chiavi = DBEGroup::___init_keys();
 DBFieldVector DBEGroup::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEGroup::chiave1 ); return ret; }
 DBEGroup::DBEGroup() {
@@ -210,8 +195,7 @@ vector<map<string,string> > DBEGroup::getDefaultEntries() const {
 }
 
 void DBEGroup::_before_insert(DBMgr* dbmgr) {
-    static const string id_field_name;
-    Field* id_field = this->getField(&id_field_name);
+    Field* id_field = this->getField("id");
     if(id_field->isNull()) {
         string uuid = dbmgr->getNextUuid(this);
         id_field->setStringValue(uuid);
@@ -221,22 +205,17 @@ void DBEGroup::_after_insert(DBMgr* dbmgr) {
     if(dbmgr->getDBEUser()==0)
         return;
     DBEUserGroup dbe;
-    static string group_id("group_id");
-    static string user_id("user_id");
-    static string id("id");
 
-    string this_id = string(this->getField(&id)->getStringValue()->c_str());
+    string this_id = string(this->getField("id")->getStringValue()->c_str());
 
-    dbe.getField(&group_id);
-    dbe.getField(&user_id),dbmgr->getDBEUser()->getField(&id)->getStringValue();
+    dbe.setValue("group_id",this_id);
+    dbe.setValue("user_id",dbmgr->getDBEUser()->getField("id")->getStringValue());
     dbmgr->Insert(&dbe);
     dbmgr->addGroup(this_id);
 }
 void DBEGroup::_after_delete(DBMgr* dbmgr) {
-    static const string group_id("group_id");
-    static const string id("id");
     DBEUserGroup search;
-    search.getField(&group_id)->setStringValue(this->getField(&id)->getStringValue());
+    search.getField("group_id")->setStringValue(this->getField("id")->getStringValue());
     DBEntityVector* list = dbmgr->Search(&search,false);
     for(DBEntity* dbe : (*list)) {
         dbmgr->Delete(dbe);
@@ -251,8 +230,8 @@ const string DBEUserGroup::nomiCampiChiave[] = { string("user_id"), string("grou
 ColumnDefinitions DBEUserGroup::_columns;
 ForeignKeyVector DBEUserGroup::_fkv;
 ColumnDefinitions DBEUserGroup::getColumns() const { return DBEUserGroup::_columns; }
-StringField DBEUserGroup::chiave1( (const string*)&DBEUserGroup::nomiCampiChiave[0] );
-StringField DBEUserGroup::chiave2( (const string*)&DBEUserGroup::nomiCampiChiave[1] );
+StringField DBEUserGroup::chiave1( DBEUserGroup::nomiCampiChiave[0] );
+StringField DBEUserGroup::chiave2( DBEUserGroup::nomiCampiChiave[1] );
 DBFieldVector DBEUserGroup::chiavi = DBEUserGroup::___init_keys();
 DBFieldVector DBEUserGroup::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEUserGroup::chiave1 ); ret.push_back( &DBEUserGroup::chiave2 ); return ret; }
 DBEUserGroup::DBEUserGroup() {
@@ -304,8 +283,8 @@ vector<map<string,string> > DBEUserGroup::getDefaultEntries() const {
 const string DBELog::nomiCampiChiave[] = { string("ip"), string("data") };
 ColumnDefinitions DBELog::_columns;
 ColumnDefinitions DBELog::getColumns() const { return DBELog::_columns; }
-StringField DBELog::chiave1( (const string*)&DBELog::nomiCampiChiave[0] );
-StringField DBELog::chiave2( (const string*)&DBELog::nomiCampiChiave[1] );
+StringField DBELog::chiave1( DBELog::nomiCampiChiave[0] );
+StringField DBELog::chiave2( DBELog::nomiCampiChiave[1] );
 DBFieldVector DBELog::chiavi = DBELog::___init_keys();
 DBFieldVector DBELog::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBELog::chiave1 ); ret.push_back( &DBELog::chiave2 ); return ret; }
 DBELog::DBELog() {
@@ -347,27 +326,61 @@ void AuthSchema::registerClasses(DBEFactory* dbeFactory) {
 void AuthSchema::checkDB(DBMgr& dbmgr) {
     cout << "AuthSchema::checkDB: start." << endl;
 
-    DBEDBVersion dbversion;
-    dbversion.setSchemaName(dbmgr.getSchema());
-    cout << dbversion.toSql("\n") << endl;
+    if(!dbmgr.connect()) {
+        cerr << "AuthSchema::checkDB: ERROR - UNABLE TO CONNECT TO DB!!!" << endl;
+        return;
+    }
 
-    DBEUser dbeuser;
-    dbeuser.setSchemaName(dbmgr.getSchema());
-    cout << dbeuser.toSql("\n") << endl;
+    // 1. Check app version
+    int current_db_version = -1;
+    DBEDBVersion* dbecurrentversion;
+    DBEDBVersion* cerca = new DBEDBVersion();
+    cerca->setValue("model_name", AuthSchema::getSchema());
+    DBEntityVector* res = dbmgr.Search(cerca,false);
+    if(!dbmgr.getErrorMessage().length()==0 && res->size()>0) {
+        cout << "Results (" << typeid(res).name() << "):" << endl;
+        for(const auto& elem : (*res)) {
+            cout << "- " << elem->toString() << endl;
+        }
+    } else {
+        static const string dbversion("dbversion");
+        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName(&dbversion);
+        dbecurrentversion->setValue("model_name", AuthSchema::getSchema());
+    }
+    dbmgr.Destroy(res);
+    delete cerca;
 
-    DBEGroup dbegroup;
-    dbegroup.setSchemaName(dbmgr.getSchema());
-    cout << dbegroup.toSql("\n") << endl;
+    cout << dbecurrentversion->toString("\n") << endl;
 
-    DBEUserGroup dbeusergroup;
-    dbeusergroup.setSchemaName(dbmgr.getSchema());
-    cout << dbeusergroup.toSql("\n") << endl;
+    // 2. Do the DB migration
+    int current_migration = -1;
+    if(current_db_version<0) {
+        DBEDBVersion dbversion;
+        dbversion.setSchemaName(dbmgr.getSchema());
+        cout << dbversion.toSql("\n") << endl;
 
-    DBELog dbelog;
-    dbelog.setSchemaName(dbmgr.getSchema());
-    cout << dbelog.toSql("\n") << endl;
+        DBEUser dbeuser;
+        dbeuser.setSchemaName(dbmgr.getSchema());
+        cout << dbeuser.toSql("\n") << endl;
 
+        DBEGroup dbegroup;
+        dbegroup.setSchemaName(dbmgr.getSchema());
+        cout << dbegroup.toSql("\n") << endl;
+
+        DBEUserGroup dbeusergroup;
+        dbeusergroup.setSchemaName(dbmgr.getSchema());
+        cout << dbeusergroup.toSql("\n") << endl;
+
+        DBELog dbelog;
+        dbelog.setSchemaName(dbmgr.getSchema());
+        cout << dbelog.toSql("\n") << endl;
+
+        current_migration++;
+    }
+
+    //dbecurrentversion->setValue("");
+    delete dbecurrentversion;
     cout << "AuthSchema::checkDB: TODO" << endl;
 
-    cout << "AuthSchema::checkDB: start." << endl;
+    cout << "AuthSchema::checkDB: end." << endl;
 }

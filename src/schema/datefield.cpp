@@ -35,17 +35,17 @@
 
 using namespace SchemaNS;
 
-DateField::DateField(const string* nome, const string* valore) : Field(nome){
+DateField::DateField(const string& nome, const string& valore) : Field(nome){
     type = Field::DATE;
     this->setValue( valore );
     this->setNull(false);
 }
-DateField::DateField(const string* nome, long seconds) : Field(nome){
+DateField::DateField(const string& nome, long seconds) : Field(nome){
     type = Field::DATE;
     this->setValue(seconds);
     this->setNull(false);
 }
-DateField::DateField(const string* nome,
+DateField::DateField(const string &nome,
                      long year, long month, long day,
                      long hour, long minute, long seconds, long millis) : Field(nome) {
     type = Field::DATE;
@@ -62,7 +62,7 @@ DateField::~DateField(){}
 
 Field* DateField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
-    return new DateField(&myName,0L);
+    return new DateField(myName,0L);
 }
 
 Field* DateField::clone() const {
@@ -94,17 +94,17 @@ bool DateField::equals(Field* field) const {
 
 
 // YYYY-MM-DD HH:MM:SS mmm
-void DateField::setValue(const string* valore) {
+void DateField::setValue(const string& valore) {
     // TODO: controllare che la stringa sia nel formato YYYY-MM-DD hh:mm:ss mmm"
 
-    const char* tmpValore = valore->c_str();
+    const char* tmpValore = valore.c_str();
 #ifdef WIN32
-    size_t tmpSize = valore->size();
+    size_t tmpSize = valore.size();
 #else
  #ifdef __i386__
-    unsigned int tmpSize = valore->size();
+    unsigned int tmpSize = valore.size();
  #else
-    unsigned long tmpSize = valore->size();
+    unsigned long tmpSize = valore.size();
  #endif
 #endif
 

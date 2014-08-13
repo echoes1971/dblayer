@@ -60,7 +60,7 @@ namespace SchemaNS {
     class DECLSPECIFIER Field {
       public:
         Field();
-        Field(const string* nome);
+        Field(const string& nome);
         virtual ~Field();
 
         virtual Field* createNewInstance(const char* aName=0) const;
@@ -98,7 +98,7 @@ namespace SchemaNS {
         void setValue(bool value);
         void setValue(long value);
         void setValue(float value);
-        void setValue(string value);
+        void setValue(const string& value);
 
         void setValue(void* value);
         void* getValue() const;

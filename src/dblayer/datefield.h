@@ -33,14 +33,14 @@ namespace DBLayer {
     class DECLSPECIFIER DateField : public DBField  {
       public:
 		/** YYYY-MM-DD HH:MM:SS mmm */
-    	DateField(const string* nome, const string* valore);
-    	DateField(const string* nome, long seconds);
-    	DateField(const string* nome,
+        DateField(const string& nome, const string& valore);
+        DateField(const string& nome, long seconds);
+        DateField(const string& nome,
                 long year, long month, long day,
                 long hour, long minute, long seconds, long millis
             );
         virtual ~DateField();
-        void setValue(const string* valore);
+        void setValue(const string& valore);
         /** Since 01/01/1970 */
         void setValue(long seconds);
         //bool isValid();

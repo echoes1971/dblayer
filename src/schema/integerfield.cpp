@@ -33,10 +33,10 @@
 #include "integerfield.h"
 using namespace SchemaNS;
 
-IntegerField::IntegerField(const string* nome) : Field(nome) {
+IntegerField::IntegerField(const string& nome) : Field(nome) {
     type = Field::INTEGER;
 }
-IntegerField::IntegerField(const string* nome, long valore) : Field(nome) {
+IntegerField::IntegerField(const string& nome, long valore) : Field(nome) {
     type = Field::INTEGER;
     this->setValue(valore);
 }
@@ -44,7 +44,7 @@ IntegerField::~IntegerField(){}
 
 Field* IntegerField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
-    return (Field*) new IntegerField(&myName);
+    return (Field*) new IntegerField(myName);
 }
 
 long IntegerField::getValue() const{ return longValue; }

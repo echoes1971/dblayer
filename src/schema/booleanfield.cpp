@@ -36,10 +36,10 @@ BooleanField::BooleanField() : Field() {
     this->type = Field::BOOLEAN;
     this->nullo = true;
 }
-BooleanField::BooleanField(const string* nome) : Field(nome) {
+BooleanField::BooleanField(const string& nome) : Field(nome) {
     this->type = Field::BOOLEAN;
 }
-BooleanField::BooleanField(const string* nome, bool valore) : Field(nome) {
+BooleanField::BooleanField(const string& nome, bool valore) : Field(nome) {
     this->type = Field::BOOLEAN;
     this->setBooleanValue(valore);
 }
@@ -47,7 +47,7 @@ BooleanField::~BooleanField(){}
 
 Field* BooleanField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
-    return new BooleanField(&myName);
+    return new BooleanField(myName);
 }
 
 string BooleanField::toString() const { return this->boolValue ? "true" : "false"; }

@@ -28,10 +28,10 @@ namespace DBLayer {
 
     class DECLSPECIFIER StringField : public DBField  {
       public:
-        StringField(const string* nome);
-        StringField(const string* nome,const string* valore );
+        StringField(const string& nome);
+        StringField(const string& nome,const string& valore );
         virtual ~StringField();
-        void setValue(const string* valore);
+        void setValue(const string& valore);
         string* getValue() const;
         string toString() const;
         virtual Field* createNewInstance(const char* aName=0) const;

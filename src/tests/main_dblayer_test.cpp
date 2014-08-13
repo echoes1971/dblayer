@@ -134,10 +134,7 @@ void testDBConnection(string host,string dbname,string usr,string pwd, string& l
 }
 
 void testDateField() {
-    string* tmpNome = new string("cippa");
-    string* tmpData = new string("1970-02-01 00:00:00");
-    string* tmpData2 = new string("2038-01-19 00:00:00");
-    DBLayer::DateField dateField = DBLayer::DateField( tmpNome, tmpData );
+    DBLayer::DateField dateField = DBLayer::DateField( "cippa", "1970-02-01 00:00:00" );
     cout << "string: " << dateField.toString() << endl;
     cout << "seconds: " << dateField.to_seconds() << endl;
     cout << "days: " << dateField.to_days() << endl;
@@ -145,14 +142,10 @@ void testDateField() {
     dateField.setValue( dateField.to_seconds() );
     cout << "seconds2date: " << dateField.toString() << endl;
 
-    dateField.setValue( tmpData2 );
+    dateField.setValue( "2038-01-19 00:00:00" );
     cout << "date: " << dateField.toString() << endl;
     dateField.setValue( dateField.to_seconds() );
     cout << "seconds2date: " << dateField.toString() << endl;
-
-    delete tmpData2;
-    delete tmpData;
-    delete tmpNome;
 }
 
 void testGetKeys(string connString, string& loginUser, string& loginPwd, string relname) {
@@ -313,10 +306,7 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
 //        long valoreInteger = 1;
 //        cerca.setValue( &nomeCampoInteger, valoreInteger );
 
-        string nomeCampoDate("data_creazione");
-//	string valoreDate("2006-03-31 20:00:00");
-        string valoreDate("2006-04-01 16:15:30");
-        cerca->setDateValue( &nomeCampoDate, &valoreDate );
+        cerca->setDateValue("data_creazione","2006-04-01 16:15:30");
 
         cout << "testSearch: cerca = " << cerca->toString() << endl;
 
@@ -325,7 +315,6 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
 
         if ( lista->size()>0 ) {
             cout << "Lista (" << typeid(lista).name() << "):" << endl;
-            DBEntityVector::iterator theIterator;
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
@@ -334,7 +323,7 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
         dbmgr->Destroy(lista);
         delete cerca;
     } else {
-        cout << "Errore: " << dbmgr->getErrorMessage() << endl;
+        cout << "Error: " << dbmgr->getErrorMessage() << endl;
     }
     delete dbmgr;
     delete mycon;
@@ -371,13 +360,10 @@ void testDBE(string connString, string& loginUser, string& loginPwd) {
     }
 
     if ( dbmgr->connect() ) {
-        string myclazzname("societa");
         string mytypename("DBESocieta");
         DBEntity* cerca = dbmgr->getClazzByTypeName(&mytypename);
 
-        string nomeCampo("ragione_sociale");
-        string valoreStringa("a");
-        cerca->setValue( &nomeCampo, &valoreStringa );
+        cerca->setValue("ragione_sociale","a");
 
         //string nomeCampoInteger("cap");
         //long valoreInteger = 20156;
@@ -444,12 +430,10 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
     if ( dbmgr->connect() ) {
         string myclazzname("societa");
         DBEntity* nuova = dbmgr->getClazz(&myclazzname);
-        string nomeCampo("ragione_sociale");
         string valoreStringa("Nuova Societa S.r.l.");
-        nuova->setValue( &nomeCampo, &valoreStringa );
-        nomeCampo="data_creazione";
+        nuova->setValue("ragione_sociale","Nuova Societa S.r.l.");
         valoreStringa="1970-02-01 00:00:00";
-        nuova->setDateValue(&nomeCampo,&valoreStringa);
+        nuova->setDateValue("data_creazione","1970-02-01 00:00:00");
 
         cout << "testCRUD: da inserire " << nuova->toString() << endl;
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
@@ -462,9 +446,8 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         DBEntity* cerca = dbmgr->getClazz(&myclazzname);
-        string nomeCampoId("id");
-        DBField* idField = (DBField*) nuova->getField(&nomeCampoId);
-        cerca->setValue(&nomeCampoId, idField!=0 ? idField->getIntegerValue() : -1 );
+        DBField* idField = (DBField*) nuova->getField("id");
+        cerca->setValue("id", idField!=0 ? idField->getIntegerValue() : -1 );
         string orderBy = string("id");
         cout << "testCRUD: cerca=" << cerca->toString() << endl;
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
@@ -483,10 +466,8 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
         printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         // Update
-        string valoreStringa2("Nuova Societa L\'Attico S.r.l.");
-        nuova->setValue( &nomeCampo, &valoreStringa2 );
-        string nomeCampoCap("cap");
-        nuova->setValue( &nomeCampoCap, 60015L );
+        nuova->setValue("ragione_sociale","Nuova Societa L\'Attico S.r.l.");
+        nuova->setValue("cap", 60015L);
 
         cout << endl;
         nuova = dbmgr->Update(nuova);
@@ -518,9 +499,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
 
         cout << endl;
         DBEntity* cercaCopia = dbmgr->getClazz(&myclazzname);
-        string nomeCampoRagioneSociale("ragione_sociale");
-        string valoreCampoRagioneSociale("Societa");
-        cercaCopia->setValue( &nomeCampoRagioneSociale, &valoreCampoRagioneSociale );
+        cercaCopia->setValue("ragione_sociale","Societa");
         lista = dbmgr->Search(cercaCopia, true, true, &orderBy );
         if ( lista->size()>0 ) {
             cout << "Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;

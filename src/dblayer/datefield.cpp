@@ -23,18 +23,18 @@
 
 using namespace DBLayer;
 
-DateField::DateField(const string* nome, const string* valore) : DBField(nome) {
+DateField::DateField(const string &nome, const string &valore) : DBField(nome) {
 	type = DBField::DATE;
 	this->setValue( valore );
 	this->setNull(false);
 }
-DateField::DateField(const string* nome, long seconds) : DBField(nome) {
+DateField::DateField(const string &nome, long seconds) : DBField(nome) {
 	type = DBField::DATE;
 	this->setValue(seconds);
 	this->setNull(false);
 }
-DateField::DateField(const string* nome,
-				long year, long month, long day,
+DateField::DateField(const string &nome,
+                long year, long month, long day,
                 long hour, long minute, long seconds, long millis) : DBField(nome) {
 	type = DBField::DATE;
 	this->year    = year;
@@ -57,30 +57,30 @@ Field* DateField::createNewInstance(const char* aName) const {
     } else {
         myName.append( aName );
     }
-    ret = new DateField(&myName,0L);
+    ret = new DateField(myName,0L);
     return ret;
 }
 
 // YYYY-MM-DD HH:MM:SS mmm
-void DateField::setValue(const string* valore) {
+void DateField::setValue(const string &valore) {
 	// TODO: controllare che la stringa sia nel formato YYYY-MM-DD hh:mm:ss mmm"
 
 	this->year = 0;	this->month = 0;	this->day = 0;
 	this->hour = 0;	this->minute = 0;	this->seconds = 0;
 	this->millis = 0;
 
-	if ( valore->size() >= 10 ) {
-		this->year  = atoi( valore->substr(0,4).c_str() );
-		this->month = atoi( valore->substr(5,2).c_str() );
-		this->day   = atoi( valore->substr(8,2).c_str() );
+    if ( valore.size() >= 10 ) {
+        this->year  = atoi( valore.substr(0,4).c_str() );
+        this->month = atoi( valore.substr(5,2).c_str() );
+        this->day   = atoi( valore.substr(8,2).c_str() );
 	}
-	if ( valore->size() >=19 ) {
-		this->hour    = atoi( valore->substr(11,2).c_str() );
-		this->minute  = atoi( valore->substr(14,2).c_str() );
-		this->seconds = atoi( valore->substr(17,2).c_str() );
+    if ( valore.size() >=19 ) {
+        this->hour    = atoi( valore.substr(11,2).c_str() );
+        this->minute  = atoi( valore.substr(14,2).c_str() );
+        this->seconds = atoi( valore.substr(17,2).c_str() );
 	}
-	if ( valore->size() >=23 ) {
-		this->millis = atoi( valore->substr(20,3).c_str() );
+    if ( valore.size() >=23 ) {
+        this->millis = atoi( valore.substr(20,3).c_str() );
 	}
 
 	this->setNull(false);

@@ -20,20 +20,20 @@
 #include "stringfield.h"
 using namespace DBLayer;
 
-StringField::StringField(const string* nome) : DBField(nome) {
+StringField::StringField(const string &nome) : DBField(nome) {
   type = DBField::STRING;
 }
-StringField::StringField(const string* nome,const string* valore) : DBField(nome) {
+StringField::StringField(const string &nome, const string &valore) : DBField(nome) {
   type = DBField::STRING;
   this->setValue(valore);
 }
 StringField::~StringField() {}
 
-void StringField::setValue(const string* valore) {
+void StringField::setValue(const string &valore) {
     if(this->stringValue!=0) { delete this->stringValue; this->stringValue=0; }
-    const char* tmpValore = valore->c_str();
+    const char* tmpValore = valore.c_str();
     this->stringValue = new string(tmpValore);
-    if ( ((long)valore!=0) && valore->size()>0 )
+    if(valore.size()>0)
         nullo = false;
 }
 string* DBLayer::StringField::getValue() const { return this->stringValue; }
@@ -51,6 +51,6 @@ Field* StringField::createNewInstance(const char* aName) const {
     } else {
         myName.append( aName );
     }
-    ret = (Field*) new StringField(&myName);
+    ret = (Field*) new StringField(myName);
     return ret;
 }

@@ -20,10 +20,10 @@
 #include <cstdio>
 #include "floatfield.h"
 
-DBLayer::FloatField::FloatField(const string* nome) : DBField(nome) {
+DBLayer::FloatField::FloatField(const string &nome) : DBField(nome) {
     type = DBField::FLOAT;
 }
-DBLayer::FloatField::FloatField(const string* nome, float valore) : DBField(nome) {
+DBLayer::FloatField::FloatField(const string &nome, float valore) : DBField(nome) {
     type = DBField::FLOAT;
     this->setValue(valore);
 }
@@ -55,6 +55,6 @@ Field* DBLayer::FloatField::createNewInstance(const char* aName) const {
     } else {
         myName.append( aName );
     }
-    ret = new DBLayer::FloatField(&myName);
+    ret = new DBLayer::FloatField(myName);
     return ret;
 }

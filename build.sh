@@ -25,9 +25,9 @@ cmake ${cmake_params} ${SRC_DIR}
 #make -j 12 && ./tests/dblayer_test dblayer:sqlite:../examples/test.db
 #make -j 12 && ./apps/dbshell dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php
 
-#make -j 12 && ./apps/dbshell "dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;"
+#make -j 12 && ./apps/dbshell "dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;" roberto echoestrade
 
-make -j 12 && ./tests/dblayer_test "dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;"
+make -j 12 && ./tests/dblayer_test "dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;" roberto echoestrade
 #make -j 12 && ./tests/dblayer_test dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php roberto echoestrade
 
 cd ..

@@ -43,8 +43,8 @@ namespace DBLayer {
 
 	class DECLSPECIFIER IntegerField : public DBField  {
       public:
-		IntegerField(const string* nome);
-		IntegerField(const string* nome, long valore);
+        IntegerField(const string& nome);
+        IntegerField(const string& nome, long valore);
 		virtual ~IntegerField();
 		void setValue(long valore);
 		long getValue();

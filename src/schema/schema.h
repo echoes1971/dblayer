@@ -80,18 +80,18 @@ namespace SchemaNS {
         virtual bool equals(Schema* right) const;
         friend DECLSPECIFIER bool operator==(const Schema& left, const Schema& right);
 
-        virtual Field* createNewField(const string* fieldName, bool valore) const;
-        virtual Field* createNewField(const string* fieldName, float valore) const;
-        virtual Field* createNewField(const string* fieldName, long valore) const;
-        virtual Field* createNewField(const string* fieldName, const string* valore) const;
-        virtual Field* createNewDateField(const string* fieldName, const string* valore) const;
+        virtual Field* createNewField(const string& fieldName, bool valore) const;
+        virtual Field* createNewField(const string& fieldName, float valore) const;
+        virtual Field* createNewField(const string& fieldName, long valore) const;
+        virtual Field* createNewField(const string& fieldName, const string& valore) const;
+        virtual Field* createNewDateField(const string& fieldName, const string& valore) const;
 
         void addField( Field* field );
-        Field* getField(string* field) const;
-        Field* getField(const string* field) const;
+        Field* getField(string& field) const;
+        Field* getField(const string &field) const;
         Field* getField(int i) const;
         /** Ritorna la posizione del field nel vettore */
-        int getFieldIndex(const string* field) const;
+        int getFieldIndex(const string& field) const;
         /** Ritorna i dbfields presenti nella dbe */
         int getFieldSize() const;
 
@@ -101,29 +101,29 @@ namespace SchemaNS {
         FieldMap getValuesDictionary() const;
 
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setValue(const string* fieldName, bool valore);
+        void setValue(const string& fieldName, bool valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setValue(const string* fieldName, float valore);
+        void setValue(const string& fieldName, float valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setValue(const string* fieldName, long valore);
+        void setValue(const string& fieldName, long valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setValue(const string* fieldName, const string* valore);
+        void setValue(const string& fieldName, const string& valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
-        void setDateValue(const string* fieldName, const string* valore);
+        void setDateValue(const string& fieldName, const string& valore);
 
         /**
          * Ritorna il valore del field in argomento
          * L'esistenza del field deve essere prima testata con la funzione isNull
          */
-        string getValue(const string* fieldName) const;
-        string getDateValue(const string* fieldName) const;
+        string getValue(const string& fieldName) const;
+        string getDateValue(const string& fieldName) const;
 
         /**
          * Ritorna true se il field non è presente oppure se è presente ma ha valore nullo
          */
-        bool isNull(const string* fieldName) const;
-        void setNull(const string* fieldName);
-        void setNull(const string* fieldName, bool valore);
+        bool isNull(const string& fieldName) const;
+        void setNull(const string& fieldName);
+        void setNull(const string& fieldName, bool valore);
 
         static int getSchemiCreati();
         static int getSchemiDistrutti();

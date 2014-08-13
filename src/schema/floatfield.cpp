@@ -33,11 +33,11 @@
 #include "floatfield.h"
 using namespace SchemaNS;
 
-FloatField::FloatField(const string* nome) : Field(nome) {
+FloatField::FloatField(const string& nome) : Field(nome) {
     this->type = Field::FLOAT;
     this->validRepr=false;
 }
-FloatField::FloatField(const string* nome, float valore) : Field(nome) {
+FloatField::FloatField(const string& nome, float valore) : Field(nome) {
     this->type = Field::FLOAT;
     this->validRepr=false;
     this->setValue(valore);
@@ -46,7 +46,7 @@ FloatField::~FloatField() {}
 
 Field* FloatField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
-    return new FloatField(&myName);
+    return new FloatField(myName);
 }
 
 float FloatField::getValue() const { return floatValue; }

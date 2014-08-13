@@ -37,8 +37,8 @@ namespace SchemaNS {
 
     class DECLSPECIFIER FloatField : public Field  {
       public:
-        FloatField(const string* nome);
-        FloatField(const string* nome, float valore);
+        FloatField(const string &nome);
+        FloatField(const string &nome, float valore);
         virtual ~FloatField();
 
         virtual Field* createNewInstance(const char* aName=0) const;

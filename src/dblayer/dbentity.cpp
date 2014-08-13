@@ -163,7 +163,7 @@ string DBEntity::toString_nodes(string prefix) const {
 
 string DBEntity::toSql(string prefix) {
     string ret;
-    ret.append(prefix+"create table ");//.append(string(this->getSchemaName()->c_str())).append("_").append(string(this->getTableName().c_str())).append(" (");
+    ret.append(prefix+"CREATE TABLE ");//.append(string(this->getSchemaName()->c_str())).append("_").append(string(this->getTableName().c_str())).append(" (");
     if(this->getSchemaName().length()>0) {
         ret.append(this->getSchemaName());
         ret.append("_");
@@ -180,9 +180,9 @@ string DBEntity::toSql(string prefix) {
             for(const string s : pair.second) {
                 ret.append(s).append(" ");
             }
-            if(this->isKey(pair.first)) {
-                ret.append("primary key ");
-            }
+            //if(this->isKey(pair.first)) {
+            //    ret.append("primary key ");
+            //}
             // Foreign Key: TODO
             //if(this->isFK(pair.first)) {
                 ForeignKeyVector& fks = this->getFK();
@@ -199,6 +199,21 @@ string DBEntity::toSql(string prefix) {
                 ret.append(",");
             }
             cols_counter++;
+        }
+        DBFieldVector* mykeys = this->getKeys();
+        if(mykeys->size()>0) {
+            ret.append(",");
+            ret.append(prefix+" PRIMARY KEY ( ");
+            int keys_length = mykeys->size();
+            int keys_counter=0;
+            for(const DBField* field : *mykeys) {
+                ret.append(field->getName());
+                if(keys_counter<(keys_length-1)) {
+                    ret.append(", ");
+                }
+                keys_counter++;
+            }
+            ret.append(" )");
         }
     }
     ret.append(prefix+");");
@@ -291,7 +306,7 @@ void* DBEntity::getValue(const string& field) {
   return (void*)0;
 }
 
-string DBEntity::getStringValue(const string* fieldName) {
+string DBEntity::getStringValue(const string &fieldName) {
     Field* ret = this->getField(fieldName);
     return ret==0 ? "" : ret->toString();
 }
@@ -320,11 +335,11 @@ bool DBEntity::isKey(string fieldName) const {
 }
 
 DBEntity* DBEntity::createNewInstance() const { return new DBEntity(); }
-Field* DBEntity::createNewField(const string* fieldName, bool valore) const { return new BooleanField(fieldName, valore); }
-Field* DBEntity::createNewField(const string* fieldName, float valore) const { return new FloatField(fieldName, valore); }
-Field* DBEntity::createNewField(const string* fieldName, long valore) const { return new IntegerField(fieldName, valore); }
-Field* DBEntity::createNewField(const string* fieldName, const string* valore) const { return new StringField(fieldName, valore); }
-Field* DBEntity::createNewDateField(const string* fieldName, const string* valore) const { return new DateField(fieldName, valore); }
+Field* DBEntity::createNewField(const string &fieldName, bool valore) const { return new BooleanField(fieldName, valore); }
+Field* DBEntity::createNewField(const string &fieldName, float valore) const { return new FloatField(fieldName, valore); }
+Field* DBEntity::createNewField(const string &fieldName, long valore) const { return new IntegerField(fieldName, valore); }
+Field* DBEntity::createNewField(const string &fieldName, const string &valore) const { return new StringField(fieldName, valore); }
+Field* DBEntity::createNewDateField(const string &fieldName, const string &valore) const { return new DateField(fieldName, valore); }
 
 ForeignKeyVector& DBEntity::getFK() const { return DBEntity::_fkv; }
 ForeignKeyVector DBEntity::getFKForTable(string tablename) {
@@ -343,19 +358,19 @@ void DBEntity::readFKFrom(DBEntity* dbe) {
     ForeignKeyVector fks = this->getFKForTable( dbe->getTableName() );
     for(unsigned int i=0; i<fks.size(); i++) {
         ForeignKey& f = fks.at(i);
-        DBField* myfield = (DBField*) dbe->getField( &f.colonna_riferita );
+        DBField* myfield = (DBField*) dbe->getField( f.colonna_riferita );
         if( myfield!=0 && !myfield->isNull() ) {
             string nomeField = f.colonna_fk;
             if ( myfield->isBoolean() ) {
-                    this->setValue( &nomeField, myfield->getBooleanValue() );
+                this->setValue( nomeField, myfield->getBooleanValue() );
             } else if ( myfield->isInteger() ) {
-                    this->setValue( &nomeField, myfield->getIntegerValue() );
+                this->setValue( nomeField, myfield->getIntegerValue() );
             } else if ( myfield->isFloat() || myfield->isDouble() )  {
-                    this->setValue( &nomeField, myfield->getFloatValue() );
+                this->setValue( nomeField, myfield->getFloatValue() );
             } else if ( myfield->isString() ) {
-                    this->setValue( &nomeField, myfield->getStringValue() );
+                this->setValue( nomeField, myfield->getStringValue() );
             } else if ( myfield->isDate() ) {
-                    this->setDateValue( &nomeField, myfield->getStringValue() );
+                this->setDateValue( nomeField, *myfield->getStringValue() );
             }
         }
     }
@@ -364,19 +379,19 @@ DBEntity* DBEntity::writeFKTo(DBEntity* dbemaster) {
     ForeignKeyVector fks = this->getFKForTable( dbemaster->getTableName() );
     for(unsigned int i=0; i<fks.size(); i++) {
         ForeignKey& f = fks.at(i);
-        DBField* myfield = (DBField*) this->getField( &f.colonna_fk );
+        DBField* myfield = (DBField*) this->getField( f.colonna_fk );
         if( myfield!=0 && !myfield->isNull() ) {
             string nomeField = myfield->getName();
             if ( myfield->isBoolean() ) {
-                    dbemaster->setValue( &nomeField, myfield->getBooleanValue() );
+                dbemaster->setValue( nomeField, myfield->getBooleanValue() );
             } else if ( myfield->isInteger() ) {
-                    dbemaster->setValue( &nomeField, myfield->getIntegerValue() );
+                dbemaster->setValue( nomeField, myfield->getIntegerValue() );
             } else if ( myfield->isFloat() || myfield->isDouble() )  {
-                    dbemaster->setValue( &nomeField, myfield->getFloatValue() );
+                dbemaster->setValue( nomeField, myfield->getFloatValue() );
             } else if ( myfield->isString() ) {
-                    dbemaster->setValue( &nomeField, myfield->getStringValue() );
+                dbemaster->setValue( nomeField, myfield->getStringValue() );
             } else if ( myfield->isDate() ) {
-                    dbemaster->setDateValue( &nomeField, myfield->getStringValue() );
+                dbemaster->setDateValue( nomeField, *myfield->getStringValue() );
             }
         }
     }
@@ -524,7 +539,7 @@ bool DBEntity::isNew() {
     bool ret = false;
     DBLayer::StringVector nomiChiavi = this->getKeyNames();
     for(const string& elem : nomiChiavi) {
-        Field* field = this->getField( &elem );
+        Field* field = this->getField( elem );
         if(field==0) ret=true;
         else if(field->isNull()) ret=true;
     }

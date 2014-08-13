@@ -37,13 +37,13 @@ namespace SchemaNS {
 
     class DECLSPECIFIER StringField : public Field  {
       public:
-        StringField(const string* nome);
-        StringField(const string* nome,const string* valore );
+        StringField(const string& nome);
+        StringField(const string& nome,const string& valore );
         virtual ~StringField();
 
         virtual Field* createNewInstance(const char* aName=0) const;
 
-		void setValue(const string* valore);
+        void setValue(const string& valore);
         const string* getValue() const;
 
         string toString() const;
