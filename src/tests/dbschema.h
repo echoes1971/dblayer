@@ -24,7 +24,7 @@ using namespace DBLayer;
 #include <string>
 using namespace std;
 
-namespace MySchema {
+namespace TestSchema {
 
 	class DECLSPECIFIER DBETestDBLayer : public DBEntity {
 	  public:
@@ -60,6 +60,7 @@ namespace MySchema {
 
     string getSchema();
     void registerClasses(DBEFactory* dbeFactory);
+    void checkDB(DBMgr& dbmgr);
 }
 
 #endif

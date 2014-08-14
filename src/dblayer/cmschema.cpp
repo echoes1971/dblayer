@@ -8,6 +8,41 @@ using namespace CMSchema;
 #include <string>
 using namespace std;
 
+//*********************** DBELog: start.
+const string DBELog::nomiCampiChiave[] = { string("ip"), string("data") };
+ColumnDefinitions DBELog::_columns;
+ColumnDefinitions DBELog::getColumns() const { return DBELog::_columns; }
+StringField DBELog::chiave1( DBELog::nomiCampiChiave[0] );
+StringField DBELog::chiave2( DBELog::nomiCampiChiave[1] );
+DBFieldVector DBELog::chiavi = DBELog::___init_keys();
+DBFieldVector DBELog::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBELog::chiave1 ); ret.push_back( &DBELog::chiave2 ); return ret; }
+DBELog::DBELog() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(DBELog::_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            DBELog::_columns[pair.first] = pair.second;
+        }
+        DBELog::_columns["ip"] = vector<string> {"uuid","not null"};
+        DBELog::_columns["data"] = vector<string> {"date","not null default '0000-00-00'"};
+        DBELog::_columns["ora"] = vector<string> {"time","not null default '00:00:00'"};
+        DBELog::_columns["count"] = vector<string> {"int","not null default 0"};
+        DBELog::_columns["url"] = vector<string> {"varchar(255)","default null"};
+        DBELog::_columns["note"] = vector<string> {"varchar(255)","not null default ''"};
+        DBELog::_columns["note2"] = vector<string> {"text","not null"};
+    }
+}
+DBELog::~DBELog() {}
+string DBELog::name() const { return "DBELog"; }
+string DBELog::getTableName() const { return "log"; }
+DBFieldVector* DBELog::getKeys() const { return &DBELog::chiavi; }
+DBELog* DBELog::createNewInstance() const { return new DBELog(); }
+DBLayer::StringVector DBELog::getOrderBy() const {
+    static DBLayer::StringVector ret({"data desc", "ora desc"});
+    return ret;
+}
+//*********************** DBELog: end.
+
 //*********************** DBEObject: start.
 const string DBEObject::nomiCampiChiave[] = { string("id") };
 StringField DBEObject::chiave1( DBEObject::nomiCampiChiave[0] );
@@ -130,13 +165,14 @@ DBEPage* DBEPage::createNewInstance() const { return new DBEPage(); }
 
 string CMSchema::getSchema() { return "cm"; }
 void CMSchema::registerClasses(DBEFactory* dbeFactory) {
-  dbeFactory->registerClass("objects", new DBEObject() );
-  dbeFactory->registerClass("countrylist", new DBECountry() );
-  dbeFactory->registerClass("companies", new DBECompany() );
-  dbeFactory->registerClass("people", new DBEPeople() );
-  dbeFactory->registerClass("files", new DBEFile() );
-  dbeFactory->registerClass("folders", new DBEFolder() );
-  dbeFactory->registerClass("links", new DBELink() );
-  dbeFactory->registerClass("notes", new DBENote() );
-  dbeFactory->registerClass("pages", new DBEPage() );
+    dbeFactory->registerClass("log", new DBELog() );
+    dbeFactory->registerClass("objects", new DBEObject() );
+    dbeFactory->registerClass("countrylist", new DBECountry() );
+    dbeFactory->registerClass("companies", new DBECompany() );
+    dbeFactory->registerClass("people", new DBEPeople() );
+    dbeFactory->registerClass("files", new DBEFile() );
+    dbeFactory->registerClass("folders", new DBEFolder() );
+    dbeFactory->registerClass("links", new DBELink() );
+    dbeFactory->registerClass("notes", new DBENote() );
+    dbeFactory->registerClass("pages", new DBEPage() );
 }

@@ -124,25 +124,6 @@ namespace AuthSchema {
       static DBFieldVector ___init_keys();
   };
 
-  class DBELog : public DBEntity {
-    public:
-    DBELog();
-      virtual ~DBELog();
-      virtual ColumnDefinitions getColumns() const;
-      virtual string name() const;
-      virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
-      virtual DBELog* createNewInstance() const;
-      virtual DBLayer::StringVector getOrderBy() const;
-    private:
-      static ColumnDefinitions _columns;
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // varchar(16)
-      static StringField chiave2; // date
-      static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
-  };
-
   string getSchema();
   void registerClasses(DBEFactory* dbeFactory);
 

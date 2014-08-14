@@ -49,7 +49,7 @@
 using namespace DBLayer;
 
 #include "dbschema.h"
-using namespace MySchema;
+using namespace TestSchema;
 
 #include "dblayer/authschema.h"
 using namespace AuthSchema;
@@ -285,7 +285,8 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
     dbmgr->setSchema("rra");
     AuthSchema::registerClasses(&dbeFactory);
     AuthSchema::checkDB(*dbmgr);
-    MySchema::registerClasses(&dbeFactory);
+    TestSchema::registerClasses(&dbeFactory);
+    TestSchema::checkDB(*dbmgr);
 
     if ( dbmgr->connect() ) {
         DBETestDBLayer* cerca = new DBETestDBLayer();
@@ -614,9 +615,6 @@ void testThis() {
 
     DBEGroup dbeg;
     cout << dbeg.toString("\n") << endl;
-
-    DBELog dbelog;
-    cout << dbelog.toString("\n") << endl;
 
     DBEUser dbeu;
     cout << dbeu.toString("\n") << endl;

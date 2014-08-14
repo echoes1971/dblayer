@@ -101,7 +101,8 @@ bool DBEUser::isRoot() {
 
 void DBEUser::_before_insert(DBMgr* dbmgr) {
     if(this->isNull("id")) {
-        this->getField("id")->setStringValue(dbmgr->getNextUuid(this));
+        this->setValue("id",dbmgr->getNextUuid(this));
+//        this->getField("id")->setStringValue(dbmgr->getNextUuid(this));
     }
     if(this->checkNewPassword()) {
         this->_createGroup(dbmgr);
@@ -115,7 +116,8 @@ void DBEUser::_after_update(DBMgr* dbmgr) {
 }
 void DBEUser::_after_delete(DBMgr* dbmgr) {
     DBEUserGroup search;
-    search.getField("user_id")->setStringValue(string(this->getStringValue("id").c_str()));
+    search.setValue("user_id",this->getStringValue("id"));
+//    search.getField("user_id")->setStringValue(string(this->getStringValue("id").c_str()));
     DBEntityVector* list = dbmgr->Search(&search,false);
     for(DBEntity* dbe : (*list)) {
         dbmgr->Delete(dbe);
@@ -127,21 +129,27 @@ void DBEUser::_createGroup(DBMgr* dbmgr) {
     if(!this->getField("group_id")->isNull())
         return;
     DBEGroup* dbe = new DBEGroup();
-    dbe->getField("name")->setStringValue(string(this->getStringValue("login").c_str()));
-    dbe->getField("description")->setStringValue("Private group for "+string(this->getStringValue("id").c_str())+"-"+string(this->getStringValue("login").c_str()));
+    dbe->setValue("name",this->getStringValue("login"));
+    dbe->setValue("description","Private group for "+string(this->getStringValue("id").c_str())+"-"+string(this->getStringValue("login").c_str()));
+//    dbe->getField("name")->setStringValue(string(this->getStringValue("login").c_str()));
+//    dbe->getField("description")->setStringValue("Private group for "+string(this->getStringValue("id").c_str())+"-"+string(this->getStringValue("login").c_str()));
     dbe = (DBEGroup*) dbmgr->Insert(dbe);
-    this->getField("group_id")->setStringValue(string(dbe->getStringValue("id").c_str()));
+    this->setValue("group_id",dbe->getStringValue("id"));
+//    this->getField("group_id")->setStringValue(string(dbe->getStringValue("id").c_str()));
     delete dbe;
 }
 void DBEUser::_deleteGroup(DBMgr* dbmgr) {
     DBEGroup dbe;
-    dbe.getField("id")->setStringValue(string(this->getField("group_id")->getStringValue()->c_str()));
+    dbe.setValue("id",this->getStringValue("group_id"));
+    //dbe.getField("id")->setStringValue(string(this->getField("group_id")->getStringValue()->c_str()));
     dbmgr->Delete(&dbe);
 }
 void DBEUser::_checkGroupAssociation(DBMgr* dbmgr) {
     DBEUserGroup ug;
-    ug.getField("user_id")->setStringValue(this->getField("id")->getStringValue());
-    ug.getField("group_id")->setStringValue(this->getField("group_id")->getStringValue());
+    ug.setValue("user_id",this->getStringValue("id"));
+    ug.setValue("group_id",this->getStringValue("group_id"));
+    //ug.getField("user_id")->setStringValue(this->getField("id")->getStringValue());
+    //ug.getField("group_id")->setStringValue(this->getField("group_id")->getStringValue());
     bool exists = dbmgr->exists(&ug);
     if(!exists) {
         dbmgr->Insert(&ug);
@@ -283,41 +291,6 @@ vector<map<string,string> > DBEUserGroup::getDefaultEntries() const {
 }
 //*********************** DBEUserGroup: end.
 
-//*********************** DBELog: start.
-const string DBELog::nomiCampiChiave[] = { string("ip"), string("data") };
-ColumnDefinitions DBELog::_columns;
-ColumnDefinitions DBELog::getColumns() const { return DBELog::_columns; }
-StringField DBELog::chiave1( DBELog::nomiCampiChiave[0] );
-StringField DBELog::chiave2( DBELog::nomiCampiChiave[1] );
-DBFieldVector DBELog::chiavi = DBELog::___init_keys();
-DBFieldVector DBELog::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBELog::chiave1 ); ret.push_back( &DBELog::chiave2 ); return ret; }
-DBELog::DBELog() {
-    this->tableName.clear();
-    this->schemaName = AuthSchema::getSchema();
-    if(DBELog::_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
-            DBELog::_columns[pair.first] = pair.second;
-        }
-        DBELog::_columns["ip"] = vector<string> {"uuid","not null"};
-        DBELog::_columns["data"] = vector<string> {"date","not null default '0000-00-00'"};
-        DBELog::_columns["ora"] = vector<string> {"time","not null default '00:00:00'"};
-        DBELog::_columns["count"] = vector<string> {"int","not null default 0"};
-        DBELog::_columns["url"] = vector<string> {"varchar(255)","default null"};
-        DBELog::_columns["note"] = vector<string> {"varchar(255)","not null default ''"};
-        DBELog::_columns["note2"] = vector<string> {"text","not null"};
-    }
-}
-DBELog::~DBELog() {}
-string DBELog::name() const { return "DBELog"; }
-string DBELog::getTableName() const { return "log"; }
-DBFieldVector* DBELog::getKeys() const { return &DBELog::chiavi; }
-DBELog* DBELog::createNewInstance() const { return new DBELog(); }
-DBLayer::StringVector DBELog::getOrderBy() const {
-    static DBLayer::StringVector ret({"data desc", "ora desc"});
-    return ret;
-}
-//*********************** DBELog: end.
-
 
 string AuthSchema::getSchema() { return "auth"; }
 void AuthSchema::registerClasses(DBEFactory* dbeFactory) {
@@ -325,7 +298,6 @@ void AuthSchema::registerClasses(DBEFactory* dbeFactory) {
   dbeFactory->registerClass("users", new DBEUser() );
   dbeFactory->registerClass("groups", new DBEGroup() );
   dbeFactory->registerClass("users_groups", new DBEUserGroup() );
-  dbeFactory->registerClass("log", new DBELog() );
 }
 
 void AuthSchema::checkDB(DBMgr& dbmgr) {
@@ -359,7 +331,7 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
 
     cerr << "AuthSchema::checkDB: current_db_version=" << current_db_version << endl;
 
-    // drop table dblayer_dbversion,auth_groups,auth_log,auth_users,auth_users_groups;
+    // drop table dblayer_dbversion,auth_groups,auth_users,auth_users_groups;
 
     // 2. Do the DB migration
     long current_migration = -1;
@@ -392,32 +364,28 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
         dbmgr.getConnection()->exec(sql);
         cout << sql << endl;
 
-        DBELog dbelog;
-        sql = dbelog.toSql("\n",use_fk);
-        dbmgr.getConnection()->exec(sql);
-        cout << sql << endl;
+        dbegroup.setValue("id","-1")->setValue("name","Admin")->setValue("description","System admins"); dbmgr.Insert(&dbegroup);
+        dbegroup.setValue("id","-2")->setValue("name","Users")->setValue("description","System users");  dbmgr.Insert(&dbegroup);
+        dbegroup.setValue("id","-3")->setValue("name","Guests")->setValue("description","System guests (read only)"); dbmgr.Insert(&dbegroup);
 
-        dbegroup.setValue("id","-2")->setValue("name","Admin")->setValue("description","System admins");
-        dbmgr.Insert(&dbegroup);
-        /*
-        "insert into _groups values ( -2, 'Admin','System admins' )",
-        "insert into _groups values ( -3, 'Users','System users' )",
-        "insert into _groups values ( -4, 'Guests','System guests (read only)' )",
-        "insert into _groups values ( -5, 'Project','R-Project user' )",
-        "insert into _groups values ( -6, 'Webmaster','Web content creators' )",
-        "insert into _users values ( -1, 'adm','adm','','Administrator',-2 )",
-        "insert into _users_groups ( user_id, group_id ) values( -1, -2 )",
-        "insert into _users_groups ( user_id, group_id ) values( -1, -5 )",
-        "insert into _users_groups ( user_id, group_id ) values( -1, -6 )",
-        */
+        dbeuser.setValue("id","-4")->setValue("login","adm")->setValue("pwd","adm")->setValue("fullname","Administrator")->setValue("group_id","-1")->setValue("pwd_salt","");
+        dbmgr.Insert(&dbeuser);
+        dbeuser.setValue("id","-5")->setValue("login","usr")->setValue("pwd","usr")->setValue("fullname","A User")->setValue("group_id","-2")->setValue("pwd_salt","");
+        dbmgr.Insert(&dbeuser);
+        dbeuser.setValue("id","-6")->setValue("login","guest")->setValue("pwd","guest")->setValue("fullname","A Guest")->setValue("group_id","-3")->setValue("pwd_salt","");
+        dbmgr.Insert(&dbeuser);
 
-        current_migration++;
+        dbeusergroup.setValue("user_id","-4")->setValue("group_id","-1"); dbmgr.Insert(&dbeusergroup);
+        dbeusergroup.setValue("user_id","-5")->setValue("group_id","-2"); dbmgr.Insert(&dbeusergroup);
+        dbeusergroup.setValue("user_id","-6")->setValue("group_id","-3"); dbmgr.Insert(&dbeusergroup);
+
     }
+    current_migration++;
 
     // 3. Write version to DB
     dbecurrentversion->setValue("version",current_migration);
     cout << dbecurrentversion->toString("\n") << endl;
-    //dbmgr.Update(dbecurrentversion);
+    dbmgr.Update(dbecurrentversion);
 
     //dbecurrentversion->setValue("");
     delete dbecurrentversion;
