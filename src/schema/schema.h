@@ -80,12 +80,6 @@ namespace SchemaNS {
         virtual bool equals(Schema* right) const;
         friend DECLSPECIFIER bool operator==(const Schema& left, const Schema& right);
 
-        virtual Field* createNewField(const string& fieldName, bool valore) const;
-        virtual Field* createNewField(const string& fieldName, float valore) const;
-        virtual Field* createNewField(const string& fieldName, long valore) const;
-        virtual Field* createNewField(const string& fieldName, const string& valore) const;
-        virtual Field* createNewDateField(const string& fieldName, const string& valore) const;
-
         Schema* addField( Field* field );
         Field* getField(string& field) const;
         Field* getField(const string &field) const;
@@ -108,6 +102,15 @@ namespace SchemaNS {
         Schema* setValue(const string& fieldName, long valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
         Schema* setValue(const string& fieldName, const string& valore);
+        /**
+         * Looks like if you have "a quoted string", the evaluation ordewr is:
+         * const char*
+         * bool
+         * std::string
+         * so we need to patch it like this :-(
+         * See: http://stackoverflow.com/questions/1149109/why-does-a-quoted-string-match-bool-method-signature-before-a-stdstring
+         */
+        Schema* setValue(const string& fieldName, const char* valore);
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
         Schema* setDateValue(const string& fieldName, const string& valore);
 
@@ -131,6 +134,12 @@ namespace SchemaNS {
         static int getSchemiDistrutti();
 
       protected:
+        virtual Field* createNewField(const string& fieldName, bool valore) const;
+        virtual Field* createNewField(const string& fieldName, float valore) const;
+        virtual Field* createNewField(const string& fieldName, long valore) const;
+        virtual Field* createNewField(const string& fieldName, const string& valore) const;
+        virtual Field* createNewDateField(const string& fieldName, const string& valore) const;
+
         /** Schema name */
         string name;
         /** Schema fields */

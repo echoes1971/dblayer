@@ -299,13 +299,14 @@ Schema *Schema::setDateValue(const string& fieldName, const string& valore) {
 Schema *Schema::setValue(const string& fieldName, const string& valore) {
     Field* field = this->getField(fieldName);
     if(field==0) {
-        field = this->createNewField(fieldName, valore);
+        field = this->createNewField(fieldName, (const string&) valore);
         this->addField(field);
     } else {
         field->setStringValue(valore);
     }
     return this;
 }
+Schema *Schema::setValue(const string& fieldName, const char* valore) { return this->setValue(fieldName,string(valore)); }
 Schema *Schema::setValue(const string& fieldName, bool valore) {
     Field* field = this->getField(fieldName);
     if(field==0) {

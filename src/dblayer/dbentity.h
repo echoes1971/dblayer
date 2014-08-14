@@ -95,12 +95,6 @@ namespace DBLayer {
 
         /** @return a new DBE instance */
         virtual DBEntity* createNewInstance() const;
-        virtual Field* createNewField(const string& fieldName, bool valore) const;
-        virtual Field* createNewField(const string& fieldName, float valore) const;
-        virtual Field* createNewField(const string& fieldName, long valore) const;
-        virtual Field* createNewField(const string& fieldName, const string& valore) const;
-        virtual Field* createNewDateField(const string& fieldName, const string& valore) const;
-
         /**	TODO: DEPRECARE?	*/
         void* getValue(string* field);
         /**	TODO: DEPRECARE?	*/
@@ -146,6 +140,12 @@ namespace DBLayer {
         virtual void _after_copy(DBMgr* dbmgr=0);
 
       protected:
+        virtual Field* createNewField(const string& fieldName, bool valore) const;
+        virtual Field* createNewField(const string& fieldName, float valore) const;
+        virtual Field* createNewField(const string& fieldName, long valore) const;
+        virtual Field* createNewField(const string& fieldName, const string& valore) const;
+        virtual Field* createNewDateField(const string& fieldName, const string& valore) const;
+
         string tableName;
         string schemaName;
 
