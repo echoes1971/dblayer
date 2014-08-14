@@ -316,11 +316,12 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     DBEntityVector* res = dbmgr.Search(cerca,false);
     cout << "AuthSchema::checkDB: res.size=" << res->size() << endl;
     if(dbmgr.getErrorMessage().length()==0 && res->size()>0) {
-//        cout << "Results (" << typeid(res).name() << "):" << endl;
-//        for(const auto& elem : (*res)) {
-//            cout << "- " << elem->toString() << endl;
-//        }
+        cout << "Results (" << typeid(res).name() << "):" << endl;
+        for(const auto& elem : (*res)) {
+            cout << "- " << elem->toString() << endl;
+        }
         dbecurrentversion = (DBEDBVersion*) res->at(0);
+        res->clear();
         cout << "AuthSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;
         current_db_version = dbecurrentversion->getIntegerValue("version");
     } else if(dbmgr.getErrorMessage().length()>0) {
@@ -383,6 +384,7 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     current_migration++;
 
     // 3. Write version to DB
+    cout << dbecurrentversion->toString("\n") << endl;
     dbecurrentversion->setValue("version",current_migration);
     cout << dbecurrentversion->toString("\n") << endl;
     dbmgr.Update(dbecurrentversion);

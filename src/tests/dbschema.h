@@ -31,12 +31,15 @@ namespace TestSchema {
 		DBETestDBLayer();
 		virtual ~DBETestDBLayer();
 
+        virtual ColumnDefinitions getColumns() const;
+
         virtual string name() const;
         virtual DBFieldVector* getKeys() const;
         virtual DBETestDBLayer* createNewInstance() const;
 
 	  private:
-		static const string nomiCampiChiave[];
+        static ColumnDefinitions _columns;
+        static const string nomiCampiChiave[];
 		static IntegerField chiave1;
 		static DBFieldVector chiavi;
 	};
@@ -46,6 +49,8 @@ namespace TestSchema {
 		DBESocieta();
 		virtual ~DBESocieta();
 
+        virtual ColumnDefinitions getColumns() const;
+
         virtual string name() const;
         virtual DBFieldVector* getKeys() const;
         virtual DBESocieta* createNewInstance() const;
@@ -53,7 +58,8 @@ namespace TestSchema {
         virtual void _before_insert(DBMgr* dbmgr=0);
         virtual void _before_copy(DBMgr* dbmgr=0);
 	  private:
-		static const string nomiCampiChiave[];
+        static ColumnDefinitions _columns;
+        static const string nomiCampiChiave[];
 		static IntegerField chiave1;
 		static DBFieldVector chiavi;
 	};

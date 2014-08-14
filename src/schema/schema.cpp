@@ -38,6 +38,9 @@
 #include "schema.h"
 using namespace SchemaNS;
 
+#include <iostream>
+using namespace std;
+
 int Schema::schemiCreati = 0;
 int Schema::schemiDistrutti = 0;
 
@@ -236,6 +239,7 @@ int Schema::getFieldIndex(const string& field) const {
 #endif
 
 #endif
+        cout << "Schema::getFieldIndex: " << i << ":" << this->fields.at(i)->getName() << endl;
         if ( fields[i]->getName().compare( fieldCstr ) == 0 ) {
             ret = (int)i;
         }

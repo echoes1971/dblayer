@@ -235,6 +235,8 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     //dbmgr->setSchema("rra");
     AuthSchema::registerClasses(&dbeFactory);
     AuthSchema::checkDB(*dbmgr);
+    TestSchema::registerClasses(&dbeFactory);
+    TestSchema::checkDB(*dbmgr);
 
     if(dbmgr->connect()) {
 
@@ -243,8 +245,8 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
         }
 
         if(dbmgr->isLoggedIn()) {
-            DBEntityVector* lista = dbmgr->Select("users","select * from rra_users");
-            //DBEntityVector* lista = dbmgr->Select("test_dblayer","select * from test_dblayer");
+            //DBEntityVector* lista = dbmgr->Select("users","select * from rra_users");
+            DBEntityVector* lista = dbmgr->Select("test_dblayer","select * from test_test_dblayer");
 
             if(lista->size()>0) {
                 cout << "Lista (" << typeid(lista).name() << ") di " << lista->size() << " elementi:" << endl;

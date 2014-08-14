@@ -20,12 +20,35 @@ using namespace std;
 
 //***********************	DBETestDBLayer: start.
 const string DBETestDBLayer::nomiCampiChiave[] = { string("id") };
+ColumnDefinitions DBETestDBLayer::_columns;
+ColumnDefinitions DBETestDBLayer::getColumns() const { return DBETestDBLayer::_columns; }
 IntegerField DBETestDBLayer::chiave1( DBETestDBLayer::nomiCampiChiave[0] );
 DBFieldVector DBETestDBLayer::chiavi( 1, &DBETestDBLayer::chiave1 );
 
 DBETestDBLayer::DBETestDBLayer() {
 	this->tableName.clear();
 	this->tableName.append( "test_dblayer" );
+    if(DBETestDBLayer::_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            DBETestDBLayer::_columns[pair.first] = pair.second;
+        }
+        DBETestDBLayer::_columns["id"] = vector<string> {"int","not null"};
+        DBETestDBLayer::_columns["nome"] = vector<string> {"text"};
+        DBETestDBLayer::_columns["descrizione"] = vector<string> {"text"};
+        DBETestDBLayer::_columns["abilitato"] = vector<string> {"bool"};
+        DBETestDBLayer::_columns["data_creazione"] = vector<string> {"text"};
+        DBETestDBLayer::_columns["prezzo"] = vector<string> {"float"};
+        DBETestDBLayer::_columns["data_disponibilita"] = vector<string> {"text"};
+    }
+
+//    id int NOT NULL,
+//    nome text,
+//    descrizione text,
+//    abilitato int,
+//    data_creazione text,
+//    prezzo float,
+//    data_disponibilita text,
+//    PRIMARY KEY (id)
 }
 DBETestDBLayer::~DBETestDBLayer() {}
 string DBETestDBLayer::name() const { return "DBETestDBLayer"; }
@@ -37,13 +60,48 @@ DBETestDBLayer* DBETestDBLayer::createNewInstance() const { return new DBETestDB
 //***********************	DBESocieta: start.
 
 const string DBESocieta::nomiCampiChiave[] = { string("id") };
+ColumnDefinitions DBESocieta::_columns;
+ColumnDefinitions DBESocieta::getColumns() const { return DBESocieta::_columns; }
 IntegerField DBESocieta::chiave1( DBESocieta::nomiCampiChiave[0] );
 DBFieldVector DBESocieta::chiavi( 1, &DBESocieta::chiave1 );
-
-
 DBESocieta::DBESocieta() {
     this->tableName.clear();
     this->tableName.append( "societa" );
+    if(DBESocieta::_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            DBESocieta::_columns[pair.first] = pair.second;
+        }
+        DBESocieta::_columns["id"] = vector<string> {"int","not null"};
+        DBESocieta::_columns["ragione_sociale"] = vector<string> {"text"};
+        DBESocieta::_columns["indirizzo"] = vector<string> {"text"};
+        DBESocieta::_columns["cap"] = vector<string> {"varchar(6)"};
+        DBESocieta::_columns["nazione"] = vector<string> {"text"};
+        DBESocieta::_columns["telefono"] = vector<string> {"text"};
+        DBESocieta::_columns["fax"] = vector<string> {"text"};
+        DBESocieta::_columns["email"] = vector<string> {"text"};
+        DBESocieta::_columns["note"] = vector<string> {"text"};
+        DBESocieta::_columns["website"] = vector<string> {"text"};
+        DBESocieta::_columns["citta"] = vector<string> {"text"};
+        DBESocieta::_columns["provincia"] = vector<string> {"text"};
+        DBESocieta::_columns["partita_iva"] = vector<string> {"text"};
+        DBESocieta::_columns["tipo"] = vector<string> {"text"};
+        DBESocieta::_columns["data_creazione"] = vector<string> {"text"};
+    }
+//    id integer NOT NULL,
+//    ragione_sociale text,
+//    indirizzo text,
+//    cap integer,
+//    nazione text,
+//    telefono integer,
+//    fax integer,
+//    email text,
+//    note text,
+//    website text,
+//    citta text,
+//    provincia text,
+//    partita_iva text,
+//    tipo text,
+//    data_creazione text,
 }
 DBESocieta::~DBESocieta() {}
 string DBESocieta::name() const { return "DBESocieta"; }
@@ -97,6 +155,7 @@ void TestSchema::checkDB(DBMgr& dbmgr) {
     cout << "TestSchema::checkDB: res.size=" << res->size() << endl;
     if(dbmgr.getErrorMessage().length()==0 && res->size()>0) {
         dbecurrentversion = res->at(0);
+        res->clear();
         cout << "TestSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;
         current_db_version = dbecurrentversion->getIntegerValue("version");
     } else if(dbmgr.getErrorMessage().length()>0) {
