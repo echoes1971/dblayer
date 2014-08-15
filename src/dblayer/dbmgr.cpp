@@ -124,7 +124,6 @@ DBLayer::StringVector DBMgr::_buildWhereCondition(DBEntity* dbe, bool uselike, b
         string clausola;
         string nome = field->getName();
         string valore = field->toString();
-        cout << "DBMgr::_buildWhereCondition: valore=" << valore << endl;
 
         if( field->isString() ) {
             valore = this->escapeString(valore);

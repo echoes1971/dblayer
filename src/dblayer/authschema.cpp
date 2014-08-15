@@ -300,8 +300,8 @@ void AuthSchema::registerClasses(DBEFactory* dbeFactory) {
   dbeFactory->registerClass("users_groups", new DBEUserGroup() );
 }
 
-void AuthSchema::checkDB(DBMgr& dbmgr) {
-    cout << "AuthSchema::checkDB: start." << endl;
+void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
+    if(verbose) cout << "AuthSchema::checkDB: start." << endl;
 
     if(!dbmgr.connect()) {
         cerr << "AuthSchema::checkDB: ERROR - UNABLE TO CONNECT TO DB!!!" << endl;
@@ -314,23 +314,25 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     DBEDBVersion* cerca = new DBEDBVersion();
     cerca->setValue("model_name", AuthSchema::getSchema());
     DBEntityVector* res = dbmgr.Search(cerca,false);
-    cout << "AuthSchema::checkDB: res.size=" << res->size() << endl;
+    if(verbose) cout << "AuthSchema::checkDB: res.size=" << res->size() << endl;
     if(dbmgr.getErrorMessage().length()==0 && res->size()>0) {
-        cout << "Results (" << typeid(res).name() << "):" << endl;
-        for(const auto& elem : (*res)) {
-            cout << "- " << elem->toString() << endl;
+        if(verbose) {
+            cout << "Results (" << typeid(res).name() << "):" << endl;
+            for(const auto& elem : (*res)) {
+                cout << "- " << elem->toString() << endl;
+            }
         }
         dbecurrentversion = (DBEDBVersion*) res->at(0);
         res->clear();
-        cout << "AuthSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;
+        if(verbose) cout << "AuthSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;
         current_db_version = dbecurrentversion->getIntegerValue("version");
     } else if(dbmgr.getErrorMessage().length()>0) {
-        cout << "AuthSchema::checkDB: " << dbmgr.getErrorMessage() << endl;
+        cerr << "AuthSchema::checkDB: " << dbmgr.getErrorMessage() << endl;
     }
     dbmgr.Destroy(res);
     delete cerca;
 
-    cerr << "AuthSchema::checkDB: current_db_version=" << current_db_version << endl;
+    if(verbose) cout << "AuthSchema::checkDB: current_db_version=" << current_db_version << endl;
 
     // Lambda :-)
     std::function<string(const string&)> lambda_dbeType2dbType = [&dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
@@ -345,39 +347,36 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
         DBEDBVersion dbversion;
         sql = dbversion.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
-        cout << sql << endl;
+        if(verbose) cout << sql << endl;
 
         dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
         dbecurrentversion->setValue("model_name", AuthSchema::getSchema());
         dbecurrentversion->setValue("version",current_db_version);
         dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
-        cout << dbecurrentversion->toString("\n") << endl;
+        if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
         DBEGroup dbegroup;
         sql = dbegroup.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
-        cout << sql << endl;
+        if(verbose) cout << sql << endl;
 
         DBEUser dbeuser;
         sql = dbeuser.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
-        cout << sql << endl;
+        if(verbose) cout << sql << endl;
 
         DBEUserGroup dbeusergroup;
         sql = dbeusergroup.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
-        cout << sql << endl;
+        if(verbose) cout << sql << endl;
 
         dbegroup.setValue("id","-1")->setValue("name","Admin")->setValue("description","System admins"); dbmgr.Insert(&dbegroup);
         dbegroup.setValue("id","-2")->setValue("name","Users")->setValue("description","System users");  dbmgr.Insert(&dbegroup);
         dbegroup.setValue("id","-3")->setValue("name","Guests")->setValue("description","System guests (read only)"); dbmgr.Insert(&dbegroup);
 
-        dbeuser.setValue("id","-4")->setValue("login","adm")->setValue("pwd","adm")->setValue("fullname","Administrator")->setValue("group_id","-1")->setValue("pwd_salt","");
-        dbmgr.Insert(&dbeuser);
-        dbeuser.setValue("id","-5")->setValue("login","usr")->setValue("pwd","usr")->setValue("fullname","A User")->setValue("group_id","-2")->setValue("pwd_salt","");
-        dbmgr.Insert(&dbeuser);
-        dbeuser.setValue("id","-6")->setValue("login","guest")->setValue("pwd","guest")->setValue("fullname","A Guest")->setValue("group_id","-3")->setValue("pwd_salt","");
-        dbmgr.Insert(&dbeuser);
+        dbeuser.setValue("id","-4")->setValue("login","adm")->setValue("pwd","adm")->setValue("fullname","Administrator")->setValue("group_id","-1")->setValue("pwd_salt",""); dbmgr.Insert(&dbeuser);
+        dbeuser.setValue("id","-5")->setValue("login","usr")->setValue("pwd","usr")->setValue("fullname","A User")->setValue("group_id","-2")->setValue("pwd_salt","");        dbmgr.Insert(&dbeuser);
+        dbeuser.setValue("id","-6")->setValue("login","guest")->setValue("pwd","guest")->setValue("fullname","A Guest")->setValue("group_id","-3")->setValue("pwd_salt","");   dbmgr.Insert(&dbeuser);
 
         dbeusergroup.setValue("user_id","-4")->setValue("group_id","-1"); dbmgr.Insert(&dbeusergroup);
         dbeusergroup.setValue("user_id","-5")->setValue("group_id","-2"); dbmgr.Insert(&dbeusergroup);
@@ -386,13 +385,11 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     current_migration++;
 
     // 3. Write version to DB
-    cout << dbecurrentversion->toString("\n") << endl;
     dbecurrentversion->setValue("version",current_migration);
-    cout << dbecurrentversion->toString("\n") << endl;
     dbmgr.Update(dbecurrentversion);
 
     //dbecurrentversion->setValue("");
     delete dbecurrentversion;
 
-    cout << "AuthSchema::checkDB: end." << endl;
+    if(verbose) cout << "AuthSchema::checkDB: end." << endl;
 }

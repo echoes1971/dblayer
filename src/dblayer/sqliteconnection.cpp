@@ -363,6 +363,15 @@ IntegerVector SQLiteConnection::getForeignKeys(string* relname) {
     this->errorMessage.append("SQLiteConnection::getForeignKeys: UNSUPPORTED; relname=" + string(relname->c_str()));
     return ret;
 }
+string SQLiteConnection::dbeType2dbType(const string& dbetype) {
+    string ret = dbetype;
+    if(dbetype=="int")
+        ret = "int";
+    else if(dbetype=="uuid")
+        ret = "varchar(40)";
+    return ret;
+}
+
 //********************* SQLiteConnection: end.
 
 

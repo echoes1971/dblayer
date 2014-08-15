@@ -127,7 +127,7 @@ namespace AuthSchema {
   string getSchema();
   void registerClasses(DBEFactory* dbeFactory);
 
-  void checkDB(DBMgr& dbmgr);
+  void checkDB(DBMgr& dbmgr, bool verbose=false);
 }
 
 #endif

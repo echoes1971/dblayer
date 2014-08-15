@@ -28,6 +28,7 @@ DBFieldVector DBETestDBLayer::chiavi( 1, &DBETestDBLayer::chiave1 );
 DBETestDBLayer::DBETestDBLayer() {
 	this->tableName.clear();
 	this->tableName.append( "test_dblayer" );
+    this->schemaName = TestSchema::getSchema();
     if(DBETestDBLayer::_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBETestDBLayer::_columns[pair.first] = pair.second;
@@ -67,6 +68,7 @@ DBFieldVector DBESocieta::chiavi( 1, &DBESocieta::chiave1 );
 DBESocieta::DBESocieta() {
     this->tableName.clear();
     this->tableName.append( "societa" );
+    this->schemaName = TestSchema::getSchema();
     if(DBESocieta::_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBESocieta::_columns[pair.first] = pair.second;
@@ -138,8 +140,8 @@ void TestSchema::registerClasses(DBEFactory* dbeFactory) {
   dbeFactory->registerClass("test_dblayer", new DBETestDBLayer() );
   dbeFactory->registerClass("societa", new DBESocieta() );
 }
-void TestSchema::checkDB(DBMgr& dbmgr) {
-    cout << "TestSchema::checkDB: start." << endl;
+void TestSchema::checkDB(DBMgr& dbmgr, bool verbose) {
+    if(verbose) cout << "TestSchema::checkDB: start." << endl;
 
     if(!dbmgr.connect()) {
         cerr << "TestSchema::checkDB: ERROR - UNABLE TO CONNECT TO DB!!!" << endl;
@@ -152,22 +154,22 @@ void TestSchema::checkDB(DBMgr& dbmgr) {
     DBEntity* cerca = dbmgr.getClazz("dbversion");
     cerca->setValue("model_name", TestSchema::getSchema());
     DBEntityVector* res = dbmgr.Search(cerca,false);
-    cout << "TestSchema::checkDB: res.size=" << res->size() << endl;
+    if(verbose) cout << "TestSchema::checkDB: res.size=" << res->size() << endl;
     if(dbmgr.getErrorMessage().length()==0 && res->size()>0) {
         dbecurrentversion = res->at(0);
         res->clear();
-        cout << "TestSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;
+        if(verbose) cout << "TestSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;
         current_db_version = dbecurrentversion->getIntegerValue("version");
     } else if(dbmgr.getErrorMessage().length()>0) {
-        cout << "TestSchema::checkDB: " << dbmgr.getErrorMessage() << endl;
+        cerr << "TestSchema::checkDB: " << dbmgr.getErrorMessage() << endl;
     }
     dbmgr.Destroy(res);
     delete cerca;
 
-    cerr << "TestSchema::checkDB: current_db_version=" << current_db_version << endl;
+    if(verbose) cout << "TestSchema::checkDB: current_db_version=" << current_db_version << endl;
 
     // Lambda :-)
-    std::function<string(const string&)> lambda_dbeType2dbType = [dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
+    std::function<string(const string&)> lambda_dbeType2dbType = [&dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
 
     // drop table test_test_dblayer,test_societa;
     // drop table dblayer_dbversion,auth_groups,auth_users,auth_users_groups, test_test_dblayer,test_societa;
@@ -182,33 +184,27 @@ void TestSchema::checkDB(DBMgr& dbmgr) {
         dbecurrentversion->setValue("model_name", TestSchema::getSchema());
         dbecurrentversion->setValue("version",current_db_version);
         dbecurrentversion = dbmgr.Insert(dbecurrentversion);
-        cout << dbecurrentversion->toString("\n") << endl;
-        if(dbmgr.getErrorMessage().length()>0) { cout << "AuthSchema::checkDB: " << dbmgr.getErrorMessage() << endl; return; }
+        if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
         DBETestDBLayer dbe1;
         sql = dbe1.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
-        cout << sql << endl;
-        if(dbmgr.getErrorMessage().length()>0) { cout << "AuthSchema::checkDB: " << dbmgr.getErrorMessage() << endl; return; }
+        if(verbose) cout << sql << endl;
 
         DBESocieta dbe2;
         sql = dbe2.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
-        cout << sql << endl;
+        if(verbose) cout << sql << endl;
 
 //        dbeusergroup.setValue("user_id","-4")->setValue("group_id","-1"); dbmgr.Insert(&dbeusergroup);
-//        dbeusergroup.setValue("user_id","-5")->setValue("group_id","-2"); dbmgr.Insert(&dbeusergroup);
-//        dbeusergroup.setValue("user_id","-6")->setValue("group_id","-3"); dbmgr.Insert(&dbeusergroup);
-
     }
     current_migration++;
 
     // 3. Write version to DB
     dbecurrentversion->setValue("version",current_migration);
-    cout << dbecurrentversion->toString("\n") << endl;
     dbmgr.Update(dbecurrentversion);
 
     delete dbecurrentversion;
 
-    cout << "TestSchema::checkDB: end." << endl;
+    if(verbose) cout << "TestSchema::checkDB: end." << endl;
 }
