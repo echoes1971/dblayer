@@ -333,7 +333,7 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
     cerr << "AuthSchema::checkDB: current_db_version=" << current_db_version << endl;
 
     // Lambda :-)
-    std::function<string(const string&)> lambda_dbeType2dbType = [dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
+    std::function<string(const string&)> lambda_dbeType2dbType = [&dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
 
     // drop table dblayer_dbversion,auth_groups,auth_users,auth_users_groups;
 
@@ -382,7 +382,6 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
         dbeusergroup.setValue("user_id","-4")->setValue("group_id","-1"); dbmgr.Insert(&dbeusergroup);
         dbeusergroup.setValue("user_id","-5")->setValue("group_id","-2"); dbmgr.Insert(&dbeusergroup);
         dbeusergroup.setValue("user_id","-6")->setValue("group_id","-3"); dbmgr.Insert(&dbeusergroup);
-
     }
     current_migration++;
 
@@ -394,7 +393,6 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
 
     //dbecurrentversion->setValue("");
     delete dbecurrentversion;
-    cout << "AuthSchema::checkDB: TODO" << endl;
 
     cout << "AuthSchema::checkDB: end." << endl;
 }

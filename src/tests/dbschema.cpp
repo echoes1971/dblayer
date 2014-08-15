@@ -170,6 +170,7 @@ void TestSchema::checkDB(DBMgr& dbmgr) {
     std::function<string(const string&)> lambda_dbeType2dbType = [dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
 
     // drop table test_test_dblayer,test_societa;
+    // drop table dblayer_dbversion,auth_groups,auth_users,auth_users_groups, test_test_dblayer,test_societa;
 
     // 2. Do the DB migration
     long current_migration = -1;
@@ -182,11 +183,13 @@ void TestSchema::checkDB(DBMgr& dbmgr) {
         dbecurrentversion->setValue("version",current_db_version);
         dbecurrentversion = dbmgr.Insert(dbecurrentversion);
         cout << dbecurrentversion->toString("\n") << endl;
+        if(dbmgr.getErrorMessage().length()>0) { cout << "AuthSchema::checkDB: " << dbmgr.getErrorMessage() << endl; return; }
 
         DBETestDBLayer dbe1;
         sql = dbe1.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         cout << sql << endl;
+        if(dbmgr.getErrorMessage().length()>0) { cout << "AuthSchema::checkDB: " << dbmgr.getErrorMessage() << endl; return; }
 
         DBESocieta dbe2;
         sql = dbe2.toSql(lambda_dbeType2dbType,"\n",use_fk);
