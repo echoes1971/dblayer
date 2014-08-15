@@ -332,15 +332,18 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
 
     cerr << "AuthSchema::checkDB: current_db_version=" << current_db_version << endl;
 
+    // Lambda :-)
+    std::function<string(const string&)> lambda_dbeType2dbType = [dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
+
     // drop table dblayer_dbversion,auth_groups,auth_users,auth_users_groups;
 
     // 2. Do the DB migration
     long current_migration = -1;
     if(current_db_version<0) {
         string sql;
-        bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL" && dbmgr.getConnection()->getDBType()!="SQLite";
+        bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL";// && dbmgr.getConnection()->getDBType()!="SQLite";
         DBEDBVersion dbversion;
-        sql = dbversion.toSql("\n",use_fk);
+        sql = dbversion.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         cout << sql << endl;
 
@@ -351,17 +354,17 @@ void AuthSchema::checkDB(DBMgr& dbmgr) {
         cout << dbecurrentversion->toString("\n") << endl;
 
         DBEGroup dbegroup;
-        sql = dbegroup.toSql("\n",use_fk);
+        sql = dbegroup.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         cout << sql << endl;
 
         DBEUser dbeuser;
-        sql = dbeuser.toSql("\n",use_fk);
+        sql = dbeuser.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         cout << sql << endl;
 
         DBEUserGroup dbeusergroup;
-        sql = dbeusergroup.toSql("\n",use_fk);
+        sql = dbeusergroup.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         cout << sql << endl;
 

@@ -163,6 +163,11 @@ namespace DBLayer {
             virtual string getSchemaName();
             virtual string getDBType();
 
+            virtual string dbeType2dbType(const string& dbetype);
+            virtual string dbType2dbeType(const string& dbtype);
+            virtual string dbConstraints2dbeConstraints(map<string,string>& def);
+            virtual string dbColumnDefinition2dbeColumnDefinition(map<string,string>& def);
+
             // **************** Proxy Connections: start. *********************
             // The proxy connections are used by DBMgr to execute the following methods
             virtual bool isProxy() const;

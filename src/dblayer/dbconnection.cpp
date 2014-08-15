@@ -134,6 +134,44 @@ string Connection::getDBSchema(string language) { return "Connection::getDBSchem
 string Connection::getSchemaName() { return "Connection::getSchemaName: NOT SUPPORTED"; }
 string Connection::getDBType() { return "generic"; }
 
+string Connection::dbeType2dbType(const string& dbetype) {
+    string ret = dbetype;
+    if(dbetype=="int")
+        ret = "int(11)";
+    else if(dbetype=="uuid")
+        ret = "char(40)";
+    return ret;
+}
+string Connection::dbType2dbeType(const string& dbtype) {
+    string ret = dbtype;
+    if(dbtype=="int(11)")
+        ret = "int";
+    else if(dbtype=="char(40)")
+        ret = "uuid";
+    return ret;
+}
+
+string Connection::dbConstraints2dbeConstraints(map<string,string>& def) {
+    StringVector constraints;
+    if( def["Null"]=="NO") constraints.push_back("not null");
+    if( def.find("Default")!=def.end() ) {
+        string apice ="\'";
+        if( def["Type"]=="int(11)" || def["Type"]=="float")
+            apice = "";
+        constraints.push_back( string("default ").append(apice).append(def["Default"]).append(apice) );
+    } else if(def.find("Default")==def.end() && def["Null"]=="YES") {
+        constraints.push_back("default null");
+    }
+    string glue(" ");
+    return constraints.size()>0 ? DBLayer::joinString(&constraints, &glue) : "";
+}
+string Connection::dbColumnDefinition2dbeColumnDefinition(map<string,string>& def) {
+    string constraints = Connection::dbConstraints2dbeConstraints(def);
+    return string("'$col'=>array('").append( Connection::dbType2dbeType(def["Type"]) ).append("',")
+            .append( constraints.length()>0 ? constraints : "" )
+            .append("),\n");
+}
+
 ResultSet* Connection::exec(const string s) { return new ResultSet(); }
 
 string Connection::getErrorMessage() const { return this->errorMessage; }

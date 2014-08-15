@@ -66,10 +66,6 @@ namespace DBLayer {
 
         string getColumnType(const string& column_name);
         virtual ColumnDefinitions getColumns() const;
-        static string dbeType2dbType(const string& dbetype);
-        static string dbType2dbeType(const string& dbtype);
-        static string dbConstraints2dbeConstraints(map<string,string>& def);
-        static string dbColumnDefinition2dbeColumnDefinition(map<string,string>& def);
 
         /** Returns the column names of the default orderby */
         virtual DBLayer::StringVector getOrderBy() const;
@@ -91,7 +87,7 @@ namespace DBLayer {
          */
         virtual string toString(string prefix="", bool valuesAsAttributes=false) const;
 
-        string toSql(string prefix="",bool use_fk=true);
+        string toSql(std::function<string(const string&)> dbeType2dbType, string prefix="", bool use_fk=true);
 
         /** @return a new DBE instance */
         virtual DBEntity* createNewInstance() const;

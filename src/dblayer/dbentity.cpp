@@ -161,7 +161,7 @@ string DBEntity::toString_nodes(string prefix) const {
     return ret;
 }
 
-string DBEntity::toSql(string prefix,bool use_fk) {
+string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, string prefix, bool use_fk) {
     string ret;
     ret.append(prefix+"CREATE TABLE ");//.append(string(this->getSchemaName()->c_str())).append("_").append(string(this->getTableName().c_str())).append(" (");
     if(this->getSchemaName().length()>0) {
@@ -178,7 +178,7 @@ string DBEntity::toSql(string prefix,bool use_fk) {
         for(const pair<string,vector<string> > pair : defs) {
             ret.append(prefix+" ").append(pair.first).append(" ");
             for(const string s : pair.second) {
-                ret.append( DBEntity::dbeType2dbType(s) ).append(" ");
+                ret.append( dbeType2dbType(s) ).append(" ");
             }
             // Foreign Key
             if(use_fk) {
@@ -451,43 +451,6 @@ string DBEntity::getColumnType(const string& column_name) {
     }
 }
 ColumnDefinitions DBEntity::getColumns() const { return DBEntity::_columns; }
-string DBEntity::dbeType2dbType(const string& dbetype) {
-    string ret = dbetype;
-    if(dbetype=="int")
-        ret = "int(11)";
-    else if(dbetype=="uuid")
-        ret = "char(40)";
-    return ret;
-}
-string DBEntity::dbType2dbeType(const string& dbtype) {
-    string ret = dbtype;
-    if(dbtype=="int(11)")
-        ret = "int";
-    else if(dbtype=="char(40)")
-        ret = "uuid";
-    return ret;
-}
-
-string DBEntity::dbConstraints2dbeConstraints(map<string,string>& def) {
-    StringVector constraints;
-    if( def["Null"]=="NO") constraints.push_back("not null");
-    if( def.find("Default")!=def.end() ) {
-        string apice ="\'";
-        if( def["Type"]=="int(11)" || def["Type"]=="float")
-            apice = "";
-        constraints.push_back( string("default ").append(apice).append(def["Default"]).append(apice) );
-    } else if(def.find("Default")==def.end() && def["Null"]=="YES") {
-        constraints.push_back("default null");
-    }
-    string glue(" ");
-    return constraints.size()>0 ? DBLayer::joinString(&constraints, &glue) : "";
-}
-string DBEntity::dbColumnDefinition2dbeColumnDefinition(map<string,string>& def) {
-    string constraints = DBEntity::dbConstraints2dbeConstraints(def);
-    return string("'$col'=>array('").append( DBEntity::dbType2dbeType(def["Type"]) ).append("',")
-            .append( constraints.length()>0 ? constraints : "" )
-            .append("),\n");
-}
 DBLayer::StringVector DBEntity::getOrderBy() const { return this->getKeyNames(); }
 string DBEntity::getOrderByString() const {
     string glue(",");

@@ -166,13 +166,16 @@ void TestSchema::checkDB(DBMgr& dbmgr) {
 
     cerr << "TestSchema::checkDB: current_db_version=" << current_db_version << endl;
 
+    // Lambda :-)
+    std::function<string(const string&)> lambda_dbeType2dbType = [dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
+
     // drop table test_test_dblayer,test_societa;
 
     // 2. Do the DB migration
     long current_migration = -1;
     if(current_db_version<0) {
         string sql;
-        bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL" && dbmgr.getConnection()->getDBType()!="SQLite";
+        bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL";// && dbmgr.getConnection()->getDBType()!="SQLite";
 
         dbecurrentversion = dbmgr.getClazzByTypeName("DBEDBVersion");
         dbecurrentversion->setValue("model_name", TestSchema::getSchema());
@@ -181,12 +184,12 @@ void TestSchema::checkDB(DBMgr& dbmgr) {
         cout << dbecurrentversion->toString("\n") << endl;
 
         DBETestDBLayer dbe1;
-        sql = dbe1.toSql("\n",use_fk);
+        sql = dbe1.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         cout << sql << endl;
 
         DBESocieta dbe2;
-        sql = dbe2.toSql("\n",use_fk);
+        sql = dbe2.toSql(lambda_dbeType2dbType,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         cout << sql << endl;
 
