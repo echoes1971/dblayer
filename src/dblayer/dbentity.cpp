@@ -364,7 +364,7 @@ void DBEntity::readFKFrom(DBEntity* dbe) {
             } else if ( myfield->isFloat() || myfield->isDouble() )  {
                 this->setValue( nomeField, myfield->getFloatValue() );
             } else if ( myfield->isString() ) {
-                this->setValue( nomeField, myfield->getStringValue() );
+                this->setValue( nomeField, myfield->getStringValue()->c_str() );
             } else if ( myfield->isDate() ) {
                 this->setDateValue( nomeField, *myfield->getStringValue() );
             }

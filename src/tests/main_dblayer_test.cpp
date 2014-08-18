@@ -84,11 +84,12 @@ void testDBConnection(string& connString, string& loginUser, string& loginPwd) {
     }
 
     if ( !con->hasErrors() ) {
-        string myquery("select * from rra_users order by id desc");
+        string myquery("select * from test_societa order by id desc");
         res = con->exec(myquery);
         //res = con->exec(string("select * from kware_users order by id desc"));
         //res = con->exec(string("select * from test_test_dblayer order by id desc"));
         //res = con->exec(string("select * from test_societa"));
+        //res = con->exec(string("select * from rra_users order by id desc"));
         //res = con->exec(string("select oid,typname from pg_type"));
         //string relname = string("comuni");
         //res = con->exec(string("select conkey from pg_constraint join pg_class on pg_class.oid=conrelid where contype='p' and relname='" + relname + "' "));
@@ -245,13 +246,12 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
         }
 
         if(dbmgr->isLoggedIn()) {
-            //DBEntityVector* lista = dbmgr->Select("users","select * from rra_users");
             DBEntityVector* lista = dbmgr->Select("test_dblayer","select * from test_test_dblayer");
 
             if(lista->size()>0) {
-                cout << "Lista (" << typeid(lista).name() << ") di " << lista->size() << " elementi:" << endl;
+                cout << "List (" << typeid(lista).name() << ") of " << lista->size() << " elements:" << endl;
                 for(const auto& elem : (*lista)) {
-                    cout << "- " << elem->toString("\n") << endl;
+                    cout << "- " << elem->toString() << endl;
                 }
                 cout << "====" << endl;
             } else {
@@ -290,7 +290,7 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
     TestSchema::registerClasses(&dbeFactory);
     TestSchema::checkDB(*dbmgr);
 
-    if ( dbmgr->connect() ) {
+    if(dbmgr->connect()) {
         DBETestDBLayer* cerca = new DBETestDBLayer();
 
 //        string nomeCampo("nome");
@@ -315,7 +315,7 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
         DBEntityVector* lista = dbmgr->Search(cerca,true,true,"nome");
 
         if ( lista->size()>0 ) {
-            cout << "Lista (" << typeid(lista).name() << "):" << endl;
+            cout << "List (" << typeid(lista).name() << "):" << endl;
             for(const auto& elem : (*lista)) {
                 cout << "- " << elem->toString() << endl;
             }
@@ -335,21 +335,22 @@ void testSearch(string host,string dbname,string usr,string pwd, string& loginUs
 }
 
 void testDBE(string connString, string& loginUser, string& loginPwd) {
-    Connection* con;
+    Connection* mycon;
     DBMgr* dbmgr;
-    DBEFactory* dbeFactory;
 
-    con = DBLayer::createConnection( connString.c_str() );
-    dbmgr = new DBLayer::DBMgr(con, false);
+    mycon = DBLayer::createConnection( connString.c_str() );
+    dbmgr = new DBLayer::DBMgr(mycon, false);
 
-    dbeFactory = new DBEFactory();
-    dbeFactory->registerClass(string("societa"),new DBESocieta());
-    dbeFactory->registerClass(string("test_dblayer"),new DBETestDBLayer());
-
-    dbmgr->setDBEFactory(dbeFactory);
+    DBEFactory dbeFactory(false);
+    dbmgr->setDBEFactory(&dbeFactory);
+    //dbmgr->setSchema("rra");
+    AuthSchema::registerClasses(&dbeFactory);
+    AuthSchema::checkDB(*dbmgr);
+    TestSchema::registerClasses(&dbeFactory);
+    TestSchema::checkDB(*dbmgr);
 
     // Stampo la factory
-    cout << "testDBE: factory = " << dbeFactory->toString() << endl;
+    cout << "testDBE: factory = " << dbeFactory.toString() << endl;
 
     // Stampo le classi registrate
     DBEntityVector myTypes = dbmgr->getRegisteredTypes();
@@ -394,9 +395,8 @@ void testDBE(string connString, string& loginUser, string& loginPwd) {
     } else {
         cout << "Errore: " << dbmgr->getErrorMessage() << endl;
     }
-    delete dbeFactory;
     delete dbmgr;
-    delete con;
+    delete mycon;
 }
 void testDBE(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
@@ -404,50 +404,48 @@ void testDBE(string host,string dbname,string usr,string pwd, string& loginUser,
 }
 
 void testCRUD(string connString, string& loginUser, string& loginPwd) {
-    Connection* con;
+    DBLayer::Connection* con;
     DBMgr* dbmgr;
-    DBEFactory* dbeFactory;
-
-    int fieldCreati = SchemaNS::getFieldCreati();
-    int fieldDistrutti = SchemaNS::getFieldDistrutti();
-    int schemiCreati = SchemaNS::getSchemiCreati();
-    int schemiDistrutti = SchemaNS::getSchemiDistrutti();
-    printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
     con = DBLayer::createConnection( connString.c_str() );
-
     dbmgr = new DBLayer::DBMgr(con, false);
 
-    dbeFactory = new DBEFactory();
-    dbeFactory->registerClass(string("societa"),new DBESocieta());
-    dbeFactory->registerClass(string("test_dblayer"),new DBETestDBLayer());
+    //int fieldCreati = SchemaNS::getFieldCreati();
+    //int fieldDistrutti = SchemaNS::getFieldDistrutti();
+    //int schemiCreati = SchemaNS::getSchemiCreati();
+    //int schemiDistrutti = SchemaNS::getSchemiDistrutti();
+    //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
-    dbmgr->setDBEFactory(dbeFactory);
-    cout << "testCRUD: Creata DBEFactory." << endl;
-    printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+    DBEFactory dbeFactory(false);
+    dbmgr->setDBEFactory(&dbeFactory);
+    //dbmgr->setSchema("rra");
+    AuthSchema::registerClasses(&dbeFactory);
+    AuthSchema::checkDB(*dbmgr);
+    TestSchema::registerClasses(&dbeFactory);
+    TestSchema::checkDB(*dbmgr);
+
+    cout << "testCRUD: registrati schemi." << endl;
+    //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
     if ( dbmgr->connect() ) {
         DBEntity* nuova = dbmgr->getClazz("societa");
-        string valoreStringa("Nuova Societa S.r.l.");
         nuova->setValue("ragione_sociale","Nuova Societa S.r.l.");
-        valoreStringa="1970-02-01 00:00:00";
         nuova->setDateValue("data_creazione","1970-02-01 00:00:00");
 
         cout << "testCRUD: da inserire " << nuova->toString() << endl;
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         // Insert
         cout << endl;
         cout << "testCRUD: provo ad inserire una nuova dbe " << endl;
         nuova = dbmgr->Insert(nuova);
         cout << "testCRUD: inserita nuova dbe " << nuova->toString() << endl;
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         DBEntity* cerca = dbmgr->getClazz("societa");
-        DBField* idField = (DBField*) nuova->getField("id");
-        cerca->setValue("id", idField!=0 ? idField->getIntegerValue() : -1 );
+        cerca->setValue("id", nuova->getStringValue("id") );
         cout << "testCRUD: cerca=" << cerca->toString() << endl;
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         cout << endl;
         DBEntityVector* lista = dbmgr->Search(cerca,true,true,"id");
@@ -460,7 +458,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
             cout << "testCRUD: EMPTY LIST!!!" << endl;
         }
         dbmgr->Destroy(lista);
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         // Update
         nuova->setValue("ragione_sociale","Nuova Societa L\'Attico S.r.l.");
@@ -469,7 +467,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
         cout << endl;
         nuova = dbmgr->Update(nuova);
         cout << "testCRUD: modificata nuova dbe " << nuova->toString() << endl;
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         cout << endl;
         lista = dbmgr->Search(cerca,true,true,"id");
@@ -482,7 +480,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
             cout << "testCRUD: LISTA VUOTA!!!" << endl;
         }
         dbmgr->Destroy(lista);
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         // Copy
         cout << endl;
@@ -492,7 +490,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
         } else {
             cout << "testCRUD: FALLITA copia" << endl;
         }
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         cout << endl;
         DBEntity* cercaCopia = dbmgr->getClazz("societa");
@@ -507,7 +505,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
             cout << "testCRUD: LISTA VUOTA!!!" << endl;
         }
         dbmgr->Destroy(lista);
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
 
         // Delete
@@ -519,10 +517,12 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
             copia = dbmgr->Delete(copia);
             cout << "testCRUD: cancellata copia dbe " << copia->toString() << endl;
         }
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         cout << endl;
+        dbmgr->setVerbose(false);
         lista = dbmgr->Search(cercaCopia,true,true,"id");
+        dbmgr->setVerbose(false);
         if ( lista->size()>0 ) {
             cout << "Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
             for(const auto& elem : (*lista)) {
@@ -532,22 +532,21 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
             cout << "testCRUD: LISTA VUOTA!!!" << endl;
         }
         dbmgr->Destroy(lista);
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
         delete nuova;
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
         delete copia;
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
         delete cerca;
-        printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+        //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
         delete cercaCopia;
     } else {
         cout << "testCRUD: ERRORE " << dbmgr->getErrorMessage() << endl;
     }
-    printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+    //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
     delete dbmgr;
-    delete dbeFactory;
-    printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+    //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
     delete con;
 }
 void testCRUD(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
@@ -698,9 +697,7 @@ int main(int argc, char *argv[]) {
     cout << "---------------->>  testDBMgr: end." << endl;
     cout << endl;
 
-    return 0;
-
-    cout << "---------------->>  testSearch" << endl;
+    cout << "---------------->>  testSearch: start." << endl;
     if(argc==5) {
         testSearch( host, dbname, usr, pwd, login_user, login_password );
     } else {
@@ -710,8 +707,10 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    cout << "---------------->>  testSearch: end." << endl;
+    cout << endl;
 
-    cout << "---------------->>  testDBE" << endl;
+    cout << "---------------->>  testDBE: start." << endl;
     if(argc==5) {
         testDBE( host, dbname, usr, pwd, login_user, login_password );
     } else {
@@ -721,8 +720,10 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    cout << "---------------->>  testDBE: end." << endl;
+    cout << endl;
 
-    cout << "---------------->>  testCRUD" << endl;
+    cout << "---------------->>  testCRUD: start." << endl;
     if(argc==5) {
         testCRUD( host, dbname, usr, pwd, login_user, login_password );
     } else {
@@ -733,8 +734,10 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    cout << "---------------->>  testCRUD: end." << endl;
+    cout << endl;
 
-    cout << "---------------->>  testGetKeys" << endl;
+    cout << "---------------->>  testGetKeys: start." << endl;
     if( argc==5 ) {
         testGetKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
         testGetKeys( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
@@ -742,8 +745,12 @@ int main(int argc, char *argv[]) {
         testGetKeys( connString, login_user, login_password, "test_test_dblayer" );
         testGetKeys( connString, login_user, login_password, "test_societa" );
     }
+    cout << "---------------->>  testGetKeys: end." << endl;
+    cout << endl;
 
-    cout << "---------------->>  testGetForeignKeys" << endl;
+    return 0;
+
+    cout << "---------------->>  testGetForeignKeys: start." << endl;
     if( argc==5 ) {
         testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
         testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
@@ -751,8 +758,10 @@ int main(int argc, char *argv[]) {
         testGetForeignKeys( connString, login_user, login_password, "test_test_dblayer" );
         testGetForeignKeys( connString, login_user, login_password, "test_societa" );
     }
+    cout << "---------------->>  testGetForeignKeys: end." << endl;
+    cout << endl;
 
-    cout << "---------------->>  testGetColumnsForTable" << endl;
+    cout << "---------------->>  testGetColumnsForTable: start." << endl;
     if( argc==5 ) {
         testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
         testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
@@ -763,6 +772,8 @@ int main(int argc, char *argv[]) {
         testGetColumnsForTable( connString, login_user, login_password, "rra_users" );
         //testGetColumnsForTable( connString, login_user, login_password, "rra_people" );
     }
+    cout << "---------------->>  testGetColumnsForTable: end." << endl;
+    cout << endl;
 
     return EXIT_SUCCESS;
 }

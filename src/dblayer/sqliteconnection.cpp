@@ -369,6 +369,8 @@ string SQLiteConnection::dbeType2dbType(const string& dbetype) {
         ret = "int";
     else if(dbetype=="uuid")
         ret = "varchar(40)";
+    else if(dbetype=="bool")
+        ret = "int";
     return ret;
 }
 

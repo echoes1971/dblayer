@@ -33,7 +33,7 @@ DBETestDBLayer::DBETestDBLayer() {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBETestDBLayer::_columns[pair.first] = pair.second;
         }
-        DBETestDBLayer::_columns["id"] = vector<string> {"int","not null"};
+        DBETestDBLayer::_columns["id"] = vector<string> {"uuid","not null"};
         DBETestDBLayer::_columns["nome"] = vector<string> {"text"};
         DBETestDBLayer::_columns["descrizione"] = vector<string> {"text"};
         DBETestDBLayer::_columns["abilitato"] = vector<string> {"bool"};
@@ -55,6 +55,13 @@ DBETestDBLayer::~DBETestDBLayer() {}
 string DBETestDBLayer::name() const { return "DBETestDBLayer"; }
 DBFieldVector* DBETestDBLayer::getKeys() const { return &DBETestDBLayer::chiavi; }
 DBETestDBLayer* DBETestDBLayer::createNewInstance() const { return new DBETestDBLayer(); }
+
+void DBETestDBLayer::_before_insert(DBMgr* dbmgr) {
+    if(this->isNull("id")) {
+        this->setValue("id",dbmgr->getNextUuid(this));
+    }
+}
+
 //***********************	DBETestDBLayer: end.
 
 
@@ -73,7 +80,7 @@ DBESocieta::DBESocieta() {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             DBESocieta::_columns[pair.first] = pair.second;
         }
-        DBESocieta::_columns["id"] = vector<string> {"int","not null"};
+        DBESocieta::_columns["id"] = vector<string> {"uuid","not null"};
         DBESocieta::_columns["ragione_sociale"] = vector<string> {"text"};
         DBESocieta::_columns["indirizzo"] = vector<string> {"text"};
         DBESocieta::_columns["cap"] = vector<string> {"varchar(6)"};
@@ -111,17 +118,9 @@ DBFieldVector* DBESocieta::getKeys() const { return &DBESocieta::chiavi; }
 DBESocieta* DBESocieta::createNewInstance() const { return new DBESocieta(); }
 
 void DBESocieta::_before_insert(DBMgr* dbmgr) {
-    DBEntityVector* lista = dbmgr->Select(this->name(),"select max(id) as max_id from societa");
-    if( lista!=0 && lista->size()==1 ) {
-        long maxId = 0;
-        if(lista->at(0)->getFieldSize()>0) {
-            DBField* field = (DBField*) lista->at(0)->getField(0);
-            maxId = field->getIntegerValue();
-        }
-        this->setValue("id", maxId+1 );
-        dbmgr->Destroy(lista);
+    if(this->isNull("id")) {
+        this->setValue("id",dbmgr->getNextUuid(this));
     }
-    if(dbmgr==0) return;
 }
 void DBESocieta::_before_copy(DBMgr* dbmgr) {
     DBField* campo = (DBField*) this->getField("ragione_sociale");
@@ -196,7 +195,24 @@ void TestSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
-//        dbeusergroup.setValue("user_id","-4")->setValue("group_id","-1"); dbmgr.Insert(&dbeusergroup);
+        dbe1.setNull("id")->setValue("nome","cippa")->setValue("descrizione","Cippa Lippa")->setValue("data_creazione","2006-04-01 16:15:30"); dbmgr.Insert(&dbe1);
+        dbe1.setNull("id")->setValue("nome","lippo")->setValue("descrizione","Lippo Lippi")->setValue("data_creazione","2006-04-01 16:15:30"); dbmgr.Insert(&dbe1);
+        dbe1.setNull("id")->setValue("nome","generale")->setValue("descrizione","Generale Putzerstoven")->setValue("data_creazione","2014-04-01 16:15:30"); dbmgr.Insert(&dbe1);
+
+        dbe2.setNull("id")->setValue("ragione_sociale","Società A Srl")->setValue("indirizzo","via vai 7, falconara")
+                ->setValue("cap",60015L)->setValue("nazione","IT"); dbmgr.Insert(&dbe2);
+        dbe2.setNull("id")->setValue("ragione_sociale","Società B Srl")->setValue("indirizzo","via matteotti 7, falconara")
+                ->setValue("cap",60015L)->setValue("nazione","IT"); dbmgr.Insert(&dbe2);
+//    telefono integer,
+//    fax integer,
+//    email text,
+//    note text,
+//    website text,
+//    citta text,
+//    provincia text,
+//    partita_iva text,
+//    tipo text,
+//    data_creazione text,
     }
     current_migration++;
 

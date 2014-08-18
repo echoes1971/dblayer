@@ -37,6 +37,7 @@ namespace TestSchema {
         virtual DBFieldVector* getKeys() const;
         virtual DBETestDBLayer* createNewInstance() const;
 
+        virtual void _before_insert(DBMgr* dbmgr);
 	  private:
         static ColumnDefinitions _columns;
         static const string nomiCampiChiave[];
