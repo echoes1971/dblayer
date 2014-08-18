@@ -28,8 +28,8 @@ cmake ${cmake_params} ${SRC_DIR}
 #make -j 12 && ./apps/dbshell "dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;" adm adm
 
 #make -j 12 && ./tests/dblayer_test "dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;" adm adm
-make -j 12 && ./tests/dblayer_test "dblayer:pg:host=localhost dbname=rproject user=postgres password=" adm adm
-#make -j 12 && ./tests/dblayer_test dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php adm adm
+#make -j 12 && ./tests/dblayer_test "dblayer:pg:host=localhost dbname=rproject user=postgres password=" adm adm
+make -j 12 && ./tests/dblayer_test dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php adm adm
 
 cd ..
 

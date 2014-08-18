@@ -261,8 +261,8 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     DBMgr* dbmgr;
 
     con = DBLayer::createConnection( connString.c_str() );
-    dbmgr = new DBLayer::DBMgr(con, true);
-    con->setVerbose(true);
+    dbmgr = new DBLayer::DBMgr(con, false);
+    //con->setVerbose(true);
 
     DBEFactory dbeFactory(false);
     dbmgr->setDBEFactory(&dbeFactory);
@@ -270,7 +270,7 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     AuthSchema::registerClasses(&dbeFactory);
     AuthSchema::checkDB(*dbmgr,true);
     TestSchema::registerClasses(&dbeFactory);
-    TestSchema::checkDB(*dbmgr,true);
+    TestSchema::checkDB(*dbmgr,false);
 
     if(dbmgr->connect()) {
 
@@ -495,7 +495,7 @@ void testCRUD(string connString, string& loginUser, string& loginPwd) {
 
         // Update
         nuova->setValue("ragione_sociale","Nuova Societa L\'Attico S.r.l.");
-        nuova->setValue("cap", 60015L);
+        nuova->setValue("cap", "60015");
 
         cout << endl;
         nuova = dbmgr->Update(nuova);
@@ -741,8 +741,6 @@ int main(int argc, char *argv[]) {
     cout << "---------------->>  testSearch: end." << endl;
     cout << endl;
 
-    return 0;
-
     cout << "---------------->>  testDBE: start." << endl;
     if(argc==5) {
         testDBE( host, dbname, usr, pwd, login_user, login_password );
@@ -769,6 +767,8 @@ int main(int argc, char *argv[]) {
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
     cout << "---------------->>  testCRUD: end." << endl;
     cout << endl;
+
+    return 0;
 
     cout << "---------------->>  testGetKeys: start." << endl;
     if( argc==5 ) {

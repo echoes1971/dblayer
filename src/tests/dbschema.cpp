@@ -205,13 +205,14 @@ void TestSchema::checkDB(DBMgr& dbmgr, bool verbose) {
             ->setValue("prezzo",(float) -125); dbmgr.Insert(&dbe1);
         dbe1.setNull("id")->setValue("nome","generale")->setValue("descrizione","Generale Putzerstoven")
             ->setValue("data_creazione","2014-04-01 16:15:30")
+            ->setValue("data_disponibilita","2014-12-01 00:16:27")
             ->setValue("abilitato",true)
             ->setValue("prezzo",(float) 99); dbmgr.Insert(&dbe1);
 
         dbe2.setNull("id")->setValue("ragione_sociale","Società A Srl")->setValue("indirizzo","via vai 7, falconara")
-                ->setValue("cap",60015L)->setValue("nazione","IT"); dbmgr.Insert(&dbe2);
+                ->setValue("cap","60015")->setValue("nazione","IT"); dbmgr.Insert(&dbe2);
         dbe2.setNull("id")->setValue("ragione_sociale","Società B Srl")->setValue("indirizzo","via matteotti 7, falconara")
-                ->setValue("cap",60015L)->setValue("nazione","IT"); dbmgr.Insert(&dbe2);
+                ->setValue("cap","60015")->setValue("nazione","IT"); dbmgr.Insert(&dbe2);
 //    telefono integer,
 //    fax integer,
 //    email text,
