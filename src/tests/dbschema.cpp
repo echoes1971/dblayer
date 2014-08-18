@@ -34,12 +34,12 @@ DBETestDBLayer::DBETestDBLayer() {
             DBETestDBLayer::_columns[pair.first] = pair.second;
         }
         DBETestDBLayer::_columns["id"] = vector<string> {"uuid","not null"};
-        DBETestDBLayer::_columns["nome"] = vector<string> {"text"};
-        DBETestDBLayer::_columns["descrizione"] = vector<string> {"text"};
+        DBETestDBLayer::_columns["nome"] = vector<string> {"varchar(255)"};
+        DBETestDBLayer::_columns["descrizione"] = vector<string> {"varchar(2000)"};
         DBETestDBLayer::_columns["abilitato"] = vector<string> {"bool"};
-        DBETestDBLayer::_columns["data_creazione"] = vector<string> {"text"};
+        DBETestDBLayer::_columns["data_creazione"] = vector<string> {"datetime"};
         DBETestDBLayer::_columns["prezzo"] = vector<string> {"float"};
-        DBETestDBLayer::_columns["data_disponibilita"] = vector<string> {"text"};
+        DBETestDBLayer::_columns["data_disponibilita"] = vector<string> {"datetime"};
     }
 
 //    id int NOT NULL,
@@ -94,7 +94,7 @@ DBESocieta::DBESocieta() {
         DBESocieta::_columns["provincia"] = vector<string> {"text"};
         DBESocieta::_columns["partita_iva"] = vector<string> {"text"};
         DBESocieta::_columns["tipo"] = vector<string> {"text"};
-        DBESocieta::_columns["data_creazione"] = vector<string> {"text"};
+        DBESocieta::_columns["data_creazione"] = vector<string> {"datetime"};
     }
 //    id integer NOT NULL,
 //    ragione_sociale text,
@@ -195,9 +195,18 @@ void TestSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
-        dbe1.setNull("id")->setValue("nome","cippa")->setValue("descrizione","Cippa Lippa")->setValue("data_creazione","2006-04-01 16:15:30"); dbmgr.Insert(&dbe1);
-        dbe1.setNull("id")->setValue("nome","lippo")->setValue("descrizione","Lippo Lippi")->setValue("data_creazione","2006-04-01 16:15:30"); dbmgr.Insert(&dbe1);
-        dbe1.setNull("id")->setValue("nome","generale")->setValue("descrizione","Generale Putzerstoven")->setValue("data_creazione","2014-04-01 16:15:30"); dbmgr.Insert(&dbe1);
+        dbe1.setNull("id")->setValue("nome","cippa")->setValue("descrizione","Cippa Lippa")
+            ->setValue("data_creazione","2006-04-01 16:15:30")
+            ->setValue("abilitato",true)
+            ->setValue("prezzo",6.023F); dbmgr.Insert(&dbe1);
+        dbe1.setNull("id")->setValue("nome","lippo")->setValue("descrizione","Lippo Lippi")
+            ->setValue("data_creazione","2006-04-01 16:15:30")
+            ->setValue("abilitato",false)
+            ->setValue("prezzo",(float) -125); dbmgr.Insert(&dbe1);
+        dbe1.setNull("id")->setValue("nome","generale")->setValue("descrizione","Generale Putzerstoven")
+            ->setValue("data_creazione","2014-04-01 16:15:30")
+            ->setValue("abilitato",true)
+            ->setValue("prezzo",(float) 99); dbmgr.Insert(&dbe1);
 
         dbe2.setNull("id")->setValue("ragione_sociale","Società A Srl")->setValue("indirizzo","via vai 7, falconara")
                 ->setValue("cap",60015L)->setValue("nazione","IT"); dbmgr.Insert(&dbe2);

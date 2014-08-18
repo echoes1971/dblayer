@@ -123,6 +123,38 @@ void testDBConnection(string& connString, string& loginUser, string& loginPwd) {
             cout << "Errors: " << con->getErrorMessage() << endl;
         }
         delete res;
+
+        myquery = "select * from test_test_dblayer order by id desc";
+        res = con->exec(myquery);
+        if( !con->hasErrors() ) {
+            cout << "res.status: " << res->getStatus() << "." << endl;
+            cout << "res.toString() = " << res->toString() << endl;
+
+            int nColonne = res->getNumColumns();
+            printf( "N. Colonne: %d\n", nColonne );
+            for( int i=0; i<nColonne; i++) {
+                cout << "Colonna[" << i << "]: " << string(res->getColumnName(i))
+                     << " - " << res->getColumnType(i)
+                     << ": " << res->getColumnSize(i)
+                     << endl;
+            }
+
+            int nRighe = res->getNumRows();
+            cout << " Righe:" << nRighe << endl;
+            for(int r=0; r<nRighe; r++) {
+                for(int c=0; c<nColonne; c++) {
+                    if (! res->isNull(r,c) ) {
+                        cout << res->getValue(r,c) << "\t";
+                    } else {
+                        cout << "\\N" << "\t";
+                    }
+                }
+                cout << endl;
+            }
+        } else {
+            cout << "Errors: " << con->getErrorMessage() << endl;
+        }
+        delete res;
     } else {
         cout << "(testDBConnection) Errors: " << con->getErrorMessage() << endl;
     }
@@ -229,15 +261,16 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     DBMgr* dbmgr;
 
     con = DBLayer::createConnection( connString.c_str() );
-    dbmgr = new DBLayer::DBMgr(con, false);
+    dbmgr = new DBLayer::DBMgr(con, true);
+    con->setVerbose(true);
 
     DBEFactory dbeFactory(false);
     dbmgr->setDBEFactory(&dbeFactory);
     //dbmgr->setSchema("rra");
     AuthSchema::registerClasses(&dbeFactory);
-    AuthSchema::checkDB(*dbmgr);
+    AuthSchema::checkDB(*dbmgr,true);
     TestSchema::registerClasses(&dbeFactory);
-    TestSchema::checkDB(*dbmgr);
+    TestSchema::checkDB(*dbmgr,true);
 
     if(dbmgr->connect()) {
 
@@ -280,7 +313,7 @@ void testSearch(string connString, string& loginUser, string& loginPwd) {
     DBMgr* dbmgr;
 
     mycon = DBLayer::createConnection( connString.c_str() );
-    dbmgr = new DBLayer::DBMgr(mycon, true);
+    dbmgr = new DBLayer::DBMgr(mycon, false);
 
     DBEFactory dbeFactory(false);
     dbmgr->setDBEFactory(&dbeFactory);
@@ -663,7 +696,12 @@ int main(int argc, char *argv[]) {
     QXmlrpcConnection::registerClass();
 #endif
 
-    cout << "---------------->>  testDBConnection" << endl;
+    cout << "---------------->>  testDateField: start." << endl;
+    testDateField();
+    cout << "---------------->>  testDateField: end." << endl;
+    cout << endl;
+
+    cout << "---------------->>  testDBConnection: start." << endl;
     if( argc==5 ) {
         testDBConnection( host, dbname, usr, pwd, login_user, login_password );
     } else {
@@ -673,15 +711,8 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-
-    cout << "---------------->>  testGetKeys" << endl;
-    if(argc==5) {
-        testGetKeys( host, dbname, usr, pwd, login_user, login_password, string("test_societa") );
-    } else {
-        testGetKeys( connString, login_user, login_password, string("test_societa") );
-    }
-
-    testDateField();
+    cout << "---------------->>  testDBConnection: end." << endl;
+    cout << endl;
 
     cout << "---------------->>  testDBMgr: start." << endl;
     if ( argc==5 ) {
@@ -709,6 +740,8 @@ int main(int argc, char *argv[]) {
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
     cout << "---------------->>  testSearch: end." << endl;
     cout << endl;
+
+    return 0;
 
     cout << "---------------->>  testDBE: start." << endl;
     if(argc==5) {
@@ -748,8 +781,6 @@ int main(int argc, char *argv[]) {
     cout << "---------------->>  testGetKeys: end." << endl;
     cout << endl;
 
-    return 0;
-
     cout << "---------------->>  testGetForeignKeys: start." << endl;
     if( argc==5 ) {
         testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
@@ -765,12 +796,11 @@ int main(int argc, char *argv[]) {
     if( argc==5 ) {
         testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
         testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
-        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "rra_users" );
+        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "auth_users" );
     } else {
         testGetColumnsForTable( connString, login_user, login_password, "test_test_dblayer" );
         testGetColumnsForTable( connString, login_user, login_password, "test_societa" );
-        testGetColumnsForTable( connString, login_user, login_password, "rra_users" );
-        //testGetColumnsForTable( connString, login_user, login_password, "rra_people" );
+        testGetColumnsForTable( connString, login_user, login_password, "auth_users" );
     }
     cout << "---------------->>  testGetColumnsForTable: end." << endl;
     cout << endl;

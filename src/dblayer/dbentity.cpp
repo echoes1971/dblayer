@@ -186,7 +186,7 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, stri
                 for(unsigned int i=0; i<fks.size(); i++) {
                     ForeignKey& f = fks.at(i);
                     if(f.colonna_fk == pair.first) {
-                        ret.append("REFERENCES ").append(f.tabella_riferita).append(" (").append(f.colonna_riferita).append(") ");
+                        ret.append("REFERENCES ").append(this->getSchemaName()).append("_").append(f.tabella_riferita).append(" (").append(f.colonna_riferita).append(") ");
                         break;
                     }
                 }
@@ -407,17 +407,17 @@ bool DBEntity::isFK(string field_name, string referred_table) {
 }
 
 void DBEntity::cleanKeyFields() {
-    bool cancellato = true;
-    while(cancellato) {
+    bool deleted = true;
+    while(deleted) {
 //        for(const auto& elem : fields) {
 //            string nomeField = elem->getName();
 //            if( this->isKey( nomeField ) ) {
 //                delete elem;
 //                fields.erase( (*elem) );
-//                cancellato = true;
+//                deleted = true;
 //                break;
 //            } else {
-//                cancellato = false;
+//                deleted = false;
 //            }
 //        }
         for(FieldVector::iterator it=fields.begin(); it!=fields.end(); it++) {
@@ -425,10 +425,10 @@ void DBEntity::cleanKeyFields() {
             if( this->isKey( nomeField ) ) {
                 delete (*it);
                 fields.erase(it);
-                cancellato = true;
+                deleted = true;
                 break;
             } else {
-                cancellato = false;
+                deleted = false;
             }
         }
     }

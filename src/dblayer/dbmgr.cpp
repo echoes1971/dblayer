@@ -448,6 +448,9 @@ void DBMgr::rs2dbelist(ResultSet* res,string& nomeTabella,DBEntityVector* ret) {
             } else if ( res->getColumnType(c)==DBLayer::type_string ) {
                 string valore = res->getValue( r, c );
                 dbfield = new StringField( columnName, valore );
+            } else if ( res->getColumnType(c)==DBLayer::type_blob ) {
+                string valore = res->getValue( r, c );
+                dbfield = new StringField( columnName, valore );
             } else if ( res->getColumnType(c)==DBLayer::type_datetime ) {
                 string valore = res->getValue( r, c );
                 dbfield = new DateField( columnName, valore );
@@ -600,7 +603,7 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
     DBEntity* cerca = this->getClazzByTypeName("DBEUser");
     cerca->setValue("login",user);
     cerca->setValue("pwd",pwd);
-cout << "DBMgr::login: cerca=" << cerca->toString() << endl;
+
     DBEntityVector* lista = this->Search(cerca,false);
 
     // TODO: how to handle this in C++?

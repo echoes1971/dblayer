@@ -207,6 +207,8 @@ namespace DBLayer {
         IntegerVector getKeys(string* relname);
 
         inline string getDBType() { return "POSTGRESQL"; }
+        
+        virtual string dbeType2dbType(const string& dbetype);
         // Overridden: end.
 
                 // PG Functions

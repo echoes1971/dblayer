@@ -111,6 +111,7 @@ Connection::Connection(string s) {
     this->connectionString = s;
     this->errorMessage.clear();
     this->connected = false;
+    this->verbose = false;
 }
 
 Connection::~Connection() { this->disconnect(); }
@@ -431,6 +432,15 @@ string PGConnection::pgtype2string(int t) {
 }
 int PGConnection::clientEncoding() { return PQclientEncoding( this->conn ); }
 int PGConnection::setClientEncoding(string s) { return PQsetClientEncoding( this->conn, s.c_str() ); }
+
+string PGConnection::dbeType2dbType(const string& dbetype) {
+    string ret = dbetype;
+    if(dbetype=="datetime") {
+        ret = "timestamp";
+    } else if(dbetype=="uuid")
+        ret = "char(40)";
+    return ret;
+}
 
 #endif
 

@@ -326,7 +326,7 @@ IntegerVector MySQLConnection::getForeignKeys(string* relname) {
     MYSQL_FIELD *field;
     for(unsigned int i=0; ret.size()==0 && i<lengths; i++) {
         field = mysql_fetch_field(result);
-        this->printField(field);
+        if(this->verbose) this->printField(field);
         if( ( (field->flags&PRI_KEY_FLAG) == 0 ) && ( (field->flags&MULTIPLE_KEY_FLAG) == MULTIPLE_KEY_FLAG ) ) {
             ret.push_back( (int) i+1 );
         }
