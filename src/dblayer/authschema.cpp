@@ -303,6 +303,10 @@ void AuthSchema::registerClasses(DBEFactory* dbeFactory) {
 void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
     if(verbose) cout << "AuthSchema::checkDB: start." << endl;
 
+    if(dbmgr.getConnection()->isProxy()) {
+        cerr << "AuthSchema::checkDB: WARNING - remote databases cannot be checked." << endl;
+        return;
+    }
     if(!dbmgr.connect()) {
         cerr << "AuthSchema::checkDB: ERROR - UNABLE TO CONNECT TO DB!!!" << endl;
         return;

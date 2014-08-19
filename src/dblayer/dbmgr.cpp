@@ -470,10 +470,11 @@ DBEntityVector* DBMgr::Select(const string& tableName, const string& searchStrin
         if( this->verbose ) cout << "DBMgr::Select: nomeTabella=" << nomeTabella << endl;
         DBEntity* dbe = this->getClazz(nomeTabella);
         if( this->verbose ) cout << "DBMgr::Select: dbe=" << dbe->toString() << endl;
-        string myTableName = this->_buildTableName(dbe);
+        string myTableName = tableName;//this->_buildTableName(dbe);
         if( this->verbose ) cout << "DBMgr::Select: myTableName=" << myTableName << endl;
         ret = this->con->Select(dbe,myTableName,searchString);
         delete dbe;
+        if(ret==0) ret = new DBEntityVector();
         return ret;
     }
     DBEntityVector* ret = new DBEntityVector;
@@ -495,7 +496,9 @@ DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, c
     if(this->con->isProxy()) {
         if( this->verbose ) cout << "DBMgr::Search: calling con->Search()" << endl;
         //if( this->verbose ) cout << "DBMgr::Search: dbe=" << dbe->toString() << endl;
-        return this->con->Search(dbe, uselike, caseSensitive, orderBy);
+        DBEntityVector* ret = this->con->Search(dbe, uselike, caseSensitive, orderBy);
+        if(ret==0) ret = new DBEntityVector();
+        return ret;
     }
     string myquery = this->_buildSelectString( dbe, uselike, caseSensitive );
     if( orderBy.size()!=0 ) {

@@ -59,8 +59,8 @@ class QXmlrpcConnection : public QObject , public Connection {
     virtual DBEntity* Insert(DBEntity *dbe);
     virtual DBEntity* Update(DBEntity *dbe);
     virtual DBEntity* Delete(DBEntity *dbe);
-    virtual DBEntityVector* Select(DBEntity* dbe, const string* tableName, const string* searchString);
-    virtual DBEntityVector* Search(DBEntity* dbe, bool uselike=true, bool caseSensitive=true, const string* orderBy=new string("") );
+    virtual DBEntityVector* Select(DBEntity* dbe, const string& tableName, const string& searchString);
+    virtual DBEntityVector* Search(DBEntity* dbe, bool uselike=true, bool caseSensitive=true, const string& orderBy="" );
     virtual string ping();
   private:
     QList<QVariant>* _dbeToVariant(DBEntity* dbe, QList<QVariant>* ioVariant);

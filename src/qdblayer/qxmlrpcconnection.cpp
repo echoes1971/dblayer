@@ -449,17 +449,18 @@ DBEntity* QXmlrpcConnection::Delete(DBEntity *dbe) {
 
     return dbe;
 }
-DBEntityVector* QXmlrpcConnection::Select(DBEntity* dbe, const string* tableName, const string* searchString) {
+DBEntityVector* QXmlrpcConnection::Select(DBEntity* dbe, const string& tableName, const string& searchString) {
     this->errorMessage.clear();
 
     QList<QVariant> params;
-    params.push_back(QString(tableName->c_str()));
-    params.push_back(QString(searchString->c_str()));
+    params.push_back(QString(tableName.c_str()));
+    params.push_back(QString(searchString.c_str()));
     QString method = "select";
 
     QVariant resp = this->myClient->syncCall(method,params);
     DBEntityVector* ret = new DBEntityVector;
 
+    if(this->verbose) printf("QXmlrpcConnection::Select: resp=%s\n", this->variant2string( resp, "\n").toStdString().c_str());
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         if(this->verbose) printf("QXmlrpcConnection::Select: %s\n", resp.toList().at(0).toString().toStdString().c_str());
         QList<QVariant> lista = resp.toList().at(1).toList(); //.at(0).toList();
@@ -467,11 +468,11 @@ DBEntityVector* QXmlrpcConnection::Select(DBEntity* dbe, const string* tableName
             ret->push_back( this->_variantToDBE( &(lista[i]), dbe->createNewInstance() ) );
         }
     } else
-        printf("QXmlrpcConnection::Select: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
+        printf("QXmlrpcConnection::Select: cannot convert this %s\n", this->variant2string( resp, "\n").toStdString().c_str());
 
     return ret;
 }
-DBEntityVector* QXmlrpcConnection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string* orderBy ) {
+DBEntityVector* QXmlrpcConnection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string& orderBy ) {
     //printf("%0x::QXmlrpcConnection::Search: start.\n",(int) QThread::currentThread());
     this->errorMessage.clear();
     QList<QVariant> cerca;
@@ -481,7 +482,7 @@ DBEntityVector* QXmlrpcConnection::Search(DBEntity* dbe, bool uselike, bool case
     params.push_back(cerca);
     params.push_back(uselike);
     params.push_back(caseSensitive);
-    params.push_back(QString(orderBy->c_str()));
+    params.push_back(QString(orderBy.c_str()));
     QString method = "search";
 
     //printf("%0x::QXmlrpcConnection::Search: invoking remote method...\n",(int) QThread::currentThread());

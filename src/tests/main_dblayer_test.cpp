@@ -261,14 +261,14 @@ void testDBMgr(string connString, string& loginUser, string& loginPwd) {
     DBMgr* dbmgr;
 
     con = DBLayer::createConnection( connString.c_str() );
+    con->setVerbose(true);
     dbmgr = new DBLayer::DBMgr(con, false);
-    //con->setVerbose(true);
 
     DBEFactory dbeFactory(false);
     dbmgr->setDBEFactory(&dbeFactory);
     //dbmgr->setSchema("rra");
     AuthSchema::registerClasses(&dbeFactory);
-    AuthSchema::checkDB(*dbmgr,true);
+    AuthSchema::checkDB(*dbmgr,false);
     TestSchema::registerClasses(&dbeFactory);
     TestSchema::checkDB(*dbmgr,false);
 
@@ -727,6 +727,8 @@ int main(int argc, char *argv[]) {
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
     cout << "---------------->>  testDBMgr: end." << endl;
     cout << endl;
+
+    return 0;
 
     cout << "---------------->>  testSearch: start." << endl;
     if(argc==5) {
