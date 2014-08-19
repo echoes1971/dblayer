@@ -62,6 +62,8 @@ class QXmlrpcConnection : public QObject , public Connection {
     virtual DBEntityVector* Select(DBEntity* dbe, const string& tableName, const string& searchString);
     virtual DBEntityVector* Search(DBEntity* dbe, bool uselike=true, bool caseSensitive=true, const string& orderBy="" );
     virtual string ping();
+
+    virtual ColumnDefinitions getColumnsForTable(const string& tablename);
   private:
     QList<QVariant>* _dbeToVariant(DBEntity* dbe, QList<QVariant>* ioVariant);
     DBEntity* _variantToDBE(QVariant* v, DBEntity* ioDbe);

@@ -219,6 +219,7 @@ QVariant XmlRpcClient::syncCall(const QString& method, const QList<QVariant>& pa
 //    parameters.addQueryItem("license_string", licenseString());
 
     //if(this->debug) printf("%0lx::XmlRpcClient::syncCall: posting request...\n",(unsigned long) QThread::currentThread());
+    this->syncResp.clear();
     QNetworkReply* reply = _http_client->post(request,payload);//, parameters.query());
     //reply->ignoreSslErrors();
     //if(this->debug) printf("%0lx::XmlRpcClient::syncCall: call waitForNetworkReply...\n",(unsigned long) QThread::currentThread());

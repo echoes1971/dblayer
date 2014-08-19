@@ -108,7 +108,7 @@ ResultSet* QXmlrpcConnection::login(string user, string pwd) {
         QList<QVariant> lista = resp.toList().at(1).toList();
         if(lista.size()>0) {
             ret = QXmlrpcConnection::list2resultset( &lista, new QXmlrpcResultSet() );
-            printf("%0lx::QXmlrpcConnection::login: ret=%s\n",(unsigned long) QThread::currentThread(), ret->toString("\n").c_str());
+            if(this->verbose) printf("%0lx::QXmlrpcConnection::login: ret=%s\n",(unsigned long) QThread::currentThread(), ret->toString("\n").c_str());
         } else {
             this->errorMessage = "Authentication failed!";
             //printf("%0lx::QXmlrpcConnection::login: lista=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(lista,"\n").toStdString().c_str());
@@ -267,6 +267,7 @@ DBLayer::IntegerVector QXmlrpcConnection::getKeys(string* relname) {
 
     QVariant resp = this->myClient->syncCall(method,params);
 
+    if(this->verbose) printf("QXmlrpcConnection::getKeys: resp=%s\n", this->variant2string( resp, "\n").toStdString().c_str());
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         for(int i=0; i<resp.toList().at(1).toList().size(); i++) {
            ret.push_back( resp.toList().at(1).toList().at(i).toInt() );
@@ -295,6 +296,39 @@ DBLayer::IntegerVector QXmlrpcConnection::getForeignKeys(string* relname) {
 
     return ret;
 }
+ColumnDefinitions QXmlrpcConnection::getColumnsForTable(const string& tablename) {
+    ColumnDefinitions ret;
+    this->errorMessage.clear();
+
+    QList<QVariant> params;
+    QString method = "getColumnsForTable";
+    params.push_back(QString(tablename.c_str()));
+
+    QVariant resp = this->myClient->syncCall(method,params);
+
+    if(this->verbose) printf("QXmlrpcConnection::getColumnsForTable: resp=%s\n", this->variant2string( resp, "\n").toStdString().c_str());
+    if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
+        QMap<QString,QVariant> mymap = resp.toList().at(1).toMap();
+        //printf("QXmlrpcConnection::getColumnsForTable: mymap=%s\n", this->variant2string( mymap, "\n").toStdString().c_str());
+        // nome, tipo, nullo, hasdefault, valoredefault
+        for(const QString& k : mymap.keys()) {
+            StringVector row;
+            QMap<QString,QVariant> mysubmap = mymap[k].toMap();
+            row.push_back(mysubmap["Field"].toString().toStdString());
+            row.push_back(mysubmap["Type"].toString().toStdString());
+            row.push_back(mysubmap["Null"].toString().toStdString());
+            if(mysubmap.contains(QString("Default"))) {
+                row.push_back(mysubmap["Default"].toString().toStdString());
+            } else {
+                row.push_back("\\N");
+            }
+            ret[ k.toStdString() ] = row;
+        }
+    } else
+        printf("QXmlrpcConnection::getColumnsForTable: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
+    return ret;
+}
+
 QString QXmlrpcConnection::variant2string(const QVariant& v, QString prefix) {
     QString ret;
     QStringList l;
