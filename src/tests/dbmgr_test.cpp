@@ -72,100 +72,6 @@ using namespace AuthSchema;
 
 using namespace std;
 
-void testDBConnection(string& connString, string& loginUser, string& loginPwd) {
-    DBLayer::Connection* con;
-    DBLayer::ResultSet* res;
-
-    con = DBLayer::createConnection( connString.c_str() );
-    con->connect();
-
-    if(loginUser.length()>0 && loginPwd.length()>0) {
-        con->login(loginUser,loginPwd);
-    }
-
-    if ( !con->hasErrors() ) {
-        string myquery("select * from test_societa order by id desc");
-        res = con->exec(myquery);
-        //res = con->exec(string("select * from kware_users order by id desc"));
-        //res = con->exec(string("select * from test_test_dblayer order by id desc"));
-        //res = con->exec(string("select * from test_societa"));
-        //res = con->exec(string("select * from rra_users order by id desc"));
-        //res = con->exec(string("select oid,typname from pg_type"));
-        //string relname = string("comuni");
-        //res = con->exec(string("select conkey from pg_constraint join pg_class on pg_class.oid=conrelid where contype='p' and relname='" + relname + "' "));
-
-        if( !con->hasErrors() ) {
-            cout << "res.status: " << res->getStatus() << "." << endl;
-            cout << "res.toString() = " << res->toString() << endl;
-
-            int nColonne = res->getNumColumns();
-            printf( "N. Colonne: %d\n", nColonne );
-            for( int i=0; i<nColonne; i++) {
-                cout << "Colonna[" << i << "]: " << string(res->getColumnName(i))
-                     << " - " << res->getColumnType(i)
-                     << ": " << res->getColumnSize(i)
-                     << endl;
-            }
-
-            int nRighe = res->getNumRows();
-            cout << " Righe:" << nRighe << endl;
-            for(int r=0; r<nRighe; r++) {
-                for(int c=0; c<nColonne; c++) {
-                    if (! res->isNull(r,c) ) {
-                        cout << res->getValue(r,c) << "\t";
-                    } else {
-                        cout << "\\N" << "\t";
-                    }
-                }
-                cout << endl;
-            }
-        } else {
-            cout << "Errors: " << con->getErrorMessage() << endl;
-        }
-        delete res;
-
-        myquery = "select * from test_test_dblayer order by id desc";
-        res = con->exec(myquery);
-        if( !con->hasErrors() ) {
-            cout << "res.status: " << res->getStatus() << "." << endl;
-            cout << "res.toString() = " << res->toString() << endl;
-
-            int nColonne = res->getNumColumns();
-            printf( "N. Colonne: %d\n", nColonne );
-            for( int i=0; i<nColonne; i++) {
-                cout << "Colonna[" << i << "]: " << string(res->getColumnName(i))
-                     << " - " << res->getColumnType(i)
-                     << ": " << res->getColumnSize(i)
-                     << endl;
-            }
-
-            int nRighe = res->getNumRows();
-            cout << " Righe:" << nRighe << endl;
-            for(int r=0; r<nRighe; r++) {
-                for(int c=0; c<nColonne; c++) {
-                    if (! res->isNull(r,c) ) {
-                        cout << res->getValue(r,c) << "\t";
-                    } else {
-                        cout << "\\N" << "\t";
-                    }
-                }
-                cout << endl;
-            }
-        } else {
-            cout << "Errors: " << con->getErrorMessage() << endl;
-        }
-        delete res;
-    } else {
-        cout << "(testDBConnection) Errors: " << con->getErrorMessage() << endl;
-    }
-    //con->disconnect();
-    delete con;
-}
-void testDBConnection(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
-    string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testDBConnection( connString, loginUser, loginPwd );
-}
-
 void testDateField() {
     DBLayer::DateField dateField = DBLayer::DateField( "cippa", "1970-02-01 00:00:00" );
     cout << "string: " << dateField.toString() << endl;
@@ -179,83 +85,6 @@ void testDateField() {
     cout << "date: " << dateField.toString() << endl;
     dateField.setValue( dateField.to_seconds() );
     cout << "seconds2date: " << dateField.toString() << endl;
-}
-
-void testGetKeys(string connString, string& loginUser, string& loginPwd, string relname) {
-    DBLayer::Connection* con;
-
-    con = DBLayer::createConnection( connString.c_str() );
-    con->connect();
-    //con->setVerbose(true);
-
-    if(loginUser.length()>0 && loginPwd.length()>0) {
-        con->login(loginUser,loginPwd);
-    }
-
-    if ( !con->hasErrors() ) {
-        cout << "testGetKeys: table=" << relname << endl;
-
-        int numColonne = con->getColumnSize( &relname );
-        cout << "\tNum. Colonne: " << numColonne << endl;
-        for(int c = 1; c<=numColonne; c++) {
-            cout << "\t" << c << ") " << con->getColumnName( &relname, c ) << endl;
-        }
-
-        DBLayer::IntegerVector chiavi = con->getKeys(&relname);
-        if( !con->hasErrors() ) {
-            unsigned int nChiavi = (unsigned int) chiavi.size();
-            for(unsigned int i=0; i<nChiavi; i++) {
-                cout << "Colonna chiave:\t" << chiavi[i] << "\t"
-                     << con->getColumnName( &relname, chiavi[i] ) << endl;
-            }
-        } else {
-            cerr << "testGetKeys: Errors: " << con->getErrorMessage() << endl;
-        }
-    } else {
-        cerr << "testGetKeys: Errors: " << con->getErrorMessage() << endl;
-    }
-    delete con;
-}
-void testGetKeys(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
-    string connString( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testGetKeys(connString, loginUser, loginPwd, relname);
-}
-
-void testGetForeignKeys(string connString, string& loginUser, string& loginPwd, string relname) {
-    DBLayer::Connection* con;
-    con = DBLayer::createConnection( connString.c_str() );
-    con->connect();
-    //con->setVerbose(true);
-
-    if(loginUser.length()>0 && loginPwd.length()>0) {
-        con->login(loginUser,loginPwd);
-    }
-
-    if ( !con->hasErrors() ) {
-        cout << "testGetForeignKeys: table=" << relname << endl;
-        int numColonne = con->getColumnSize( &relname );
-        cout << "\tNum. Colonne: " << numColonne << endl;
-        for(int c = 1; c<=numColonne; c++) {
-            cout << "\t" << c << ") " << con->getColumnName( &relname, c ) << endl;
-        }
-        DBLayer::IntegerVector chiavi = con->getForeignKeys(&relname);
-        if( !con->hasErrors() ) {
-            unsigned int nChiavi = (unsigned int) chiavi.size();
-            for(unsigned int i=0; i<nChiavi; i++) {
-                cout << "testGetForeignKeys: foreign key column:\t" << chiavi[i] << "\t"
-                     << con->getColumnName( &relname, chiavi[i] ) << endl;
-            }
-        } else {
-            cout << "Errors: " << con->getErrorMessage() << endl;
-        }
-    } else {
-        cout << "Errors: " << con->getErrorMessage() << endl;
-    }
-    delete con;
-}
-void testGetForeignKeys(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
-    string connString( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testGetForeignKeys(connString, loginUser, loginPwd, relname);
 }
 
 void testDBMgr(string connString, string& loginUser, string& loginPwd) {
@@ -597,66 +426,7 @@ void testCRUD(string host,string dbname,string usr,string pwd, string& loginUser
     testCRUD( connString, loginUser, loginPwd );
 }
 
-void testGetColumnsForTable(string connString, string& loginUser, string& loginPwd, string relname) {
-    DBLayer::Connection* con;
-    DBMgr* dbmgr;
-
-    con = DBLayer::createConnection( connString.c_str() );
-    //con->setVerbose(true);
-    dbmgr = new DBLayer::DBMgr(con, false);
-
-    int fieldCreati = SchemaNS::getFieldCreati();
-    int fieldDistrutti = SchemaNS::getFieldDistrutti();
-    int schemiCreati = SchemaNS::getSchemiCreati();
-    int schemiDistrutti = SchemaNS::getSchemiDistrutti();
-    printf("::testGetColumnsForTable: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
-
-    DBEFactory dbeFactory(false);
-    dbmgr->setDBEFactory(&dbeFactory);
-    //dbmgr->setSchema("rra");
-    AuthSchema::registerClasses(&dbeFactory);
-    AuthSchema::checkDB(*dbmgr,false);
-    TestSchema::registerClasses(&dbeFactory);
-    TestSchema::checkDB(*dbmgr,false);
-
-    cout << "testGetColumnsForTable: Creata DBEFactory." << endl;
-    printf("::testGetColumnsForTable: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
-
-    if ( dbmgr->connect() ) {
-        
-        if(loginUser.length()>0 && loginPwd.length()>0) {
-            dbmgr->login(loginUser,loginPwd);
-        }
-
-        if(dbmgr->isLoggedIn()) {
-            cout << endl;
-            cout << "testGetColumnsForTable: fetching definitions for table " << relname << endl;
-            ColumnDefinitions cols = dbmgr->getColumnsForTable(relname);
-
-            for(const auto& elem : cols) {
-                cout << elem.first << endl;
-                string glue(",");
-                cout << "  " << joinString( (DBLayer::StringVector*) &(elem.second),&glue) << endl;
-            }
-        } else {
-            cerr << "testGetColumnsForTable: Login error - " << dbmgr->getErrorMessage() << "." << endl;
-        }
-    } else {
-        cerr << "testGetColumnsForTable: ERROR " << dbmgr->getErrorMessage() << endl;
-    }
-    printf("::testGetColumnsForTable: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
-    delete dbmgr;
-    printf("::testGetColumnsForTable: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
-    delete con;
-}
-void testGetColumnsForTable(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
-    string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testGetColumnsForTable( connString, loginUser, loginPwd, relname );
-}
-
-
-
-void testThis() {
+void testDBES() {
     DBEntity dbe;
     cout << dbe.toString("\n") << endl;
 
@@ -720,19 +490,6 @@ int main(int argc, char *argv[]) {
     cout << "---------------->>  testDateField: end." << endl;
     cout << endl;
 
-    cout << "---------------->>  testDBConnection: start." << endl;
-    if( argc==5 ) {
-        testDBConnection( host, dbname, usr, pwd, login_user, login_password );
-    } else {
-        testDBConnection( connString, login_user, login_password );
-    }
-    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
-    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
-    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
-    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-    cout << "---------------->>  testDBConnection: end." << endl;
-    cout << endl;
-
     cout << "---------------->>  testDBMgr: start." << endl;
     if ( argc==5 ) {
         testDBMgr( host, dbname, usr, pwd, login_user, login_password );
@@ -785,41 +542,6 @@ int main(int argc, char *argv[]) {
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
     cout << "---------------->>  testCRUD: end." << endl;
-    cout << endl;
-
-    cout << "---------------->>  testGetKeys: start." << endl;
-    if( argc==5 ) {
-        testGetKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
-        testGetKeys( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
-    } else {
-        testGetKeys( connString, login_user, login_password, "test_test_dblayer" );
-        testGetKeys( connString, login_user, login_password, "test_societa" );
-    }
-    cout << "---------------->>  testGetKeys: end." << endl;
-    cout << endl;
-
-    cout << "---------------->>  testGetForeignKeys: start." << endl;
-    if( argc==5 ) {
-        testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
-        testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
-    } else {
-        testGetForeignKeys( connString, login_user, login_password, "test_test_dblayer" );
-        testGetForeignKeys( connString, login_user, login_password, "test_societa" );
-    }
-    cout << "---------------->>  testGetForeignKeys: end." << endl;
-    cout << endl;
-
-    cout << "---------------->>  testGetColumnsForTable: start." << endl;
-    if( argc==5 ) {
-        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
-        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
-        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "auth_users" );
-    } else {
-        testGetColumnsForTable( connString, login_user, login_password, "test_test_dblayer" );
-        testGetColumnsForTable( connString, login_user, login_password, "test_societa" );
-        testGetColumnsForTable( connString, login_user, login_password, "auth_users" );
-    }
-    cout << "---------------->>  testGetColumnsForTable: end." << endl;
     cout << endl;
 
     return EXIT_SUCCESS;
