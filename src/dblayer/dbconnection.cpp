@@ -128,7 +128,13 @@ bool Connection::disconnect() {
 
 bool Connection::isConnected() const { return this->connected; }
 
-ResultSet* Connection::login(string user, string pwd) { return new ResultSet(); }
+ResultSet* Connection::login(string user, string pwd) {
+    string query("");
+    query.append("select * from auth_users where login='").append(this->escapeString(user))
+        .append("' and pwd='").append(this->escapeString(pwd)).append("'");
+    return this->exec(query);
+    //return new ResultSet();
+}
 
 string Connection::getFormSchema(string language) { return "Connection::getFormSchema: NOT SUPPORTED - " + language; }
 string Connection::getDBSchema(string language) { return "Connection::getDBSchema: NOT SUPPORTED - " + language; }
