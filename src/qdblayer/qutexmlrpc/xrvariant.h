@@ -72,8 +72,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *   
  */
 
-class XmlRpcVariant : public QVariant
-{
+class XmlRpcVariant : public QVariant {
     public:
 	/**
 	 * @param aqv QVariant from which to create a XRVariant
