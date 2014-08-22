@@ -8,21 +8,15 @@ using namespace DBLayer;
 
 namespace DBLayer {
 
-class QXmlrpcResultSet : public ResultSet {
+class QResultSet : public ResultSet {
   friend class QXmlrpcConnection;
 
   public:
-    QXmlrpcResultSet();
-    virtual ~QXmlrpcResultSet();
-//	virtual int getColumnIndex(string* columnName );
+    QResultSet();
+    virtual ~QResultSet();
     virtual int getColumnSize(int i) const;
 
     virtual string toString(string prefix="\n") const;
-
-    int getReqNumber();
-
-  protected:
-    int req;
 
   private:
     static std::string integer2string(long longValue);

@@ -3,7 +3,7 @@
 #include "qutexmlrpc/xrclient.h"
 
 #include "qxmlrpcconnection.h"
-#include "qxmlrpcresultset.h"
+#include "qresultset.h"
 using namespace DBLayer;
 
 
@@ -55,7 +55,7 @@ bool QXmlrpcConnection::connect() {
         if(lista.size()>0) {
             //printf("%0lx::QXmlrpcConnection::login: lista[0]=%s\n",(unsigned long) QThread::currentThread(),this->variant2string(lista.at(0).toByteArray().data(),"\n").toStdString().c_str());
             s_resp = QString( lista.at(0).toByteArray().data() );
-            //ret = QXmlrpcConnection::list2resultset( &lista, new QXmlrpcResultSet() );
+            //ret = QXmlrpcConnection::list2resultset( &lista, new QResultSet() );
         } else {
             //this->errorMessage = "Authentication failed!";
         }
@@ -107,7 +107,7 @@ ResultSet* QXmlrpcConnection::login(string user, string pwd) {
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         QList<QVariant> lista = resp.toList().at(1).toList();
         if(lista.size()>0) {
-            ret = QXmlrpcConnection::list2resultset( &lista, new QXmlrpcResultSet() );
+            ret = QXmlrpcConnection::list2resultset( &lista, new QResultSet() );
             if(this->verbose) printf("%0lx::QXmlrpcConnection::login: ret=%s\n",(unsigned long) QThread::currentThread(), ret->toString("\n").c_str());
         } else {
             this->errorMessage = "Authentication failed!";
@@ -182,7 +182,7 @@ string QXmlrpcConnection::getSchemaName() {
 }
 
 ResultSet* QXmlrpcConnection::exec(const string s) {
-    QXmlrpcResultSet* rs = new QXmlrpcResultSet();
+    QResultSet* rs = new QResultSet();
     this->errorMessage.clear();
 
     QList<QVariant> params;
@@ -364,7 +364,7 @@ QString QXmlrpcConnection::variant2string(const QVariant& v, QString prefix) {
     }
     return ret;
 }
-QXmlrpcResultSet* QXmlrpcConnection::list2resultset(QList<QVariant>* iLista, QXmlrpcResultSet* ioResultSet) {
+QResultSet* QXmlrpcConnection::list2resultset(QList<QVariant>* iLista, QResultSet* ioResultSet) {
     QStringList l;
     QList<QString> chiavi;
     l.clear();
@@ -552,7 +552,7 @@ string QXmlrpcConnection::ping() {
         if(lista.size()>0) {
             //printf("%0lx::QXmlrpcConnection::login: lista[0]=%s\n",(unsigned long) QThread::currentThread(),this->variant2string(lista.at(0).toByteArray().data(),"\n").toStdString().c_str());
             ret = QString( lista.at(0).toByteArray().data() );
-            //ret = QXmlrpcConnection::list2resultset( &lista, new QXmlrpcResultSet() );
+            //ret = QXmlrpcConnection::list2resultset( &lista, new QResultSet() );
         } else {
             //this->errorMessage = "Authentication failed!";
         }

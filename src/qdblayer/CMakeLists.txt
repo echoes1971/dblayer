@@ -7,7 +7,7 @@ include_directories(".")
 add_library(qdblayer
     qdblayer.cpp
     qxmlrpcconnection.cpp
-    qxmlrpcresultset.cpp
+    qresultset.cpp
 
     qutexmlrpc/xrbase64.cpp
     qutexmlrpc/xrclient.cpp

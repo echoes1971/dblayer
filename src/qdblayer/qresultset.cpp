@@ -1,40 +1,27 @@
-#include "qxmlrpcresultset.h"
+#include "qresultset.h"
 using namespace DBLayer;
 
 #ifdef WIN32
-QXmlrpcResultSet::QXmlrpcResultSet() : ResultSet() {
+QResultSet::QResultSet() : ResultSet() {
 #else
-QXmlrpcResultSet::QXmlrpcResultSet() : ResultSet::ResultSet() {
+QResultSet::QResultSet() : ResultSet::ResultSet() {
 #endif
-    //cout << "QXmlrpcResultSet::QXmlrpcResultSet: inizio." << endl;
-    req=-1;
-    //cout << "QXmlrpcResultSet::QXmlrpcResultSet: fine." << endl;
+    //cout << "QResultSet::QResultSet: inizio." << endl;
+    //cout << "QResultSet::QResultSet: fine." << endl;
 }
-QXmlrpcResultSet::~QXmlrpcResultSet() {
-    //cout << "QXmlrpcResultSet::~QXmlrpcResultSet: inizio." << endl;
-    //cout << "QXmlrpcResultSet::~QXmlrpcResultSet: req=" << this->integer2string(this->req) << endl;
-    //cout << "QXmlrpcResultSet::~QXmlrpcResultSet: fine." << endl;
+QResultSet::~QResultSet() {
+    //cout << "QResultSet::~QResultSet: inizio." << endl;
+    //cout << "QResultSet::~QResultSet: fine." << endl;
 }
 
-int QXmlrpcResultSet::getColumnSize(int i) const {
+int QResultSet::getColumnSize(int i) const {
     // Non significativo per Xmlrpc
     return -i;
 }
-//int QXmlrpcResultSet::getColumnIndex(string* columnName ) {
-//	int ret = -1;
-//	const char* columnNameChar = columnName->c_str();
-//	for(unsigned int i=0; i<this->columnName.size() && ret<0; i++) {
-//		const char* currentColumnNameChar = this->columnName[i].c_str();
-//		if( strcmp( columnNameChar, currentColumnNameChar )==0 )
-//			ret = i;
-//	}
-//	return ret;
-//}
 
-string QXmlrpcResultSet::toString(string prefix) const {
+string QResultSet::toString(string prefix) const {
         string ret;
-        ret.append(prefix+"<QXmlrpcResultSet>");
-        ret.append(prefix+" <req>"+DBLayer::integer2string((long)this->req)+"</req>" );
+        ret.append(prefix+"<QResultSet>");
 
         int nColonne = this->getNumColumns();
         ret.append(prefix+" <Columns>" );
@@ -66,11 +53,11 @@ string QXmlrpcResultSet::toString(string prefix) const {
         }
         ret.append(prefix+" </Rows>");
 
-        ret.append(prefix+"</QXmlrpcResultSet>");
+        ret.append(prefix+"</QResultSet>");
         return ret;
 }
 
-std::string QXmlrpcResultSet::integer2string(long longValue) {
+std::string QResultSet::integer2string(long longValue) {
         int i = 50-2;
         char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
         if ( longValue<0 ) {
@@ -89,7 +76,7 @@ std::string QXmlrpcResultSet::integer2string(long longValue) {
         }
         return std::string( (char*)&tmp[i+1] );
 }
-std::string QXmlrpcResultSet::double2string(double longValue) {
+std::string QResultSet::double2string(double longValue) {
         int i = 50-2;
         char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
         if ( longValue<0 ) {
@@ -114,8 +101,4 @@ std::string QXmlrpcResultSet::double2string(double longValue) {
                 parte_intera.append( integer2string( decimale_long ) );
         }
         return parte_intera + std::string( (char*)&tmp[i+1] );
-}
-
-int QXmlrpcResultSet::getReqNumber() {
-    return this->req;
 }

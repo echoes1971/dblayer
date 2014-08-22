@@ -10,7 +10,7 @@
 #include <dblayer/dbconnection.h>
 #include <dblayer/dbentity.h>
 #include "qdblayer.h"
-#include "qxmlrpcresultset.h"
+#include "qresultset.h"
 using namespace DBLayer;
 
 //#include <xrclient.h>
@@ -49,7 +49,7 @@ class QXmlrpcConnection : public QObject , public Connection {
     static QString variant2string(const QVariant& v, QString prefix="");
     /* Non mi piacciono i parametri in input usati anche per l'output,
         per questo ritorno lo stesso resultset passato in argomento */
-    static QXmlrpcResultSet* list2resultset(QList<QVariant>* iLista, QXmlrpcResultSet* ioResultSet);
+    static QResultSet* list2resultset(QList<QVariant>* iLista, QResultSet* ioResultSet);
 
     XmlRpcClient* getXmlrpcClient();
     //void setXmlrpcClient(XRClient* c); // RRA - NO!
@@ -79,7 +79,7 @@ class QXmlrpcConnection : public QObject , public Connection {
 
     QMap<int, QString> _req_to_method;
     QMap<int, QVariant*> _request_responses;
-    QMap<int, QXmlrpcResultSet*> _resultsets;
+    QMap<int, QResultSet*> _resultsets;
 
     /* DBEUser */
     DBEntity* user;
