@@ -66,98 +66,106 @@ using namespace DBLayer;
 
 using namespace std;
 
-void testDBConnection(string& connString, string& loginUser, string& loginPwd) {
+bool testDBConnection(string& connString, string& loginUser, string& loginPwd) {
+    bool success = true;
     DBLayer::Connection* con;
     DBLayer::ResultSet* res;
 
     con = DBLayer::createConnection( connString.c_str() );
-    con->connect();
+    success = con->connect();
 
     if(loginUser.length()>0 && loginPwd.length()>0) {
         con->login(loginUser,loginPwd);
     }
 
     if ( !con->hasErrors() ) {
-        string myquery("select * from test_societa order by id desc");
-        res = con->exec(myquery);
-        //res = con->exec(string("select * from kware_users order by id desc"));
-        //res = con->exec(string("select * from test_test_dblayer order by id desc"));
-        //res = con->exec(string("select * from test_societa"));
-        //res = con->exec(string("select * from rra_users order by id desc"));
-        //res = con->exec(string("select oid,typname from pg_type"));
-        //string relname = string("comuni");
-        //res = con->exec(string("select conkey from pg_constraint join pg_class on pg_class.oid=conrelid where contype='p' and relname='" + relname + "' "));
+        if(success) {
+            string myquery("select * from test_societa order by id desc");
+            res = con->exec(myquery);
+            //res = con->exec(string("select * from kware_users order by id desc"));
+            //res = con->exec(string("select * from test_test_dblayer order by id desc"));
+            //res = con->exec(string("select * from test_societa"));
+            //res = con->exec(string("select * from rra_users order by id desc"));
+            //res = con->exec(string("select oid,typname from pg_type"));
+            //string relname = string("comuni");
+            //res = con->exec(string("select conkey from pg_constraint join pg_class on pg_class.oid=conrelid where contype='p' and relname='" + relname + "' "));
 
-        if( !con->hasErrors() ) {
-            cout << "res.status: " << res->getStatus() << "." << endl;
-            cout << "res.toString() = " << res->toString() << endl;
+            if( !con->hasErrors() ) {
+                cout << "res.status: " << res->getStatus() << "." << endl;
+                cout << "res.toString() = " << res->toString() << endl;
 
-            int nColonne = res->getNumColumns();
-            printf( "N. Colonne: %d\n", nColonne );
-            for( int i=0; i<nColonne; i++) {
-                cout << "Colonna[" << i << "]: " << string(res->getColumnName(i))
-                     << " - " << res->getColumnType(i)
-                     << ": " << res->getColumnSize(i)
-                     << endl;
-            }
-
-            int nRighe = res->getNumRows();
-            cout << " Righe:" << nRighe << endl;
-            for(int r=0; r<nRighe; r++) {
-                for(int c=0; c<nColonne; c++) {
-                    if (! res->isNull(r,c) ) {
-                        cout << res->getValue(r,c) << "\t";
-                    } else {
-                        cout << "\\N" << "\t";
-                    }
+                int nColonne = res->getNumColumns();
+                printf( "N. Colonne: %d\n", nColonne );
+                for( int i=0; i<nColonne; i++) {
+                    cout << "Colonna[" << i << "]: " << string(res->getColumnName(i))
+                         << " - " << res->getColumnType(i)
+                         << ": " << res->getColumnSize(i)
+                         << endl;
                 }
-                cout << endl;
-            }
-        } else {
-            cout << "Errors: " << con->getErrorMessage() << endl;
-        }
-        delete res;
 
-        myquery = "select * from test_test_dblayer order by id desc";
-        res = con->exec(myquery);
-        if( !con->hasErrors() ) {
-            cout << "res.status: " << res->getStatus() << "." << endl;
-            cout << "res.toString() = " << res->toString() << endl;
-
-            int nColonne = res->getNumColumns();
-            printf( "N. Colonne: %d\n", nColonne );
-            for( int i=0; i<nColonne; i++) {
-                cout << "Colonna[" << i << "]: " << string(res->getColumnName(i))
-                     << " - " << res->getColumnType(i)
-                     << ": " << res->getColumnSize(i)
-                     << endl;
-            }
-
-            int nRighe = res->getNumRows();
-            cout << " Righe:" << nRighe << endl;
-            for(int r=0; r<nRighe; r++) {
-                for(int c=0; c<nColonne; c++) {
-                    if (! res->isNull(r,c) ) {
-                        cout << res->getValue(r,c) << "\t";
-                    } else {
-                        cout << "\\N" << "\t";
+                int nRighe = res->getNumRows();
+                cout << " Righe:" << nRighe << endl;
+                for(int r=0; r<nRighe; r++) {
+                    for(int c=0; c<nColonne; c++) {
+                        if (! res->isNull(r,c) ) {
+                            cout << res->getValue(r,c) << "\t";
+                        } else {
+                            cout << "\\N" << "\t";
+                        }
                     }
+                    cout << endl;
                 }
-                cout << endl;
+            } else {
+                success = false;
+                cout << "Errors: " << con->getErrorMessage() << endl;
             }
-        } else {
-            cout << "Errors: " << con->getErrorMessage() << endl;
+            delete res;
         }
-        delete res;
+
+        if(success) {
+            string myquery = "select * from test_test_dblayer order by id desc";
+            res = con->exec(myquery);
+            if( !con->hasErrors() ) {
+                cout << "res.status: " << res->getStatus() << "." << endl;
+                cout << "res.toString() = " << res->toString() << endl;
+
+                int nColonne = res->getNumColumns();
+                printf( "N. Colonne: %d\n", nColonne );
+                for( int i=0; i<nColonne; i++) {
+                    cout << "Colonna[" << i << "]: " << string(res->getColumnName(i))
+                         << " - " << res->getColumnType(i)
+                         << ": " << res->getColumnSize(i)
+                         << endl;
+                }
+
+                int nRighe = res->getNumRows();
+                cout << " Righe:" << nRighe << endl;
+                for(int r=0; r<nRighe; r++) {
+                    for(int c=0; c<nColonne; c++) {
+                        if (! res->isNull(r,c) ) {
+                            cout << res->getValue(r,c) << "\t";
+                        } else {
+                            cout << "\\N" << "\t";
+                        }
+                    }
+                    cout << endl;
+                }
+            } else {
+                success = false;
+                cout << "Errors: " << con->getErrorMessage() << endl;
+            }
+            delete res;
+        }
     } else {
         cout << "(testDBConnection) Errors: " << con->getErrorMessage() << endl;
     }
     //con->disconnect();
     delete con;
+    return success;
 }
-void testDBConnection(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
+bool testDBConnection(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testDBConnection( connString, loginUser, loginPwd );
+    return testDBConnection( connString, loginUser, loginPwd );
 }
 
 void testDateField() {
@@ -332,6 +340,7 @@ int main(int argc, char *argv[]) {
     QSqliteConnection::registerClass();
     QXmlrpcConnection::registerClass();
 #endif
+    bool success = true;
 
     cout << "---------------->>  testDateField: start." << endl;
     testDateField();
@@ -340,9 +349,9 @@ int main(int argc, char *argv[]) {
 
     cout << "---------------->>  testDBConnection: start." << endl;
     if( argc==5 ) {
-        testDBConnection( host, dbname, usr, pwd, login_user, login_password );
+        success = testDBConnection( host, dbname, usr, pwd, login_user, login_password );
     } else {
-        testDBConnection( connString, login_user, login_password );
+        success = testDBConnection( connString, login_user, login_password );
     }
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
@@ -350,6 +359,10 @@ int main(int argc, char *argv[]) {
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
     cout << "---------------->>  testDBConnection: end." << endl;
     cout << endl;
+    if(!success) {
+        cerr << "TEST FAILED!!!" << endl;
+        return 1;
+    }
 
     cout << "---------------->>  testGetKeys: start." << endl;
     if( argc==5 ) {

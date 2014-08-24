@@ -20,4 +20,4 @@ add_library(qdblayer
     )
 
 #target_link_libraries(qdblayer Qt::Core Qt::Network Qt::Widgets Qt::Xml)
-qt5_use_modules(qdblayer Core Network Widgets Xml)
+qt5_use_modules(qdblayer Core Network Sql Widgets Xml)

@@ -15,10 +15,10 @@ add_executable(connection_test
 
 if(Qt5Widgets_FOUND)
  target_link_libraries(connection_test qdblayer ${EXTRA_LIBS})
- qt5_use_modules(connection_test Core Network Widgets Xml)
+ qt5_use_modules(connection_test Core Network Sql Widgets Xml)
 
  target_link_libraries(dbmgr_test qdblayer ${EXTRA_LIBS})
- qt5_use_modules(dbmgr_test Core Network Widgets Xml)
+ qt5_use_modules(dbmgr_test Core Network Sql Widgets Xml)
 else()
  target_link_libraries(connection_test ${EXTRA_LIBS})
  target_link_libraries(dbmgr_test ${EXTRA_LIBS})
