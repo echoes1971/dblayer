@@ -158,7 +158,7 @@ void TestSchema::checkDB(DBMgr& dbmgr, bool verbose) {
     cerca->setValue("model_name", TestSchema::getSchema());
     DBEntityVector* res = dbmgr.Search(cerca,false);
     if(verbose) cout << "TestSchema::checkDB: res.size=" << res->size() << endl;
-    if(dbmgr.getErrorMessage().length()==0 && !res==0 && res->size()>0) {
+    if(dbmgr.getErrorMessage().length()==0 && res!=0 && res->size()>0) {
         dbecurrentversion = res->at(0);
         res->clear();
         if(verbose) cout << "TestSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;

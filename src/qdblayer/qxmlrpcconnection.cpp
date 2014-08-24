@@ -84,7 +84,7 @@ bool QXmlrpcConnection::reconnect() {
         return false;
 }
 
-bool debugQXmlrpcExec = false;
+bool debugQSqliteExec = false;
 
 ResultSet* QXmlrpcConnection::login(string user, string pwd) {
     //printf("%0x::QXmlrpcConnection::login: start.\n",(int) QThread::currentThread());

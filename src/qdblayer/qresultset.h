@@ -9,6 +9,7 @@ using namespace DBLayer;
 namespace DBLayer {
 
 class QResultSet : public ResultSet {
+  friend class QSqliteConnection;
   friend class QXmlrpcConnection;
 
   public:

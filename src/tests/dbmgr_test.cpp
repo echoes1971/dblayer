@@ -58,6 +58,7 @@ using namespace AuthSchema;
 
 #ifdef USE_QXMLRPC
 #include <QApplication>
+#include "qdblayer/qsqliteconnection.h"
 #include "qdblayer/qxmlrpcconnection.h"
 #include <QDebug>
 #endif
@@ -482,7 +483,8 @@ int main(int argc, char *argv[]) {
 
 #ifdef USE_QXMLRPC
     QApplication a(argc, argv);
-    QXmlrpcConnection::registerClass();
+    QSqliteConnection::registerClass();
+    DBLayer::QXmlrpcConnection::registerClass();
 #endif
 
     cout << "---------------->>  testDateField: start." << endl;

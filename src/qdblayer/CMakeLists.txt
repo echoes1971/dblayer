@@ -6,6 +6,7 @@ include_directories(".")
 
 add_library(qdblayer
     qdblayer.cpp
+    qsqliteconnection.cpp
     qxmlrpcconnection.cpp
     qresultset.cpp
 

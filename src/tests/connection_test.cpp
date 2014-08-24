@@ -51,6 +51,7 @@ using namespace DBLayer;
 
 #ifdef USE_QXMLRPC
 #include <QApplication>
+#include "qdblayer/qsqliteconnection.h"
 #include "qdblayer/qxmlrpcconnection.h"
 #include <QDebug>
 #endif
@@ -328,6 +329,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef USE_QXMLRPC
     QApplication a(argc, argv);
+    QSqliteConnection::registerClass();
     QXmlrpcConnection::registerClass();
 #endif
 
