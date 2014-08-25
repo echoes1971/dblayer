@@ -12,7 +12,7 @@ PATH=~/Qt/5.3/clang_64/bin/:~/Qt/5.3/gcc_64/bin/:${PATH}
 #CONNECTION_STRING="dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;"
 #CONNECTION_STRING="dblayer:pg:host=localhost dbname=rproject user=postgres password="
 #CONNECTION_STRING="dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php"
-CONNECTION_STRING="dblayer:qsqlite:../examples/test.db"
+CONNECTION_STRING="dblayer:qsqlite:../examples/test_auth.db"
 TEST_USER=adm
 TEST_PWD=adm
 
@@ -39,7 +39,7 @@ cmake ${cmake_params} ${SRC_DIR}
 
 make -j 12 \
     &&./tests/connection_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
-    && ./tests/dbmgr_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
+#    && ./tests/dbmgr_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
 
 cd ..
 

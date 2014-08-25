@@ -374,7 +374,7 @@ int main(int argc, char *argv[]) {
     }
     cout << "---------------->>  testGetKeys: end." << endl;
     cout << endl;
-
+return 0;
     cout << "---------------->>  testGetForeignKeys: start." << endl;
     if( argc==5 ) {
         testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );

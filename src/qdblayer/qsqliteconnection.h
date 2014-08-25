@@ -52,9 +52,6 @@ class QSqliteConnection : public Connection {
     static void registerClass();
 
   private:
-    QList<QVariant>* _dbeToVariant(DBEntity* dbe, QList<QVariant>* ioVariant);
-    DBEntity* _variantToDBE(QVariant* v, DBEntity* ioDbe);
-
     string dbname;
     QSqlDatabase db;
 };

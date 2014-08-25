@@ -1,6 +1,8 @@
 #include <cstdio>
 
+#include <QtSql/QSqlField>
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
 
 #include "qsqliteconnection.h"
 #include "qresultset.h"
@@ -25,6 +27,7 @@ QSqliteConnection::QSqliteConnection(string s) : Connection::Connection(s) {
 #endif
     this->dbname = s;
     db = QSqlDatabase::addDatabase("QSQLITE");
+    cout << "QSqliteConnection::QSqliteConnection: defaultConnection=" << QSqlDatabase::defaultConnection << endl;
 }
 QSqliteConnection::~QSqliteConnection() {
     this->disconnect();
@@ -71,11 +74,48 @@ ResultSet* QSqliteConnection::exec(const string s) {
     QSqlQuery query(db);
     query.exec(QString(s.c_str()));
 
-    DA QUI
+    QSqlRecord record = query.record();
 
+    // Preparing metadata
+    int nColonne = record.count();
+    for( int i=0; i<nColonne; i++) {
+        rs->columnName.push_back(record.fieldName(i).toStdString());
+        rs->columnSize.push_back(record.field(i).length());
+        QVariant::Type fieldType = record.field(i).type();
+        switch(fieldType) {
+            case QVariant::Int:
+            case QVariant::LongLong:
+                rs->columnType.push_back( DBLayer::type_integer );
+                break;
+            case QVariant::String:
+            case QVariant::Char:
+                rs->columnType.push_back( DBLayer::type_string );
+                break;
+            case QVariant::Double:
+                rs->columnType.push_back( DBLayer::type_double );
+                break;
+            case QVariant::Bool:
+                rs->columnType.push_back( DBLayer::type_boolean );
+                break;
+            case QVariant::Date:
+            case QVariant::DateTime:
+                rs->columnType.push_back( DBLayer::type_datetime );
+                break;
+            default:
+                cerr << "QSqliteConnection::exec: fieldType \'" << fieldType
+                     << "\' Unknown!" << endl;
+                rs->columnType.push_back( DBLayer::type_blob );
+                break;
+        }
+    }
 
-//    QList<QVariant> lista = v.toList().at(1).toList();
-//    rs = QSqliteConnection::list2resultset( &lista, rs );
+    // Fetching rows
+    while(query.next()) {
+        for(int i = 0; i < record.count(); i++) {
+            QVariant val =  query.value(i);
+            rs->righe.push_back( val.toString().toStdString() );
+        }
+    }
     return rs;
 }
 string QSqliteConnection::escapeString(string s) const {
@@ -219,6 +259,7 @@ QResultSet* QSqliteConnection::list2resultset(QList<QVariant>* iLista, QResultSe
         for(int i=0; i<chiavi.size(); i++) {
             // Metadati
             if(ioResultSet->columnName.size()<=colonna) {
+                // Column Name
                 ioResultSet->columnName.push_back( chiavi.at(i).toStdString() );
             }
             switch(map[chiavi.at(i)].type()) {
@@ -237,7 +278,6 @@ QResultSet* QSqliteConnection::list2resultset(QList<QVariant>* iLista, QResultSe
                     if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_boolean );
                     ioResultSet->righe.push_back( map[chiavi.at(i)].toBool() ? string("1") : string("0") );
                     break;
-
                 case QVariant::String:
                     if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_string );
                     ioResultSet->righe.push_back( map[chiavi.at(i)].toString().toStdString() );
@@ -246,12 +286,11 @@ QResultSet* QSqliteConnection::list2resultset(QList<QVariant>* iLista, QResultSe
                     if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_string );
                     ioResultSet->righe.push_back( string( map[chiavi.at(i)].toByteArray().data() ) );
                     break;
-
                 case QVariant::Date:
                 case QVariant::DateTime:
                     if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_datetime );
                     ioResultSet->righe.push_back( string( map[chiavi.at(i)].toByteArray().data() ) );
-
+                    break;
                 default:
                     if(ioResultSet->columnType.size()<=colonna) ioResultSet->columnType.push_back( DBLayer::type_blob );
                     ioResultSet->righe.push_back( map[chiavi.at(i)].toString().toStdString() + ( QString(" (%1)").arg(map[chiavi.at(i)].typeName()) ).toStdString() );
@@ -262,70 +301,3 @@ QResultSet* QSqliteConnection::list2resultset(QList<QVariant>* iLista, QResultSe
     }
     return ioResultSet;
 }
-
-
-QList<QVariant>* QSqliteConnection::_dbeToVariant(DBEntity* dbe, QList<QVariant>* ioVariant) {
-    QMap<QString,QVariant>* d = new QMap<QString,QVariant>();
-    ioVariant->push_back( QVariant(dbe->name().c_str()) );
-    StringVector names = dbe->getNames();
-    for(StringVector::iterator it=names.begin(); it!=names.end(); it++) {
-        Field* field = dbe->getField(*it);
-        //printf("QSqliteConnection::_dbeToVariant: %s type=%d  - is %s null\n", (*it).c_str(), field->getType(), field->isNull()?"":"not");
-        if(field->isNull()) continue;
-        //if(field->getStringValue()!=0) printf("QSqliteConnection::_dbeToVariant: %s=>%s\n", (*it).c_str(), field->getStringValue()->c_str());
-        if(field->isBoolean()) d->insert(QString( (*it).c_str() ), field->getBooleanValue());
-        else if(field->isInteger()) d->insert(QString( (*it).c_str() ), (qlonglong) field->getIntegerValue());
-        else if(field->isFloat()) d->insert(QString( (*it).c_str() ), field->getFloatValue());
-        else if(field->isDouble()) d->insert(QString( (*it).c_str() ), field->getFloatValue());
-        else if(field->isDate()) {
-            //printf("QSqliteConnection::_dbeToVariant: %s=>%s\n", (*it).c_str(), field->toString().c_str());
-            d->insert(QString( (*it).c_str() ), field->toString().c_str());
-        } else d->insert(QString( (*it).c_str() ), field->getStringValue()->c_str());
-    }
-    ioVariant->push_back( (*d) );
-    return ioVariant;
-}
-DBEntity* QSqliteConnection::_variantToDBE(QVariant* v, DBEntity* ioDbe) {
-    QString typeName = v->toMap()["_typeName"].toString();
-    //printf("QSqliteConnection::_variantToDBE: ioDbe->name()=%s\n", ioDbe->name().c_str());
-    //printf("QSqliteConnection::_variantToDBE: typeName=%s\n", typeName.toStdString().c_str());
-    // NOTE se il tipo tornato non coincide => abortisce :-( questo causava 34 entry vuote x l'auto fill di mylog
-    if( strcmp(ioDbe->name().c_str(),typeName.toStdString() .c_str())!=0 ) {
-        return ioDbe;
-    }
-    QList<QString> chiavi = v->toMap().keys();
-    for(int i=0; i<chiavi.size(); i++) {
-        QString qkey = chiavi[i];
-        if(qkey=="_typeName" || qkey=="_typename") continue;
-        string key = qkey.toStdString();
-        string value = v->toMap()[ qkey ].toString().toStdString();
-        switch(v->toMap()[ qkey ].type()) {
-            case QVariant::Bool:
-                ioDbe->setValue(key, (bool) v->toMap()[ qkey ].toBool());
-                break;
-            case QVariant::Int:
-            case QVariant::LongLong:
-            case QVariant::UInt:
-            case QVariant::ULongLong:
-                ioDbe->setValue(key, (long) v->toMap()[ qkey ].toLongLong());
-                break;
-            case QVariant::Double:
-                ioDbe->setValue(key, (float) v->toMap()[ qkey ].toDouble());
-                break;
-            case QVariant::Date:
-            case QVariant::DateTime:
-            case QVariant::Time:
-                ioDbe->setDateValue(key, value);
-                break;
-            default:
-                ioDbe->setValue(key, value);
-                break;
-        }
-        //printf("QSqliteConnection::_variantToDBE: %s=>%s (%d::%s)\n", key.c_str(), value.c_str(), v->toMap()[ qkey ].type(), v->toMap()[ qkey ].typeName());
-    }
-    return ioDbe;
-}
-// **************** Proxy Connections: end. *********************
-
-
-// **************************************** SLOTS ****************************************
