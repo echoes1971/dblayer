@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include <QtSql/QSqlField>
+#include <QtSql/QSqlIndex>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 
@@ -26,11 +27,24 @@ QSqliteConnection::QSqliteConnection(string s) : Connection::Connection(s) {
 //QSqliteConnection::QSqliteConnection(string s, QObject* parent) : QObject(parent), Connection::Connection(s) {
 #endif
     this->dbname = s;
-    db = QSqlDatabase::addDatabase("QSQLITE");
-    cout << "QSqliteConnection::QSqliteConnection: defaultConnection=" << QSqlDatabase::defaultConnection << endl;
+    for(const QString name : QSqlDatabase::connectionNames()) {
+        cout << "name: " << name.toStdString() << endl;
+    }
+    if(!QSqlDatabase::contains("dblayer_qsqlite")) {
+        db = QSqlDatabase::addDatabase("QSQLITE","dblayer_qsqlite");
+    } else {
+        db = QSqlDatabase::database("dblayer_qsqlite");
+    }
+    cout << "QSqliteConnection::QSqliteConnection: db.connectionName()=" << db.connectionName().toStdString() << endl;
+//     cout << "QSqliteConnection::QSqliteConnection: defaultConnection=" << QSqlDatabase::defaultConnection << endl;
 }
 QSqliteConnection::~QSqliteConnection() {
     this->disconnect();
+//     this->db.removeDatabase("dblayer_qsqlite");
+    for(const QString name : QSqlDatabase::connectionNames()) {
+        cout << "QSqliteConnection::~QSqliteConnection: removing " << name.toStdString() << endl;
+        QSqlDatabase::removeDatabase(name);
+    }
 }
 
 bool QSqliteConnection::connect() {
@@ -50,7 +64,7 @@ bool QSqliteConnection::disconnect() {
     printf("QSqliteConnection::disconnect: start.\n");
     if(!this->connected)
         return true;
-    db.close();
+    this->db.close();
     this->connected=false;
     printf("QSqliteConnection::disconnect: end.\n");
     return true;
@@ -70,7 +84,6 @@ ResultSet* QSqliteConnection::exec(const string s) {
     QResultSet* rs = new QResultSet();
     this->errorMessage.clear();
 
-    printf("QSqliteConnection::exec: TODO\n");
     QSqlQuery query(db);
     query.exec(QString(s.c_str()));
 
@@ -151,39 +164,47 @@ string QSqliteConnection::getColumnName(string* relname, int column) {
 
     return ret;
 }
-DBLayer::IntegerVector QSqliteConnection::getKeys(string* relname) {
-    IntegerVector ret;
-    this->errorMessage.clear();
-
-    printf("QSqliteConnection::getKeys: TODO\n");
-    QVariant resp;// = this->myClient->syncCall(method,params);
-
-    if(this->verbose) printf("QSqliteConnection::getKeys: resp=%s\n", this->variant2string( resp, "\n").toStdString().c_str());
-    if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
-        for(int i=0; i<resp.toList().at(1).toList().size(); i++) {
-           ret.push_back( resp.toList().at(1).toList().at(i).toInt() );
-        }
-    } else
-        printf("QSqliteConnection::getKeys: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
-
-    return ret;
-}
-DBLayer::IntegerVector QSqliteConnection::getForeignKeys(string* relname) {
-    IntegerVector ret;
-    this->errorMessage.clear();
-
-    printf("QSqliteConnection::getForeignKeys: TODO\n");
-    QVariant resp;// = this->myClient->syncCall(method,params);
-
-    if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
-        for(int i=0; i<resp.toList().at(1).toList().size(); i++) {
-           ret.push_back( resp.toList().at(1).toList().at(i).toInt() );
-        }
-    } else
-        printf("QSqliteConnection::getForeignKeys: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
-
-    return ret;
-}
+// DBLayer::IntegerVector QSqliteConnection::getKeys(string* relname) {
+//     IntegerVector ret;
+//     this->errorMessage.clear();
+// 
+//     if(!db.open()) {
+//         this->connected = false;
+//         this->errorMessage.append("Unable to open '").append(this->dbname.c_str()).append("'.");
+//         return ret;
+//     }
+// 
+//     printf("QSqliteConnection::getKeys: TODO\n");
+//     QSqlIndex index = db.primaryIndex(QString(relname->c_str()));
+//     cout << "QSqliteConnection::getKeys: index.name()=" << index.name().toStdString() << endl;
+//     QVariant resp;// = this->myClient->syncCall(method,params);
+// 
+//     if(this->verbose) printf("QSqliteConnection::getKeys: resp=%s\n", this->variant2string( resp, "\n").toStdString().c_str());
+//     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
+//         for(int i=0; i<resp.toList().at(1).toList().size(); i++) {
+//            ret.push_back( resp.toList().at(1).toList().at(i).toInt() );
+//         }
+//     } else
+//         printf("QSqliteConnection::getKeys: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
+// 
+//     return ret;
+// }
+// DBLayer::IntegerVector QSqliteConnection::getForeignKeys(string* relname) {
+//     IntegerVector ret;
+//     this->errorMessage.clear();
+// 
+//     printf("QSqliteConnection::getForeignKeys: TODO\n");
+//     QVariant resp;// = this->myClient->syncCall(method,params);
+// 
+//     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
+//         for(int i=0; i<resp.toList().at(1).toList().size(); i++) {
+//            ret.push_back( resp.toList().at(1).toList().at(i).toInt() );
+//         }
+//     } else
+//         printf("QSqliteConnection::getForeignKeys: %s\n", this->variant2string( resp, "\n").toStdString().c_str());
+// 
+//     return ret;
+// }
 ColumnDefinitions QSqliteConnection::getColumnsForTable(const string& tablename) {
     ColumnDefinitions ret;
     this->errorMessage.clear();

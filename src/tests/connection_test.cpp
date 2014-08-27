@@ -159,7 +159,7 @@ bool testDBConnection(string& connString, string& loginUser, string& loginPwd) {
     } else {
         cout << "(testDBConnection) Errors: " << con->getErrorMessage() << endl;
     }
-    //con->disconnect();
+    con->disconnect();
     delete con;
     return success;
 }
@@ -183,7 +183,8 @@ void testDateField() {
     cout << "seconds2date: " << dateField.toString() << endl;
 }
 
-void testGetKeys(string connString, string& loginUser, string& loginPwd, string relname) {
+bool testGetKeys(string connString, string& loginUser, string& loginPwd, string relname) {
+    bool ret = true;
     DBLayer::Connection* con;
 
     con = DBLayer::createConnection( connString.c_str() );
@@ -197,15 +198,17 @@ void testGetKeys(string connString, string& loginUser, string& loginPwd, string 
     if ( !con->hasErrors() ) {
         cout << "testGetKeys: table=" << relname << endl;
 
-        int numColonne = con->getColumnSize( &relname );
-        cout << "\tNum. Colonne: " << numColonne << endl;
-        for(int c = 1; c<=numColonne; c++) {
-            cout << "\t" << c << ") " << con->getColumnName( &relname, c ) << endl;
-        }
+//         int numColonne = con->getColumnSize( &relname );
+//         cout << "\tNum. Colonne: " << numColonne << endl;
+//         for(int c = 1; c<=numColonne; c++) {
+//             cout << "\t" << c << ") " << con->getColumnName( &relname, c ) << endl;
+//         }
 
         DBLayer::IntegerVector chiavi = con->getKeys(&relname);
         if( !con->hasErrors() ) {
             unsigned int nChiavi = (unsigned int) chiavi.size();
+            if(nChiavi==0)
+                ret = false;
             for(unsigned int i=0; i<nChiavi; i++) {
                 cout << "Colonna chiave:\t" << chiavi[i] << "\t"
                      << con->getColumnName( &relname, chiavi[i] ) << endl;
@@ -217,13 +220,15 @@ void testGetKeys(string connString, string& loginUser, string& loginPwd, string 
         cerr << "testGetKeys: Errors: " << con->getErrorMessage() << endl;
     }
     delete con;
+    return ret;
 }
-void testGetKeys(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
+bool testGetKeys(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
     string connString( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testGetKeys(connString, loginUser, loginPwd, relname);
+    return testGetKeys(connString, loginUser, loginPwd, relname);
 }
 
-void testGetForeignKeys(string connString, string& loginUser, string& loginPwd, string relname) {
+bool testGetForeignKeys(string connString, string& loginUser, string& loginPwd, string relname) {
+    bool ret = true;
     DBLayer::Connection* con;
     con = DBLayer::createConnection( connString.c_str() );
     con->connect();
@@ -243,6 +248,8 @@ void testGetForeignKeys(string connString, string& loginUser, string& loginPwd, 
         DBLayer::IntegerVector chiavi = con->getForeignKeys(&relname);
         if( !con->hasErrors() ) {
             unsigned int nChiavi = (unsigned int) chiavi.size();
+            if(nChiavi==0)
+                ret = false;
             for(unsigned int i=0; i<nChiavi; i++) {
                 cout << "testGetForeignKeys: foreign key column:\t" << chiavi[i] << "\t"
                      << con->getColumnName( &relname, chiavi[i] ) << endl;
@@ -254,14 +261,16 @@ void testGetForeignKeys(string connString, string& loginUser, string& loginPwd, 
         cout << "Errors: " << con->getErrorMessage() << endl;
     }
     delete con;
+    return ret;
 }
-void testGetForeignKeys(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
+bool testGetForeignKeys(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
     string connString( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testGetForeignKeys(connString, loginUser, loginPwd, relname);
+    return testGetForeignKeys(connString, loginUser, loginPwd, relname);
 }
 
 
-void testGetColumnsForTable(string connString, string& loginUser, string& loginPwd, string relname) {
+bool testGetColumnsForTable(string connString, string& loginUser, string& loginPwd, string relname) {
+    bool ret = true;
     DBLayer::Connection* con;
 
     con = DBLayer::createConnection( connString.c_str() );
@@ -279,7 +288,8 @@ void testGetColumnsForTable(string connString, string& loginUser, string& loginP
             cout << endl;
             cout << "testGetColumnsForTable: fetching definitions for table " << relname << endl;
             ColumnDefinitions cols = con->getColumnsForTable(relname);
-
+            if(cols.size()==0)
+                ret = false;
             for(const auto& elem : cols) {
                 cout << elem.first << endl;
                 string glue(",");
@@ -292,10 +302,11 @@ void testGetColumnsForTable(string connString, string& loginUser, string& loginP
         cerr << "testGetColumnsForTable: ERROR " << con->getErrorMessage() << endl;
     }
     delete con;
+    return ret;
 }
-void testGetColumnsForTable(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
+bool testGetColumnsForTable(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd, string relname) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    testGetColumnsForTable( connString, loginUser, loginPwd, relname );
+    return testGetColumnsForTable( connString, loginUser, loginPwd, relname );
 }
 
 
@@ -366,37 +377,46 @@ int main(int argc, char *argv[]) {
 
     cout << "---------------->>  testGetKeys: start." << endl;
     if( argc==5 ) {
-        testGetKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
-        testGetKeys( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
+        success = testGetKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
+        success = success && testGetKeys( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
     } else {
-        testGetKeys( connString, login_user, login_password, "test_test_dblayer" );
-        testGetKeys( connString, login_user, login_password, "test_societa" );
+        success = testGetKeys( connString, login_user, login_password, "test_test_dblayer" );
+        success = success && testGetKeys( connString, login_user, login_password, "test_societa" );
     }
     cout << "---------------->>  testGetKeys: end." << endl;
+    if(!success) {
+        cerr << "TEST FAILED!!!" << endl;
+    }
     cout << endl;
-return 0;
+
     cout << "---------------->>  testGetForeignKeys: start." << endl;
     if( argc==5 ) {
-        testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
-        testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
+        success = testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
+        success = success && testGetForeignKeys( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
     } else {
-        testGetForeignKeys( connString, login_user, login_password, "test_test_dblayer" );
-        testGetForeignKeys( connString, login_user, login_password, "test_societa" );
+        success = testGetForeignKeys( connString, login_user, login_password, "test_test_dblayer" );
+        success = success && testGetForeignKeys( connString, login_user, login_password, "test_societa" );
     }
     cout << "---------------->>  testGetForeignKeys: end." << endl;
+    if(!success) {
+        cerr << "TEST FAILED!!!" << endl;
+    }
     cout << endl;
 
     cout << "---------------->>  testGetColumnsForTable: start." << endl;
     if( argc==5 ) {
-        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
-        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
-        testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "auth_users" );
+        success = testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_test_dblayer" );
+        success = success && testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "test_societa" );
+        success = success && testGetColumnsForTable( host, dbname, usr, pwd, login_user, login_password, "auth_users" );
     } else {
-        testGetColumnsForTable( connString, login_user, login_password, "test_test_dblayer" );
-        testGetColumnsForTable( connString, login_user, login_password, "test_societa" );
-        testGetColumnsForTable( connString, login_user, login_password, "auth_users" );
+        success = testGetColumnsForTable( connString, login_user, login_password, "test_test_dblayer" );
+        success = success && testGetColumnsForTable( connString, login_user, login_password, "test_societa" );
+        success = success && testGetColumnsForTable( connString, login_user, login_password, "auth_users" );
     }
     cout << "---------------->>  testGetColumnsForTable: end." << endl;
+    if(!success) {
+        cerr << "TEST FAILED!!!" << endl;
+    }
     cout << endl;
 
     return EXIT_SUCCESS;

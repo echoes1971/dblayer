@@ -38,8 +38,8 @@ class QSqliteConnection : public Connection {
     virtual ColumnDefinitions getColumnsForTable(const string& tablename);
     virtual int getColumnSize(string* relname);
     virtual string getColumnName(string* relname, int column);
-    virtual IntegerVector getKeys(string* relname);
-    virtual IntegerVector getForeignKeys(string* relname);
+//     virtual IntegerVector getKeys(string* relname);
+//     virtual IntegerVector getForeignKeys(string* relname);
     inline string getDBType() { return "QSqlite"; }
 
     //virtual string dbeType2dbType(const string& dbetype);
