@@ -38,7 +38,8 @@ cmake ${cmake_params} ${SRC_DIR}
 #make -j 12 && ./apps/dbshell "dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;" adm adm
 
 make -j 12 \
-    &&./tests/connection_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
+    && ./tests/cm_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
+#    &&./tests/connection_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
 #    && ./tests/dbmgr_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
 
 cd ..
