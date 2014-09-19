@@ -125,13 +125,21 @@ string DBEntity::toString_nodes(string prefix) const {
         // Table Columns
         if(this->getColumns().size()>0) {
             ret.append(prefix+" 'columns': {");
-            for(const pair<string,vector<string> > pair : this->getColumns()) {
-                ret.append(prefix+"  '").append(pair.first).append("': [");
-                for(const string s : pair.second) {
+            for(const string colname: this->getColumnNames()) {
+                ret.append(prefix+"  '").append(colname).append("': [");
+                StringVector definition = this->getColumns()[colname];
+                for(const string s : definition) {
                     ret.append("'").append(s).append("',");
                 }
                 ret.append("],");
             }
+//            for(const pair<string,vector<string> > pair : this->getColumns()) {
+//                ret.append(prefix+"  '").append(pair.first).append("': [");
+//                for(const string s : pair.second) {
+//                    ret.append("'").append(s).append("',");
+//                }
+//                ret.append("],");
+//            }
             ret.append(prefix+" },");
         }
         // Foreign Keys
@@ -449,6 +457,12 @@ string DBEntity::getColumnType(const string& column_name) {
     } else {
         return "";
     }
+}
+StringVector DBEntity::getColumnNames() const {
+    StringVector ret;
+    for(const pair<string,vector<string> > pair : this->getColumns())
+        ret.push_back(pair.first);
+    return ret;
 }
 ColumnDefinitions DBEntity::getColumns() const { return DBEntity::_columns; }
 DBLayer::StringVector DBEntity::getOrderBy() const { return this->getKeyNames(); }

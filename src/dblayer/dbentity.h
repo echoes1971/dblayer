@@ -65,6 +65,7 @@ namespace DBLayer {
         virtual ~DBEntity();
 
         string getColumnType(const string& column_name);
+        virtual StringVector getColumnNames() const;
         virtual ColumnDefinitions getColumns() const;
 
         /** Returns the column names of the default orderby */

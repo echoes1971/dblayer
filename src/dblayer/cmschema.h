@@ -20,12 +20,14 @@ class DBELog : public DBEntity {
   DBELog();
     virtual ~DBELog();
     virtual ColumnDefinitions getColumns() const;
+    virtual StringVector getColumnNames() const;
     virtual string name() const;
     virtual string getTableName() const;
     virtual DBFieldVector* getKeys() const;
     virtual DBELog* createNewInstance() const;
     virtual DBLayer::StringVector getOrderBy() const;
   private:
+    static StringVector _column_order;
     static ColumnDefinitions _columns;
     static const string nomiCampiChiave[];
     static StringField chiave1; // varchar(16)
@@ -171,6 +173,8 @@ class DBELog : public DBEntity {
 
   string getSchema();
   void registerClasses(DBEFactory* dbeFactory);
+
+  void checkDB(DBMgr& dbmgr, bool verbose=false);
 }
 
 #endif
