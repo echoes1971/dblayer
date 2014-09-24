@@ -88,7 +88,7 @@ namespace DBLayer {
          */
         virtual string toString(string prefix="", bool valuesAsAttributes=false) const;
 
-        string toSql(std::function<string(const string&)> dbeType2dbType, string prefix="", bool use_fk=true);
+        string toSql(std::function<string(const string&)> dbeType2dbType, std::function<string(const string&)> lambda_getClazzSchema, string prefix="", bool use_fk=true);
 
         /** @return a new DBE instance */
         virtual DBEntity* createNewInstance() const;

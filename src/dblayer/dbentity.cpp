@@ -169,7 +169,7 @@ string DBEntity::toString_nodes(string prefix) const {
     return ret;
 }
 
-string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, string prefix, bool use_fk) {
+string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, std::function<string(const string&)> lambda_getClazzSchema, string prefix, bool use_fk) {
     string ret;
     ret.append(prefix+"CREATE TABLE ");//.append(string(this->getSchemaName()->c_str())).append("_").append(string(this->getTableName().c_str())).append(" (");
     if(this->getSchemaName().length()>0) {
@@ -195,7 +195,7 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, stri
                 for(unsigned int i=0; i<fks.size(); i++) {
                     ForeignKey& f = fks.at(i);
                     if(f.colonna_fk == colname) {
-                        ret.append("REFERENCES ").append(this->getSchemaName()).append("_").append(f.tabella_riferita).append(" (").append(f.colonna_riferita).append(") ");
+                        ret.append("REFERENCES ").append(lambda_getClazzSchema(f.tabella_riferita)).append("_").append(f.tabella_riferita).append(" (").append(f.colonna_riferita).append(") ");
                         break;
                     }
                 }

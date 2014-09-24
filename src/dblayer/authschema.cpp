@@ -340,6 +340,12 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
 
     // Lambda :-)
     std::function<string(const string&)> lambda_dbeType2dbType = [&dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
+    std::function<string(const string&)> lambda_getClazzSchema = [&dbmgr] (const string& s) mutable -> string {
+        DBEntity* dbe = dbmgr.getClazz(s);
+        string ret = dbe->getSchemaName();
+        delete dbe;
+        return ret;
+    };
 
     // drop table dblayer_dbversion,auth_groups,auth_users,auth_users_groups;
 
@@ -349,7 +355,7 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         string sql;
         bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL";// && dbmgr.getConnection()->getDBType()!="SQLite";
         DBEDBVersion dbversion;
-        sql = dbversion.toSql(lambda_dbeType2dbType,"\n",use_fk);
+        sql = dbversion.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
@@ -360,17 +366,17 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
         DBEGroup dbegroup;
-        sql = dbegroup.toSql(lambda_dbeType2dbType,"\n",use_fk);
+        sql = dbegroup.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
         DBEUser dbeuser;
-        sql = dbeuser.toSql(lambda_dbeType2dbType,"\n",use_fk);
+        sql = dbeuser.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
         DBEUserGroup dbeusergroup;
-        sql = dbeusergroup.toSql(lambda_dbeType2dbType,"\n",use_fk);
+        sql = dbeusergroup.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 

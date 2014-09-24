@@ -88,10 +88,13 @@ DBEObject::DBEObject() {
         _columns["description"] = vector<string> {"text","not null"};
     }
     if(_fkv.size()==0) {
-        for(const DBLayer::ForeignKey& fk : DBEntity::getFK()) {
-            _fkv.push_back(fk);
-        }
+        for(const DBLayer::ForeignKey& fk : DBEntity::getFK()) { _fkv.push_back(fk); }
+        _fkv.push_back(ForeignKey("owner","users","id"));
         _fkv.push_back(ForeignKey("group_id","groups","id"));
+        _fkv.push_back(ForeignKey("creator","users","id"));
+        _fkv.push_back(ForeignKey("last_modify","users","id"));
+        _fkv.push_back(ForeignKey("deleted_by","users","id"));
+        _fkv.push_back(ForeignKey("father_id",DBEObject::getTableName(),"id"));
     }
 }
 DBEObject::~DBEObject() {}
@@ -271,6 +274,12 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
 
     // Lambda :-)
     std::function<string(const string&)> lambda_dbeType2dbType = [&dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
+    std::function<string(const string&)> lambda_getClazzSchema = [&dbmgr] (const string& s) mutable -> string {
+        DBEntity* dbe = dbmgr.getClazz(s);
+        string ret = dbe->getSchemaName();
+        delete dbe;
+        return ret;
+    };
 
     // drop table dblayer_dbversion,auth_groups,auth_users,auth_users_groups;
 
@@ -280,7 +289,7 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         string sql;
         bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL";// && dbmgr.getConnection()->getDBType()!="SQLite";
         DBEDBVersion dbversion;
-        sql = dbversion.toSql(lambda_dbeType2dbType,"\n",use_fk);
+        sql = dbversion.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
@@ -291,7 +300,7 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
 //         DBELog dbelog;
-//         sql = dbelog.toSql(lambda_dbeType2dbType,"\n",use_fk);
+//         sql = dbelog.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
 // //        dbmgr.getConnection()->exec(sql);
 //         if(verbose) cout << sql << endl;
 
@@ -300,12 +309,12 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
                                 "notes","pages"};
         for(const string clazz : classes) {
             DBEntity* dbe = dbmgr.getClazz(clazz);
-            sql = dbe->toSql(lambda_dbeType2dbType,"\n",use_fk);
+            sql = dbe->toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
             //dbmgr.getConnection()->exec(sql);
             if(verbose) cout << sql << endl;
             dbmgr.Delete(dbe);
 
-            if(clazz=="objects") break;
+            if(clazz=="companies") break;
         }
 
 

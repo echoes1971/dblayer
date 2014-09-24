@@ -173,6 +173,12 @@ void TestSchema::checkDB(DBMgr& dbmgr, bool verbose) {
 
     // Lambda :-)
     std::function<string(const string&)> lambda_dbeType2dbType = [&dbmgr] (const string& s) mutable -> string { return dbmgr.getConnection()->dbeType2dbType(s); };
+    std::function<string(const string&)> lambda_getClazzSchema = [&dbmgr] (const string& s) mutable -> string {
+        DBEntity* dbe = dbmgr.getClazz(s);
+        string ret = dbe->getSchemaName();
+        delete dbe;
+        return ret;
+    };
 
     // drop table test_test_dblayer,test_societa;
     // drop table dblayer_dbversion,auth_groups,auth_users,auth_users_groups, test_test_dblayer,test_societa;
@@ -190,12 +196,12 @@ void TestSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
         DBETestDBLayer dbe1;
-        sql = dbe1.toSql(lambda_dbeType2dbType,"\n",use_fk);
+        sql = dbe1.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
         DBESocieta dbe2;
-        sql = dbe2.toSql(lambda_dbeType2dbType,"\n",use_fk);
+        sql = dbe2.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
