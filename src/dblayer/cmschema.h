@@ -19,12 +19,13 @@ class DBELog : public DBEntity {
   public:
   DBELog();
     virtual ~DBELog();
-    virtual ColumnDefinitions getColumns() const;
-    virtual StringVector getColumnNames() const;
     virtual string name() const;
     virtual string getTableName() const;
     virtual DBFieldVector* getKeys() const;
     virtual DBELog* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector getColumnNames() const;
+
     virtual DBLayer::StringVector getOrderBy() const;
   private:
     static StringVector _column_order;
@@ -43,12 +44,20 @@ class DBELog : public DBEntity {
       virtual string name() const;
       virtual string getTableName() const;
       virtual DBFieldVector* getKeys() const;
+      virtual ForeignKeyVector& getFK() const;
       virtual DBEObject* createNewInstance() const;
+      virtual ColumnDefinitions getColumns() const;
+      StringVector getColumnNames() const;
+
+      virtual DBLayer::StringVector getOrderBy() const;
     private:
       static const string nomiCampiChiave[];
       static StringField chiave1; // uuid
       static DBFieldVector chiavi;
       static DBFieldVector ___init_keys();
+      static ForeignKeyVector _fkv;
+      static StringVector _column_order;
+      static ColumnDefinitions _columns;
   };
 
   class DBECountry : public DBEntity {

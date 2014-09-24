@@ -12,29 +12,29 @@ using namespace std;
 
 //*********************** DBELog: start.
 const string DBELog::nomiCampiChiave[] = { string("ip"), string("data") };
-ColumnDefinitions DBELog::_columns;
-StringVector DBELog::_column_order;
-ColumnDefinitions DBELog::getColumns() const { return DBELog::_columns; }
-StringVector DBELog::getColumnNames() const { return DBELog::_column_order; }
 StringField DBELog::chiave1( DBELog::nomiCampiChiave[0] );
 StringField DBELog::chiave2( DBELog::nomiCampiChiave[1] );
 DBFieldVector DBELog::chiavi = DBELog::___init_keys();
 DBFieldVector DBELog::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBELog::chiave1 ); ret.push_back( &DBELog::chiave2 ); return ret; }
+ColumnDefinitions DBELog::_columns;
+StringVector DBELog::_column_order;
+ColumnDefinitions DBELog::getColumns() const { return _columns; }
+StringVector DBELog::getColumnNames() const { return _column_order; }
 DBELog::DBELog() {
     this->tableName.clear();
     this->schemaName = CMSchema::getSchema();
-    if(DBELog::_columns.size()==0) {
+    if(_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
-            DBELog::_columns[pair.first] = pair.second;
+            _columns[pair.first] = pair.second;
         }
-        DBELog::_column_order = {"ip","data","ora","count","url","note","note2"};
-        DBELog::_columns["ip"] = vector<string> {"uuid","not null"};
-        DBELog::_columns["data"] = vector<string> {"date","not null default '0000-00-00'"};
-        DBELog::_columns["ora"] = vector<string> {"time","not null default '00:00:00'"};
-        DBELog::_columns["count"] = vector<string> {"int","not null default 0"};
-        DBELog::_columns["url"] = vector<string> {"varchar(255)","default null"};
-        DBELog::_columns["note"] = vector<string> {"varchar(255)","not null default ''"};
-        DBELog::_columns["note2"] = vector<string> {"text","not null"};
+        _column_order = {"ip","data","ora","count","url","note","note2"};
+        _columns["ip"] = vector<string> {"uuid","not null"};
+        _columns["data"] = vector<string> {"date","not null default '0000-00-00'"};
+        _columns["ora"] = vector<string> {"time","not null default '00:00:00'"};
+        _columns["count"] = vector<string> {"int","not null default 0"};
+        _columns["url"] = vector<string> {"varchar(255)","default null"};
+        _columns["note"] = vector<string> {"varchar(255)","not null default ''"};
+        _columns["note2"] = vector<string> {"text","not null"};
     }
 }
 DBELog::~DBELog() {}
@@ -53,12 +53,61 @@ const string DBEObject::nomiCampiChiave[] = { string("id") };
 StringField DBEObject::chiave1( DBEObject::nomiCampiChiave[0] );
 DBFieldVector DBEObject::chiavi = DBEObject::___init_keys();
 DBFieldVector DBEObject::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEObject::chiave1 ); return ret; }
-DBEObject::DBEObject() { this->tableName.clear(); }
+ForeignKeyVector DBEObject::_fkv;
+ColumnDefinitions DBEObject::_columns;
+StringVector DBEObject::_column_order;
+DBEObject::DBEObject() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _column_order = {
+            "id","owner","group_id","permissions"
+            ,"creator","creation_date"
+            ,"last_modify","last_modify_date"
+            ,"deleted_by","deleted_date"
+            ,"father_id"
+            ,"name","description"
+        };
+        _columns["id"] = vector<string> {"uuid","not null"};
+        _columns["owner"] = vector<string> {"uuid","not null"};
+        _columns["group_id"] = vector<string> {"uuid","not null"};
+
+        _columns["permissions"] = vector<string> {"char(9)","not null default 'rwx------'"};
+        _columns["creator"] = vector<string> {"uuid","not null"};
+        _columns["creation_date"] = vector<string> {"datetime","default null"};
+        _columns["last_modify"] = vector<string> {"uuid","not null"};
+        _columns["last_modify_date"] = vector<string> {"datetime","default null"};
+        _columns["deleted_by"] = vector<string> {"uuid","not null"};
+        _columns["deleted_date"] = vector<string> {"datetime","not null default '0000-00-00 00:00:00'"};
+        _columns["deleted_by"] = vector<string> {"uuid","not null"};
+        _columns["father_id"] = vector<string> {"uuid","default null"};
+        _columns["name"] = vector<string> {"varchar(255)","not null"};
+        _columns["description"] = vector<string> {"text","not null"};
+    }
+    if(_fkv.size()==0) {
+        for(const DBLayer::ForeignKey& fk : DBEntity::getFK()) {
+            _fkv.push_back(fk);
+        }
+        _fkv.push_back(ForeignKey("group_id","groups","id"));
+    }
+}
 DBEObject::~DBEObject() {}
 string DBEObject::name() const { return "DBEObject"; }
 string DBEObject::getTableName() const { return "objects"; }
 DBFieldVector* DBEObject::getKeys() const { return &DBEObject::chiavi; }
+ForeignKeyVector& DBEObject::getFK() const {
+    return _fkv;
+}
 DBEObject* DBEObject::createNewInstance() const { return new DBEObject(); }
+ColumnDefinitions DBEObject::getColumns() const { return _columns; }
+StringVector DBEObject::getColumnNames() const { return _column_order; }
+DBLayer::StringVector DBEObject::getOrderBy() const {
+    static DBLayer::StringVector ret({"name"});
+    return ret;
+}
 //*********************** DBEObject: end.
 
 //*********************** DBECountry: start.
@@ -241,10 +290,10 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
         if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
-        DBELog dbelog;
-        sql = dbelog.toSql(lambda_dbeType2dbType,"\n",use_fk);
-//        dbmgr.getConnection()->exec(sql);
-        if(verbose) cout << sql << endl;
+//         DBELog dbelog;
+//         sql = dbelog.toSql(lambda_dbeType2dbType,"\n",use_fk);
+// //        dbmgr.getConnection()->exec(sql);
+//         if(verbose) cout << sql << endl;
 
         StringVector classes = {"log","objects","countrylist","companies",
                                 "people","files","folders","links",
@@ -255,6 +304,8 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
             //dbmgr.getConnection()->exec(sql);
             if(verbose) cout << sql << endl;
             dbmgr.Delete(dbe);
+
+            if(clazz=="objects") break;
         }
 
 

@@ -183,9 +183,10 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, stri
         ColumnDefinitions defs = this->getColumns();
         int cols_length = defs.size();
         int cols_counter=0;
-        for(const pair<string,vector<string> > pair : defs) {
-            ret.append(prefix+" ").append(pair.first).append(" ");
-            for(const string s : pair.second) {
+        for(const string colname: this->getColumnNames()) {
+            ret.append(prefix+" ").append(colname).append(" ");
+            StringVector definition = this->getColumns()[colname];
+            for(const string s : definition) {
                 ret.append( dbeType2dbType(s) ).append(" ");
             }
             // Foreign Key
@@ -193,7 +194,7 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, stri
                 ForeignKeyVector& fks = this->getFK();
                 for(unsigned int i=0; i<fks.size(); i++) {
                     ForeignKey& f = fks.at(i);
-                    if(f.colonna_fk == pair.first) {
+                    if(f.colonna_fk == colname) {
                         ret.append("REFERENCES ").append(this->getSchemaName()).append("_").append(f.tabella_riferita).append(" (").append(f.colonna_riferita).append(") ");
                         break;
                     }
