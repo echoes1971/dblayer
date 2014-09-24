@@ -30,11 +30,7 @@ class DBELog : public DBEntity {
   private:
     static StringVector _column_order;
     static ColumnDefinitions _columns;
-    static const string nomiCampiChiave[];
-    static StringField chiave1; // varchar(16)
-    static StringField chiave2; // date
     static DBFieldVector chiavi;
-    static DBFieldVector ___init_keys();
 };
 
   class DBEObject : public DBEntity {
@@ -51,8 +47,6 @@ class DBELog : public DBEntity {
 
       virtual DBLayer::StringVector getOrderBy() const;
     private:
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
       static DBFieldVector chiavi;
       static DBFieldVector ___init_keys();
       static ForeignKeyVector _fkv;

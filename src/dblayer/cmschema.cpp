@@ -11,13 +11,9 @@ using namespace CMSchema;
 using namespace std;
 
 //*********************** DBELog: start.
-const string DBELog::nomiCampiChiave[] = { string("ip"), string("data") };
-StringField DBELog::chiave1( DBELog::nomiCampiChiave[0] );
-StringField DBELog::chiave2( DBELog::nomiCampiChiave[1] );
-DBFieldVector DBELog::chiavi = DBELog::___init_keys();
-DBFieldVector DBELog::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBELog::chiave1 ); ret.push_back( &DBELog::chiave2 ); return ret; }
+DBFieldVector DBELog::chiavi = { new StringField(string("ip")), new StringField(string("data")) };
 ColumnDefinitions DBELog::_columns;
-StringVector DBELog::_column_order;
+StringVector DBELog::_column_order = {"ip","data","ora","count","url","note","note2"};
 ColumnDefinitions DBELog::getColumns() const { return _columns; }
 StringVector DBELog::getColumnNames() const { return _column_order; }
 DBELog::DBELog() {
@@ -27,7 +23,6 @@ DBELog::DBELog() {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _column_order = {"ip","data","ora","count","url","note","note2"};
         _columns["ip"] = vector<string> {"uuid","not null"};
         _columns["data"] = vector<string> {"date","not null default '0000-00-00'"};
         _columns["ora"] = vector<string> {"time","not null default '00:00:00'"};
@@ -40,7 +35,7 @@ DBELog::DBELog() {
 DBELog::~DBELog() {}
 string DBELog::name() const { return "DBELog"; }
 string DBELog::getTableName() const { return "log"; }
-DBFieldVector* DBELog::getKeys() const { return &DBELog::chiavi; }
+DBFieldVector* DBELog::getKeys() const { return &chiavi; }
 DBELog* DBELog::createNewInstance() const { return new DBELog(); }
 DBLayer::StringVector DBELog::getOrderBy() const {
     static DBLayer::StringVector ret({"data desc", "ora desc"});
@@ -49,13 +44,17 @@ DBLayer::StringVector DBELog::getOrderBy() const {
 //*********************** DBELog: end.
 
 //*********************** DBEObject: start.
-const string DBEObject::nomiCampiChiave[] = { string("id") };
-StringField DBEObject::chiave1( DBEObject::nomiCampiChiave[0] );
-DBFieldVector DBEObject::chiavi = DBEObject::___init_keys();
-DBFieldVector DBEObject::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEObject::chiave1 ); return ret; }
+DBFieldVector DBEObject::chiavi = { new StringField(string("id")) };
 ForeignKeyVector DBEObject::_fkv;
 ColumnDefinitions DBEObject::_columns;
-StringVector DBEObject::_column_order;
+StringVector DBEObject::_column_order = {
+    "id","owner","group_id","permissions"
+    ,"creator","creation_date"
+    ,"last_modify","last_modify_date"
+    ,"deleted_by","deleted_date"
+    ,"father_id"
+    ,"name","description"
+};
 DBEObject::DBEObject() {
     this->tableName.clear();
     this->schemaName = CMSchema::getSchema();
@@ -63,14 +62,6 @@ DBEObject::DBEObject() {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _column_order = {
-            "id","owner","group_id","permissions"
-            ,"creator","creation_date"
-            ,"last_modify","last_modify_date"
-            ,"deleted_by","deleted_date"
-            ,"father_id"
-            ,"name","description"
-        };
         _columns["id"] = vector<string> {"uuid","not null"};
         _columns["owner"] = vector<string> {"uuid","not null"};
         _columns["group_id"] = vector<string> {"uuid","not null"};
@@ -100,7 +91,7 @@ DBEObject::DBEObject() {
 DBEObject::~DBEObject() {}
 string DBEObject::name() const { return "DBEObject"; }
 string DBEObject::getTableName() const { return "objects"; }
-DBFieldVector* DBEObject::getKeys() const { return &DBEObject::chiavi; }
+DBFieldVector* DBEObject::getKeys() const { return &chiavi; }
 ForeignKeyVector& DBEObject::getFK() const {
     return _fkv;
 }
