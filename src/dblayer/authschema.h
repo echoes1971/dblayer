@@ -20,40 +20,37 @@ namespace AuthSchema {
       DBEDBVersion();
       virtual ~DBEDBVersion();
 
-      virtual ColumnDefinitions getColumns() const;
-
       virtual string name() const;
       virtual string getTableName() const;
       virtual DBFieldVector* getKeys() const;
       virtual DBEDBVersion* createNewInstance() const;
+      virtual ColumnDefinitions getColumns() const;
+      virtual StringVector getColumnNames() const;
       virtual DBLayer::StringVector getOrderBy() const;
 
       int version();
     private:
+      static StringVector _column_order;
       static ColumnDefinitions _columns;
-      static const string nomiCampiChiave[];
-      static IntegerField chiave1; // int
       static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
   };
 
   class DBEUser : public DBEntity {
     public:
       DBEUser();
       virtual ~DBEUser();
-      virtual ColumnDefinitions getColumns() const;
       virtual string name() const;
       virtual string getTableName() const;
       virtual DBFieldVector* getKeys() const;
       virtual ForeignKeyVector& getFK() const;
       virtual DBEUser* createNewInstance() const;
+      virtual ColumnDefinitions getColumns() const;
+      virtual StringVector getColumnNames() const;
       virtual DBLayer::StringVector getOrderBy() const;
 
       // Custom methods
       vector<map<string,string> > getDefaultEntries() const;
-
       inline bool checkNewPassword() { return true; }
-
       bool isRoot();
 
       virtual void _before_insert(DBMgr* dbmgr=0);
@@ -65,23 +62,22 @@ namespace AuthSchema {
       void _deleteGroup(DBMgr* dbmgr=0);
       void _checkGroupAssociation(DBMgr* dbmgr=0);
     private:
-      static ColumnDefinitions _columns;
-      static ForeignKeyVector _fkv;
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
       static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
+      static ForeignKeyVector _fkv;
+      static StringVector _column_order;
+      static ColumnDefinitions _columns;
   };
 
   class DBEGroup : public DBEntity {
     public:
       DBEGroup();
       virtual ~DBEGroup();
-      virtual ColumnDefinitions getColumns() const;
       virtual string name() const;
       virtual string getTableName() const;
       virtual DBFieldVector* getKeys() const;
       virtual DBEGroup* createNewInstance() const;
+      virtual ColumnDefinitions getColumns() const;
+      virtual StringVector getColumnNames() const;
       virtual DBLayer::StringVector getOrderBy() const;
 
       // Custom methods
@@ -92,36 +88,32 @@ namespace AuthSchema {
       virtual void _after_delete(DBMgr* dbmgr=0);
 
     private:
+      static StringVector _column_order;
       static ColumnDefinitions _columns;
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
       static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
   };
 
   class DBEUserGroup : public DBEntity {
     public:
       DBEUserGroup();
       virtual ~DBEUserGroup();
-      virtual ColumnDefinitions getColumns() const;
       virtual string name() const;
       virtual string getTableName() const;
       virtual DBFieldVector* getKeys() const;
       virtual ForeignKeyVector& getFK() const;
       virtual DBEUserGroup* createNewInstance() const;
+      virtual ColumnDefinitions getColumns() const;
+      virtual StringVector getColumnNames() const;
       virtual DBLayer::StringVector getOrderBy() const;
 
       // Custom methods
       vector<map<string,string> > getDefaultEntries() const;
 
     private:
-      static ColumnDefinitions _columns;
-      static ForeignKeyVector _fkv;
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
-      static StringField chiave2; // uuid
       static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
+      static ForeignKeyVector _fkv;
+      static StringVector _column_order;
+      static ColumnDefinitions _columns;
   };
 
   string getSchema();

@@ -9,21 +9,20 @@ using namespace AuthSchema;
 using namespace std;
 
 //*********************** DBEDBVersion: start.
-const string DBEDBVersion::nomiCampiChiave[] = { string("model_name") };
+DBFieldVector DBEDBVersion::chiavi = { new StringField(string("model_name")) };
 ColumnDefinitions DBEDBVersion::_columns;
-ColumnDefinitions DBEDBVersion::getColumns() const { return DBEDBVersion::_columns; }
-IntegerField DBEDBVersion::chiave1( DBEDBVersion::nomiCampiChiave[0] );
-DBFieldVector DBEDBVersion::chiavi = DBEDBVersion::___init_keys();
-DBFieldVector DBEDBVersion::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEDBVersion::chiave1 ); return ret; }
+StringVector DBEDBVersion::_column_order = {"model_name","version"};
+ColumnDefinitions DBEDBVersion::getColumns() const { return _columns; }
+StringVector DBEDBVersion::getColumnNames() const { return _column_order; }
 DBEDBVersion::DBEDBVersion() {
     this->tableName.clear();
     this->schemaName = "dblayer";
-    if(DBEDBVersion::_columns.size()==0) {
+    if(_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
-            DBEDBVersion::_columns[pair.first] = pair.second;
+            _columns[pair.first] = pair.second;
         }
-        DBEDBVersion::_columns["model_name"] = vector<string> {"varchar(255)","not null"};
-        DBEDBVersion::_columns["version"] = vector<string> {"int","not null"};
+        _columns["model_name"] = vector<string> {"varchar(255)","not null"};
+        _columns["version"] = vector<string> {"int","not null"};
     }
 }
 DBEDBVersion::~DBEDBVersion() {}
@@ -31,7 +30,6 @@ string DBEDBVersion::name() const { return "DBEDBVersion"; }
 string DBEDBVersion::getTableName() const { return "dbversion"; }
 DBFieldVector* DBEDBVersion::getKeys() const { return &DBEDBVersion::chiavi; }
 DBEDBVersion* DBEDBVersion::createNewInstance() const { return new DBEDBVersion(); }
-
 DBLayer::StringVector DBEDBVersion::getOrderBy() const {
     static DBLayer::StringVector ret({"version"});
     return ret;
@@ -40,45 +38,39 @@ DBLayer::StringVector DBEDBVersion::getOrderBy() const {
 int DBEDBVersion::version() {
     return this->getField("version")->getIntegerValue();
 }
-
 //*********************** DBEDBVersion: end.
 
 //*********************** DBEUser: start.
-const string DBEUser::nomiCampiChiave[] = { string("id") };
-ColumnDefinitions DBEUser::_columns;
+DBFieldVector DBEUser::chiavi = { new StringField(string("id")) };
 ForeignKeyVector DBEUser::_fkv;
-ColumnDefinitions DBEUser::getColumns() const { return DBEUser::_columns; }
-StringField DBEUser::chiave1( DBEUser::nomiCampiChiave[0] );
-DBFieldVector DBEUser::chiavi = DBEUser::___init_keys();
-DBFieldVector DBEUser::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEUser::chiave1 ); return ret; }
+ColumnDefinitions DBEUser::_columns;
+StringVector DBEUser::_column_order = {"id","login","pwd","pwd_salt","fullname","group_id"};
 DBEUser::DBEUser() {
     this->tableName.clear();
     this->schemaName = AuthSchema::getSchema();
     if(DBEUser::_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
-            DBEUser::_columns[pair.first] = pair.second;
+            _columns[pair.first] = pair.second;
         }
-        DBEUser::_columns["id"] = vector<string> {"uuid","not null"};
-        DBEUser::_columns["login"] = vector<string> {"varchar(255)","not null"};
-        DBEUser::_columns["pwd"] = vector<string> {"varchar(255)","not null"};
-        DBEUser::_columns["pwd_salt"] = vector<string> {"varchar(4)","default ''"};
-        DBEUser::_columns["fullname"] = vector<string> {"text","default null"};
-        DBEUser::_columns["group_id"] = vector<string> {"uuid","not null"};
+        _columns["id"] = vector<string> {"uuid","not null"};
+        _columns["login"] = vector<string> {"varchar(255)","not null"};
+        _columns["pwd"] = vector<string> {"varchar(255)","not null"};
+        _columns["pwd_salt"] = vector<string> {"varchar(4)","default ''"};
+        _columns["fullname"] = vector<string> {"text","default null"};
+        _columns["group_id"] = vector<string> {"uuid","not null"};
+    }
+    if(_fkv.size()==0) {
+        for(const auto& fk : DBEntity::getFK()) { _fkv.push_back(fk); }
+        _fkv.push_back(ForeignKey("group_id","groups","id"));
     }
 }
 DBEUser::~DBEUser() {}
 string DBEUser::name() const { return "DBEUser"; }
 string DBEUser::getTableName() const { return "users"; }
 DBFieldVector* DBEUser::getKeys() const { return &DBEUser::chiavi; }
-ForeignKeyVector& DBEUser::getFK() const {
-    if(_fkv.size()==0) {
-        for(const auto& fk : DBEntity::getFK()) {
-            _fkv.push_back(fk);
-        }
-        _fkv.push_back(ForeignKey("group_id","groups","id"));
-    }
-    return _fkv;
-}
+ForeignKeyVector& DBEUser::getFK() const { return _fkv; }
+ColumnDefinitions DBEUser::getColumns() const { return _columns; }
+StringVector DBEUser::getColumnNames() const { return _column_order; }
 DBEUser* DBEUser::createNewInstance() const { return new DBEUser(); }
 DBLayer::StringVector DBEUser::getOrderBy() const {
     static DBLayer::StringVector ret({"fullname"});
@@ -158,30 +150,28 @@ void DBEUser::_checkGroupAssociation(DBMgr* dbmgr) {
 //*********************** DBEUser: end.
 
 //*********************** DBEGroup: start.
-const string DBEGroup::nomiCampiChiave[] = { string("id") };
+DBFieldVector DBEGroup::chiavi = { new StringField(string("id")) };
 ColumnDefinitions DBEGroup::_columns;
-ColumnDefinitions DBEGroup::getColumns() const { return DBEGroup::_columns; }
-StringField DBEGroup::chiave1( DBEGroup::nomiCampiChiave[0] );
-DBFieldVector DBEGroup::chiavi = DBEGroup::___init_keys();
-DBFieldVector DBEGroup::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEGroup::chiave1 ); return ret; }
+StringVector DBEGroup::_column_order = {"id","name","description"};
 DBEGroup::DBEGroup() {
     this->tableName.clear();
     this->schemaName = AuthSchema::getSchema();
-    if(DBEGroup::_columns.size()==0) {
+    if(_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
-            DBEGroup::_columns[pair.first] = pair.second;
+            _columns[pair.first] = pair.second;
         }
-        DBEGroup::_columns["id"] = vector<string> {"uuid","not null"};
-        DBEGroup::_columns["name"] = vector<string> {"varchar(255)","not null"};
-        DBEGroup::_columns["description"] = vector<string> {"text","default null"};
+        _columns["id"] = vector<string> {"uuid","not null"};
+        _columns["name"] = vector<string> {"varchar(255)","not null"};
+        _columns["description"] = vector<string> {"text","default null"};
     }
 }
 DBEGroup::~DBEGroup() {}
 string DBEGroup::name() const { return "DBEGroup"; }
 string DBEGroup::getTableName() const { return "groups"; }
-DBFieldVector* DBEGroup::getKeys() const { return &DBEGroup::chiavi; }
 DBEGroup* DBEGroup::createNewInstance() const { return new DBEGroup(); }
-
+DBFieldVector* DBEGroup::getKeys() const { return &chiavi; }
+ColumnDefinitions DBEGroup::getColumns() const { return _columns; }
+StringVector DBEGroup::getColumnNames() const { return _column_order; }
 DBLayer::StringVector DBEGroup::getOrderBy() const {
     static DBLayer::StringVector ret({"name"});
     return ret;
@@ -237,30 +227,20 @@ void DBEGroup::_after_delete(DBMgr* dbmgr) {
 //*********************** DBEGroup: end.
 
 //*********************** DBEUserGroup: start.
-const string DBEUserGroup::nomiCampiChiave[] = { string("user_id"), string("group_id") };
-ColumnDefinitions DBEUserGroup::_columns;
+DBFieldVector DBEUserGroup::chiavi = { new StringField(string("user_id")), new StringField(string("group_id")) };
 ForeignKeyVector DBEUserGroup::_fkv;
-ColumnDefinitions DBEUserGroup::getColumns() const { return DBEUserGroup::_columns; }
-StringField DBEUserGroup::chiave1( DBEUserGroup::nomiCampiChiave[0] );
-StringField DBEUserGroup::chiave2( DBEUserGroup::nomiCampiChiave[1] );
-DBFieldVector DBEUserGroup::chiavi = DBEUserGroup::___init_keys();
-DBFieldVector DBEUserGroup::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEUserGroup::chiave1 ); ret.push_back( &DBEUserGroup::chiave2 ); return ret; }
+ColumnDefinitions DBEUserGroup::_columns;
+StringVector DBEUserGroup::_column_order = {"user_id","group_id"};
 DBEUserGroup::DBEUserGroup() {
     this->tableName.clear();
     this->schemaName = AuthSchema::getSchema();
-    if(DBEUserGroup::_columns.size()==0) {
+    if(_columns.size()==0) {
         for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
-            DBEUserGroup::_columns[pair.first] = pair.second;
+            _columns[pair.first] = pair.second;
         }
-        DBEUserGroup::_columns["user_id"] = vector<string> {"uuid","not null"};
-        DBEUserGroup::_columns["group_id"] = vector<string> {"uuid","not null"};
+        _columns["user_id"] = vector<string> {"uuid","not null"};
+        _columns["group_id"] = vector<string> {"uuid","not null"};
     }
-}
-DBEUserGroup::~DBEUserGroup() {}
-string DBEUserGroup::name() const { return "DBEUserGroup"; }
-string DBEUserGroup::getTableName() const { return "users_groups"; }
-DBFieldVector* DBEUserGroup::getKeys() const { return &DBEUserGroup::chiavi; }
-ForeignKeyVector& DBEUserGroup::getFK() const {
     if(_fkv.size()==0) {
         for(const auto& fk : DBEntity::getFK()) {
             _fkv.push_back(fk);
@@ -268,11 +248,15 @@ ForeignKeyVector& DBEUserGroup::getFK() const {
         _fkv.push_back(ForeignKey("user_id","users","id"));
         _fkv.push_back(ForeignKey("group_id","groups","id"));
     }
-    return _fkv;
 }
-
+DBEUserGroup::~DBEUserGroup() {}
+string DBEUserGroup::name() const { return "DBEUserGroup"; }
+string DBEUserGroup::getTableName() const { return "users_groups"; }
+DBFieldVector* DBEUserGroup::getKeys() const { return &chiavi; }
+ForeignKeyVector& DBEUserGroup::getFK() const { return _fkv; }
+ColumnDefinitions DBEUserGroup::getColumns() const { return _columns; }
+StringVector DBEUserGroup::getColumnNames() const { return _column_order; }
 DBEUserGroup* DBEUserGroup::createNewInstance() const { return new DBEUserGroup(); }
-
 DBLayer::StringVector DBEUserGroup::getOrderBy() const {
     static DBLayer::StringVector ret({"user_id","group_id"});
     return ret;

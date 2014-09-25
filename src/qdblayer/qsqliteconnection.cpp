@@ -27,15 +27,17 @@ QSqliteConnection::QSqliteConnection(string s) : Connection::Connection(s) {
 //QSqliteConnection::QSqliteConnection(string s, QObject* parent) : QObject(parent), Connection::Connection(s) {
 #endif
     this->dbname = s;
-    for(const QString name : QSqlDatabase::connectionNames()) {
-        cout << "name: " << name.toStdString() << endl;
+    if(this->verbose) {
+        for(const QString name : QSqlDatabase::connectionNames()) {
+            cout << "name: " << name.toStdString() << endl;
+        }
     }
     if(!QSqlDatabase::contains("dblayer_qsqlite")) {
         db = QSqlDatabase::addDatabase("QSQLITE","dblayer_qsqlite");
     } else {
         db = QSqlDatabase::database("dblayer_qsqlite");
     }
-    cout << "QSqliteConnection::QSqliteConnection: db.connectionName()=" << db.connectionName().toStdString() << endl;
+    if(this->verbose) cout << "QSqliteConnection::QSqliteConnection: db.connectionName()=" << db.connectionName().toStdString() << endl;
 //     cout << "QSqliteConnection::QSqliteConnection: defaultConnection=" << QSqlDatabase::defaultConnection << endl;
 }
 QSqliteConnection::~QSqliteConnection() {
@@ -48,25 +50,25 @@ QSqliteConnection::~QSqliteConnection() {
 }
 
 bool QSqliteConnection::connect() {
-    printf("QSqliteConnection::connect: start.\n");
+    if(this->verbose) printf("QSqliteConnection::connect: start.\n");
     this->errorMessage.clear();
     this->connected = true;
-    cout << "QSqliteConnection::connect: dbname=" << this->dbname << endl;
+    if(this->verbose) cout << "QSqliteConnection::connect: dbname=" << this->dbname << endl;
     db.setDatabaseName( QString(this->dbname.c_str()) );
     if(!db.open()) {
         this->connected = false;
         this->errorMessage.append("Unable to open '").append(this->dbname.c_str()).append("'.");
     }
-    printf("QSqliteConnection::connect: end.\n");
+    if(this->verbose) printf("QSqliteConnection::connect: end.\n");
     return this->connected;
 }
 bool QSqliteConnection::disconnect() {
-    printf("QSqliteConnection::disconnect: start.\n");
+    if(this->verbose) printf("QSqliteConnection::disconnect: start.\n");
     if(!this->connected)
         return true;
     this->db.close();
     this->connected=false;
-    printf("QSqliteConnection::disconnect: end.\n");
+    if(this->verbose) printf("QSqliteConnection::disconnect: end.\n");
     return true;
 }
 bool QSqliteConnection::reconnect() {
@@ -80,7 +82,7 @@ bool debugQSqliteExec = false;
 
 
 ResultSet* QSqliteConnection::exec(const string s) {
-    printf("QSqliteConnection::exec: start.\n");
+    if(this->verbose) printf("QSqliteConnection::exec: start.\n");
     QResultSet* rs = new QResultSet();
     this->errorMessage.clear();
 
@@ -129,6 +131,7 @@ ResultSet* QSqliteConnection::exec(const string s) {
             rs->righe.push_back( val.toString().toStdString() );
         }
     }
+    if(this->verbose) printf("QSqliteConnection::exec: end.\n");
     return rs;
 }
 string QSqliteConnection::escapeString(string s) const {

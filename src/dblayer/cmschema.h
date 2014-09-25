@@ -48,7 +48,6 @@ class DBELog : public DBEntity {
       virtual DBLayer::StringVector getOrderBy() const;
     private:
       static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
       static ForeignKeyVector _fkv;
       static StringVector _column_order;
       static ColumnDefinitions _columns;

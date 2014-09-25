@@ -91,11 +91,9 @@ DBEObject::DBEObject() {
 DBEObject::~DBEObject() {}
 string DBEObject::name() const { return "DBEObject"; }
 string DBEObject::getTableName() const { return "objects"; }
-DBFieldVector* DBEObject::getKeys() const { return &chiavi; }
-ForeignKeyVector& DBEObject::getFK() const {
-    return _fkv;
-}
 DBEObject* DBEObject::createNewInstance() const { return new DBEObject(); }
+DBFieldVector* DBEObject::getKeys() const { return &chiavi; }
+ForeignKeyVector& DBEObject::getFK() const { return _fkv; }
 ColumnDefinitions DBEObject::getColumns() const { return _columns; }
 StringVector DBEObject::getColumnNames() const { return _column_order; }
 DBLayer::StringVector DBEObject::getOrderBy() const {
