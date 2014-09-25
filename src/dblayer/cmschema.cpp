@@ -128,7 +128,7 @@ string DBEObject::getGroupId() const { return this->getField("group_id")==0 || t
 bool DBEObject::isDeleted() const { return this->getField("deleted_date")==0 || this->getField("deleted_date")->isNull() || *(this->getField("deleted_date")->getStringValue())=="0000-00-00 00:00:00" ? false : true; }
 bool DBEObject::canRead(const string kind) const {
     string perms = this->getField("permissions")==0 || this->getField("permissions")->isNull() ? "" : *(this->getField("permissions")->getStringValue());
-    if(!perms.length()>0) return true;
+    if(!(perms.length()>0)) return true;
     if(kind=="U") {
         return perms.at(0+0)=='r';
     } else if(kind=="G") {
@@ -139,7 +139,7 @@ bool DBEObject::canRead(const string kind) const {
 }
 bool DBEObject::canWrite(const string kind) const {
     string perms = this->getField("permissions")==0 || this->getField("permissions")->isNull() ? "" : *(this->getField("permissions")->getStringValue());
-    if(!perms.length()>0) return true;
+    if(!(perms.length()>0)) return true;
     if(kind=="U") {
         return perms.at(1+0)=='w';
     } else if(kind=="G") {
@@ -150,7 +150,7 @@ bool DBEObject::canWrite(const string kind) const {
 }
 bool DBEObject::canExecute(const string kind) const {
     string perms = this->getField("permissions")==0 || this->getField("permissions")->isNull() ? "" : *(this->getField("permissions")->getStringValue());
-    if(!perms.length()>0) return true;
+    if(!(perms.length()>0)) return true;
     if(kind=="U") {
         return perms.at(2+0)=='x';
     } else if(kind=="G") {
