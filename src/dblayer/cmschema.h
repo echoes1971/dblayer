@@ -33,25 +33,35 @@ class DBELog : public DBEntity {
     static DBFieldVector chiavi;
 };
 
-  class DBEObject : public DBEntity {
-    public:
-    DBEObject();
-      virtual ~DBEObject();
-      virtual string name() const;
-      virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
-      virtual ForeignKeyVector& getFK() const;
-      virtual DBEObject* createNewInstance() const;
-      virtual ColumnDefinitions getColumns() const;
-      StringVector getColumnNames() const;
+class DBEObject : public DBEntity {
+  public:
+  DBEObject();
+    virtual ~DBEObject();
+    virtual string name() const;
+    virtual string getTableName() const;
+    virtual DBFieldVector* getKeys() const;
+    virtual ForeignKeyVector& getFK() const;
+    virtual DBEObject* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    StringVector getColumnNames() const;
+    virtual DBLayer::StringVector getOrderBy() const;
 
-      virtual DBLayer::StringVector getOrderBy() const;
-    private:
-      static DBFieldVector chiavi;
-      static ForeignKeyVector _fkv;
-      static StringVector _column_order;
-      static ColumnDefinitions _columns;
-  };
+    // Custom methods
+    string getOwnerId() const;
+    string getGroupId() const;
+    bool isDeleted() const;
+
+    bool canRead(const string kind="") const;
+    bool canWrite(const string kind="") const;
+    bool canExecute(const string kind="") const;
+  protected:
+    static string _getTodayString();
+  private:
+    static DBFieldVector chiavi;
+    static ForeignKeyVector _fkv;
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
+};
 
   class DBECountry : public DBEntity {
     public:

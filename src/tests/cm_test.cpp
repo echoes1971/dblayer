@@ -157,6 +157,29 @@ bool testDBES() {
     DBEObject dbeobject;
     cout << dbeobject.toString("\n") << endl;
 
+    cout << "Owner ID:\t" << dbeobject.getOwnerId() << " => ";
+    dbeobject.setValue("owner","cippa");
+    cout << dbeobject.getOwnerId() << endl;
+
+    cout << "Group ID:\t" << dbeobject.getGroupId() << " => ";
+    dbeobject.setValue("group_id","lippa");
+    cout << dbeobject.getGroupId() << endl;
+
+    cout << "Deleted:\t" << dbeobject.isDeleted() << " => ";
+    dbeobject.setValue("deleted_date","lippa");
+    cout << dbeobject.isDeleted() << endl;
+
+    dbeobject.setValue("permissions","r---w---x");
+    //dbeobject.setValue("permissions","rwx------");
+    cout << "User  can read: " << dbeobject.canRead("U") << endl;
+    cout << "Group can read: " << dbeobject.canRead("G") << endl;
+    cout << "All   can read: " << dbeobject.canRead("A") << endl;
+    cout << "User  can write: " << dbeobject.canWrite("U") << endl;
+    cout << "Group can write: " << dbeobject.canWrite("G") << endl;
+    cout << "All   can write: " << dbeobject.canWrite("A") << endl;
+    cout << "User  can exec: " << dbeobject.canExecute("U") << endl;
+    cout << "Group can exec: " << dbeobject.canExecute("G") << endl;
+    cout << "All   can exec: " << dbeobject.canExecute("A") << endl;
     //success = false;
 
     return success;
@@ -219,7 +242,7 @@ int main(int argc, char *argv[]) {
         cerr << "TEST FAILED!!!" << endl;
         return 1;
     }
-
+return 0;
     cout << "---------------->>  testDBMgr: start." << endl;
     if ( argc==5 ) {
         success = testDBMgr( host, dbname, usr, pwd, login_user, login_password );

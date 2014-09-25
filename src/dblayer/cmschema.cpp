@@ -7,6 +7,7 @@ using namespace AuthSchema;
 #include "cmschema.h"
 using namespace CMSchema;
 
+#include <ctime>
 #include <string>
 using namespace std;
 
@@ -99,6 +100,64 @@ StringVector DBEObject::getColumnNames() const { return _column_order; }
 DBLayer::StringVector DBEObject::getOrderBy() const {
     static DBLayer::StringVector ret({"name"});
     return ret;
+}
+
+string DBEObject::_getTodayString() {
+    time_t t = time(0);   // get time now
+    struct tm * now = localtime( & t );
+    string ret("");
+//    $oggi = $oggi_array['year'] . "/"
+//     . ( strlen($oggi_array['mon'])<2 ? "0" : "" ) . $oggi_array['mon'] . "/"
+//     . ( strlen($oggi_array['mday'])<2 ? "0" : "" ) . $oggi_array['mday'] . " "
+//     . ( strlen($oggi_array['hours'])<2 ? "0" : "" ) . $oggi_array['hours'] . ":"
+//     . ( strlen($oggi_array['minutes'])<2 ? "0" : "" ) . $oggi_array['minutes'];
+    string month = SchemaNS::integer2string((long) now->tm_mon+1); if(month.length()<2) month="0"+month;
+    string day = SchemaNS::integer2string((long) now->tm_mday+1); if(day.length()<2) day="0"+day;
+    string hour = SchemaNS::integer2string((long) now->tm_hour); if(hour.length()<2) hour="0"+hour;
+    string minute = SchemaNS::integer2string((long) now->tm_min); if(minute.length()<2) minute="0"+minute;
+    string secs = SchemaNS::integer2string((long) now->tm_sec); if(secs.length()<2) secs="0"+secs;
+    ret.append(SchemaNS::integer2string((long) now->tm_year + 1900))
+        .append("/").append(month)
+        .append("/").append(SchemaNS::integer2string((long) now->tm_mday))
+        .append(" ")
+        .append(hour).append(":").append(minute).append(":").append(secs);
+    return ret;
+}
+string DBEObject::getOwnerId() const { return this->getField("owner")==0 || this->getField("owner")->isNull() ? "" : *(this->getField("owner")->getStringValue()); }
+string DBEObject::getGroupId() const { return this->getField("group_id")==0 || this->getField("group_id")->isNull() ? "" : *(this->getField("group_id")->getStringValue()); }
+bool DBEObject::isDeleted() const { return this->getField("deleted_date")==0 || this->getField("deleted_date")->isNull() || *(this->getField("deleted_date")->getStringValue())=="0000-00-00 00:00:00" ? false : true; }
+bool DBEObject::canRead(const string kind) const {
+    string perms = this->getField("permissions")==0 || this->getField("permissions")->isNull() ? "" : *(this->getField("permissions")->getStringValue());
+    if(!perms.length()>0) return true;
+    if(kind=="U") {
+        return perms.at(0+0)=='r';
+    } else if(kind=="G") {
+        return perms.at(0+3)=='r';
+    } else {
+        return perms.at(0+6)=='r';
+    }
+}
+bool DBEObject::canWrite(const string kind) const {
+    string perms = this->getField("permissions")==0 || this->getField("permissions")->isNull() ? "" : *(this->getField("permissions")->getStringValue());
+    if(!perms.length()>0) return true;
+    if(kind=="U") {
+        return perms.at(1+0)=='w';
+    } else if(kind=="G") {
+        return perms.at(1+3)=='w';
+    } else {
+        return perms.at(1+6)=='w';
+    }
+}
+bool DBEObject::canExecute(const string kind) const {
+    string perms = this->getField("permissions")==0 || this->getField("permissions")->isNull() ? "" : *(this->getField("permissions")->getStringValue());
+    if(!perms.length()>0) return true;
+    if(kind=="U") {
+        return perms.at(2+0)=='x';
+    } else if(kind=="G") {
+        return perms.at(2+3)=='x';
+    } else {
+        return perms.at(2+6)=='x';
+    }
 }
 //*********************** DBEObject: end.
 

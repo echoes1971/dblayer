@@ -42,6 +42,7 @@ make -j 12 \
 #    && ./apps/dbshell "$CONNECTION_STRING" \
 #    &&./tests/connection_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
 #    && ./tests/dbmgr_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
+echo "cd build ; ./tests/cm_test \"$CONNECTION_STRING\" $TEST_USER $TEST_PWD ; cd .."
 
 cd ..
 
