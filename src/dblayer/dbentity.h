@@ -86,7 +86,7 @@ namespace DBLayer {
          *  if true, values are represented as attributes
          *  if false, values are represented as nodes
          */
-        virtual string toString(string prefix="", bool valuesAsAttributes=false) const;
+        virtual string toString(string prefix="", bool valuesAsAttributes=false, bool show_definitions=false) const;
 
         string toSql(std::function<string(const string&)> dbeType2dbType, std::function<string(const string&)> lambda_getClazzSchema, string prefix="", bool use_fk=true);
 
@@ -154,7 +154,7 @@ namespace DBLayer {
         static ColumnDefinitions _columns;
         static ForeignKeyVector _fkv;
 
-        string toString_nodes(string prefix) const;
+        string toString_nodes(string prefix, bool show_definitions=false) const;
 
     };
 

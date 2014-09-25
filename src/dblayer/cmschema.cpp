@@ -117,8 +117,8 @@ string DBEObject::_getTodayString() {
     string minute = SchemaNS::integer2string((long) now->tm_min); if(minute.length()<2) minute="0"+minute;
     string secs = SchemaNS::integer2string((long) now->tm_sec); if(secs.length()<2) secs="0"+secs;
     ret.append(SchemaNS::integer2string((long) now->tm_year + 1900))
-        .append("/").append(month)
-        .append("/").append(SchemaNS::integer2string((long) now->tm_mday))
+        .append("-").append(month)
+        .append("-").append(SchemaNS::integer2string((long) now->tm_mday))
         .append(" ")
         .append(hour).append(":").append(minute).append(":").append(secs);
     return ret;
@@ -161,6 +161,39 @@ bool DBEObject::canExecute(const string kind) const {
 }
 void DBEObject::setDefaultValues(ObjectMgr *dbmgr) {
     DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
+    if(myuser!=0) {
+        if(this->getField("owner")==0 || this->getField("owner")->isNull() || this->getField("owner")->getStringValue()->length()==0)
+            this->setValue("owner",myuser->getStringValue("id"));
+        if(this->getField("group_id")==0 || this->getField("group_id")->isNull() || this->getField("group_id")->getStringValue()->length()==0)
+            this->setValue("group_id",myuser->getStringValue("group_id"));
+        this->setValue("creator",myuser->getStringValue("id"));
+        this->setValue("last_modify",myuser->getStringValue("id"));
+    }
+    string today = this->_getTodayString();
+    this->setValue("creation_date",today);
+    this->setValue("last_modify_date",today);
+    this->setValue("deleted_date","0000-00-00 00:00:00");
+
+    if(this->getField("father_id")==0 || this->getField("father_id")->isNull()) {
+        this->setValue("father_id","0"); // TODO verify this
+
+        if(this->getField("fk_obj_id")!=0 && !this->getField("fk_obj_id")->isNull()) {
+            DBEObject* fkobj = dbmgr->objectById(this->getStringValue("id"));
+            if(fkobj!=0) {
+                this->setValue("group_id",fkobj->getStringValue("group_id"));
+                this->setValue("permissions",fkobj->getStringValue("permissions"));
+                this->setValue("father_id",this->getStringValue("fk_obj_id"));
+                delete fkobj;
+            }
+        }
+    } else {
+        DBEObject* father = dbmgr->objectById(this->getStringValue("id"));
+        if(father!=0) {
+            this->setValue("group_id",father->getStringValue("group_id"));
+            this->setValue("permissions",father->getStringValue("permissions"));
+            delete father;
+        }
+    }
 }
 //*********************** DBEObject: end.
 
@@ -171,6 +204,28 @@ ObjectMgr::ObjectMgr(Connection* con, bool verbose) : DBMgr::DBMgr(con,verbose) 
 ObjectMgr::~ObjectMgr() {
     if( this->verbose ) { cout << "ObjectMgr::~ObjectMgr: start." << endl; }
     if( this->verbose ) { cout << "ObjectMgr::~ObjectMgr: end." << endl; }
+}
+DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) const {
+    // TODO
+    cout << "ObjectMgr::objectById: TODO" << endl;
+    return 0;
+//    $tipi = $this->getFactory()->getRegisteredTypes();
+//    $q = array();
+//    foreach($tipi as $tablename=>$classname) {
+//        $mydbe = $this->getInstance($classname); // 2011.04.04 eval("\$mydbe=new $classname;");
+//        if($classname=='DBEObject' || !is_a($mydbe,'DBEObject') || is_a($mydbe,"DBAssociation")) continue;
+//        $q[]="select '$classname' as classname,id,owner,group_id,permissions,creator,"
+//                    ."creation_date,last_modify,last_modify_date,"
+//                    ."deleted_by,deleted_date," // 2012.04.04
+//                    ."father_id,name,description"
+//                ." from ".$this->buildTableName($mydbe)
+//                ." where id='".DBEntity::hex2uuid($id)."'"
+//                .($ignore_deleted?" and deleted_date='0000-00-00 00:00:00'":'');
+//    }
+//    $searchString = implode($q, " union ");
+//    if ($this->_verbose ) { printf("query: $searchString<br/>\n"); }
+//    $lista = $this->select('DBEObject', "objects", $searchString);
+//    return count($lista)==1 ? $lista[0] : null;
 }
 //*********************** ObjectManager: end.
 
@@ -363,18 +418,13 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
         if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
-//         DBELog dbelog;
-//         sql = dbelog.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
-// //        dbmgr.getConnection()->exec(sql);
-//         if(verbose) cout << sql << endl;
-
         StringVector classes = {"log","objects","countrylist","companies",
                                 "people","files","folders","links",
                                 "notes","pages"};
         for(const string clazz : classes) {
             DBEntity* dbe = dbmgr.getClazz(clazz);
             sql = dbe->toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
-            //dbmgr.getConnection()->exec(sql);
+            dbmgr.getConnection()->exec(sql);
             if(verbose) cout << sql << endl;
             dbmgr.Delete(dbe);
 
@@ -391,7 +441,7 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
 
     // 3. Write version to DB
     dbecurrentversion->setValue("version",current_migration);
-//    dbmgr.Update(dbecurrentversion);
+    dbmgr.Update(dbecurrentversion);
 
     //dbecurrentversion->setValue("");
     delete dbecurrentversion;

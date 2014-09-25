@@ -53,7 +53,7 @@ string DBEntity::getTableName() const { return string(tableName); }
 
 string DBEntity::name() const { return "DBEntity"; }
 
-string DBEntity::toString_nodes(string prefix) const {
+string DBEntity::toString_nodes(string prefix, bool show_definitions) const {
     string ret( prefix + "<" );
     ret.append( this->name() ); ret.append( " " );
     // Keys
@@ -119,7 +119,7 @@ string DBEntity::toString_nodes(string prefix) const {
         ret.append( "</" + fields[i]->getName() + ">" );
     }
 
-    if(prefix.length()>0) {
+    if(prefix.length()>0 && show_definitions) {
         ret.append(prefix+"<!--");
         ret.append(prefix+"{");
         // Table Columns
@@ -225,9 +225,9 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, std:
     return ret;
 }
 
-string DBEntity::toString(string prefix, bool valuesAsAttributes) const {
+string DBEntity::toString(string prefix, bool valuesAsAttributes, bool show_definitions) const {
     if ( !valuesAsAttributes) {
-        return toString_nodes(prefix);
+        return toString_nodes(prefix,show_definitions);
     }
     string ret( prefix + "<" );
     ret.append( this->name() ); ret.append( " " );

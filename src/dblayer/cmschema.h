@@ -72,6 +72,8 @@ class ObjectMgr : public DBMgr {
     ObjectMgr();
     ObjectMgr(Connection* con, bool verbose=false);
     virtual ~ObjectMgr();
+
+    DBEObject* objectById(const string id, const bool ignore_deleted=true) const;
 };
 
 
