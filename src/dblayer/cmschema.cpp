@@ -159,7 +159,7 @@ bool DBEObject::canExecute(const string kind) const {
         return perms.at(2+6)=='x';
     }
 }
-void DBEObject::setDefaultValues(ObjectMgr *dbmgr) {
+void DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
     DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
     if(myuser!=0) {
         if(this->getField("owner")==0 || this->getField("owner")->isNull() || this->getField("owner")->getStringValue()->length()==0)
@@ -194,6 +194,26 @@ void DBEObject::setDefaultValues(ObjectMgr *dbmgr) {
             delete father;
         }
     }
+}
+void DBEObject::_before_insert(DBMgr* dbmgr) {
+    string myid = dbmgr->getNextUuid(this);
+    this->setValue("id",myid);
+    this->setDefaultValues((ObjectMgr*) dbmgr);
+}
+void DBEObject::_before_update(DBMgr* dbmgr) {
+    DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
+    if(myuser!=0) {
+        this->setValue("last_modify",myuser->getStringValue("id"));
+    }
+    this->setValue("last_modify_date",this->_getTodayString());
+}
+void DBEObject::_before_delete(DBMgr* dbmgr) {
+    if(this->isDeleted()) return;
+    DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
+    if(myuser!=0) {
+        this->setValue("deleted_by",myuser->getStringValue("id"));
+    }
+    this->setValue("deleted_date",this->_getTodayString());
 }
 //*********************** DBEObject: end.
 

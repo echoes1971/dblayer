@@ -57,6 +57,11 @@ class DBEObject : public DBEntity {
     bool canExecute(const string kind="") const;
 
     void setDefaultValues(ObjectMgr* dbmgr=0);
+
+    virtual void _before_insert(DBMgr* dbmgr=0);
+    virtual void _before_update(DBMgr* dbmgr=0);
+    virtual void _before_delete(DBMgr* dbmgr=0);
+
   protected:
     static string _getTodayString();
   private:
