@@ -33,6 +33,7 @@ class DBELog : public DBEntity {
     static DBFieldVector chiavi;
 };
 
+class ObjectMgr;
 class DBEObject : public DBEntity {
   public:
   DBEObject();
@@ -54,6 +55,8 @@ class DBEObject : public DBEntity {
     bool canRead(const string kind="") const;
     bool canWrite(const string kind="") const;
     bool canExecute(const string kind="") const;
+
+    void setDefaultValues(ObjectMgr* dbmgr=0);
   protected:
     static string _getTodayString();
   private:
@@ -62,6 +65,15 @@ class DBEObject : public DBEntity {
     static StringVector _column_order;
     static ColumnDefinitions _columns;
 };
+
+
+class ObjectMgr : public DBMgr {
+  public:
+    ObjectMgr();
+    ObjectMgr(Connection* con, bool verbose=false);
+    virtual ~ObjectMgr();
+};
+
 
   class DBECountry : public DBEntity {
     public:

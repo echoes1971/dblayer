@@ -77,61 +77,56 @@ using namespace CMSchema;
 using namespace std;
 
 
-bool testDBMgr(string connString, string& loginUser, string& loginPwd) {
+bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
     bool success = true;
     DBLayer::Connection* con;
-    DBMgr* dbmgr;
+    ObjectMgr* objmgr;
 
     con = DBLayer::createConnection( connString.c_str() );
     //con->setVerbose(true);
-    dbmgr = new DBLayer::DBMgr(con, false);
+    objmgr = new ObjectMgr(con, true);
 
     DBEFactory dbeFactory(false);
-    dbmgr->setDBEFactory(&dbeFactory);
-    //dbmgr->setSchema("rra");
+    objmgr->setDBEFactory(&dbeFactory);
+    //objmgr->setSchema("rra");
     AuthSchema::registerClasses(&dbeFactory);
-    AuthSchema::checkDB(*dbmgr,false);
+    AuthSchema::checkDB(*objmgr,false);
     CMSchema::registerClasses(&dbeFactory);
-    CMSchema::checkDB(*dbmgr,true);
+    CMSchema::checkDB(*objmgr,true);
 
-    if(dbmgr->connect()) {
+    if(objmgr->connect()) {
 
         if(loginUser.length()>0 && loginPwd.length()>0) {
-            dbmgr->login(loginUser,loginPwd);
+            objmgr->login(loginUser,loginPwd);
         }
 
-        if(dbmgr->isLoggedIn()) {
-            DBEntityVector* lista = dbmgr->Select("test_dblayer","select * from test_test_dblayer");
+        if(objmgr->isLoggedIn()) {
 
-            if(lista->size()>0) {
-                cout << "List (" << typeid(lista).name() << ") of " << lista->size() << " elements:" << endl;
-                for(const auto& elem : (*lista)) {
-                    cout << "- " << elem->toString() << endl;
-                }
-                cout << "====" << endl;
-            } else {
-                cout << "testDBMgr: LISTA VUOTA!!!" << endl;
-            }
+            // Let's create an object instance
+            DBEObject* obj = (DBEObject*) objmgr->getClazz("objects");
 
-            cout << "testDBMgr: destroying lista..." << endl;
-            DBMgr::Destroy(lista);
-            cout << "OK!" << endl;
+            obj->setDefaultValues(objmgr);
+            cout << "Object: " << obj->toString("\n") << endl;
+
+            delete obj;
+
         } else {
-            cout << "Login Error: " << dbmgr->getErrorMessage() << "." << endl;
+            cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
             success = false;
         }
     } else {
-        cout << "Connection Error: " << dbmgr->getErrorMessage() << endl;
+        cout << "Connection Error: " << objmgr->getErrorMessage() << endl;
         success = false;
     }
-    delete dbmgr;
+    delete objmgr;
     delete con;
     return success;
 }
-bool testDBMgr(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
+bool testObjectMgr(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    return testDBMgr( connString, loginUser, loginPwd );
+    return testObjectMgr( connString, loginUser, loginPwd );
 }
+
 
 bool testDBES() {
     bool success=true;
@@ -242,19 +237,19 @@ int main(int argc, char *argv[]) {
         cerr << "TEST FAILED!!!" << endl;
         return 1;
     }
-return 0;
-    cout << "---------------->>  testDBMgr: start." << endl;
+
+    cout << "---------------->>  testObjectMgr: start." << endl;
     if ( argc==5 ) {
-        success = testDBMgr( host, dbname, usr, pwd, login_user, login_password );
+        success = testObjectMgr( host, dbname, usr, pwd, login_user, login_password );
     } else {
-        success = testDBMgr( connString, login_user, login_password );
+        success = testObjectMgr( connString, login_user, login_password );
     }
     printf("\n");
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-    cout << "---------------->>  testDBMgr: end." << endl;
+    cout << "---------------->>  testObjectMgr: end." << endl;
     cout << endl;
     if(!success) {
         cerr << "TEST FAILED!!!" << endl;

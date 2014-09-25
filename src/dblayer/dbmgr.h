@@ -132,6 +132,8 @@ class DECLSPECIFIER DBMgr {
     string name;
     string errorMessage;
 
+    bool verbose;
+
     virtual string escapeString(string s);
     virtual string quoteDate(string s);
     virtual DBEntity* _before_insert(DBEntity* dbe);
@@ -145,7 +147,6 @@ class DECLSPECIFIER DBMgr {
 
   private:
     Connection* con;
-    bool verbose;
     DBEFactory* dbeFactory;
     string _schema;
     DBEntity* _dbeuser;

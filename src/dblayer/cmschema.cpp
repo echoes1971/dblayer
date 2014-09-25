@@ -159,7 +159,23 @@ bool DBEObject::canExecute(const string kind) const {
         return perms.at(2+6)=='x';
     }
 }
+void DBEObject::setDefaultValues(ObjectMgr *dbmgr) {
+    DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
+}
 //*********************** DBEObject: end.
+
+
+//*********************** ObjectManager: start.
+ObjectMgr::ObjectMgr() : DBMgr::DBMgr() {}
+ObjectMgr::ObjectMgr(Connection* con, bool verbose) : DBMgr::DBMgr(con,verbose) {}
+ObjectMgr::~ObjectMgr() {
+    if( this->verbose ) { cout << "ObjectMgr::~ObjectMgr: start." << endl; }
+    if( this->verbose ) { cout << "ObjectMgr::~ObjectMgr: end." << endl; }
+}
+//*********************** ObjectManager: end.
+
+
+
 
 //*********************** DBECountry: start.
 const string DBECountry::nomiCampiChiave[] = { string("id") };
