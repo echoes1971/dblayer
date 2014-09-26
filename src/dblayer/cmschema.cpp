@@ -163,11 +163,11 @@ void DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
     DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
     if(myuser!=0) {
         if(this->getField("owner")==0 || this->getField("owner")->isNull() || this->getField("owner")->getStringValue()->length()==0)
-            this->setValue("owner",myuser->getStringValue("id"));
+            this->setValue("owner",myuser->getId());
         if(this->getField("group_id")==0 || this->getField("group_id")->isNull() || this->getField("group_id")->getStringValue()->length()==0)
             this->setValue("group_id",myuser->getStringValue("group_id"));
-        this->setValue("creator",myuser->getStringValue("id"));
-        this->setValue("last_modify",myuser->getStringValue("id"));
+        this->setValue("creator",myuser->getId());
+        this->setValue("last_modify",myuser->getId());
     }
     string today = this->_getTodayString();
     this->setValue("creation_date",today);
@@ -203,7 +203,7 @@ void DBEObject::_before_insert(DBMgr* dbmgr) {
 void DBEObject::_before_update(DBMgr* dbmgr) {
     DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
     if(myuser!=0) {
-        this->setValue("last_modify",myuser->getStringValue("id"));
+        this->setValue("last_modify",myuser->getId());
     }
     this->setValue("last_modify_date",this->_getTodayString());
 }
@@ -211,7 +211,7 @@ void DBEObject::_before_delete(DBMgr* dbmgr) {
     if(this->isDeleted()) return;
     DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
     if(myuser!=0) {
-        this->setValue("deleted_by",myuser->getStringValue("id"));
+        this->setValue("deleted_by",myuser->getId());
     }
     this->setValue("deleted_date",this->_getTodayString());
 }
@@ -225,7 +225,7 @@ ObjectMgr::~ObjectMgr() {
     if( this->verbose ) { cout << "ObjectMgr::~ObjectMgr: start." << endl; }
     if( this->verbose ) { cout << "ObjectMgr::~ObjectMgr: end." << endl; }
 }
-bool ObjectMgr::canRead(const DBEObject& obj) {
+bool ObjectMgr::canRead(const DBEObject& obj) const {
     bool ret = false;
     if(obj.canRead())
         ret = true;
@@ -233,9 +233,39 @@ bool ObjectMgr::canRead(const DBEObject& obj) {
         ret = true;
     else if(obj.canRead("U")) {
         DBEUser* myuser = (DBEUser*) this->getDBEUser();
-        if(myuser!=0 && myuser->getStringValue("id")==obj.getOwnerId()) {
+        if(myuser!=0 && myuser->getId()==obj.getOwnerId()) {
             ret = true;
         }
+    }
+    return ret;
+}
+bool ObjectMgr::canWrite(const DBEObject& obj) const {
+    bool ret = false;
+    DBEUser* myuser = (DBEUser*) this->getDBEUser();
+    if(myuser!=0 && myuser->getId()==obj.getStringValue("creator")) {
+        ret = true;
+    } else {
+        if(obj.canWrite())
+            ret = true;
+        else if(obj.canWrite("G") && this->hasGroup( obj.getGroupId() ) )
+            ret = true;
+        else if(obj.canWrite("U") && myuser!=0 && myuser->getId()==obj.getOwnerId())
+            ret = true;
+    }
+    return ret;
+}
+bool ObjectMgr::canExecute(const DBEObject& obj) const {
+    bool ret = false;
+    DBEUser* myuser = (DBEUser*) this->getDBEUser();
+    if(myuser!=0 && myuser->getId()==obj.getStringValue("creator")) {
+        ret = true;
+    } else {
+        if(obj.canExecute())
+            ret = true;
+        else if(obj.canExecute("G") && this->hasGroup( obj.getGroupId() ) )
+            ret = true;
+        else if(obj.canExecute("U") && myuser!=0 && myuser->getId()==obj.getOwnerId())
+            ret = true;
     }
     return ret;
 }

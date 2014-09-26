@@ -95,7 +95,7 @@ DBEntity* DBMgr::getClazzByTypeName(const string& typeName) {
     return new DBEntity(typeName);
 }
 
-DBEntity* DBMgr::getDBEUser() { return this->_dbeuser; }
+DBEntity* DBMgr::getDBEUser() const { return this->_dbeuser; }
 void DBMgr::setDBEUser(DBEntity* dbe) { this->_dbeuser=dbe; }
 
 ColumnDefinitions DBMgr::getColumnsForTable(const string& tablename) {
@@ -672,16 +672,25 @@ string DBMgr::getServerIDString() {
     return ret;
 }
 
-bool DBMgr::hasGroup(const string& group_id) {
-    vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), group_id);
-    return i!=this->_user_groups_list.end();
+bool DBMgr::hasGroup(const string& group_id) const {
+    bool ret = false;
+    for(const string& s : this->_user_groups_list) {
+        if(s!=group_id) continue;
+        ret = true;
+        break;
+    }
+    return ret;
+//     StringVector::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), group_id);
+//     return i!=this->_user_groups_list.end();
 }
 
 void DBMgr::addGroup(const string& group_id) {
-    vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), group_id);
-    if(i==this->_user_groups_list.end()) {
+    if(!this->hasGroup(group_id))
         this->_user_groups_list.push_back(group_id);
-    }
+//     StringVector::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), group_id);
+//     if(i==this->_user_groups_list.end()) {
+//         this->_user_groups_list.push_back(group_id);
+//     }
 }
 
 void DBMgr::Destroy(DBEntityVector* lista) {

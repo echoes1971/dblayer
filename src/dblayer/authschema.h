@@ -49,6 +49,8 @@ namespace AuthSchema {
       virtual DBLayer::StringVector getOrderBy() const;
 
       // Custom methods
+      string getId() const;
+
       vector<map<string,string> > getDefaultEntries() const;
       inline bool checkNewPassword() { return true; }
       bool isRoot();

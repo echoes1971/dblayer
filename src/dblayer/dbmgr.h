@@ -69,7 +69,7 @@ class DECLSPECIFIER DBMgr {
         DBEntity* getClazz(const string &typeName);
         DBEntity* getClazzByTypeName(const string& typeName);
 
-        DBEntity* getDBEUser();
+        DBEntity* getDBEUser() const;
         void setDBEUser(DBEntity* dbe);
 
         ColumnDefinitions getColumnsForTable(const string& tablename);
@@ -111,7 +111,7 @@ class DECLSPECIFIER DBMgr {
 //            return self.user_groups_list
 //        def setUserGroupsList(self,user_groups_list):
 //            self.user_groups_list = user_groups_list
-        bool hasGroup(const string& group_id);
+        bool hasGroup(const string& group_id) const;
         void addGroup(const string& group_id);
 
         /** Destroy the DBEntity of the list and the list itself! */
@@ -145,7 +145,7 @@ class DECLSPECIFIER DBMgr {
     DBEFactory* dbeFactory;
     string _schema;
     DBEntity* _dbeuser;
-    vector<string> _user_groups_list;
+    StringVector _user_groups_list;
 
     void _loadUserGroups();
 

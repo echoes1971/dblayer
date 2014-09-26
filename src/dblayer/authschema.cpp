@@ -76,6 +76,7 @@ DBLayer::StringVector DBEUser::getOrderBy() const {
     static DBLayer::StringVector ret({"fullname"});
     return ret;
 }
+string DBEUser::getId() const { return this->getStringValue("id"); }
 vector<map<string,string> > DBEUser::getDefaultEntries() const {
     static vector<map<string,string> > ret;
     if(ret.size()==0) {

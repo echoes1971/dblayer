@@ -311,7 +311,7 @@ void* DBEntity::getValue(const string& field) {
   return (void*)0;
 }
 
-string DBEntity::getStringValue(const string &fieldName) {
+string DBEntity::getStringValue(const string &fieldName) const {
     Field* ret = this->getField(fieldName);
     return ret==0 ? "" : ret->toString();
 }

@@ -97,7 +97,7 @@ namespace DBLayer {
         /**	TODO: DEPRECARE?	*/
         void* getValue(const string& field);
 
-        string getStringValue(const string& fieldName);
+        string getStringValue(const string& fieldName) const;
 
         /** @return the key fields */
         virtual DBFieldVector* getKeys() const;
