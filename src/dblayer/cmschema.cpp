@@ -371,6 +371,38 @@ string ObjectMgr::_buildSelectString(DBEntity* dbe, bool uselike, bool caseSensi
     if( this->verbose ) cout << "ObjectMgr::_buildSelectString: end." << endl;
     return searchString;
 }
+DBEntityVector* ObjectMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string& orderBy,bool ignore_deleted, bool full_object) {
+    if( this->verbose ) cout << "ObjectMgr::Search: start." << endl;
+    DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
+    if(obj==0 || obj->name()!="DBEObject") {
+        if( this->verbose ) cout << "ObjectMgr::Search: dbe is not a DBEObject" << endl;
+        if( this->verbose ) cout << "ObjectMgr::Search: end." << endl;
+        return DBMgr::Search(dbe, uselike, caseSensitive,orderBy);
+    }
+    if( this->verbose ) cout << "ObjectMgr::Search: TODO" << endl;
+    if( ignore_deleted==true ) obj->setDateValue("deleted_date","0000-00-00 00:00:00");
+    DBEntityVector* tmp = DBMgr::Search(dbe,uselike,caseSensitive,orderBy);
+    if(!full_object) {
+        if( this->verbose ) cout << "ObjectMgr::Search: not full object." << endl;
+        if( this->verbose ) cout << "ObjectMgr::Search: end." << endl;
+        return tmp;
+    }
+    DBEntityVector* ret = new DBEntityVector();
+    // FIXME optimize this
+    for(const DBEntity* _obj : *tmp) {
+        DBEntity* search = this->getClazzByTypeName(_obj->getStringValue("classname"));
+        search->setValue("id",_obj->getStringValue("id"));
+        DBEntityVector* tmplist = this->Search(search,false);
+        delete search;
+        if(tmplist->size()!=1) {
+            this->Destroy(tmplist);
+            continue;
+        }
+        ret->push_back(tmplist->at(0));
+        delete tmplist;
+    }
+    return ret;
+}
 DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) const {
     // TODO
     cout << "ObjectMgr::objectById: TODO" << endl;
