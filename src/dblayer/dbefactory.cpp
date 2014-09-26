@@ -58,7 +58,7 @@ DBEntity* DBEFactory::getClazz(const string& tablename) const {
     if(this->_verbose) cout << "DBEFactory::getClazz: nomeTabella=" << nomeTabella << endl;
     if( this->_cache.find(nomeTabella) != this->_cache.end() ) {
         if(this->_verbose) cout << "DBEFactory::getClazz: found!" << endl;
-        DBEntity* dbe;
+        DBEntity* dbe = this->_cache.at(nomeTabella);
         return dbe->createNewInstance();
     }
     return new DBEntity(tablename);

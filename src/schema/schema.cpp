@@ -285,6 +285,22 @@ FieldMap Schema::getValuesDictionary() const {
     }
     return ret;
 }
+void Schema::setValuesDictionary(FieldMap fields) {
+    for(const pair<string,Field*> fieldpair : fields) {
+        Field* field = fieldpair.second;
+        if(field->isString()) {
+            this->setValue(field->getName(),field->getStringValue());
+        } else if(field->isInteger()) {
+            this->setValue(field->getName(),field->getIntegerValue());
+        } else if(field->isFloat() || field->isDouble()) {
+            this->setValue(field->getName(),field->getFloatValue());
+        } else if(field->isDate()) {
+            this->setDateValue(field->getName(),field->getValueAsString());
+        } else if(field->isBoolean()) {
+            this->setValue(field->getName(),field->getBooleanValue());
+        }
+    }
+}
 
 Schema *Schema::setDateValue(const string& fieldName, const string& valore) {
     Field* field = this->getField(fieldName);

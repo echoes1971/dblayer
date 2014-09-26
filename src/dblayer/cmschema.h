@@ -91,6 +91,9 @@ class ObjectMgr : public DBMgr {
 
     virtual string _buildSelectString(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
 
+    DBEntityVector* Search(DBEntity* dbe, bool uselike=true,
+                            bool caseSensitive=true, const string& orderBy="" );
+
     DBEObject* objectById(const string id, const bool ignore_deleted=true) const;
     DBEObject* fullObjectById(const string id, const bool ignore_deleted=true) const;
 };

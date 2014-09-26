@@ -348,21 +348,26 @@ string ObjectMgr::_buildSelectString(DBEntity* dbe, bool uselike, bool caseSensi
         return DBMgr::_buildSelectString(dbe, uselike, caseSensitive);
     }
     if( this->verbose ) cout << "ObjectMgr::_buildSelectString: TODO" << endl;
-    string searchString = DBMgr::_buildSelectString(dbe, uselike, caseSensitive);
+    //string searchString = DBMgr::_buildSelectString(dbe, uselike, caseSensitive);
     DBEntityVector types = this->getDBEFactory()->getRegisteredTypes();
     StringVector q;
-//     $tipi = $this->getFactory()->getRegisteredTypes();
-//     $q = array();
-//     foreach($tipi as $tablename=>$classname) {
-//         $mydbe = $this->getInstance($classname); // 2011.04.04 eval("\$mydbe=new $classname;");
-//         if(!is_a($mydbe,'DBEObject') || is_a($mydbe,"DBAssociation") || $mydbe->getTypeName()=='DBEObject') continue;
-//         $mydbe->setValuesDictionary($dbe->getValuesDictionary());
-//         $q[]=str_replace("select * ",
-//                 "select '$classname' as classname,id,owner,group_id,permissions,creator,creation_date,last_modify,last_modify_date,father_id,name,description ",
-//                 parent::_buildSelectString($mydbe,$uselike,$caseSensitive));
-//     }
-//     $searchString = implode($q, " union ");
-//     return $searchString;
+    for(const DBEntity* mytype : types) {
+        DBEntity* mydbe = mytype->createNewInstance();
+        DBEObject* myobj = dynamic_cast<DBEObject*>(mydbe);
+        if(myobj==0 || myobj->name()=="DBEObject") {
+            delete mydbe;
+            continue;
+        }
+        myobj->setValuesDictionary( dbe->getValuesDictionary() );
+        q.push_back( replaceAll( DBMgr::_buildSelectString(myobj, uselike, caseSensitive),
+                                "select * ",
+                                "select '"+myobj->name()+"' as classname,id,owner,group_id,permissions,creator,creation_date,last_modify,last_modify_date,father_id,name,description "
+                                )
+                     );
+        delete mydbe;
+    }
+    string searchString = joinString(&q,string(" union "));
+    if( this->verbose ) cout << "ObjectMgr::_buildSelectString: searchString=" << searchString << endl;
     if( this->verbose ) cout << "ObjectMgr::_buildSelectString: end." << endl;
     return searchString;
 }

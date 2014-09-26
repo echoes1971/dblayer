@@ -93,6 +93,7 @@ namespace SchemaNS {
         StringVector getNames() const;
         /** Ritorna un dizionario nome:valore della DBE */
         FieldMap getValuesDictionary() const;
+        void setValuesDictionary(FieldMap fields);
 
         /** SE non presente, aggiunge un field dello stesso tipo di valore, ALTRIMENTI ne aggiorna il contenuto. */
         Schema* setValue(const string& fieldName, bool valore);

@@ -65,7 +65,10 @@ string DBLayer::capitalizeCase(string& s) {
     delete buf;
     return r;
 }
-string DBLayer::joinString( StringVector* vs, string* glue ) {
+string DBLayer::joinString(StringVector* vs, const string glue ) {
+    return DBLayer::joinString(vs, &glue );
+}
+string DBLayer::joinString(StringVector* vs, const string* glue ) {
     string ret;
     int size = vs->size();
     for(int i=0; i<size; i++) {

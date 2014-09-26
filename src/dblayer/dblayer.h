@@ -60,7 +60,8 @@ namespace DBLayer {
     DECLSPECIFIER string lowerCase(string& s);
     DECLSPECIFIER string upperCase(string& s);
     DECLSPECIFIER string capitalizeCase(string& s);
-    DECLSPECIFIER string joinString( StringVector* vs, string* glue );
+    DECLSPECIFIER string joinString( StringVector* vs, const string glue );
+    DECLSPECIFIER string joinString( StringVector* vs, const string* glue );
     DECLSPECIFIER StringVector& splitString(const string& s, char delim, StringVector& elems);
     /** trim from start */
     DECLSPECIFIER string& string_ltrim(string& s);
