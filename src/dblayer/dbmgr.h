@@ -111,13 +111,8 @@ class DECLSPECIFIER DBMgr {
 //            return self.user_groups_list
 //        def setUserGroupsList(self,user_groups_list):
 //            self.user_groups_list = user_groups_list
-//        def hasGroup(self,group_id):
-//            """ The logged user has the requested group_id ? """
-//            return "%s"%group_id in self.user_groups_list
+        bool hasGroup(const string& group_id);
         void addGroup(const string& group_id);
-//        def addGroup(self,group_id):
-//            if not group_id in self.user_groups_list:
-//                self.user_groups_list.append(group_id)
 
         /** Destroy the DBEntity of the list and the list itself! */
         static void Destroy(DBEntityVector* lista);

@@ -225,6 +225,20 @@ ObjectMgr::~ObjectMgr() {
     if( this->verbose ) { cout << "ObjectMgr::~ObjectMgr: start." << endl; }
     if( this->verbose ) { cout << "ObjectMgr::~ObjectMgr: end." << endl; }
 }
+bool ObjectMgr::canRead(const DBEObject& obj) {
+    bool ret = false;
+    if(obj.canRead())
+        ret = true;
+    else if(obj.canRead("G") && this->hasGroup( obj.getGroupId() ) )
+        ret = true;
+    else if(obj.canRead("U")) {
+        DBEUser* myuser = (DBEUser*) this->getDBEUser();
+        if(myuser!=0 && myuser->getStringValue("id")==obj.getOwnerId()) {
+            ret = true;
+        }
+    }
+    return ret;
+}
 DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) const {
     // TODO
     cout << "ObjectMgr::objectById: TODO" << endl;

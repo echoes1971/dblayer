@@ -43,10 +43,12 @@ QSqliteConnection::QSqliteConnection(string s) : Connection::Connection(s) {
 QSqliteConnection::~QSqliteConnection() {
     this->disconnect();
 //     this->db.removeDatabase("dblayer_qsqlite");
-    for(const QString name : QSqlDatabase::connectionNames()) {
-        cout << "QSqliteConnection::~QSqliteConnection: removing " << name.toStdString() << endl;
-        QSqlDatabase::removeDatabase(name);
-    }
+    
+    // NOTE I guess this should be done automatically when the object is destroyed
+//     for(const QString name : QSqlDatabase::connectionNames()) {
+//         cout << "QSqliteConnection::~QSqliteConnection: removing " << name.toStdString() << endl;
+//         QSqlDatabase::removeDatabase(name);
+//     }
 }
 
 bool QSqliteConnection::connect() {
@@ -64,8 +66,10 @@ bool QSqliteConnection::connect() {
 }
 bool QSqliteConnection::disconnect() {
     if(this->verbose) printf("QSqliteConnection::disconnect: start.\n");
-    if(!this->connected)
+    if(!this->connected) {
+        if(this->verbose) printf("QSqliteConnection::disconnect: end2.\n");
         return true;
+    }
     this->db.close();
     this->connected=false;
     if(this->verbose) printf("QSqliteConnection::disconnect: end.\n");

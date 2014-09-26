@@ -672,6 +672,11 @@ string DBMgr::getServerIDString() {
     return ret;
 }
 
+bool DBMgr::hasGroup(const string& group_id) {
+    vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), group_id);
+    return i!=this->_user_groups_list.end();
+}
+
 void DBMgr::addGroup(const string& group_id) {
     vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), group_id);
     if(i==this->_user_groups_list.end()) {
