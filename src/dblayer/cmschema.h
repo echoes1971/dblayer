@@ -48,6 +48,7 @@ class DBEObject : public DBEntity {
     virtual DBLayer::StringVector getOrderBy() const;
 
     // Custom methods
+    string getId() const;
     string getOwnerId() const;
     string getGroupId() const;
     bool isDeleted() const;
@@ -81,7 +82,17 @@ class ObjectMgr : public DBMgr {
     bool canRead(const DBEObject& obj) const;
     bool canWrite(const DBEObject& obj) const;
     bool canExecute(const DBEObject& obj) const;
+
+    DBEntityVector* Select(const string &tableName, const string &searchString);
+    DBEntity* Insert(DBEntity *dbe);
+    DBEntity* Update(DBEntity *dbe);
+    DBEntity* Delete(DBEntity *dbe);
+    //DBEntity* Copy(DBEntity *dbe);
+
+    virtual string _buildSelectString(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
+
     DBEObject* objectById(const string id, const bool ignore_deleted=true) const;
+    DBEObject* fullObjectById(const string id, const bool ignore_deleted=true) const;
 };
 
 

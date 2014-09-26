@@ -112,6 +112,8 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
             cout << "Can read: " << objmgr->canRead(*obj) << endl;
             cout << "Can write: " << objmgr->canWrite(*obj) << endl;
             cout << "Can execute: " << objmgr->canExecute(*obj) << endl;
+            
+            cout << "objmgr.Select: TODO" << endl;
 
             delete obj;
 

@@ -123,6 +123,7 @@ string DBEObject::_getTodayString() {
         .append(hour).append(":").append(minute).append(":").append(secs);
     return ret;
 }
+string DBEObject::getId() const { return this->getField("id")==0 || this->getField("id")->isNull() ? "" : *(this->getField("id")->getStringValue()); }
 string DBEObject::getOwnerId() const { return this->getField("owner")==0 || this->getField("owner")->isNull() ? "" : *(this->getField("owner")->getStringValue()); }
 string DBEObject::getGroupId() const { return this->getField("group_id")==0 || this->getField("group_id")->isNull() ? "" : *(this->getField("group_id")->getStringValue()); }
 bool DBEObject::isDeleted() const { return this->getField("deleted_date")==0 || this->getField("deleted_date")->isNull() || *(this->getField("deleted_date")->getStringValue())=="0000-00-00 00:00:00" ? false : true; }
@@ -269,6 +270,102 @@ bool ObjectMgr::canExecute(const DBEObject& obj) const {
     }
     return ret;
 }
+DBEntityVector* ObjectMgr::Select(const string &tableName, const string &searchString) {
+    DBEntityVector* tmp = DBMgr::Select(tableName, searchString);
+    DBEUser* myuser = (DBEUser*) this->getDBEUser();
+    if(myuser!=0 && myuser->isRoot())
+        return tmp;
+
+    DBEntityVector* ret = new DBEntityVector();
+    for(DBEntity* dbe : (*tmp) ) {
+        bool append = false;
+        DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
+        if( obj!=0 ) {
+            if(myuser!=0 && myuser->getId()==obj->getStringValue("creator")) {
+                append = true;
+            } else if( obj->isDeleted() ) {
+                append = false;
+            } else if(this->canRead(*obj)) {
+                append = true;
+            }
+        } else {
+            append = true;
+        }
+        if(append)
+            ret->push_back(dbe);
+        else
+            delete dbe;
+    }
+    delete tmp;
+    return ret;
+}
+DBEntity* ObjectMgr::Insert(DBEntity *dbe) {
+    bool have_permission = true;
+    DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
+    if( obj!=0 ) {
+        have_permission = this->canWrite(*obj);
+    }
+    return have_permission ? DBMgr::Insert(dbe) : 0;
+}
+DBEntity* ObjectMgr::Update(DBEntity *dbe) {
+    bool have_permission = true;
+    DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
+    if( obj!=0 ) {
+        have_permission = this->canWrite(*obj);
+    }
+    return have_permission ? DBMgr::Update(dbe) : 0;
+}
+DBEntity* ObjectMgr::Delete(DBEntity *dbe) {
+    bool have_permission = true;
+    DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
+    if( obj!=0 ) {
+        obj = this->fullObjectById( obj->getId(), false );
+        have_permission = this->canWrite(*obj);
+    }
+    if( have_permission ) {
+        if( obj==0 || obj->isDeleted() ) {
+            return DBMgr::Delete(dbe);
+        } else {
+            //this->connect();
+            dbe->_before_delete( this );
+            string sqlString = this->_buildUpdateString( dbe );
+            if( this->verbose ) cout << "ObjectMgr.delete: sqlString = " << sqlString << endl;
+            ResultSet* rs = this->getConnection()->exec( sqlString );
+            delete rs;
+            dbe->_after_delete( this );
+            return dbe;
+        }
+    } else {
+        return dbe;
+    }
+}
+string ObjectMgr::_buildSelectString(DBEntity* dbe, bool uselike, bool caseSensitive) {
+    if( this->verbose ) cout << "ObjectMgr::_buildSelectString: start." << endl;
+    DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
+    if(obj==0 || obj->name()!="DBEObject") {
+        if( this->verbose ) cout << "ObjectMgr::_buildSelectString: dbe is not a DBEObject" << endl;
+        if( this->verbose ) cout << "ObjectMgr::_buildSelectString: end." << endl;
+        return DBMgr::_buildSelectString(dbe, uselike, caseSensitive);
+    }
+    if( this->verbose ) cout << "ObjectMgr::_buildSelectString: TODO" << endl;
+    string searchString = DBMgr::_buildSelectString(dbe, uselike, caseSensitive);
+    DBEntityVector types = this->getDBEFactory()->getRegisteredTypes();
+    StringVector q;
+//     $tipi = $this->getFactory()->getRegisteredTypes();
+//     $q = array();
+//     foreach($tipi as $tablename=>$classname) {
+//         $mydbe = $this->getInstance($classname); // 2011.04.04 eval("\$mydbe=new $classname;");
+//         if(!is_a($mydbe,'DBEObject') || is_a($mydbe,"DBAssociation") || $mydbe->getTypeName()=='DBEObject') continue;
+//         $mydbe->setValuesDictionary($dbe->getValuesDictionary());
+//         $q[]=str_replace("select * ",
+//                 "select '$classname' as classname,id,owner,group_id,permissions,creator,creation_date,last_modify,last_modify_date,father_id,name,description ",
+//                 parent::_buildSelectString($mydbe,$uselike,$caseSensitive));
+//     }
+//     $searchString = implode($q, " union ");
+//     return $searchString;
+    if( this->verbose ) cout << "ObjectMgr::_buildSelectString: end." << endl;
+    return searchString;
+}
 DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) const {
     // TODO
     cout << "ObjectMgr::objectById: TODO" << endl;
@@ -290,6 +387,18 @@ DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) con
 //    if ($this->_verbose ) { printf("query: $searchString<br/>\n"); }
 //    $lista = $this->select('DBEObject', "objects", $searchString);
 //    return count($lista)==1 ? $lista[0] : null;
+}
+DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted) const {
+    // TODO
+    cout << "ObjectMgr::fullObjectById: TODO" << endl;
+    return 0;
+//     $myobj = $this->objectById($id,$a_ignore_deleted);
+//     if($myobj===null) return null;
+//     eval("\$cerca=new ".$myobj->getValue('classname')."();");
+//     $cerca->setValue('id',$myobj->getValue('id'));
+//     $lista = $this->search($cerca,0,false,null,$a_ignore_deleted);
+//     if ($this->_verbose ) { printf("ObjectMgr.fullObjectById: lista=".count($lista)."<br/>\n"); }
+//     return count($lista)==1 ? $lista[0] : null;
 }
 //*********************** ObjectManager: end.
 

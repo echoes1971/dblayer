@@ -53,17 +53,18 @@ void DBEFactory::registerClass(const string& tablename, DBEntity* clazz) {
     this->_cache[tmpIndex] = clazz;
 }
 
-DBEntity* DBEFactory::getClazz(const string& tablename) {
+DBEntity* DBEFactory::getClazz(const string& tablename) const {
     string nomeTabella(tablename.c_str());
     if(this->_verbose) cout << "DBEFactory::getClazz: nomeTabella=" << nomeTabella << endl;
     if( this->_cache.find(nomeTabella) != this->_cache.end() ) {
         if(this->_verbose) cout << "DBEFactory::getClazz: found!" << endl;
-        return this->_cache[nomeTabella]->createNewInstance();
+        DBEntity* dbe;
+        return dbe->createNewInstance();
     }
     return new DBEntity(tablename);
 }
 
-DBEntity* DBEFactory::getClazzByTypeName(const string& typeName, bool caseSensitive) {
+DBEntity* DBEFactory::getClazzByTypeName(const string& typeName, bool caseSensitive) const {
     if(this->_verbose) cout << "DBEFactory::getClazzByTypeName: typeName=" << typeName << endl;
     for(const auto& elem : this->_cache) {
         if(this->_verbose) cout << " " << elem.first << ": " << elem.second->name() << endl;
@@ -74,7 +75,7 @@ DBEntity* DBEFactory::getClazzByTypeName(const string& typeName, bool caseSensit
     return new DBEntity();
 }
 
-DBEntityVector DBEFactory::getRegisteredTypes() {
+DBEntityVector DBEFactory::getRegisteredTypes() const {
     DBEntityVector ret;
     for(const auto& elem : this->_cache) {
         ret.push_back(elem.second);
@@ -82,7 +83,7 @@ DBEntityVector DBEFactory::getRegisteredTypes() {
     return ret;
 }
 
-string DBEFactory::toString(string prefix) {
+string DBEFactory::toString(string prefix) const {
     string ret;
     ret.append(prefix + "<DBEFactory>");
     for(const auto& elem : this->_cache) {

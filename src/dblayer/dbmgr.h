@@ -140,6 +140,9 @@ class DECLSPECIFIER DBMgr {
     virtual DBEntity* _before_copy(DBEntity* dbe);
     virtual DBEntity* _after_copy(DBEntity* dbe);
 
+    string _buildUpdateString(DBEntity* dbe);
+    virtual string _buildSelectString(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
+
   private:
     Connection* con;
     DBEFactory* dbeFactory;
@@ -154,9 +157,7 @@ class DECLSPECIFIER DBMgr {
     string _buildTableName(DBEntity* dbe);
     string _buildKeysCondition(DBEntity* dbe);
     string _buildInsertString(DBEntity* dbe);
-    string _buildUpdateString(DBEntity* dbe);
     string _buildDeleteString(DBEntity* dbe);
-    string _buildSelectString(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
     StringVector _buildWhereCondition(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
 
 };
