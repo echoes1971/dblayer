@@ -44,6 +44,51 @@ DBLayer::StringVector DBELog::getOrderBy() const {
 }
 //*********************** DBELog: end.
 
+//*********************** DBECountry: start.
+DBFieldVector DBECountry::chiavi = { new StringField(string("id")) };
+ColumnDefinitions DBECountry::_columns;
+StringVector DBECountry::_column_order = {
+    "id","Common_Name","Formal_Name","Type","Sub_Type","Sovereignty","Capital"
+    ,"ISO_4217_Currency_Code","ISO_4217_Currency_Name","ITU_T_Telephone_Code"
+    ,"ISO_3166_1_2_Letter_Code","ISO_3166_1_3_Letter_Code","ISO_3166_1_Number"
+    ,"IANA_Country_Code_TLD"
+};
+ColumnDefinitions DBECountry::getColumns() const { return _columns; }
+StringVector DBECountry::getColumnNames() const { return _column_order; }
+DBECountry::DBECountry() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _columns["id"] = vector<string> {"uuid","not null"};
+        _columns["Common_Name"] = vector<string> {"varchar(255)","default null"};
+        _columns["Formal_Name"] = vector<string> {"varchar(255)","default null"};
+        _columns["Type"] = vector<string> {"varchar(255)","default null"};
+        _columns["Sub_Type"] = vector<string> {"varchar(255)","default null"};
+        _columns["Sovereignty"] = vector<string> {"varchar(255)","default null"};
+        _columns["Capital"] = vector<string> {"varchar(255)","default null"};
+        _columns["ISO_4217_Currency_Code"] = vector<string> {"varchar(255)","default null"};
+        _columns["ISO_4217_Currency_Name"] = vector<string> {"varchar(255)","default null"};
+        _columns["ITU_T_Telephone_Code"] = vector<string> {"varchar(255)","default null"};
+        _columns["ISO_3166_1_2_Letter_Code"] = vector<string> {"varchar(255)","default null"};
+        _columns["ISO_3166_1_3_Letter_Code"] = vector<string> {"varchar(255)","default null"};
+        _columns["ISO_3166_1_Number"] = vector<string> {"varchar(255)","default null"};
+        _columns["IANA_Country_Code_TLD"] = vector<string> {"varchar(255)","default null"};
+    }
+}
+DBECountry::~DBECountry() {}
+string DBECountry::name() const { return "DBECountry"; }
+string DBECountry::getTableName() const { return "countrylist"; }
+DBFieldVector* DBECountry::getKeys() const { return &DBECountry::chiavi; }
+DBECountry* DBECountry::createNewInstance() const { return new DBECountry(); }
+DBLayer::StringVector DBECountry::getOrderBy() const {
+    static DBLayer::StringVector ret({"id"});
+    return ret;
+}
+//*********************** DBECountry: end.
+
 //*********************** DBEObject: start.
 DBFieldVector DBEObject::chiavi = { new StringField(string("id")) };
 ForeignKeyVector DBEObject::_fkv;
@@ -124,6 +169,7 @@ string DBEObject::_getTodayString() {
     return ret;
 }
 string DBEObject::getId() const { return this->getField("id")==0 || this->getField("id")->isNull() ? "" : *(this->getField("id")->getStringValue()); }
+string DBEObject::getName() const { return this->getField("name")==0 || this->getField("name")->isNull() ? "" : *(this->getField("name")->getStringValue()); }
 string DBEObject::getOwnerId() const { return this->getField("owner")==0 || this->getField("owner")->isNull() ? "" : *(this->getField("owner")->getStringValue()); }
 string DBEObject::getGroupId() const { return this->getField("group_id")==0 || this->getField("group_id")->isNull() ? "" : *(this->getField("group_id")->getStringValue()); }
 bool DBEObject::isDeleted() const { return this->getField("deleted_date")==0 || this->getField("deleted_date")->isNull() || *(this->getField("deleted_date")->getStringValue())=="0000-00-00 00:00:00" ? false : true; }
@@ -349,7 +395,7 @@ string ObjectMgr::_buildSelectString(DBEntity* dbe, bool uselike, bool caseSensi
     }
     if( this->verbose ) cout << "ObjectMgr::_buildSelectString: TODO" << endl;
     //string searchString = DBMgr::_buildSelectString(dbe, uselike, caseSensitive);
-    DBEntityVector types = this->getDBEFactory()->getRegisteredTypes();
+    DBEntityVector types = this->getRegisteredTypes();
     StringVector q;
     for(const DBEntity* mytype : types) {
         DBEntity* mydbe = mytype->createNewInstance();
@@ -361,7 +407,7 @@ string ObjectMgr::_buildSelectString(DBEntity* dbe, bool uselike, bool caseSensi
         myobj->setValuesDictionary( dbe->getValuesDictionary() );
         q.push_back( replaceAll( DBMgr::_buildSelectString(myobj, uselike, caseSensitive),
                                 "select * ",
-                                "select '"+myobj->name()+"' as classname,id,owner,group_id,permissions,creator,creation_date,last_modify,last_modify_date,father_id,name,description "
+                                "select '"+myobj->name()+"' as classname,id,owner,group_id,permissions,creator,creation_date,last_modify,last_modify_date,deleted_by,deleted_date,father_id,name,description "
                                 )
                      );
         delete mydbe;
@@ -403,57 +449,130 @@ DBEntityVector* ObjectMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitiv
     }
     return ret;
 }
-DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) const {
-    // TODO
-    cout << "ObjectMgr::objectById: TODO" << endl;
-    return 0;
-//    $tipi = $this->getFactory()->getRegisteredTypes();
-//    $q = array();
-//    foreach($tipi as $tablename=>$classname) {
-//        $mydbe = $this->getInstance($classname); // 2011.04.04 eval("\$mydbe=new $classname;");
-//        if($classname=='DBEObject' || !is_a($mydbe,'DBEObject') || is_a($mydbe,"DBAssociation")) continue;
-//        $q[]="select '$classname' as classname,id,owner,group_id,permissions,creator,"
-//                    ."creation_date,last_modify,last_modify_date,"
-//                    ."deleted_by,deleted_date," // 2012.04.04
-//                    ."father_id,name,description"
-//                ." from ".$this->buildTableName($mydbe)
-//                ." where id='".DBEntity::hex2uuid($id)."'"
-//                .($ignore_deleted?" and deleted_date='0000-00-00 00:00:00'":'');
-//    }
-//    $searchString = implode($q, " union ");
-//    if ($this->_verbose ) { printf("query: $searchString<br/>\n"); }
-//    $lista = $this->select('DBEObject', "objects", $searchString);
-//    return count($lista)==1 ? $lista[0] : null;
+DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) {
+    if( this->verbose ) cout << "ObjectMgr::objectById: start." << endl;
+    DBEntityVector types = this->getRegisteredTypes();
+    StringVector q;
+    for(const DBEntity* mytype : types) {
+        DBEntity* mydbe = mytype->createNewInstance();
+        DBEObject* myobj = dynamic_cast<DBEObject*>(mydbe);
+        if(myobj==0 || myobj->name()=="DBEObject") {
+            delete mydbe;
+            continue;
+        }
+        q.push_back( "select '"+myobj->name()+"' as classname,id,owner,group_id,permissions,creator,creation_date,last_modify,last_modify_date,deleted_by,deleted_date,father_id,name,description"
+                   + "  from " + this->_buildTableName(myobj)
+                   + " where id='"+DBEntity::hex2uuid(id)+"'"
+                   +(ignore_deleted?" and deleted_date='0000-00-00 00:00:00'":"")
+                     );
+        delete mydbe;
+    }
+    string searchString = joinString(&q,string(" union "));
+    if( this->verbose ) cout << "ObjectMgr::objectById: searchString=" << searchString << endl;
+    DBEntityVector* mylist = this->Select("objects", searchString);
+    DBEObject* ret = 0;
+    if(mylist->size()==1) {
+        DBEntity* tmpret = mylist->at(0);
+        ret = dynamic_cast<DBEObject*>(tmpret);
+        if(ret==0) {
+            delete tmpret;
+        }
+        delete mylist;
+    } else {
+        this->Destroy(mylist);
+    }
+    if( this->verbose ) cout << "ObjectMgr::objectById: end." << endl;
+    return ret;
 }
-DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted) const {
-    // TODO
-    cout << "ObjectMgr::fullObjectById: TODO" << endl;
-    return 0;
-//     $myobj = $this->objectById($id,$a_ignore_deleted);
-//     if($myobj===null) return null;
-//     eval("\$cerca=new ".$myobj->getValue('classname')."();");
-//     $cerca->setValue('id',$myobj->getValue('id'));
-//     $lista = $this->search($cerca,0,false,null,$a_ignore_deleted);
-//     if ($this->_verbose ) { printf("ObjectMgr.fullObjectById: lista=".count($lista)."<br/>\n"); }
-//     return count($lista)==1 ? $lista[0] : null;
+DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted) {
+    cout << "ObjectMgr::fullObjectById: start." << endl;
+    DBEObject* myobj = this->objectById(id,ignore_deleted);
+    if(myobj==0) {
+        cout << "ObjectMgr::fullObjectById: end." << endl;
+        return 0;
+    }
+    DBEntity* search = this->getClazzByTypeName(myobj->getStringValue("classname"));
+    search->setValue("id",myobj->getId());
+    // FIXME this looks like a bit redundant, maybe there is a smarter way to do it
+    DBEntityVector* mylist = this->Search(search,false,false,"",ignore_deleted);
+    DBEObject* ret = 0;
+    if(mylist->size()==1) {
+        DBEntity* tmpret = mylist->at(0);
+        ret = dynamic_cast<DBEObject*>(tmpret);
+        if(ret==0) {
+            delete tmpret;
+        }
+        delete mylist;
+    } else {
+        this->Destroy(mylist);
+    }
+    cout << "ObjectMgr::fullObjectById: end." << endl;
+    return ret;
+}
+DBEObject* ObjectMgr::objectByName(const string name, const bool ignore_deleted) {
+    if( this->verbose ) cout << "ObjectMgr::objectByName: start." << endl;
+    DBEntityVector types = this->getRegisteredTypes();
+    StringVector q;
+    for(const DBEntity* mytype : types) {
+        DBEntity* mydbe = mytype->createNewInstance();
+        DBEObject* myobj = dynamic_cast<DBEObject*>(mydbe);
+        if(myobj==0 || myobj->name()=="DBEObject") {
+            delete mydbe;
+            continue;
+        }
+        q.push_back( "select '"+myobj->name()+"' as classname,id,owner,group_id,permissions,creator,creation_date,last_modify,last_modify_date,deleted_by,deleted_date,father_id,name,description"
+                   + "  from " + this->_buildTableName(myobj)
+                   + " where name='"+name+"'"
+                   +(ignore_deleted?" and deleted_date='0000-00-00 00:00:00'":"")
+                     );
+        delete mydbe;
+    }
+    string searchString = joinString(&q,string(" union "));
+    if( this->verbose ) cout << "ObjectMgr::objectByName: searchString=" << searchString << endl;
+    DBEntityVector* mylist = this->Select("objects", searchString);
+    DBEObject* ret = 0;
+    if(mylist->size()==1) {
+        DBEntity* tmpret = mylist->at(0);
+        ret = dynamic_cast<DBEObject*>(tmpret);
+        if(ret==0) {
+            delete tmpret;
+        }
+        delete mylist;
+    } else {
+        this->Destroy(mylist);
+    }
+    if( this->verbose ) cout << "ObjectMgr::objectByName: end." << endl;
+    return ret;
+}
+DBEObject* ObjectMgr::fullObjectByName(const string name, const bool ignore_deleted) {
+    cout << "ObjectMgr::fullObjectByName: start." << endl;
+    DBEObject* myobj = this->objectByName(name,ignore_deleted);
+    if(myobj==0) {
+        cout << "ObjectMgr::fullObjectByName: end." << endl;
+        return 0;
+    }
+    DBEntity* search = this->getClazzByTypeName(myobj->getStringValue("classname"));
+    search->setValue("id",myobj->getId());
+    // FIXME this looks like a bit redundant, maybe there is a smarter way to do it
+    DBEntityVector* mylist = this->Search(search,false,false,"",ignore_deleted);
+    DBEObject* ret = 0;
+    if(mylist->size()==1) {
+        DBEntity* tmpret = mylist->at(0);
+        ret = dynamic_cast<DBEObject*>(tmpret);
+        if(ret==0) {
+            delete tmpret;
+        }
+        delete mylist;
+    } else {
+        this->Destroy(mylist);
+    }
+    cout << "ObjectMgr::fullObjectByName: end." << endl;
+    return ret;
 }
 //*********************** ObjectManager: end.
 
 
 
-
-//*********************** DBECountry: start.
-const string DBECountry::nomiCampiChiave[] = { string("id") };
-StringField DBECountry::chiave1( DBECountry::nomiCampiChiave[0] );
-DBFieldVector DBECountry::chiavi = DBECountry::___init_keys();
-DBFieldVector DBECountry::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBECountry::chiave1 ); return ret; }
-DBECountry::DBECountry() { this->tableName.clear(); }
-DBECountry::~DBECountry() {}
-string DBECountry::name() const { return "DBECountry"; }
-string DBECountry::getTableName() const { return "countrylist"; }
-DBFieldVector* DBECountry::getKeys() const { return &DBECountry::chiavi; }
-DBECountry* DBECountry::createNewInstance() const { return new DBECountry(); }
-//*********************** DBECountry: end.
 
 //*********************** DBECompany: start.
 const string DBECompany::nomiCampiChiave[] = { string("id") };

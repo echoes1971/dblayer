@@ -83,13 +83,13 @@ string DBMgr::getErrorMessage() { return this->errorMessage; }
 void DBMgr::setDBEFactory(DBEFactory* dbeFactory) { this->dbeFactory=dbeFactory; }
 DBEFactory* DBMgr::getDBEFactory() { return this->dbeFactory; }
 void DBMgr::setVerbose(bool b) { this->verbose=b; }
-DBEntityVector DBMgr::getRegisteredTypes() { return this->dbeFactory->getRegisteredTypes(); }
-DBEntity* DBMgr::getClazz(const string& typeName) {
+DBEntityVector DBMgr::getRegisteredTypes() const { return this->dbeFactory->getRegisteredTypes(); }
+DBEntity* DBMgr::getClazz(const string& typeName) const {
     if(this->dbeFactory!=0)
         return this->dbeFactory->getClazz(typeName);
     return new DBEntity(typeName);
 }
-DBEntity* DBMgr::getClazzByTypeName(const string& typeName) {
+DBEntity* DBMgr::getClazzByTypeName(const string& typeName) const {
     if(this->dbeFactory!=0)
         return this->dbeFactory->getClazzByTypeName(typeName);
     return new DBEntity(typeName);
@@ -269,7 +269,7 @@ string DBMgr::_buildDeleteString(DBEntity* dbe) {
     ret.append( " where " + this->_buildKeysCondition(dbe) );
     return ret;
 }
-string DBMgr::_buildTableName(DBEntity* dbe) {
+string DBMgr::_buildTableName(DBEntity* dbe) const {
     string ret = "";
     if(this->_schema.length()>0) {
         ret.append(this->_schema);

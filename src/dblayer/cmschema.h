@@ -33,6 +33,24 @@ class DBELog : public DBEntity {
     static DBFieldVector chiavi;
 };
 
+class DBECountry : public DBEntity {
+  public:
+    DBECountry();
+    virtual ~DBECountry();
+    virtual string name() const;
+    virtual string getTableName() const;
+    virtual DBFieldVector* getKeys() const;
+    virtual DBECountry* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector getColumnNames() const;
+
+    virtual DBLayer::StringVector getOrderBy() const;
+  private:
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
+    static DBFieldVector chiavi;
+};
+
 class ObjectMgr;
 class DBEObject : public DBEntity {
   public:
@@ -49,6 +67,7 @@ class DBEObject : public DBEntity {
 
     // Custom methods
     string getId() const;
+    string getName() const;
     string getOwnerId() const;
     string getGroupId() const;
     bool isDeleted() const;
@@ -96,25 +115,12 @@ class ObjectMgr : public DBMgr {
                             bool ignore_deleted=true, bool full_object=true
                           );
 
-    DBEObject* objectById(const string id, const bool ignore_deleted=true) const;
-    DBEObject* fullObjectById(const string id, const bool ignore_deleted=true) const;
+    DBEObject* objectById(const string id, const bool ignore_deleted=true);
+    DBEObject* fullObjectById(const string id, const bool ignore_deleted=true);
+    DBEObject* objectByName(const string name, const bool ignore_deleted=true);
+    DBEObject* fullObjectByName(const string name, const bool ignore_deleted=true);
 };
 
-
-  class DBECountry : public DBEntity {
-    public:
-    DBECountry();
-      virtual ~DBECountry();
-      virtual string name() const;
-      virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
-      virtual DBECountry* createNewInstance() const;
-    private:
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
-      static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
-  };
 
   class DBECompany : public DBEObject {
     public:

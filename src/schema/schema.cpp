@@ -285,7 +285,7 @@ FieldMap Schema::getValuesDictionary() const {
     }
     return ret;
 }
-void Schema::setValuesDictionary(FieldMap fields) {
+Schema* Schema::setValuesDictionary(FieldMap fields) {
     for(const pair<string,Field*> fieldpair : fields) {
         Field* field = fieldpair.second;
         if(field->isString()) {

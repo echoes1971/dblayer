@@ -64,10 +64,10 @@ class DECLSPECIFIER DBMgr {
         void setDBEFactory(DBEFactory* dbeFactory);
         void setVerbose(bool b);
         DBEFactory* getDBEFactory();
-        DBEntityVector getRegisteredTypes();
+        DBEntityVector getRegisteredTypes() const;
         /** get clazz by table name */
-        DBEntity* getClazz(const string &typeName);
-        DBEntity* getClazzByTypeName(const string& typeName);
+        DBEntity* getClazz(const string &typeName) const;
+        DBEntity* getClazzByTypeName(const string& typeName) const;
 
         DBEntity* getDBEUser() const;
         void setDBEUser(DBEntity* dbe);
@@ -142,6 +142,7 @@ class DECLSPECIFIER DBMgr {
 
     string _buildUpdateString(DBEntity* dbe);
     virtual string _buildSelectString(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
+    string _buildTableName(DBEntity* dbe) const;
 
   private:
     Connection* con;
@@ -154,7 +155,6 @@ class DECLSPECIFIER DBMgr {
 
     void rs2dbelist(ResultSet* res, string& nomeTabella, DBEntityVector* ret);
 
-    string _buildTableName(DBEntity* dbe);
     string _buildKeysCondition(DBEntity* dbe);
     string _buildInsertString(DBEntity* dbe);
     string _buildDeleteString(DBEntity* dbe);
