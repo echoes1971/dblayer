@@ -53,7 +53,7 @@ namespace DBLayer {
 
       protected:
         DBEntityMap _cache;
-	private:
+      private:
         bool _verbose;
     };
 

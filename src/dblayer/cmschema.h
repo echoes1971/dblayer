@@ -45,6 +45,9 @@ class DBECountry : public DBEntity {
     virtual StringVector getColumnNames() const;
 
     virtual DBLayer::StringVector getOrderBy() const;
+
+    // Custom methods
+    bool init_table(DBMgr* dbmgr, bool verbose=false);
   private:
     static StringVector _column_order;
     static ColumnDefinitions _columns;
