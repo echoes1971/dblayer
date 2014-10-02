@@ -21,7 +21,7 @@ class DBELog : public DBEntity {
     virtual ~DBELog();
     virtual string name() const;
     virtual string getTableName() const;
-    virtual DBFieldVector* getKeys() const;
+    virtual StringVector getKeys() const;
     virtual DBELog* createNewInstance() const;
     virtual ColumnDefinitions getColumns() const;
     virtual StringVector getColumnNames() const;
@@ -30,7 +30,7 @@ class DBELog : public DBEntity {
   private:
     static StringVector _column_order;
     static ColumnDefinitions _columns;
-    static DBFieldVector chiavi;
+    static StringVector chiavi;
 };
 
 class DBECountry : public DBEntity {
@@ -39,7 +39,7 @@ class DBECountry : public DBEntity {
     virtual ~DBECountry();
     virtual string name() const;
     virtual string getTableName() const;
-    virtual DBFieldVector* getKeys() const;
+    virtual StringVector getKeys() const;
     virtual DBECountry* createNewInstance() const;
     virtual ColumnDefinitions getColumns() const;
     virtual StringVector getColumnNames() const;
@@ -51,7 +51,7 @@ class DBECountry : public DBEntity {
   private:
     static StringVector _column_order;
     static ColumnDefinitions _columns;
-    static DBFieldVector chiavi;
+    static StringVector chiavi;
 };
 
 class ObjectMgr;
@@ -61,7 +61,7 @@ class DBEObject : public DBEntity {
     virtual ~DBEObject();
     virtual string name() const;
     virtual string getTableName() const;
-    virtual DBFieldVector* getKeys() const;
+    virtual StringVector getKeys() const;
     virtual ForeignKeyVector& getFK() const;
     virtual DBEObject* createNewInstance() const;
     virtual ColumnDefinitions getColumns() const;
@@ -88,12 +88,11 @@ class DBEObject : public DBEntity {
   protected:
     static string _getTodayString();
   private:
-    static DBFieldVector chiavi;
+    static StringVector chiavi;
     static ForeignKeyVector _fkv;
     static StringVector _column_order;
     static ColumnDefinitions _columns;
 };
-
 
 class ObjectMgr : public DBMgr {
   public:
@@ -124,21 +123,21 @@ class ObjectMgr : public DBMgr {
     DBEObject* fullObjectByName(const string name, const bool ignore_deleted=true);
 };
 
-
-  class DBECompany : public DBEObject {
-    public:
+class DBECompany : public DBEObject {
+  public:
     DBECompany();
       virtual ~DBECompany();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
+      virtual ForeignKeyVector& getFK() const;
       virtual DBECompany* createNewInstance() const;
-    private:
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
-      static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
-  };
+      virtual ColumnDefinitions getColumns() const;
+      virtual StringVector getColumnNames() const;
+  private:
+      static ForeignKeyVector _fkv;
+      static StringVector _column_order;
+      static ColumnDefinitions _columns;
+};
 
   class DBEPeople : public DBEObject {
     public:
@@ -146,13 +145,8 @@ class ObjectMgr : public DBMgr {
       virtual ~DBEPeople();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
       virtual DBEPeople* createNewInstance() const;
     private:
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
-      static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
   };
 
   class DBEFile : public DBEObject {
@@ -161,13 +155,8 @@ class ObjectMgr : public DBMgr {
       virtual ~DBEFile();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
       virtual DBEFile* createNewInstance() const;
     private:
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
-      static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
   };
 
   class DBEFolder : public DBEObject {
@@ -176,13 +165,8 @@ class ObjectMgr : public DBMgr {
       virtual ~DBEFolder();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
       virtual DBEFolder* createNewInstance() const;
     private:
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
-      static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
   };
 
   class DBELink : public DBEObject {
@@ -191,13 +175,8 @@ class ObjectMgr : public DBMgr {
       virtual ~DBELink();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
       virtual DBELink* createNewInstance() const;
     private:
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
-      static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
   };
 
   class DBENote : public DBEObject {
@@ -206,13 +185,8 @@ class ObjectMgr : public DBMgr {
       virtual ~DBENote();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
       virtual DBENote* createNewInstance() const;
     private:
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
-      static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
   };
 
   class DBEPage : public DBEObject {
@@ -221,13 +195,8 @@ class ObjectMgr : public DBMgr {
       virtual ~DBEPage();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
       virtual DBEPage* createNewInstance() const;
     private:
-      static const string nomiCampiChiave[];
-      static StringField chiave1; // uuid
-      static DBFieldVector chiavi;
-      static DBFieldVector ___init_keys();
   };
 
   string getSchema();

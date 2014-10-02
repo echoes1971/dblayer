@@ -100,7 +100,8 @@ namespace DBLayer {
         string getStringValue(const string& fieldName) const;
 
         /** @return the key fields */
-        virtual DBFieldVector* getKeys() const;
+        virtual StringVector getKeys() const;
+        //virtual DBFieldVector* getKeys() const;
         /** @return the key fields NAMES */
         StringVector getKeyNames() const;
         /** @return true if the field name is key */

@@ -22,7 +22,7 @@ namespace AuthSchema {
 
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
+      virtual StringVector getKeys() const;
       virtual DBEDBVersion* createNewInstance() const;
       virtual ColumnDefinitions getColumns() const;
       virtual StringVector getColumnNames() const;
@@ -32,7 +32,7 @@ namespace AuthSchema {
     private:
       static StringVector _column_order;
       static ColumnDefinitions _columns;
-      static DBFieldVector chiavi;
+      static StringVector chiavi;
   };
 
   class DBEUser : public DBEntity {
@@ -41,7 +41,7 @@ namespace AuthSchema {
       virtual ~DBEUser();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
+      virtual StringVector getKeys() const;
       virtual ForeignKeyVector& getFK() const;
       virtual DBEUser* createNewInstance() const;
       virtual ColumnDefinitions getColumns() const;
@@ -64,7 +64,7 @@ namespace AuthSchema {
       void _deleteGroup(DBMgr* dbmgr=0);
       void _checkGroupAssociation(DBMgr* dbmgr=0);
     private:
-      static DBFieldVector chiavi;
+      static StringVector chiavi;
       static ForeignKeyVector _fkv;
       static StringVector _column_order;
       static ColumnDefinitions _columns;
@@ -76,7 +76,7 @@ namespace AuthSchema {
       virtual ~DBEGroup();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
+      virtual StringVector getKeys() const;
       virtual DBEGroup* createNewInstance() const;
       virtual ColumnDefinitions getColumns() const;
       virtual StringVector getColumnNames() const;
@@ -92,7 +92,7 @@ namespace AuthSchema {
     private:
       static StringVector _column_order;
       static ColumnDefinitions _columns;
-      static DBFieldVector chiavi;
+      static StringVector chiavi;
   };
 
   class DBEUserGroup : public DBEntity {
@@ -101,7 +101,7 @@ namespace AuthSchema {
       virtual ~DBEUserGroup();
       virtual string name() const;
       virtual string getTableName() const;
-      virtual DBFieldVector* getKeys() const;
+      virtual StringVector getKeys() const;
       virtual ForeignKeyVector& getFK() const;
       virtual DBEUserGroup* createNewInstance() const;
       virtual ColumnDefinitions getColumns() const;
@@ -112,7 +112,7 @@ namespace AuthSchema {
       vector<map<string,string> > getDefaultEntries() const;
 
     private:
-      static DBFieldVector chiavi;
+      static StringVector chiavi;
       static ForeignKeyVector _fkv;
       static StringVector _column_order;
       static ColumnDefinitions _columns;

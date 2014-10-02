@@ -57,18 +57,30 @@ string DBEntity::toString_nodes(string prefix, bool show_definitions) const {
     string ret( prefix + "<" );
     ret.append( this->name() ); ret.append( " " );
     // Keys
-    DBFieldVector* myKeys = this->getKeys();
-    if( myKeys->size()>0 ) {
+    StringVector myKeys = this->getKeys();
+    if( myKeys.size()>0 ) {
         ret.append("_keys=\'{");
-        unsigned int numeroChiavi = (unsigned int) myKeys->size();
+        unsigned int numeroChiavi = (unsigned int) myKeys.size();
         for(unsigned int i=0; i<numeroChiavi; i++) {
-            ret.append( myKeys->at(i)->getName() );
+            ret.append( myKeys.at(i) );
             if( i!= (numeroChiavi-1) ) {
                 ret.append(",");
             }
         }
         ret.append("}\' ");
     }
+//    DBFieldVector* myKeys = this->getKeys();
+//    if( myKeys->size()>0 ) {
+//        ret.append("_keys=\'{");
+//        unsigned int numeroChiavi = (unsigned int) myKeys->size();
+//        for(unsigned int i=0; i<numeroChiavi; i++) {
+//            ret.append( myKeys->at(i)->getName() );
+//            if( i!= (numeroChiavi-1) ) {
+//                ret.append(",");
+//            }
+//        }
+//        ret.append("}\' ");
+//    }
     ret.append(">");
     // Fields
     for(unsigned int i=0; i<fields.size(); i++) {
@@ -205,14 +217,14 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, std:
             }
             cols_counter++;
         }
-        DBFieldVector* mykeys = this->getKeys();
-        if(mykeys->size()>0) {
+        StringVector mykeys = this->getKeys();
+        if(mykeys.size()>0) {
             ret.append(",");
             ret.append(prefix+" PRIMARY KEY ( ");
-            int keys_length = mykeys->size();
+            int keys_length = mykeys.size();
             int keys_counter=0;
-            for(const DBField* field : *mykeys) {
-                ret.append(field->getName());
+            for(const string& field : mykeys) {
+                ret.append(field);
                 if(keys_counter<(keys_length-1)) {
                     ret.append(", ");
                 }
@@ -220,6 +232,21 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, std:
             }
             ret.append(" )");
         }
+//        DBFieldVector* mykeys = this->getKeys();
+//        if(mykeys->size()>0) {
+//            ret.append(",");
+//            ret.append(prefix+" PRIMARY KEY ( ");
+//            int keys_length = mykeys->size();
+//            int keys_counter=0;
+//            for(const DBField* field : *mykeys) {
+//                ret.append(field->getName());
+//                if(keys_counter<(keys_length-1)) {
+//                    ret.append(", ");
+//                }
+//                keys_counter++;
+//            }
+//            ret.append(" )");
+//        }
     }
     ret.append(prefix+");");
     return ret;
@@ -232,18 +259,30 @@ string DBEntity::toString(string prefix, bool valuesAsAttributes, bool show_defi
     string ret( prefix + "<" );
     ret.append( this->name() ); ret.append( " " );
     // Keys
-    DBFieldVector* myKeys = this->getKeys();
-    if( myKeys->size()>0 ) {
+    StringVector myKeys = this->getKeys();
+    if( myKeys.size()>0 ) {
         ret.append("_keys=\'{");
-        unsigned int numeroChiavi = (unsigned int) myKeys->size();
+        unsigned int numeroChiavi = (unsigned int) myKeys.size();
         for(unsigned int i=0; i<numeroChiavi; i++) {
-            ret.append( myKeys->at(i)->getName() );
+            ret.append( myKeys.at(i) );
             if( i!= (numeroChiavi-1) ) {
                 ret.append(",");
             }
         }
         ret.append("}\' ");
     }
+//    DBFieldVector* myKeys = this->getKeys();
+//    if( myKeys->size()>0 ) {
+//        ret.append("_keys=\'{");
+//        unsigned int numeroChiavi = (unsigned int) myKeys->size();
+//        for(unsigned int i=0; i<numeroChiavi; i++) {
+//            ret.append( myKeys->at(i)->getName() );
+//            if( i!= (numeroChiavi-1) ) {
+//                ret.append(",");
+//            }
+//        }
+//        ret.append("}\' ");
+//    }
     // Fields
     for(unsigned int i=0; i<fields.size(); i++) {
         ret.append( fields[i]->getName().c_str() );
@@ -316,19 +355,21 @@ string DBEntity::getStringValue(const string &fieldName) const {
     return ret==0 ? "" : ret->toString();
 }
 
-DBFieldVector* DBEntity::getKeys() const {
-    static DBFieldVector vuoto;
-    return &vuoto;
-}
+StringVector DBEntity::getKeys() const { return StringVector(); }
+//DBFieldVector* DBEntity::getKeys() const {
+//    static DBFieldVector vuoto;
+//    return &vuoto;
+//}
 DBLayer::StringVector DBEntity::getKeyNames() const {
-    StringVector ret;
-    DBFieldVector* chiavi = this->getKeys();
-    unsigned int chiaviSize = (unsigned int)chiavi->size();
-    for(unsigned int i=0; i<chiaviSize; i++) {
-        DBField* chiave = chiavi->at(i);
-        ret.push_back( chiave->getName() );
-    }
-    return ret;
+//    StringVector ret;
+    return this->getKeys();
+//    DBFieldVector* chiavi = this->getKeys();
+//    unsigned int chiaviSize = (unsigned int)chiavi->size();
+//    for(unsigned int i=0; i<chiaviSize; i++) {
+//        DBField* chiave = chiavi->at(i);
+//        ret.push_back( chiave->getName() );
+//    }
+//    return ret;
 }
 bool DBEntity::isKey(string fieldName) const {
     StringVector chiavi = this->getKeyNames();

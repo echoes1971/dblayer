@@ -9,7 +9,7 @@ using namespace AuthSchema;
 using namespace std;
 
 //*********************** DBEDBVersion: start.
-DBFieldVector DBEDBVersion::chiavi = { new StringField(string("model_name")) };
+StringVector DBEDBVersion::chiavi = { "model_name" };
 ColumnDefinitions DBEDBVersion::_columns;
 StringVector DBEDBVersion::_column_order = {"model_name","version"};
 ColumnDefinitions DBEDBVersion::getColumns() const { return _columns; }
@@ -28,7 +28,7 @@ DBEDBVersion::DBEDBVersion() {
 DBEDBVersion::~DBEDBVersion() {}
 string DBEDBVersion::name() const { return "DBEDBVersion"; }
 string DBEDBVersion::getTableName() const { return "dbversion"; }
-DBFieldVector* DBEDBVersion::getKeys() const { return &DBEDBVersion::chiavi; }
+StringVector DBEDBVersion::getKeys() const { return DBEDBVersion::chiavi; }
 DBEDBVersion* DBEDBVersion::createNewInstance() const { return new DBEDBVersion(); }
 DBLayer::StringVector DBEDBVersion::getOrderBy() const {
     static DBLayer::StringVector ret({"version"});
@@ -41,7 +41,7 @@ int DBEDBVersion::version() {
 //*********************** DBEDBVersion: end.
 
 //*********************** DBEUser: start.
-DBFieldVector DBEUser::chiavi = { new StringField(string("id")) };
+StringVector DBEUser::chiavi = { "id" };
 ForeignKeyVector DBEUser::_fkv;
 ColumnDefinitions DBEUser::_columns;
 StringVector DBEUser::_column_order = {"id","login","pwd","pwd_salt","fullname","group_id"};
@@ -67,7 +67,7 @@ DBEUser::DBEUser() {
 DBEUser::~DBEUser() {}
 string DBEUser::name() const { return "DBEUser"; }
 string DBEUser::getTableName() const { return "users"; }
-DBFieldVector* DBEUser::getKeys() const { return &DBEUser::chiavi; }
+StringVector DBEUser::getKeys() const { return DBEUser::chiavi; }
 ForeignKeyVector& DBEUser::getFK() const { return _fkv; }
 ColumnDefinitions DBEUser::getColumns() const { return _columns; }
 StringVector DBEUser::getColumnNames() const { return _column_order; }
@@ -151,7 +151,7 @@ void DBEUser::_checkGroupAssociation(DBMgr* dbmgr) {
 //*********************** DBEUser: end.
 
 //*********************** DBEGroup: start.
-DBFieldVector DBEGroup::chiavi = { new StringField(string("id")) };
+StringVector DBEGroup::chiavi = { "id" };
 ColumnDefinitions DBEGroup::_columns;
 StringVector DBEGroup::_column_order = {"id","name","description"};
 DBEGroup::DBEGroup() {
@@ -170,7 +170,7 @@ DBEGroup::~DBEGroup() {}
 string DBEGroup::name() const { return "DBEGroup"; }
 string DBEGroup::getTableName() const { return "groups"; }
 DBEGroup* DBEGroup::createNewInstance() const { return new DBEGroup(); }
-DBFieldVector* DBEGroup::getKeys() const { return &chiavi; }
+StringVector DBEGroup::getKeys() const { return chiavi; }
 ColumnDefinitions DBEGroup::getColumns() const { return _columns; }
 StringVector DBEGroup::getColumnNames() const { return _column_order; }
 DBLayer::StringVector DBEGroup::getOrderBy() const {
@@ -228,7 +228,7 @@ void DBEGroup::_after_delete(DBMgr* dbmgr) {
 //*********************** DBEGroup: end.
 
 //*********************** DBEUserGroup: start.
-DBFieldVector DBEUserGroup::chiavi = { new StringField(string("user_id")), new StringField(string("group_id")) };
+StringVector DBEUserGroup::chiavi = {"user_id","group_id"};
 ForeignKeyVector DBEUserGroup::_fkv;
 ColumnDefinitions DBEUserGroup::_columns;
 StringVector DBEUserGroup::_column_order = {"user_id","group_id"};
@@ -253,7 +253,7 @@ DBEUserGroup::DBEUserGroup() {
 DBEUserGroup::~DBEUserGroup() {}
 string DBEUserGroup::name() const { return "DBEUserGroup"; }
 string DBEUserGroup::getTableName() const { return "users_groups"; }
-DBFieldVector* DBEUserGroup::getKeys() const { return &chiavi; }
+StringVector DBEUserGroup::getKeys() const { return chiavi; }
 ForeignKeyVector& DBEUserGroup::getFK() const { return _fkv; }
 ColumnDefinitions DBEUserGroup::getColumns() const { return _columns; }
 StringVector DBEUserGroup::getColumnNames() const { return _column_order; }

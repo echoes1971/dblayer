@@ -19,11 +19,9 @@ using namespace TestSchema;
 using namespace std;
 
 //***********************	DBETestDBLayer: start.
-const string DBETestDBLayer::nomiCampiChiave[] = { string("id") };
+StringVector DBETestDBLayer::chiavi = { "id" };
 ColumnDefinitions DBETestDBLayer::_columns;
 ColumnDefinitions DBETestDBLayer::getColumns() const { return DBETestDBLayer::_columns; }
-IntegerField DBETestDBLayer::chiave1( DBETestDBLayer::nomiCampiChiave[0] );
-DBFieldVector DBETestDBLayer::chiavi( 1, &DBETestDBLayer::chiave1 );
 
 DBETestDBLayer::DBETestDBLayer() {
 	this->tableName.clear();
@@ -53,7 +51,7 @@ DBETestDBLayer::DBETestDBLayer() {
 }
 DBETestDBLayer::~DBETestDBLayer() {}
 string DBETestDBLayer::name() const { return "DBETestDBLayer"; }
-DBFieldVector* DBETestDBLayer::getKeys() const { return &DBETestDBLayer::chiavi; }
+StringVector DBETestDBLayer::getKeys() const { return DBETestDBLayer::chiavi; }
 DBETestDBLayer* DBETestDBLayer::createNewInstance() const { return new DBETestDBLayer(); }
 
 void DBETestDBLayer::_before_insert(DBMgr* dbmgr) {
@@ -67,11 +65,9 @@ void DBETestDBLayer::_before_insert(DBMgr* dbmgr) {
 
 //***********************	DBESocieta: start.
 
-const string DBESocieta::nomiCampiChiave[] = { string("id") };
+StringVector DBESocieta::chiavi = { "id" };
 ColumnDefinitions DBESocieta::_columns;
 ColumnDefinitions DBESocieta::getColumns() const { return DBESocieta::_columns; }
-IntegerField DBESocieta::chiave1( DBESocieta::nomiCampiChiave[0] );
-DBFieldVector DBESocieta::chiavi( 1, &DBESocieta::chiave1 );
 DBESocieta::DBESocieta() {
     this->tableName.clear();
     this->tableName.append( "societa" );
@@ -114,7 +110,7 @@ DBESocieta::DBESocieta() {
 }
 DBESocieta::~DBESocieta() {}
 string DBESocieta::name() const { return "DBESocieta"; }
-DBFieldVector* DBESocieta::getKeys() const { return &DBESocieta::chiavi; }
+StringVector DBESocieta::getKeys() const { return DBESocieta::chiavi; }
 DBESocieta* DBESocieta::createNewInstance() const { return new DBESocieta(); }
 
 void DBESocieta::_before_insert(DBMgr* dbmgr) {

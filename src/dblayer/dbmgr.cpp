@@ -284,11 +284,14 @@ string DBMgr::_buildTableName(DBEntity* dbe) const {
 string DBMgr::_buildKeysCondition(DBEntity* dbe) {
     string ret;
     StringVector clausole;
-    DBFieldVector* chiavi = dbe->getKeys();
-    unsigned int chiaviSize = (unsigned int) chiavi->size();
+//    DBFieldVector* chiavi = dbe->getKeys();
+//    unsigned int chiaviSize = (unsigned int) chiavi->size();
+//    for(unsigned int i=0; i<chiaviSize; i++) {
+//        DBField* chiave = chiavi->at(i);
+    StringVector chiavi = dbe->getKeys();
+    unsigned int chiaviSize = (unsigned int) chiavi.size();
     for(unsigned int i=0; i<chiaviSize; i++) {
-        DBField* chiave = chiavi->at(i);
-        string nomeChiave = chiave->getName();
+        string nomeChiave = chiavi.at(i);
         DBField* valore = (DBField*) dbe->getField(nomeChiave);
         if( valore!=0 && !valore->isNull() ) {
             string valoreChiave = valore->toString();

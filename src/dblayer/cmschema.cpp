@@ -12,7 +12,7 @@ using namespace CMSchema;
 using namespace std;
 
 //*********************** DBELog: start.
-DBFieldVector DBELog::chiavi = { new StringField(string("ip")), new StringField(string("data")) };
+StringVector DBELog::chiavi = {"ip","data"};
 ColumnDefinitions DBELog::_columns;
 StringVector DBELog::_column_order = {"ip","data","ora","count","url","note","note2"};
 ColumnDefinitions DBELog::getColumns() const { return _columns; }
@@ -36,7 +36,7 @@ DBELog::DBELog() {
 DBELog::~DBELog() {}
 string DBELog::name() const { return "DBELog"; }
 string DBELog::getTableName() const { return "log"; }
-DBFieldVector* DBELog::getKeys() const { return &chiavi; }
+StringVector DBELog::getKeys() const { return chiavi; }
 DBELog* DBELog::createNewInstance() const { return new DBELog(); }
 DBLayer::StringVector DBELog::getOrderBy() const {
     static DBLayer::StringVector ret({"data desc", "ora desc"});
@@ -45,7 +45,7 @@ DBLayer::StringVector DBELog::getOrderBy() const {
 //*********************** DBELog: end.
 
 //*********************** DBECountry: start.
-DBFieldVector DBECountry::chiavi = { new StringField(string("id")) };
+StringVector DBECountry::chiavi = {"id"};
 ColumnDefinitions DBECountry::_columns;
 StringVector DBECountry::_column_order = {
     "id","Common_Name","Formal_Name","Type","Sub_Type","Sovereignty","Capital"
@@ -81,7 +81,7 @@ DBECountry::DBECountry() {
 DBECountry::~DBECountry() {}
 string DBECountry::name() const { return "DBECountry"; }
 string DBECountry::getTableName() const { return "countrylist"; }
-DBFieldVector* DBECountry::getKeys() const { return &DBECountry::chiavi; }
+StringVector DBECountry::getKeys() const { return DBECountry::chiavi; }
 DBECountry* DBECountry::createNewInstance() const { return new DBECountry(); }
 DBLayer::StringVector DBECountry::getOrderBy() const {
     static DBLayer::StringVector ret({"id"});
@@ -377,7 +377,7 @@ bool DBECountry::init_table(DBMgr* dbmgr, bool verbose) {
 //*********************** DBECountry: end.
 
 //*********************** DBEObject: start.
-DBFieldVector DBEObject::chiavi = { new StringField(string("id")) };
+StringVector DBEObject::chiavi = {"id"};
 ForeignKeyVector DBEObject::_fkv;
 ColumnDefinitions DBEObject::_columns;
 StringVector DBEObject::_column_order = {
@@ -425,7 +425,7 @@ DBEObject::~DBEObject() {}
 string DBEObject::name() const { return "DBEObject"; }
 string DBEObject::getTableName() const { return "objects"; }
 DBEObject* DBEObject::createNewInstance() const { return new DBEObject(); }
-DBFieldVector* DBEObject::getKeys() const { return &chiavi; }
+StringVector DBEObject::getKeys() const { return chiavi; }
 ForeignKeyVector& DBEObject::getFK() const { return _fkv; }
 ColumnDefinitions DBEObject::getColumns() const { return _columns; }
 StringVector DBEObject::getColumnNames() const { return _column_order; }
@@ -862,28 +862,55 @@ DBEObject* ObjectMgr::fullObjectByName(const string name, const bool ignore_dele
 
 
 //*********************** DBECompany: start.
-const string DBECompany::nomiCampiChiave[] = { string("id") };
-StringField DBECompany::chiave1( DBECompany::nomiCampiChiave[0] );
-DBFieldVector DBECompany::chiavi = DBECompany::___init_keys();
-DBFieldVector DBECompany::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBECompany::chiave1 ); return ret; }
-DBECompany::DBECompany() { this->tableName.clear(); }
+ForeignKeyVector DBECompany::_fkv;
+ColumnDefinitions DBECompany::_columns;
+StringVector DBECompany::_column_order = {"street","zip","city","state","fk_countrylist_id","phone","fax","email","url","p_iva"};
+DBECompany::DBECompany() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        StringVector column_order = DBECompany::getColumnNames();
+        StringVector parentColumns = DBEObject::getColumnNames();
+        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+            cout << "DBECompany::DBECompany: "<< i << "=" << parentColumns.at(i) << endl;
+            column_order.insert(column_order.begin(),parentColumns.at(i));
+        }
+//         for(const string& s : _column_order) column_order.push_back(s);
+        _column_order = column_order;
+        for(const pair<string,vector<string> > pair: DBEObject::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _columns["street"] = vector<string> {"varchar(255)","default null"};
+        _columns["zip"] = vector<string> {"varchar(255)","default null"};
+        _columns["city"] = vector<string> {"varchar(255)","default null"};
+        _columns["state"] = vector<string> {"varchar(255)","default null"};
+        _columns["fk_countrylist_id"] = vector<string> {"uuid","default null"};
+        _columns["phone"] = vector<string> {"varchar(255)","default null"};
+        _columns["fax"] = vector<string> {"varchar(255)","default null"};
+        _columns["email"] = vector<string> {"varchar(255)","default null"};
+        _columns["url"] = vector<string> {"varchar(255)","default null"};
+        _columns["p_iva"] = vector<string> {"varchar(16)","default null"};
+    }
+    if(_fkv.size()==0) {
+        for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
+//         _fkv.push_back(ForeignKey("father_id",DBECompany::getTableName(),"id"));
+        _fkv.push_back(ForeignKey("fk_countrylist_id","countrylist","id"));
+    }
+}
 DBECompany::~DBECompany() {}
 string DBECompany::name() const { return "DBECompany"; }
 string DBECompany::getTableName() const { return "companies"; }
-DBFieldVector* DBECompany::getKeys() const { return &DBECompany::chiavi; }
+ForeignKeyVector& DBECompany::getFK() const { return _fkv; }
+ColumnDefinitions DBECompany::getColumns() const { return _columns; }
+StringVector DBECompany::getColumnNames() const { return _column_order; }
 DBECompany* DBECompany::createNewInstance() const { return new DBECompany(); }
 //*********************** DBECompany: end.
 
 //*********************** DBEPeople: start.
-const string DBEPeople::nomiCampiChiave[] = { string("id") };
-StringField DBEPeople::chiave1( DBEPeople::nomiCampiChiave[0] );
-DBFieldVector DBEPeople::chiavi = DBEPeople::___init_keys();
-DBFieldVector DBEPeople::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEPeople::chiave1 ); return ret; }
 DBEPeople::DBEPeople() { this->tableName.clear(); }
 DBEPeople::~DBEPeople() {}
 string DBEPeople::name() const { return "DBEPeople"; }
 string DBEPeople::getTableName() const { return "people"; }
-DBFieldVector* DBEPeople::getKeys() const { return &DBEPeople::chiavi; }
 DBEPeople* DBEPeople::createNewInstance() const { return new DBEPeople(); }
 //*********************** DBEPeople: end.
 
@@ -891,67 +918,42 @@ DBEPeople* DBEPeople::createNewInstance() const { return new DBEPeople(); }
 
 
 //*********************** DBEFile: start.
-const string DBEFile::nomiCampiChiave[] = { string("id") };
-StringField DBEFile::chiave1( DBEFile::nomiCampiChiave[0] );
-DBFieldVector DBEFile::chiavi = DBEFile::___init_keys();
-DBFieldVector DBEFile::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEFile::chiave1 ); return ret; }
 DBEFile::DBEFile() { this->tableName.clear(); }
 DBEFile::~DBEFile() {}
 string DBEFile::name() const { return "DBEFile"; }
 string DBEFile::getTableName() const { return "files"; }
-DBFieldVector* DBEFile::getKeys() const { return &DBEFile::chiavi; }
 DBEFile* DBEFile::createNewInstance() const { return new DBEFile(); }
 //*********************** DBEFile: end.
 
 //*********************** DBEFolder: start.
-const string DBEFolder::nomiCampiChiave[] = { string("id") };
-StringField DBEFolder::chiave1( DBEFolder::nomiCampiChiave[0] );
-DBFieldVector DBEFolder::chiavi = DBEFolder::___init_keys();
-DBFieldVector DBEFolder::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEFolder::chiave1 ); return ret; }
 DBEFolder::DBEFolder() { this->tableName.clear(); }
 DBEFolder::~DBEFolder() {}
 string DBEFolder::name() const { return "DBEFolder"; }
 string DBEFolder::getTableName() const { return "folders"; }
-DBFieldVector* DBEFolder::getKeys() const { return &DBEFolder::chiavi; }
 DBEFolder* DBEFolder::createNewInstance() const { return new DBEFolder(); }
 //*********************** DBEFolder: end.
 
 //*********************** DBELink: start.
-const string DBELink::nomiCampiChiave[] = { string("id") };
-StringField DBELink::chiave1( DBELink::nomiCampiChiave[0] );
-DBFieldVector DBELink::chiavi = DBELink::___init_keys();
-DBFieldVector DBELink::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBELink::chiave1 ); return ret; }
 DBELink::DBELink() { this->tableName.clear(); }
 DBELink::~DBELink() {}
 string DBELink::name() const { return "DBELink"; }
 string DBELink::getTableName() const { return "links"; }
-DBFieldVector* DBELink::getKeys() const { return &DBELink::chiavi; }
 DBELink* DBELink::createNewInstance() const { return new DBELink(); }
 //*********************** DBELink: end.
 
 //*********************** DBENote: start.
-const string DBENote::nomiCampiChiave[] = { string("id") };
-StringField DBENote::chiave1( DBENote::nomiCampiChiave[0] );
-DBFieldVector DBENote::chiavi = DBENote::___init_keys();
-DBFieldVector DBENote::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBENote::chiave1 ); return ret; }
 DBENote::DBENote() { this->tableName.clear(); }
 DBENote::~DBENote() {}
 string DBENote::name() const { return "DBENote"; }
 string DBENote::getTableName() const { return "notes"; }
-DBFieldVector* DBENote::getKeys() const { return &DBENote::chiavi; }
 DBENote* DBENote::createNewInstance() const { return new DBENote(); }
 //*********************** DBENote: end.
 
 //*********************** DBEPage: start.
-const string DBEPage::nomiCampiChiave[] = { string("id") };
-StringField DBEPage::chiave1( DBEPage::nomiCampiChiave[0] );
-DBFieldVector DBEPage::chiavi = DBEPage::___init_keys();
-DBFieldVector DBEPage::___init_keys() { DBFieldVector ret = DBFieldVector(); ret.push_back( &DBEPage::chiave1 ); return ret; }
 DBEPage::DBEPage() { this->tableName.clear(); }
 DBEPage::~DBEPage() {}
 string DBEPage::name() const { return "DBEPage"; }
 string DBEPage::getTableName() const { return "pages"; }
-DBFieldVector* DBEPage::getKeys() const { return &DBEPage::chiavi; }
 DBEPage* DBEPage::createNewInstance() const { return new DBEPage(); }
 //*********************** DBEPage: end.
 

@@ -34,16 +34,14 @@ namespace TestSchema {
         virtual ColumnDefinitions getColumns() const;
 
         virtual string name() const;
-        virtual DBFieldVector* getKeys() const;
+        virtual StringVector getKeys() const;
         virtual DBETestDBLayer* createNewInstance() const;
 
         virtual void _before_insert(DBMgr* dbmgr);
 	  private:
         static ColumnDefinitions _columns;
-        static const string nomiCampiChiave[];
-		static IntegerField chiave1;
-		static DBFieldVector chiavi;
-	};
+        static StringVector chiavi;
+    };
 
 	class DECLSPECIFIER DBESocieta : public DBEntity {
 	  public:
@@ -53,17 +51,15 @@ namespace TestSchema {
         virtual ColumnDefinitions getColumns() const;
 
         virtual string name() const;
-        virtual DBFieldVector* getKeys() const;
+        virtual StringVector getKeys() const;
         virtual DBESocieta* createNewInstance() const;
 
         virtual void _before_insert(DBMgr* dbmgr=0);
         virtual void _before_copy(DBMgr* dbmgr=0);
 	  private:
         static ColumnDefinitions _columns;
-        static const string nomiCampiChiave[];
-		static IntegerField chiave1;
-		static DBFieldVector chiavi;
-	};
+        static StringVector chiavi;
+    };
 
     string getSchema();
     void registerClasses(DBEFactory* dbeFactory);
