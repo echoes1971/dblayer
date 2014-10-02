@@ -562,17 +562,13 @@ void DBMgr::_loadUserGroups() {
 
     DBEntityVector* lista = this->Search(cerca,false);
 
-    for(DBEntity* elem : (this->_user_groups_list) ) {
-        delete elem;
-    }
     this->_user_groups_list.clear();
-
     for(const DBEntity* g : (*lista)) {
         this->_user_groups_list.push_back(string(g->getField("group_id")->getStringValue()->c_str()));
     }
 
     string user_group_id = string(this->_dbeuser->getField("group_id")->getStringValue()->c_str());
-    vector<string>::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), user_group_id);
+    StringVector::iterator i = find(this->_user_groups_list.begin(), this->_user_groups_list.end(), user_group_id);
     if(i==this->_user_groups_list.end()) {
         this->_user_groups_list.push_back(user_group_id);
     }
