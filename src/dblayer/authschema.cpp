@@ -350,8 +350,8 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
         if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
-        DBEGroup dbegroup;
-        sql = dbegroup.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
+        DBEGroup* dbegroup = new DBEGroup();
+        sql = dbegroup->toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
@@ -365,9 +365,10 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
-        dbegroup.setValue("id","-1")->setValue("name","Admin")->setValue("description","System admins"); dbmgr.Insert(&dbegroup);
-        dbegroup.setValue("id","-2")->setValue("name","Users")->setValue("description","System users");  dbmgr.Insert(&dbegroup);
-        dbegroup.setValue("id","-3")->setValue("name","Guests")->setValue("description","System guests (read only)"); dbmgr.Insert(&dbegroup);
+        dbegroup->setValue("id","-1")->setValue("name","Admin")->setValue("description","System admins"); dbmgr.Insert(dbegroup);
+        dbegroup->setValue("id","-2")->setValue("name","Users")->setValue("description","System users");  dbmgr.Insert(dbegroup);
+        dbegroup->setValue("id","-3")->setValue("name","Guests")->setValue("description","System guests (read only)"); dbmgr.Insert(dbegroup);
+        delete dbegroup;
 
         dbeuser.setValue("id","-4")->setValue("login","adm")->setValue("pwd","adm")->setValue("fullname","Administrator")->setValue("group_id","-1")->setValue("pwd_salt",""); dbmgr.Insert(&dbeuser);
         dbeuser.setValue("id","-5")->setValue("login","usr")->setValue("pwd","usr")->setValue("fullname","A User")->setValue("group_id","-2")->setValue("pwd_salt","");        dbmgr.Insert(&dbeuser);

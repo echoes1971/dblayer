@@ -86,13 +86,37 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
     //con->setVerbose(true);
     objmgr = new ObjectMgr(con, true);
 
-    DBEFactory dbeFactory(false);
-    objmgr->setDBEFactory(&dbeFactory);
+    DBEFactory* dbeFactory = new DBEFactory(false);
+    objmgr->setDBEFactory(dbeFactory);
     //objmgr->setSchema("rra");
-    AuthSchema::registerClasses(&dbeFactory);
+    printf("\n");
+    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    printf("\n");
+    AuthSchema::registerClasses(dbeFactory);
     AuthSchema::checkDB(*objmgr,false);
-    CMSchema::registerClasses(&dbeFactory);
-    CMSchema::checkDB(*objmgr,true);
+    printf("\n");
+    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    printf("\n");
+    CMSchema::registerClasses(dbeFactory);
+    printf("\n");
+    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    printf("\n");
+    CMSchema::checkDB(*objmgr,false);
+    printf("\n");
+    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    printf("\n");
 
     if(objmgr->connect()) {
 
@@ -125,6 +149,7 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
         cout << "Connection Error: " << objmgr->getErrorMessage() << endl;
         success = false;
     }
+    delete dbeFactory;
     delete objmgr;
     delete con;
     return success;
@@ -153,36 +178,39 @@ bool testDBES() {
 //    DBEUser dbeu;
 //    cout << dbeu.toString("\n") << endl;
 
-    DBELog dbelog;
-    cout << dbelog.toString("\n") << endl;
+    DBELog* dbelog = new DBELog();
+    cout << dbelog->toString("\n") << endl;
+    delete dbelog;
 
-    DBEObject dbeobject;
-    cout << dbeobject.toString("\n") << endl;
+    DBEObject* dbeobject = new DBEObject();
+    cout << dbeobject->toString("\n") << endl;
 
-    cout << "Owner ID:\t" << dbeobject.getOwnerId() << " => ";
-    dbeobject.setValue("owner","cippa");
-    cout << dbeobject.getOwnerId() << endl;
+    cout << "Owner ID:\t" << dbeobject->getOwnerId() << " => ";
+    dbeobject->setValue("owner","cippa");
+    cout << dbeobject->getOwnerId() << endl;
 
-    cout << "Group ID:\t" << dbeobject.getGroupId() << " => ";
-    dbeobject.setValue("group_id","lippa");
-    cout << dbeobject.getGroupId() << endl;
+    cout << "Group ID:\t" << dbeobject->getGroupId() << " => ";
+    dbeobject->setValue("group_id","lippa");
+    cout << dbeobject->getGroupId() << endl;
 
-    cout << "Deleted:\t" << dbeobject.isDeleted() << " => ";
-    dbeobject.setValue("deleted_date","lippa");
-    cout << dbeobject.isDeleted() << endl;
+    cout << "Deleted:\t" << dbeobject->isDeleted() << " => ";
+    dbeobject->setValue("deleted_date","lippa");
+    cout << dbeobject->isDeleted() << endl;
 
-    dbeobject.setValue("permissions","r---w---x");
-    //dbeobject.setValue("permissions","rwx------");
-    cout << "User  can read: " << dbeobject.canRead("U") << endl;
-    cout << "Group can read: " << dbeobject.canRead("G") << endl;
-    cout << "All   can read: " << dbeobject.canRead("A") << endl;
-    cout << "User  can write: " << dbeobject.canWrite("U") << endl;
-    cout << "Group can write: " << dbeobject.canWrite("G") << endl;
-    cout << "All   can write: " << dbeobject.canWrite("A") << endl;
-    cout << "User  can exec: " << dbeobject.canExecute("U") << endl;
-    cout << "Group can exec: " << dbeobject.canExecute("G") << endl;
-    cout << "All   can exec: " << dbeobject.canExecute("A") << endl;
+    dbeobject->setValue("permissions","r---w---x");
+    //dbeobject->setValue("permissions","rwx------");
+    cout << "User  can read: " << dbeobject->canRead("U") << endl;
+    cout << "Group can read: " << dbeobject->canRead("G") << endl;
+    cout << "All   can read: " << dbeobject->canRead("A") << endl;
+    cout << "User  can write: " << dbeobject->canWrite("U") << endl;
+    cout << "Group can write: " << dbeobject->canWrite("G") << endl;
+    cout << "All   can write: " << dbeobject->canWrite("A") << endl;
+    cout << "User  can exec: " << dbeobject->canExecute("U") << endl;
+    cout << "Group can exec: " << dbeobject->canExecute("G") << endl;
+    cout << "All   can exec: " << dbeobject->canExecute("A") << endl;
     //success = false;
+
+    delete dbeobject;
 
     return success;
 }

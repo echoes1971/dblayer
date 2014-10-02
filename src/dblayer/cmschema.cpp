@@ -872,7 +872,6 @@ DBECompany::DBECompany() {
         StringVector column_order = DBECompany::getColumnNames();
         StringVector parentColumns = DBEObject::getColumnNames();
         for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
-            cout << "DBECompany::DBECompany: "<< i << "=" << parentColumns.at(i) << endl;
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
 //         for(const string& s : _column_order) column_order.push_back(s);
@@ -983,6 +982,15 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         return;
     }
 
+
+    printf("\n");
+    printf("==================================================\n");
+    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    printf("==================================================\n");
+    printf("\n");
     // 1. Check app version
     long current_db_version = -1;
     DBEDBVersion* dbecurrentversion;
@@ -1005,7 +1013,17 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         cerr << "CMSchema::checkDB: " << dbmgr.getErrorMessage() << endl;
     }
     dbmgr.Destroy(res);
+    delete dbecurrentversion;
     delete cerca;
+
+    printf("\n");
+    printf("==================================================\n");
+    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    printf("==================================================\n");
+    printf("\n");
 
     if(verbose) cout << "CMSchema::checkDB: current_db_version=" << current_db_version << endl;
 
@@ -1025,14 +1043,15 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
     if(current_db_version<0) {
         string sql;
         bool use_fk = dbmgr.getConnection()->getDBType()!="MYSQL";// && dbmgr.getConnection()->getDBType()!="SQLite";
-        DBEDBVersion dbversion;
-        sql = dbversion.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
+        DBEDBVersion* dbversion = new DBEDBVersion();
+        sql = dbversion->toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
+        delete dbversion;
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
         dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
-        dbecurrentversion->setValue("model_name", CMSchema::getSchema());
-        dbecurrentversion->setValue("version",current_db_version);
+        dbecurrentversion->setValue("model_name", CMSchema::getSchema())
+                        ->setValue("version",current_db_version);
         dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
         if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
@@ -1045,12 +1064,13 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
             dbmgr.getConnection()->exec(sql);
             if(verbose) cout << sql << endl;
             dbmgr.Delete(dbe);
-
+            delete dbe;
             //if(clazz=="companies") break;
         }
 
-        DBECountry country;
-        country.init_table(&dbmgr);
+        DBECountry* country = new DBECountry();
+        country->init_table(&dbmgr);
+        delete country;
 //        dbegroup.setValue("id","-1")->setValue("name","Admin")->setValue("description","System admins"); dbmgr.Insert(&dbegroup);
 //        dbegroup.setValue("id","-2")->setValue("name","Users")->setValue("description","System users");  dbmgr.Insert(&dbegroup);
 //        dbegroup.setValue("id","-3")->setValue("name","Guests")->setValue("description","System guests (read only)"); dbmgr.Insert(&dbegroup);
