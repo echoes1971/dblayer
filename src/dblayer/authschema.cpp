@@ -360,8 +360,8 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
-        DBEUserGroup dbeusergroup;
-        sql = dbeusergroup.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
+        DBEUserGroup* dbeusergroup = new DBEUserGroup();
+        sql = dbeusergroup->toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
@@ -374,9 +374,10 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbeuser.setValue("id","-5")->setValue("login","usr")->setValue("pwd","usr")->setValue("fullname","A User")->setValue("group_id","-2")->setValue("pwd_salt","");        dbmgr.Insert(&dbeuser);
         dbeuser.setValue("id","-6")->setValue("login","guest")->setValue("pwd","guest")->setValue("fullname","A Guest")->setValue("group_id","-3")->setValue("pwd_salt","");   dbmgr.Insert(&dbeuser);
 
-        dbeusergroup.setValue("user_id","-4")->setValue("group_id","-1"); dbmgr.Insert(&dbeusergroup);
-        dbeusergroup.setValue("user_id","-5")->setValue("group_id","-2"); dbmgr.Insert(&dbeusergroup);
-        dbeusergroup.setValue("user_id","-6")->setValue("group_id","-3"); dbmgr.Insert(&dbeusergroup);
+        dbeusergroup->setValue("user_id","-4")->setValue("group_id","-1"); dbmgr.Insert(dbeusergroup);
+        dbeusergroup->setValue("user_id","-5")->setValue("group_id","-2"); dbmgr.Insert(dbeusergroup);
+        dbeusergroup->setValue("user_id","-6")->setValue("group_id","-3"); dbmgr.Insert(dbeusergroup);
+        delete dbeusergroup;
     }
     current_migration++;
 

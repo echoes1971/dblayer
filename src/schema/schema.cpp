@@ -51,8 +51,10 @@ Schema::Schema() {
         found=true;
         break;
     }
-    if(!found)
+    if(!found) {
+        printf("Schema added: %d\n", (unsigned long) this );
         createdSchema.push_back(this);
+    }
 }
 Schema::Schema(const string* nome) {
     this->name.clear();
@@ -65,8 +67,10 @@ Schema::Schema(const string* nome) {
         found=true;
         break;
     }
-    if(!found)
+    if(!found) {
+        printf("Schema added: %d\n", (unsigned long) this );
         createdSchema.push_back(this);
+    }
 }
 Schema::~Schema() {
     for(unsigned int i=0; i<this->fields.size(); i++) {

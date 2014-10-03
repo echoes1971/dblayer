@@ -90,7 +90,7 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
     objmgr->setDBEFactory(dbeFactory);
     //objmgr->setSchema("rra");
     AuthSchema::registerClasses(dbeFactory);
-    AuthSchema::checkDB(*objmgr,false);
+    AuthSchema::checkDB(*objmgr,true);
     CMSchema::registerClasses(dbeFactory);
     CMSchema::checkDB(*objmgr,false);
 
@@ -100,33 +100,33 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
             objmgr->login(loginUser,loginPwd);
         }
 
-        if(objmgr->isLoggedIn()) {
-
-            // Let's create an object instance
-            DBEObject* obj = (DBEObject*) objmgr->getClazz("objects");
-
-            obj->setDefaultValues(objmgr);
-            cout << "Object: " << obj->toString("\n") << endl;
-
-            cout << "Has group " << obj->getGroupId() << ": " << objmgr->hasGroup(obj->getGroupId()) << endl;
-            cout << "Can read: " << objmgr->canRead(*obj) << endl;
-            cout << "Can write: " << objmgr->canWrite(*obj) << endl;
-            cout << "Can execute: " << objmgr->canExecute(*obj) << endl;
-            
-            cout << "objmgr.Select: TODO" << endl;
-
-            delete obj;
-
-            printf("\n");
-            printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
-            printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
-            printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
-            printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-            printf("\n");
-        } else {
-            cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
-            success = false;
-        }
+//         if(objmgr->isLoggedIn()) {
+// 
+//             // Let's create an object instance
+//             DBEObject* obj = (DBEObject*) objmgr->getClazz("objects");
+// 
+//             obj->setDefaultValues(objmgr);
+//             cout << "Object: " << obj->toString("\n") << endl;
+// 
+//             cout << "Has group " << obj->getGroupId() << ": " << objmgr->hasGroup(obj->getGroupId()) << endl;
+//             cout << "Can read: " << objmgr->canRead(*obj) << endl;
+//             cout << "Can write: " << objmgr->canWrite(*obj) << endl;
+//             cout << "Can execute: " << objmgr->canExecute(*obj) << endl;
+//             
+//             cout << "objmgr.Select: TODO" << endl;
+// 
+//             delete obj;
+// 
+//             printf("\n");
+//             printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+//             printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+//             printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+//             printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+//             printf("\n");
+//         } else {
+//             cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
+//             success = false;
+//         }
     } else {
         cout << "Connection Error: " << objmgr->getErrorMessage() << endl;
         success = false;
@@ -269,6 +269,7 @@ int main(int argc, char *argv[]) {
     if(SchemaNS::getCreatedSchema().size()>0) {
         printf("Schemas left:\n");
         for(const Schema* schema : SchemaNS::getCreatedSchema()) {
+            printf("%d", (unsigned long) schema );
             cout << schema->toString(" \n") << endl;
         }
     }

@@ -994,7 +994,7 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
     printf("\n");
     // 1. Check app version
     long current_db_version = -1;
-    DBEDBVersion* dbecurrentversion;
+    DBEDBVersion* dbecurrentversion = 0;
     DBEDBVersion* cerca = new DBEDBVersion();
     cerca->setValue("model_name", CMSchema::getSchema());
     DBEntityVector* res = dbmgr.Search(cerca,false);
@@ -1064,14 +1064,16 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
             sql = dbe->toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
             dbmgr.getConnection()->exec(sql);
             if(verbose) cout << sql << endl;
-            dbmgr.Delete(dbe);
+            //dbmgr.Delete(dbe);
             delete dbe;
             //if(clazz=="companies") break;
         }
 
+        if(verbose) cout << "CMSchema::checkDB: init countries..." << endl;
         DBECountry* country = new DBECountry();
-        country->init_table(&dbmgr);
+//         country->init_table(&dbmgr);
         delete country;
+        if(verbose) cout << "CMSchema::checkDB: init countries... done." << endl;
 //        dbegroup.setValue("id","-1")->setValue("name","Admin")->setValue("description","System admins"); dbmgr.Insert(&dbegroup);
 //        dbegroup.setValue("id","-2")->setValue("name","Users")->setValue("description","System users");  dbmgr.Insert(&dbegroup);
 //        dbegroup.setValue("id","-3")->setValue("name","Guests")->setValue("description","System guests (read only)"); dbmgr.Insert(&dbegroup);
