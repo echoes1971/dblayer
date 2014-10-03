@@ -61,7 +61,7 @@ class DECLSPECIFIER XmlrpcConnection : public Connection {
     virtual IntegerVector getKeys(string* relname);
     virtual IntegerVector getForeignKeys(string* relname);
 
-    inline string getDBType() { return "Xmlrpc"; }
+    inline string getDBType() const { return "Xmlrpc"; }
 
     virtual ResultSet* login(string user, string pwd);
 

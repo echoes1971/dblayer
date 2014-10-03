@@ -59,11 +59,11 @@ class DECLSPECIFIER DBMgr {
         bool connect();
         bool disconnect();
 
-        string getErrorMessage();
+        string getErrorMessage() const;
 
         void setDBEFactory(DBEFactory* dbeFactory);
         void setVerbose(bool b);
-        DBEFactory* getDBEFactory();
+        DBEFactory* getDBEFactory() const;
         DBEntityVector getRegisteredTypes() const;
         /** get clazz by table name */
         DBEntity* getClazz(const string &typeName) const;
@@ -74,14 +74,14 @@ class DECLSPECIFIER DBMgr {
 
         ColumnDefinitions getColumnsForTable(const string& tablename);
 
-        DBEntity* Insert(DBEntity *dbe);
-        DBEntity* Update(DBEntity *dbe);
-        DBEntity* Delete(DBEntity *dbe);
-        DBEntity* Copy(DBEntity *dbe);
+        DBEntity* Insert(DBEntity* dbe);
+        DBEntity* Update(DBEntity* dbe);
+        DBEntity* Delete(DBEntity* dbe);
+        DBEntity* Copy(DBEntity* dbe);
 
-        DBEntityVector* Select(const string &tableName, const string &searchString);
+        DBEntityVector* Select(const string &tableName, const string &searchString) const;
 
-        DBEntityVector* Search(DBEntity* dbe, bool uselike=true,
+        DBEntityVector* Search(DBEntity *dbe, bool uselike=true,
                                 bool caseSensitive=true, const string& orderBy="" );
         DBEntityVector* searchByKeys(DBEntity* dbe);
         bool exists(DBEntity* dbe);
@@ -102,10 +102,10 @@ class DECLSPECIFIER DBMgr {
 
         DBEntity* login(const string user,const string pwd);
         DBEntity* relogin();
-        bool isLoggedIn();
+        bool isLoggedIn() const;
 
         /** Returns a string uniquely identifying the user and the connection */
-        string getServerIDString();
+        string getServerIDString() const;
 
 //        def getUserGroupsList(self):
 //            return self.user_groups_list
@@ -118,10 +118,10 @@ class DECLSPECIFIER DBMgr {
         static void Destroy(DBEntityVector* lista);
 
         void setConnection(Connection* _newVal);
-        Connection* getConnection();
+        Connection* getConnection() const;
 
-        void setSchema(string schema);
-        string getSchema();
+        void setSchema(const string schema);
+        string getSchema() const;
 
   protected:
     string name;
@@ -129,8 +129,8 @@ class DECLSPECIFIER DBMgr {
 
     bool verbose;
 
-    virtual string escapeString(string s);
-    virtual string quoteDate(string s);
+    virtual string escapeString(string s) const;
+    virtual string quoteDate(string s) const;
     virtual DBEntity* _before_insert(DBEntity* dbe);
     virtual DBEntity* _after_insert(DBEntity* dbe);
     virtual DBEntity* _before_update(DBEntity* dbe);
@@ -140,9 +140,9 @@ class DECLSPECIFIER DBMgr {
     virtual DBEntity* _before_copy(DBEntity* dbe);
     virtual DBEntity* _after_copy(DBEntity* dbe);
 
-    string _buildUpdateString(DBEntity* dbe);
+    string _buildUpdateString(const DBEntity* dbe) const;
     virtual string _buildSelectString(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
-    string _buildTableName(DBEntity* dbe) const;
+    string _buildTableName(const DBEntity* dbe) const;
 
   private:
     Connection* con;
@@ -153,12 +153,12 @@ class DECLSPECIFIER DBMgr {
 
     void _loadUserGroups();
 
-    void rs2dbelist(ResultSet* res, string& nomeTabella, DBEntityVector* ret);
+    void rs2dbelist(const ResultSet* res, const string& nomeTabella, DBEntityVector* ret) const;
 
-    string _buildKeysCondition(DBEntity* dbe);
-    string _buildInsertString(DBEntity* dbe);
-    string _buildDeleteString(DBEntity* dbe);
-    StringVector _buildWhereCondition(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
+    string _buildKeysCondition(const DBEntity* dbe) const;
+    string _buildInsertString(const DBEntity* dbe) const;
+    string _buildDeleteString(const DBEntity* dbe) const;
+    StringVector _buildWhereCondition(const DBEntity* dbe, const bool uselike=false, const bool caseSensitive=true) const;
 
 };
 

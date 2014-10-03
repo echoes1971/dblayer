@@ -78,10 +78,10 @@ bool DBMgr::connect() {
 
 bool DBMgr::disconnect() { return this->con==0 ? false : this->con->disconnect(); }
 
-string DBMgr::getErrorMessage() { return this->errorMessage; }
+string DBMgr::getErrorMessage() const { return this->errorMessage; }
 
 void DBMgr::setDBEFactory(DBEFactory* dbeFactory) { this->dbeFactory=dbeFactory; }
-DBEFactory* DBMgr::getDBEFactory() { return this->dbeFactory; }
+DBEFactory* DBMgr::getDBEFactory() const { return this->dbeFactory; }
 void DBMgr::setVerbose(bool b) { this->verbose=b; }
 DBEntityVector DBMgr::getRegisteredTypes() const { return this->dbeFactory->getRegisteredTypes(); }
 DBEntity* DBMgr::getClazz(const string& typeName) const {
@@ -105,18 +105,18 @@ ColumnDefinitions DBMgr::getColumnsForTable(const string& tablename) {
     return ret;
 }
 
-string DBMgr::escapeString(string s) { return this->con->escapeString(s); }
-string DBMgr::quoteDate(string s) { return this->con->quoteDate(s); }
+string DBMgr::escapeString(string s) const { return this->con->escapeString(s); }
+string DBMgr::quoteDate(string s) const { return this->con->quoteDate(s); }
 
-DBLayer::StringVector DBMgr::_buildWhereCondition(DBEntity* dbe, bool uselike, bool caseSensitive) {
+DBLayer::StringVector DBMgr::_buildWhereCondition(const DBEntity* dbe, const bool uselike, const bool caseSensitive) const {
     StringVector clausole;
     int fieldSize = dbe->getFieldSize();
     for(int i=0; i<fieldSize; i++) {
         DBField* field = (DBField*) dbe->getField(i);
-        if(this->verbose) {
-            cout << "DBMgr::_buildWhereCondition: field->name=" << field->getName().c_str() << endl;
-            cout << "DBMgr::_buildWhereCondition: field->isNull=" << field->isNull() << endl;
-        }
+//         if(this->verbose) {
+//             cout << "DBMgr::_buildWhereCondition: field->name=" << field->getName().c_str() << endl;
+//             cout << "DBMgr::_buildWhereCondition: field->isNull=" << field->isNull() << endl;
+//         }
         if( field==0 || field->isNull() )
             continue;
 //        cout << "DBMgr::_buildWhereCondition: field=" << valore << endl;
@@ -182,7 +182,7 @@ DBLayer::StringVector DBMgr::_buildWhereCondition(DBEntity* dbe, bool uselike, b
     }
     return clausole;
 }
-string DBMgr::_buildSelectString(DBEntity* dbe, bool uselike, bool caseSensitive) {
+string DBMgr::_buildSelectString(DBEntity *dbe, bool uselike, bool caseSensitive) {
     string ret("select * from ");
     ret.append( this->_buildTableName(dbe) );
     StringVector clausole = this->_buildWhereCondition(dbe, uselike, caseSensitive);
@@ -193,7 +193,7 @@ string DBMgr::_buildSelectString(DBEntity* dbe, bool uselike, bool caseSensitive
     }
     return ret;
 }
-string DBMgr::_buildInsertString(DBEntity* dbe) {
+string DBMgr::_buildInsertString(const DBEntity *dbe) const {
     string ret;
 
     StringVector nomiCampi = dbe->getNames();
@@ -231,7 +231,7 @@ string DBMgr::_buildInsertString(DBEntity* dbe) {
     ret.append( ")" );
     return ret;
 }
-string DBMgr::_buildUpdateString(DBEntity* dbe) {
+string DBMgr::_buildUpdateString(const DBEntity *dbe) const {
     string ret;
     FieldMap campi = dbe->getValuesDictionary();
     StringVector setstring;
@@ -264,12 +264,12 @@ string DBMgr::_buildUpdateString(DBEntity* dbe) {
     ret.append( " where " + this->_buildKeysCondition(dbe) );
     return ret;
 }
-string DBMgr::_buildDeleteString(DBEntity* dbe) {
+string DBMgr::_buildDeleteString(const DBEntity* dbe) const {
     string ret( "delete from " + this->_buildTableName(dbe) );
     ret.append( " where " + this->_buildKeysCondition(dbe) );
     return ret;
 }
-string DBMgr::_buildTableName(DBEntity* dbe) const {
+string DBMgr::_buildTableName(const DBEntity* dbe) const {
     string ret = "";
     if(this->_schema.length()>0) {
         ret.append(this->_schema);
@@ -281,7 +281,7 @@ string DBMgr::_buildTableName(DBEntity* dbe) const {
     ret.append( dbe->getTableName() );
     return ret;
 }
-string DBMgr::_buildKeysCondition(DBEntity* dbe) {
+string DBMgr::_buildKeysCondition(const DBEntity *dbe) const {
     string ret;
     StringVector clausole;
 //    DBFieldVector* chiavi = dbe->getKeys();
@@ -424,7 +424,7 @@ DBEntity* DBMgr::Copy(DBEntity* dbe) {
 }
 
 
-void DBMgr::rs2dbelist(ResultSet* res,string& nomeTabella,DBEntityVector* ret) {
+void DBMgr::rs2dbelist(const ResultSet* res, const string &nomeTabella, DBEntityVector* ret) const {
     int nColonne = res->getNumColumns();
     int nRighe = res->getNumRows();
     for(int r=0; r<nRighe; r++) {
@@ -466,7 +466,7 @@ void DBMgr::rs2dbelist(ResultSet* res,string& nomeTabella,DBEntityVector* ret) {
     }
 }
 
-DBEntityVector* DBMgr::Select(const string& tableName, const string& searchString) {
+DBEntityVector* DBMgr::Select(const string& tableName, const string& searchString) const {
     if(this->con->isProxy()) {
         DBEntityVector* ret = 0;
         string nomeTabella = tableName;
@@ -494,7 +494,7 @@ DBEntityVector* DBMgr::Select(const string& tableName, const string& searchStrin
     return ret;
 }
 
-DBEntityVector* DBMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string &orderBy ) {
+DBEntityVector* DBMgr::Search(DBEntity *dbe, bool uselike, bool caseSensitive, const string &orderBy ) {
     if(this->verbose) cout << "DBMgr::Search: start." << endl;
     if(this->con->isProxy()) {
         if( this->verbose ) cout << "DBMgr::Search: calling con->Search()" << endl;
@@ -654,9 +654,9 @@ DBEntity* DBMgr::relogin() {
     return this->login(login,pwd);
 }
 
-bool DBMgr::isLoggedIn() { return this->_dbeuser!=0; }
+bool DBMgr::isLoggedIn() const { return this->_dbeuser!=0; }
 
-string DBMgr::getServerIDString() {
+string DBMgr::getServerIDString() const {
     string d(this->getConnection()->getDBType());
     string u("nobody");
     if(this->_dbeuser!=0) {
@@ -705,8 +705,8 @@ void DBMgr::Destroy(DBEntityVector* lista) {
     delete lista;
 }
 
-Connection* DBMgr::getConnection() { return this->con; }
+Connection* DBMgr::getConnection() const { return this->con; }
 void DBMgr::setConnection( Connection* _newVal){ this->con = _newVal; }
 
-void DBMgr::setSchema(string schema) { this->_schema=schema; }
-string DBMgr::getSchema() { return this->_schema; }
+void DBMgr::setSchema(const string schema) { this->_schema=schema; }
+string DBMgr::getSchema() const { return this->_schema; }

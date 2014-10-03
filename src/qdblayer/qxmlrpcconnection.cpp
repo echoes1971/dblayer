@@ -483,7 +483,7 @@ DBEntity* QXmlrpcConnection::Delete(DBEntity *dbe) {
 
     return dbe;
 }
-DBEntityVector* QXmlrpcConnection::Select(DBEntity* dbe, const string& tableName, const string& searchString) {
+DBEntityVector* QXmlrpcConnection::Select(const DBEntity *dbe, const string& tableName, const string& searchString) {
     this->errorMessage.clear();
 
     QList<QVariant> params;

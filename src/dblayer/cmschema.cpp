@@ -672,7 +672,7 @@ DBEntity* ObjectMgr::Delete(DBEntity *dbe) {
         return dbe;
     }
 }
-string ObjectMgr::_buildSelectString(DBEntity* dbe, bool uselike, bool caseSensitive) {
+string ObjectMgr::_buildSelectString(DBEntity *dbe, bool uselike, bool caseSensitive) {
     if( this->verbose ) cout << "ObjectMgr::_buildSelectString: start." << endl;
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
     if(obj==0 || obj->name()!="DBEObject") {

@@ -61,9 +61,9 @@ namespace DBLayer {
     string getColumnName(string* relname, int column);
     IntegerVector getKeys(string* relname);
     IntegerVector getForeignKeys(string* relname);
-    inline string getDBType() { return "SQLite"; }
+    inline string getDBType() const { return "SQLite"; }
 
-    virtual string dbeType2dbType(const string& dbetype);
+    virtual string dbeType2dbType(const string& dbetype) const;
     // Override: end.
 
 	  private:

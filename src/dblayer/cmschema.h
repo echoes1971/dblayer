@@ -110,7 +110,7 @@ class ObjectMgr : public DBMgr {
     DBEntity* Delete(DBEntity *dbe);
     //DBEntity* Copy(DBEntity *dbe);
 
-    virtual string _buildSelectString(DBEntity* dbe, bool uselike=false, bool caseSensitive=true);
+    virtual string _buildSelectString(DBEntity *dbe, bool uselike=false, bool caseSensitive=true);
 
     DBEntityVector* Search(DBEntity* dbe, bool uselike=true,
                             bool caseSensitive=true, const string& orderBy="",

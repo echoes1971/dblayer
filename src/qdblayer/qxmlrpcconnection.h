@@ -44,7 +44,7 @@ class QXmlrpcConnection : public QObject , public Connection {
     virtual string getFormSchema(string language="python");
     virtual string getDBSchema(string language="python");
     virtual string getSchemaName();
-    inline string getDBType() { return "QXmlrpc"; }
+    inline string getDBType() const { return "QXmlrpc"; }
 
     static QString variant2string(const QVariant& v, QString prefix="");
     /* Non mi piacciono i parametri in input usati anche per l'output,
@@ -60,7 +60,7 @@ class QXmlrpcConnection : public QObject , public Connection {
     virtual DBEntity* Insert(DBEntity *dbe);
     virtual DBEntity* Update(DBEntity *dbe);
     virtual DBEntity* Delete(DBEntity *dbe);
-    virtual DBEntityVector* Select(DBEntity* dbe, const string& tableName, const string& searchString);
+    virtual DBEntityVector* Select(const DBEntity* dbe, const string& tableName, const string& searchString);
     virtual DBEntityVector* Search(DBEntity* dbe, bool uselike=true, bool caseSensitive=true, const string& orderBy="" );
     virtual string ping();
   private:

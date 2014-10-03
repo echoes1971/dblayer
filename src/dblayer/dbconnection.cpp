@@ -138,10 +138,10 @@ ResultSet* Connection::login(string user, string pwd) {
 
 string Connection::getFormSchema(string language) { return "Connection::getFormSchema: NOT SUPPORTED - " + language; }
 string Connection::getDBSchema(string language) { return "Connection::getDBSchema: NOT SUPPORTED - " + language; }
-string Connection::getSchemaName() { return "Connection::getSchemaName: NOT SUPPORTED"; }
-string Connection::getDBType() { return "generic"; }
+string Connection::getSchemaName() const { return "Connection::getSchemaName: NOT SUPPORTED"; }
+string Connection::getDBType() const { return "generic"; }
 
-string Connection::dbeType2dbType(const string& dbetype) {
+string Connection::dbeType2dbType(const string& dbetype) const {
     string ret = dbetype;
     if(dbetype=="int")
         ret = "int(11)";
@@ -149,7 +149,7 @@ string Connection::dbeType2dbType(const string& dbetype) {
         ret = "char(40)";
     return ret;
 }
-string Connection::dbType2dbeType(const string& dbtype) {
+string Connection::dbType2dbeType(const string& dbtype) const {
     string ret = dbtype;
     if(dbtype=="int(11)")
         ret = "int";
@@ -158,7 +158,7 @@ string Connection::dbType2dbeType(const string& dbtype) {
     return ret;
 }
 
-string Connection::dbConstraints2dbeConstraints(map<string,string>& def) {
+string Connection::dbConstraints2dbeConstraints(map<string,string>& def) const {
     StringVector constraints;
     if( def["Null"]=="NO") constraints.push_back("not null");
     if( def.find("Default")!=def.end() ) {
@@ -172,7 +172,7 @@ string Connection::dbConstraints2dbeConstraints(map<string,string>& def) {
     string glue(" ");
     return constraints.size()>0 ? DBLayer::joinString(&constraints, &glue) : "";
 }
-string Connection::dbColumnDefinition2dbeColumnDefinition(map<string,string>& def) {
+string Connection::dbColumnDefinition2dbeColumnDefinition(map<string,string>& def) const {
     string constraints = Connection::dbConstraints2dbeConstraints(def);
     return string("'$col'=>array('").append( Connection::dbType2dbeType(def["Type"]) ).append("',")
             .append( constraints.length()>0 ? constraints : "" )
@@ -226,7 +226,7 @@ bool Connection::isProxy() const { return false; }
 DBEntity* Connection::Insert(DBEntity *dbe) { return dbe; }
 DBEntity* Connection::Update(DBEntity *dbe) { return dbe; }
 DBEntity* Connection::Delete(DBEntity *dbe) { return dbe; }
-DBEntityVector* Connection::Select(DBEntity* dbe, const string &tableName, const string& searchString) { return (DBEntityVector*) (0 & (long)dbe & (long)tableName.size() & (long)searchString.size()); }
+DBEntityVector* Connection::Select(const DBEntity *dbe, const string &tableName, const string& searchString) { return (DBEntityVector*) (0 & (long)dbe & (long)tableName.size() & (long)searchString.size()); }
 DBEntityVector* Connection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string& orderBy ) { return (DBEntityVector*) (0 & (long)dbe & (long)uselike & (long)caseSensitive & (long)orderBy.size()); }
 string Connection::ping() { return "pong"; }
 // **************** Proxy Connections: end. *********************
@@ -439,7 +439,7 @@ string PGConnection::pgtype2string(int t) {
 int PGConnection::clientEncoding() { return PQclientEncoding( this->conn ); }
 int PGConnection::setClientEncoding(string s) { return PQsetClientEncoding( this->conn, s.c_str() ); }
 
-string PGConnection::dbeType2dbType(const string& dbetype) {
+string PGConnection::dbeType2dbType(const string& dbetype) const {
     string ret = dbetype;
     if(dbetype=="datetime") {
         ret = "timestamp";

@@ -48,7 +48,7 @@ DBEntity::DBEntity(const string& tableName) {
 }
 DBEntity::~DBEntity() {}
 void DBEntity::setSchemaName(string s) { this->schemaName=s; }
-string DBEntity::getSchemaName() { return this->schemaName; }
+string DBEntity::getSchemaName() const { return this->schemaName; }
 string DBEntity::getTableName() const { return string(tableName); }
 
 string DBEntity::name() const { return "DBEntity"; }

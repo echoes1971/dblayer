@@ -160,13 +160,13 @@ namespace DBLayer {
 
             virtual string getFormSchema(string language="python");
             virtual string getDBSchema(string language="python");
-            virtual string getSchemaName();
-            virtual string getDBType();
+            virtual string getSchemaName() const;
+            virtual string getDBType() const;
 
-            virtual string dbeType2dbType(const string& dbetype);
-            virtual string dbType2dbeType(const string& dbtype);
-            virtual string dbConstraints2dbeConstraints(map<string,string>& def);
-            virtual string dbColumnDefinition2dbeColumnDefinition(map<string,string>& def);
+            virtual string dbeType2dbType(const string& dbetype) const;
+            virtual string dbType2dbeType(const string& dbtype) const;
+            virtual string dbConstraints2dbeConstraints(map<string,string>& def) const;
+            virtual string dbColumnDefinition2dbeColumnDefinition(map<string,string>& def) const;
 
             // **************** Proxy Connections: start. *********************
             // The proxy connections are used by DBMgr to execute the following methods
@@ -174,7 +174,7 @@ namespace DBLayer {
             virtual DBEntity* Insert(DBEntity *dbe);
             virtual DBEntity* Update(DBEntity *dbe);
             virtual DBEntity* Delete(DBEntity *dbe);
-            virtual DBEntityVector* Select(DBEntity* dbe, const string& tableName, const string& searchString);
+            virtual DBEntityVector* Select(const DBEntity* dbe, const string& tableName, const string& searchString);
             virtual DBEntityVector* Search(DBEntity* dbe, bool uselike=true,
                                     bool caseSensitive=true, const string& orderBy="" );
             virtual string ping();
@@ -206,9 +206,9 @@ namespace DBLayer {
         string getColumnName(string* relname, int column);
         IntegerVector getKeys(string* relname);
 
-        inline string getDBType() { return "POSTGRESQL"; }
+        inline string getDBType() const { return "POSTGRESQL"; }
         
-        virtual string dbeType2dbType(const string& dbetype);
+        virtual string dbeType2dbType(const string& dbetype) const;
         // Overridden: end.
 
                 // PG Functions

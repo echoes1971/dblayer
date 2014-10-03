@@ -40,7 +40,7 @@ class QSqliteConnection : public Connection {
     virtual string getColumnName(string* relname, int column);
 //     virtual IntegerVector getKeys(string* relname);
 //     virtual IntegerVector getForeignKeys(string* relname);
-    inline string getDBType() { return "QSqlite"; }
+    inline string getDBType() const { return "QSqlite"; }
 
     //virtual string dbeType2dbType(const string& dbetype);
 

@@ -61,7 +61,7 @@ namespace DBLayer {
 
 		virtual string quoteDate(string s);
 
-        inline string getDBType() { return "ODBC"; }
+        inline string getDBType() const { return "ODBC"; }
 
 	  private:
 		RETCODE rc;		// ODBC return code

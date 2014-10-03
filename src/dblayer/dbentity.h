@@ -77,7 +77,7 @@ namespace DBLayer {
 
         void setSchemaName(string s);
         /** Returns the table's own schema */
-        virtual string getSchemaName();
+        virtual string getSchemaName() const;
         virtual string getTableName() const;
         /** Class name */
         virtual string name() const;
