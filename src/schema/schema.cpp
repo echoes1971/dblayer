@@ -38,24 +38,47 @@
 #include "schema.h"
 using namespace SchemaNS;
 
+SchemaVector Schema::createdSchema;
 int Schema::schemiCreati = 0;
 int Schema::schemiDistrutti = 0;
 
 Schema::Schema() {
     this->name.clear();
     schemiCreati++;
+    bool found = false;
+    for(const Schema* schema : createdSchema){
+        if(schema!=this) continue;
+        found=true;
+        break;
+    }
+    if(!found)
+        createdSchema.push_back(this);
 }
 Schema::Schema(const string* nome) {
     this->name.clear();
     this->name.append( nome->c_str() );
 
     schemiCreati++;
+    bool found = false;
+    for(const Schema* schema : createdSchema){
+        if(schema!=this) continue;
+        found=true;
+        break;
+    }
+    if(!found)
+        createdSchema.push_back(this);
 }
 Schema::~Schema() {
     for(unsigned int i=0; i<this->fields.size(); i++) {
         delete this->fields.at(i);
     }
     schemiDistrutti++;
+    for(auto it=createdSchema.begin(); it!=createdSchema.end(); it++) {
+        if(*it==this) {
+            createdSchema.erase(it);
+            break;
+        }
+    }
 }
 
 string Schema::getName() const { return this->name; }
@@ -435,5 +458,7 @@ string SchemaNS::float2string(float f) {
 
 int SchemaNS::getSchemiCreati() { return Schema::getSchemiCreati(); }
 int SchemaNS::getSchemiDistrutti() { return Schema::getSchemiDistrutti(); }
+vector<Schema*> SchemaNS::getCreatedSchema() { return Schema::getCreatedSchema(); }
 int Schema::getSchemiCreati() { return Schema::schemiCreati; }
 int Schema::getSchemiDistrutti() { return Schema::schemiDistrutti; }
+vector<Schema*> Schema::getCreatedSchema() { return Schema::createdSchema; }

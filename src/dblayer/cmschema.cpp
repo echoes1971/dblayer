@@ -704,6 +704,7 @@ string ObjectMgr::_buildSelectString(DBEntity *dbe, bool uselike, bool caseSensi
     if( this->verbose ) cout << "ObjectMgr::_buildSelectString: end." << endl;
     return searchString;
 }
+
 DBEntityVector* ObjectMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string& orderBy,bool ignore_deleted, bool full_object) {
     if( this->verbose ) cout << "ObjectMgr::Search: start." << endl;
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);

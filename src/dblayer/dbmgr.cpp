@@ -611,6 +611,7 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
     cerca->setValue("pwd",pwd);
 
     DBEntityVector* lista = this->Search(cerca,false);
+    delete cerca;
 
     // TODO: how to handle this in C++?
     //try:
@@ -651,6 +652,8 @@ DBEntity* DBMgr::relogin() {
         return 0;
     string login(this->_dbeuser->getField("login")->getStringValue()->c_str());
     string pwd(this->_dbeuser->getField("pwd")->getStringValue()->c_str());
+    delete this->_dbeuser;
+    this->_dbeuser=0;
     return this->login(login,pwd);
 }
 

@@ -58,6 +58,7 @@ namespace SchemaNS {
     DECLSPECIFIER int getSchemiCreati();
     DECLSPECIFIER int getSchemiDistrutti();
 
+
     /**
      * Contenitore di field
      */
@@ -133,6 +134,7 @@ namespace SchemaNS {
 
         static int getSchemiCreati();
         static int getSchemiDistrutti();
+        static vector<Schema*> getCreatedSchema();
 
       protected:
         virtual Field* createNewField(const string& fieldName, bool valore) const;
@@ -149,9 +151,12 @@ namespace SchemaNS {
       private:
         string toString_nodes(string prefix) const;
 
+        static vector<Schema*> createdSchema;
         static int schemiCreati;
         static int schemiDistrutti;
     };
+
+    vector<Schema*> getCreatedSchema();
 
     typedef vector<Schema*>     SchemaVector;
     typedef map<string,Schema*> SchemaMap;
