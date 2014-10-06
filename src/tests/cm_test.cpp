@@ -84,13 +84,12 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
 
     con = DBLayer::createConnection( connString.c_str() );
     //con->setVerbose(true);
-    objmgr = new ObjectMgr(con, true);
+    objmgr = new ObjectMgr(con, false);
 
     DBEFactory* dbeFactory = new DBEFactory(false);
     objmgr->setDBEFactory(dbeFactory);
-    //objmgr->setSchema("rra");
     AuthSchema::registerClasses(dbeFactory);
-    AuthSchema::checkDB(*objmgr,true);
+    AuthSchema::checkDB(*objmgr,false);
     CMSchema::registerClasses(dbeFactory);
     CMSchema::checkDB(*objmgr,false);
 
@@ -248,6 +247,13 @@ int main(int argc, char *argv[]) {
     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    if(SchemaNS::getCreatedSchema().size()>0) {
+        printf("Schemas left:\n");
+        for(const Schema* schema : SchemaNS::getCreatedSchema()) {
+            printf("%d", (unsigned long) schema );
+            cout << schema->toString(" \n") << endl;
+        }
+    }
     cout << "---------------->>  testDBES: end." << endl;
     cout << endl;
     if(!success) {

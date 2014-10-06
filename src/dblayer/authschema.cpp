@@ -95,7 +95,6 @@ bool DBEUser::isRoot() {
 void DBEUser::_before_insert(DBMgr* dbmgr) {
     if(this->isNull("id")) {
         this->setValue("id",dbmgr->getNextUuid(this));
-//        this->getField("id")->setStringValue(dbmgr->getNextUuid(this));
     }
     if(this->checkNewPassword()) {
         this->_createGroup(dbmgr);
@@ -138,15 +137,14 @@ void DBEUser::_deleteGroup(DBMgr* dbmgr) {
     dbmgr->Delete(&dbe);
 }
 void DBEUser::_checkGroupAssociation(DBMgr* dbmgr) {
-    DBEUserGroup ug;
-    ug.setValue("user_id",this->getStringValue("id"));
-    ug.setValue("group_id",this->getStringValue("group_id"));
-    //ug.getField("user_id")->setStringValue(this->getField("id")->getStringValue());
-    //ug.getField("group_id")->setStringValue(this->getField("group_id")->getStringValue());
-    bool exists = dbmgr->exists(&ug);
+    DBEUserGroup* ug = new DBEUserGroup();
+    ug->setValue("user_id",this->getStringValue("id"));
+    ug->setValue("group_id",this->getStringValue("group_id"));
+    bool exists = dbmgr->exists(ug);
     if(!exists) {
-        dbmgr->Insert(&ug);
+        dbmgr->Insert(ug);
     }
+    delete ug;
 }
 //*********************** DBEUser: end.
 
@@ -206,19 +204,21 @@ void DBEGroup::_before_insert(DBMgr* dbmgr) {
 void DBEGroup::_after_insert(DBMgr* dbmgr) {
     if(dbmgr->getDBEUser()==0)
         return;
-    DBEUserGroup dbe;
+    DBEUserGroup* dbe = new DBEUserGroup();
 
     string this_id = string(this->getField("id")->getStringValue()->c_str());
 
-    dbe.setValue("group_id",this_id);
-    dbe.setValue("user_id",dbmgr->getDBEUser()->getField("id")->getStringValue());
-    dbmgr->Insert(&dbe);
+    dbe->setValue("group_id",this_id);
+    dbe->setValue("user_id",dbmgr->getDBEUser()->getField("id")->getStringValue());
+    dbmgr->Insert(dbe);
+    delete dbe;
     dbmgr->addGroup(this_id);
 }
 void DBEGroup::_after_delete(DBMgr* dbmgr) {
-    DBEUserGroup search;
-    search.getField("group_id")->setStringValue(this->getField("id")->getStringValue());
-    DBEntityVector* list = dbmgr->Search(&search,false);
+    DBEUserGroup* search = new DBEUserGroup();
+    search->getField("group_id")->setStringValue(this->getField("id")->getStringValue());
+    DBEntityVector* list = dbmgr->Search(search,false);
+    delete search;
     for(DBEntity* dbe : (*list)) {
         dbmgr->Delete(dbe);
     }
@@ -355,8 +355,8 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
-        DBEUser dbeuser;
-        sql = dbeuser.toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
+        DBEUser* dbeuser = new DBEUser();
+        sql = dbeuser->toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
@@ -370,9 +370,10 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbegroup->setValue("id","-3")->setValue("name","Guests")->setValue("description","System guests (read only)"); dbmgr.Insert(dbegroup);
         delete dbegroup;
 
-        dbeuser.setValue("id","-4")->setValue("login","adm")->setValue("pwd","adm")->setValue("fullname","Administrator")->setValue("group_id","-1")->setValue("pwd_salt",""); dbmgr.Insert(&dbeuser);
-        dbeuser.setValue("id","-5")->setValue("login","usr")->setValue("pwd","usr")->setValue("fullname","A User")->setValue("group_id","-2")->setValue("pwd_salt","");        dbmgr.Insert(&dbeuser);
-        dbeuser.setValue("id","-6")->setValue("login","guest")->setValue("pwd","guest")->setValue("fullname","A Guest")->setValue("group_id","-3")->setValue("pwd_salt","");   dbmgr.Insert(&dbeuser);
+        dbeuser->setValue("id","-4")->setValue("login","adm")->setValue("pwd","adm")->setValue("fullname","Administrator")->setValue("group_id","-1")->setValue("pwd_salt",""); dbmgr.Insert(dbeuser);
+        dbeuser->setValue("id","-5")->setValue("login","usr")->setValue("pwd","usr")->setValue("fullname","A User")->setValue("group_id","-2")->setValue("pwd_salt","");        dbmgr.Insert(dbeuser);
+        dbeuser->setValue("id","-6")->setValue("login","guest")->setValue("pwd","guest")->setValue("fullname","A Guest")->setValue("group_id","-3")->setValue("pwd_salt","");   dbmgr.Insert(dbeuser);
+        delete dbeuser;
 
         dbeusergroup->setValue("user_id","-4")->setValue("group_id","-1"); dbmgr.Insert(dbeusergroup);
         dbeusergroup->setValue("user_id","-5")->setValue("group_id","-2"); dbmgr.Insert(dbeusergroup);

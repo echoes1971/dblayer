@@ -984,14 +984,6 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
     }
 
 
-    printf("\n");
-    printf("==================================================\n");
-    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
-    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
-    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
-    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-    printf("==================================================\n");
-    printf("\n");
     // 1. Check app version
     long current_db_version = -1;
     DBEDBVersion* dbecurrentversion = 0;
@@ -1017,14 +1009,14 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
     delete dbecurrentversion;
     delete cerca;
 
-    printf("\n");
-    printf("==================================================\n");
-    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
-    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
-    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
-    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-    printf("==================================================\n");
-    printf("\n");
+//     printf("\n");
+//     printf("==================================================\n");
+//     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+//     printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+//     printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+//     printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+//     printf("==================================================\n");
+//     printf("\n");
 
     if(verbose) cout << "CMSchema::checkDB: current_db_version=" << current_db_version << endl;
 

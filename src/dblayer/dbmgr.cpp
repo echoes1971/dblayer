@@ -527,7 +527,9 @@ DBEntityVector* DBMgr::searchByKeys(DBEntity* dbe) {
         else
             cerca->setValue(chiavi[i],v);
     }
-    return this->Search(cerca,false,false);
+    DBEntityVector* ret = this->Search(cerca,false,false);
+    delete cerca;
+    return ret;
 }
 bool DBMgr::exists(DBEntity* dbe) {
     if(dbe->isNew())

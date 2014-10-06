@@ -52,7 +52,7 @@ Schema::Schema() {
         break;
     }
     if(!found) {
-        printf("Schema added: %d\n", (unsigned long) this );
+//         printf("Schema added: %d\n", (unsigned long) this );
         createdSchema.push_back(this);
     }
 }
@@ -68,7 +68,7 @@ Schema::Schema(const string* nome) {
         break;
     }
     if(!found) {
-        printf("Schema added: %d\n", (unsigned long) this );
+//         printf("Schema added: %d\n", (unsigned long) this );
         createdSchema.push_back(this);
     }
 }
