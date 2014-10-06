@@ -139,15 +139,21 @@ class DBECompany : public DBEObject {
       static ColumnDefinitions _columns;
 };
 
-  class DBEPeople : public DBEObject {
-    public:
+class DBEPeople : public DBEObject {
+  public:
     DBEPeople();
-      virtual ~DBEPeople();
-      virtual string name() const;
-      virtual string getTableName() const;
-      virtual DBEPeople* createNewInstance() const;
-    private:
-  };
+    virtual ~DBEPeople();
+    virtual string name() const;
+    virtual string getTableName() const;
+    virtual ForeignKeyVector& getFK() const;
+    virtual DBEPeople* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector getColumnNames() const;
+  private:
+    static ForeignKeyVector _fkv;
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
+};
 
   class DBEFile : public DBEObject {
     public:

@@ -907,10 +907,51 @@ DBECompany* DBECompany::createNewInstance() const { return new DBECompany(); }
 //*********************** DBECompany: end.
 
 //*********************** DBEPeople: start.
-DBEPeople::DBEPeople() { this->tableName.clear(); }
+ForeignKeyVector DBEPeople::_fkv;
+ColumnDefinitions DBEPeople::_columns;
+StringVector DBEPeople::_column_order = {"street","zip","city","state","fk_countrylist_id","fk_companies_id","fk_users_id","phone","office_phone","mobile","fax","email","url","codice_fiscale","p_iva"};
+DBEPeople::DBEPeople() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        StringVector column_order = DBEPeople::getColumnNames();
+        StringVector parentColumns = DBEObject::getColumnNames();
+        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+            column_order.insert(column_order.begin(),parentColumns.at(i));
+        }
+        _column_order = column_order;
+        for(const pair<string,vector<string> > pair: DBEObject::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _columns["street"] = vector<string> {"varchar(255)","default null"};
+        _columns["zip"] = vector<string> {"varchar(255)","default null"};
+        _columns["city"] = vector<string> {"varchar(255)","default null"};
+        _columns["state"] = vector<string> {"varchar(255)","default null"};
+        _columns["fk_countrylist_id"] = vector<string> {"uuid","default null"};
+        _columns["fk_companies_id"] = vector<string> {"uuid","default null"};
+        _columns["fk_users_id"] = vector<string> {"uuid","default null"};
+        _columns["phone"] = vector<string> {"varchar(255)","default null"};
+        _columns["office_phone"] = vector<string> {"varchar(255)","default null"};
+        _columns["mobile"] = vector<string> {"varchar(255)","default null"};
+        _columns["fax"] = vector<string> {"varchar(255)","default null"};
+        _columns["email"] = vector<string> {"varchar(255)","default null"};
+        _columns["url"] = vector<string> {"varchar(255)","default null"};
+        _columns["codice_fiscale"] = vector<string> {"varchar(20)","default null"};
+        _columns["p_iva"] = vector<string> {"varchar(16)","default null"};
+    }
+    if(_fkv.size()==0) {
+        for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
+        _fkv.push_back(ForeignKey("fk_countrylist_id","countrylist","id"));
+        _fkv.push_back(ForeignKey("fk_companies_id","companies","id"));
+        _fkv.push_back(ForeignKey("fk_users_id","users","id"));
+    }
+}
 DBEPeople::~DBEPeople() {}
 string DBEPeople::name() const { return "DBEPeople"; }
 string DBEPeople::getTableName() const { return "people"; }
+ForeignKeyVector& DBEPeople::getFK() const { return _fkv; }
+ColumnDefinitions DBEPeople::getColumns() const { return _columns; }
+StringVector DBEPeople::getColumnNames() const { return _column_order; }
 DBEPeople* DBEPeople::createNewInstance() const { return new DBEPeople(); }
 //*********************** DBEPeople: end.
 

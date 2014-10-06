@@ -77,7 +77,7 @@ using namespace CMSchema;
 using namespace std;
 
 
-bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
+bool testTemplate(string connString, string& loginUser, string& loginPwd) {
     bool success = true;
     DBLayer::Connection* con;
     ObjectMgr* objmgr;
@@ -99,8 +99,53 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
             objmgr->login(loginUser,loginPwd);
         }
 
-//         if(objmgr->isLoggedIn()) {
-// 
+        if(objmgr->isLoggedIn()) {
+
+            // TODO do something here
+
+        } else {
+            cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
+            success = false;
+        }
+    } else {
+        cout << "Connection Error: " << objmgr->getErrorMessage() << endl;
+        success = false;
+    }
+    delete dbeFactory;
+    delete objmgr;
+    delete con;
+    return success;
+}
+bool testTemplate(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
+    string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
+    return testTemplate( connString, loginUser, loginPwd );
+}
+
+
+bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
+    bool success = true;
+    DBLayer::Connection* con;
+    ObjectMgr* objmgr;
+
+    con = DBLayer::createConnection( connString.c_str() );
+    //con->setVerbose(true);
+    objmgr = new ObjectMgr(con, false);
+
+    DBEFactory* dbeFactory = new DBEFactory(false);
+    objmgr->setDBEFactory(dbeFactory);
+    AuthSchema::registerClasses(dbeFactory);
+    AuthSchema::checkDB(*objmgr,false);
+    CMSchema::registerClasses(dbeFactory);
+    CMSchema::checkDB(*objmgr,true);
+
+    if(objmgr->connect()) {
+
+        if(loginUser.length()>0 && loginPwd.length()>0) {
+            objmgr->login(loginUser,loginPwd);
+        }
+
+        if(objmgr->isLoggedIn()) {
+
 //             // Let's create an object instance
 //             DBEObject* obj = (DBEObject*) objmgr->getClazz("objects");
 // 
@@ -122,10 +167,10 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
 //             printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
 //             printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
 //             printf("\n");
-//         } else {
-//             cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
-//             success = false;
-//         }
+        } else {
+            cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
+            success = false;
+        }
     } else {
         cout << "Connection Error: " << objmgr->getErrorMessage() << endl;
         success = false;
@@ -250,7 +295,7 @@ int main(int argc, char *argv[]) {
     if(SchemaNS::getCreatedSchema().size()>0) {
         printf("Schemas left:\n");
         for(const Schema* schema : SchemaNS::getCreatedSchema()) {
-            printf("%d", (unsigned long) schema );
+            printf("%ld", (unsigned long) schema );
             cout << schema->toString(" \n") << endl;
         }
     }
@@ -275,7 +320,7 @@ int main(int argc, char *argv[]) {
     if(SchemaNS::getCreatedSchema().size()>0) {
         printf("Schemas left:\n");
         for(const Schema* schema : SchemaNS::getCreatedSchema()) {
-            printf("%d", (unsigned long) schema );
+            printf("%ld", (unsigned long) schema );
             cout << schema->toString(" \n") << endl;
         }
     }
