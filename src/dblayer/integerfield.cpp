@@ -33,7 +33,7 @@ long IntegerField::getValue() { return longValue; }
 
 void IntegerField::setValue(long valore){
   longValue=valore;
-  if (valore!=0)
+  //if (valore!=0)
     nullo = false;
 }
 

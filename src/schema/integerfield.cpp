@@ -50,7 +50,7 @@ Field* IntegerField::createNewInstance(const char* aName) const {
 long IntegerField::getValue() const{ return longValue; }
 void IntegerField::setValue(long valore){
     longValue=valore;
-    if (valore!=0)
+//     if (valore!=0)
         nullo = false;
 }
 

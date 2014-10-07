@@ -1,14 +1,14 @@
 /***************************************************************************
-**	schema.cpp  v0.1.0 - 2012.03.19
-**	-----------------------------------
+**    schema.cpp  v0.1.0 - 2012.03.19
+**    -----------------------------------
 **
-**	Author:		Roberto Rocco Angeloni.
-**	E-mail:		roberto@roccoangeloni.it
-**	Comment:	Implementazione di connection e resultset per ODBC
-**	To Do:		- ...
-**	Future:
-**	History:
-**		v0.1.0 - 2006.05.26 Versione iniziale
+**    Author:        Roberto Rocco Angeloni.
+**    E-mail:        roberto@roccoangeloni.it
+**    Comment:    Implementazione di connection e resultset per ODBC
+**    To Do:        - ...
+**    Future:
+**    History:
+**        v0.1.0 - 2006.05.26 Versione iniziale
 **
 ** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
@@ -366,33 +366,33 @@ Schema *Schema::setValue(const string& fieldName, bool valore) {
     return this;
 }
 Schema *Schema::setValue(const string& fieldName, float valore) {
-	Field* field = this->getField(fieldName);
+    Field* field = this->getField(fieldName);
     if(field==0) {
         field =  this->createNewField(fieldName, valore);
-		this->addField(field);
+        this->addField(field);
     } else if(!field->isFloat()) {
         int indice = this->getFieldIndex(fieldName);
         delete field;
         field=0;
         this->fields[indice] = new FloatField(fieldName, valore);
     } else {
-		field->setFloatValue(valore);
-	}
+        field->setFloatValue(valore);
+    }
     return this;
 }
 Schema *Schema::setValue(const string& fieldName, long valore) {
-	Field* field = this->getField(fieldName);
+    Field* field = this->getField(fieldName);
     if(field==0) {
         field =  this->createNewField(fieldName, valore);
-		this->addField(field);
+        this->addField(field);
     } else if(!field->isInteger()) {
         int indice = this->getFieldIndex(fieldName);
         delete field;
         field=0;
         this->fields[indice] = new IntegerField(fieldName, valore);
-	} else {
-		field->setIntegerValue(valore);
-	}
+    } else {
+        field->setIntegerValue(valore);
+    }
     return this;
 }
 
@@ -414,17 +414,17 @@ string Schema::getDateValue(const string& fieldName) const {
 }
 
 bool Schema::isNull(const string &fieldName) const {
-	Field* field = this->getField(fieldName);
-	return field==0 ? true : field->isNull();
+    Field* field = this->getField(fieldName);
+    return field==0 ? true : field->isNull();
 }
 Schema *Schema::setNull(const string& fieldName) {
-	Field* field = this->getField(fieldName);
-	if( field!=0 ) field->setNull();
+    Field* field = this->getField(fieldName);
+    if( field!=0 ) field->setNull();
     return this;
 }
 Schema *Schema::setNull(const string& fieldName, bool valore) {
-	Field* field = this->getField(fieldName);
-	if( field!=0 ) field->setNull(valore);
+    Field* field = this->getField(fieldName);
+    if( field!=0 ) field->setNull(valore);
     return this;
 }
 

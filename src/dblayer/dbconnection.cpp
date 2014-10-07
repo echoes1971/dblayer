@@ -143,10 +143,11 @@ string Connection::getDBType() const { return "generic"; }
 
 string Connection::dbeType2dbType(const string& dbetype) const {
     string ret = dbetype;
-    if(dbetype=="int")
-        ret = "int(11)";
-    else if(dbetype=="uuid")
-        ret = "char(40)";
+//    if(dbetype=="int")
+//        ret = "int(11)";
+//    else
+        if(dbetype=="uuid")
+            ret = "char(40)";
     return ret;
 }
 string Connection::dbType2dbeType(const string& dbtype) const {

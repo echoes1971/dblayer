@@ -299,7 +299,7 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
 
     // 1. Check app version
     long current_db_version = -1;
-    DBEDBVersion* dbecurrentversion;
+    DBEDBVersion* dbecurrentversion = 0;
     DBEDBVersion* cerca = new DBEDBVersion();
     cerca->setValue("model_name", AuthSchema::getSchema());
     DBEntityVector* res = dbmgr.Search(cerca,false);
@@ -315,6 +315,8 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         res->clear();
         if(verbose) cout << "AuthSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;
         current_db_version = dbecurrentversion->getIntegerValue("version");
+        delete dbecurrentversion;
+        dbecurrentversion = 0;
     } else if(dbmgr.getErrorMessage().length()>0) {
         cerr << "AuthSchema::checkDB: " << dbmgr.getErrorMessage() << endl;
     }
@@ -344,11 +346,11 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
-        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
-        dbecurrentversion->setValue("model_name", AuthSchema::getSchema());
-        dbecurrentversion->setValue("version",current_db_version);
-        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
-        if(verbose) cout << dbecurrentversion->toString("\n") << endl;
+//         dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
+//         dbecurrentversion->setValue("model_name", AuthSchema::getSchema());
+//         dbecurrentversion->setValue("version",current_db_version);
+//         dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
+//         if(verbose) cout << dbecurrentversion->toString("\n") << endl;
 
         DBEGroup* dbegroup = new DBEGroup();
         sql = dbegroup->toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
@@ -383,11 +385,24 @@ void AuthSchema::checkDB(DBMgr& dbmgr, bool verbose) {
     current_migration++;
 
     // 3. Write version to DB
-    dbecurrentversion->setValue("version",current_migration);
-    dbmgr.Update(dbecurrentversion);
-
+    if(verbose) cout << "AuthSchema::checkDB: current_migration=" << current_migration << endl;
+    if(verbose) cout << "AuthSchema::checkDB: current_db_version=" << current_db_version << endl;
+    if(current_db_version<current_migration) {
+        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
+        dbecurrentversion->setValue("model_name", AuthSchema::getSchema());
+        dbecurrentversion->setValue("version",current_migration);
+        dbmgr.setVerbose(true);
+        bool version_exists = dbmgr.exists(dbecurrentversion);
+        if(verbose) cout << "AuthSchema::checkDB: version_exists=" << version_exists << endl;
+        if(!version_exists)
+            dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
+        else
+            dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Update(dbecurrentversion);
+        dbmgr.setVerbose(false);
+        delete dbecurrentversion;
+        dbecurrentversion = 0;
+    }
     //dbecurrentversion->setValue("");
-    delete dbecurrentversion;
 
     if(verbose) cout << "AuthSchema::checkDB: end." << endl;
 }

@@ -114,6 +114,7 @@ bool testTemplate(string connString, string& loginUser, string& loginPwd) {
     delete dbeFactory;
     delete objmgr;
     delete con;
+    success = success && SchemaNS::getCreatedSchema().size()==0;
     return success;
 }
 bool testTemplate(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
@@ -136,7 +137,7 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
     AuthSchema::registerClasses(dbeFactory);
     AuthSchema::checkDB(*objmgr,false);
     CMSchema::registerClasses(dbeFactory);
-    CMSchema::checkDB(*objmgr,true);
+    CMSchema::checkDB(*objmgr,false);
 
     if(objmgr->connect()) {
 
@@ -145,6 +146,22 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
         }
 
         if(objmgr->isLoggedIn()) {
+
+            DBEntity* search = objmgr->getClazz("dbversion");
+            objmgr->setVerbose(true);
+            DBEntityVector* lista = objmgr->Search(search,true,true,"model_name");
+            objmgr->setVerbose(false);
+            if ( lista->size()>0 ) {
+                cout << "testObjectMgr: Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
+                for(const DBEntity* elem : (*lista)) {
+                    cout << "- " << elem->toString() << endl;
+                }
+            } else {
+                success = false;
+                cout << "testObjectMgr: EMPTY LIST!!!" << endl;
+            }
+            objmgr->Destroy(lista);
+            delete search;
 
 //             // Let's create an object instance
 //             DBEObject* obj = (DBEObject*) objmgr->getClazz("objects");
@@ -178,6 +195,7 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
     delete dbeFactory;
     delete objmgr;
     delete con;
+    success = success && SchemaNS::getCreatedSchema().size()==0;
     return success;
 }
 bool testObjectMgr(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
@@ -238,9 +256,56 @@ bool testDBES() {
 
     delete dbeobject;
 
+    success = success && SchemaNS::getCreatedSchema().size()==0;
+
     return success;
 }
 
+
+bool testCRUD(string tablename, string connString, string& loginUser, string& loginPwd) {
+    bool success = true;
+    DBLayer::Connection* con;
+    ObjectMgr* objmgr;
+
+    con = DBLayer::createConnection( connString.c_str() );
+    //con->setVerbose(true);
+    objmgr = new ObjectMgr(con, false);
+
+    DBEFactory* dbeFactory = new DBEFactory(false);
+    objmgr->setDBEFactory(dbeFactory);
+    AuthSchema::registerClasses(dbeFactory);
+    AuthSchema::checkDB(*objmgr,true);
+    CMSchema::registerClasses(dbeFactory);
+    CMSchema::checkDB(*objmgr,false);
+
+    if(objmgr->connect()) {
+
+        if(loginUser.length()>0 && loginPwd.length()>0) {
+            objmgr->login(loginUser,loginPwd);
+        }
+
+        if(objmgr->isLoggedIn()) {
+
+            // TODO do something here
+
+        } else {
+            cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
+            success = false;
+        }
+    } else {
+        cout << "Connection Error: " << objmgr->getErrorMessage() << endl;
+        success = false;
+    }
+    delete dbeFactory;
+    delete objmgr;
+    delete con;
+    success = success && SchemaNS::getCreatedSchema().size()==0;
+    return success;
+}
+bool testCRUD(string tablename, string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
+    string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
+    return testCRUD(tablename, connString, loginUser, loginPwd );
+}
 
 
 int main(int argc, char *argv[]) {
@@ -325,6 +390,31 @@ int main(int argc, char *argv[]) {
         }
     }
     cout << "---------------->>  testObjectMgr: end." << endl;
+    cout << endl;
+    if(!success) {
+        cerr << "TEST FAILED!!!" << endl;
+        return 1;
+    }
+
+    cout << "---------------->>  testCRUD: start." << endl;
+    if ( argc==5 ) {
+        success = testCRUD( "people", host, dbname, usr, pwd, login_user, login_password );
+    } else {
+        success = testCRUD( "people", connString, login_user, login_password );
+    }
+    printf("\n");
+    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    if(SchemaNS::getCreatedSchema().size()>0) {
+        printf("Schemas left:\n");
+        for(const Schema* schema : SchemaNS::getCreatedSchema()) {
+            printf("%ld", (unsigned long) schema );
+            cout << schema->toString(" \n") << endl;
+        }
+    }
+    cout << "---------------->>  testCRUD: end." << endl;
     cout << endl;
     if(!success) {
         cerr << "TEST FAILED!!!" << endl;

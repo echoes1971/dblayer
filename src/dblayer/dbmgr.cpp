@@ -202,6 +202,7 @@ string DBMgr::_buildInsertString(const DBEntity *dbe) const {
     for(unsigned int i=0; i<nomiCampi.size(); i++) {
         string nomeCampo = nomiCampi[i];
         DBField* valore = (DBField*) dbe->getField( nomeCampo );
+//         cout << "DBMgr::_buildInsertString: nomeCampo=" << nomeCampo << " null=" << valore->isNull() << endl;
         if( valore==0 || valore->isNull() )
             continue;
         tmpNomi.push_back( nomeCampo );

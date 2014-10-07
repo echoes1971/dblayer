@@ -1042,12 +1042,13 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbecurrentversion = (DBEDBVersion*) res->at(0);
         res->clear();
         if(verbose) cout << "CMSchema::checkDB: " << dbecurrentversion->toString("\n") << endl;
-        current_db_version = dbecurrentversion->getIntegerValue("version");
+        current_db_version = dbecurrentversion->version();
+        delete dbecurrentversion; dbecurrentversion = 0;
+        if(verbose) cout << "CMSchema::checkDB: current_db_version=" << current_db_version << endl;
     } else if(dbmgr.getErrorMessage().length()>0) {
         cerr << "CMSchema::checkDB: " << dbmgr.getErrorMessage() << endl;
     }
     dbmgr.Destroy(res);
-    delete dbecurrentversion;
     delete cerca;
 
 //     printf("\n");
@@ -1083,12 +1084,6 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
-        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
-        dbecurrentversion->setValue("model_name", CMSchema::getSchema())
-                        ->setValue("version",current_db_version);
-        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
-        if(verbose) cout << dbecurrentversion->toString("\n") << endl;
-
         StringVector classes = {"log","objects","countrylist","companies",
                                 "people","files","folders","links",
                                 "notes","pages"};
@@ -1114,12 +1109,22 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
     }
     current_migration++;
 
+    if(verbose) cout << "CMSchema::checkDB: current_migration=" << current_migration << endl;
+    if(verbose) cout << "CMSchema::checkDB: current_db_version=" << current_db_version << endl;
+
     // 3. Write version to DB
-    dbecurrentversion->setValue("version",current_migration);
-    dbmgr.Update(dbecurrentversion);
-
-    //dbecurrentversion->setValue("");
-    delete dbecurrentversion;
-
+    if(current_db_version<current_migration) {
+        dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.getClazzByTypeName("DBEDBVersion");
+        dbecurrentversion->setValue("model_name", CMSchema::getSchema())
+                        ->setValue("version",current_migration);
+        if(!dbmgr.exists(dbecurrentversion))
+            dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Insert(dbecurrentversion);
+        else
+            dbecurrentversion = (AuthSchema::DBEDBVersion*) dbmgr.Update(dbecurrentversion);
+        if(verbose) cout << dbecurrentversion->toString("\n") << endl;
+//         dbecurrentversion->setValue("version",current_migration);
+//         dbmgr.Update(dbecurrentversion);
+        delete dbecurrentversion;
+    }
     if(verbose) cout << "CMSchema::checkDB: end." << endl;
 }
