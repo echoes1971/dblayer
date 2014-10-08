@@ -1,14 +1,14 @@
 /***************************************************************************
-**	integerfield.h  v0.1.0 - 2012.03.19
-**	-----------------------------------
+**    integerfield.h  v0.1.0 - 2012.03.19
+**    -----------------------------------
 **
-**	Author:		Roberto Rocco Angeloni.
-**	E-mail:		roberto@roccoangeloni.it
-**	Comment:	Implementazione di connection e resultset per ODBC
-**	To Do:		- ...
-**	Future:
-**	History:
-**		v0.1.0 - 2006.05.26 Versione iniziale
+**    Author:        Roberto Rocco Angeloni.
+**    E-mail:        roberto@roccoangeloni.it
+**    Comment:    Implementazione di connection e resultset per ODBC
+**    To Do:        - ...
+**    Future:
+**    History:
+**        v0.1.0 - 2006.05.26 Versione iniziale
 **
 ** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
@@ -35,19 +35,19 @@
 
 namespace SchemaNS {
 
-	class DECLSPECIFIER IntegerField : public Field  {
+    class DECLSPECIFIER IntegerField : public Field  {
       public:
         IntegerField(const string &nome);
         IntegerField(const string &nome, long valore);
-		virtual ~IntegerField();
-		
+        virtual ~IntegerField();
+        
         virtual Field* createNewInstance(const char* aName=0) const;
-		
-		void setValue(long valore);
-        long getValue() const;
+        
+//         void setValue(long valore);
+//         long getValue() const;
 
         string toString() const;
-	};
+    };
 }
 
 #endif

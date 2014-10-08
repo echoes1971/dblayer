@@ -47,12 +47,12 @@ Field* IntegerField::createNewInstance(const char* aName) const {
     return (Field*) new IntegerField(myName);
 }
 
-long IntegerField::getValue() const{ return longValue; }
-void IntegerField::setValue(long valore){
-    longValue=valore;
-//     if (valore!=0)
-        nullo = false;
-}
+// long IntegerField::getValue() const{ return longValue; }
+// void IntegerField::setValue(long valore){
+//     longValue=valore;
+// //     if (valore!=0)
+//         nullo = false;
+// }
 
 string IntegerField::toString() const {
 	char tmp[50];

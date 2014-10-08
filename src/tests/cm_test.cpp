@@ -123,7 +123,7 @@ bool testTemplate(string host,string dbname,string usr,string pwd, string& login
 }
 
 
-bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
+bool testSchemas(string connString, string& loginUser, string& loginPwd) {
     bool success = true;
     DBLayer::Connection* con;
     ObjectMgr* objmgr;
@@ -147,18 +147,53 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
 
         if(objmgr->isLoggedIn()) {
 
-            DBEntity* search = objmgr->getClazz("dbversion");
+            DBEntity* search = 0;
+            DBEntityVector* lista = 0;
+
+            search = objmgr->getClazz("dbversion");
             objmgr->setVerbose(true);
-            DBEntityVector* lista = objmgr->Search(search,true,true,"model_name");
+            lista = objmgr->Search(search,true,true,"model_name");
             objmgr->setVerbose(false);
             if ( lista->size()>0 ) {
-                cout << "testObjectMgr: Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
+                cout << "testSchemas: Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
                 for(const DBEntity* elem : (*lista)) {
                     cout << "- " << elem->toString() << endl;
                 }
             } else {
                 success = false;
-                cout << "testObjectMgr: EMPTY LIST!!!" << endl;
+                cout << "testSchemas: EMPTY LIST!!!" << endl;
+            }
+            objmgr->Destroy(lista);
+            delete search;
+
+            search = objmgr->getClazz("users");
+            objmgr->setVerbose(true);
+            lista = objmgr->Search(search,true,true,"login");
+            objmgr->setVerbose(false);
+            if ( lista->size()>0 ) {
+                cout << "testSchemas: Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
+                for(const DBEntity* elem : (*lista)) {
+                    cout << "- " << elem->toString() << endl;
+                }
+            } else {
+                success = false;
+                cout << "testSchemas: EMPTY LIST!!!" << endl;
+            }
+            objmgr->Destroy(lista);
+            delete search;
+
+            search = objmgr->getClazz("groups");
+            objmgr->setVerbose(true);
+            lista = objmgr->Search(search,true,true,"name");
+            objmgr->setVerbose(false);
+            if ( lista->size()>0 ) {
+                cout << "testSchemas: Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
+                for(const DBEntity* elem : (*lista)) {
+                    cout << "- " << elem->toString() << endl;
+                }
+            } else {
+                success = false;
+                cout << "testSchemas: EMPTY LIST!!!" << endl;
             }
             objmgr->Destroy(lista);
             delete search;
@@ -198,9 +233,9 @@ bool testObjectMgr(string connString, string& loginUser, string& loginPwd) {
     success = success && SchemaNS::getCreatedSchema().size()==0;
     return success;
 }
-bool testObjectMgr(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
+bool testSchemas(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
     string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
-    return testObjectMgr( connString, loginUser, loginPwd );
+    return testSchemas( connString, loginUser, loginPwd );
 }
 
 
@@ -371,11 +406,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    cout << "---------------->>  testObjectMgr: start." << endl;
+    cout << "---------------->>  testSchemas: start." << endl;
     if ( argc==5 ) {
-        success = testObjectMgr( host, dbname, usr, pwd, login_user, login_password );
+        success = testSchemas( host, dbname, usr, pwd, login_user, login_password );
     } else {
-        success = testObjectMgr( connString, login_user, login_password );
+        success = testSchemas( connString, login_user, login_password );
     }
     printf("\n");
     printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
@@ -389,7 +424,7 @@ int main(int argc, char *argv[]) {
             cout << schema->toString(" \n") << endl;
         }
     }
-    cout << "---------------->>  testObjectMgr: end." << endl;
+    cout << "---------------->>  testSchemas: end." << endl;
     cout << endl;
     if(!success) {
         cerr << "TEST FAILED!!!" << endl;
