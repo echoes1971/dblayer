@@ -309,7 +309,7 @@ bool testCRUD(string tablename, string connString, string& loginUser, string& lo
     DBEFactory* dbeFactory = new DBEFactory(false);
     objmgr->setDBEFactory(dbeFactory);
     AuthSchema::registerClasses(dbeFactory);
-    AuthSchema::checkDB(*objmgr,true);
+    AuthSchema::checkDB(*objmgr,false);
     CMSchema::registerClasses(dbeFactory);
     CMSchema::checkDB(*objmgr,false);
 
@@ -321,7 +321,22 @@ bool testCRUD(string tablename, string connString, string& loginUser, string& lo
 
         if(objmgr->isLoggedIn()) {
 
+            int counter = 1;
             // TODO do something here
+            DBEObject* dbeobject = (DBEObject*) objmgr->getClazz(tablename);
+            dbeobject->setValue("name","Name " + counter);
+            dbeobject->setValue("description","Description " + counter);
+
+            cout << "testCRUD: to insert " << dbeobject->toString() << endl;
+            //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+
+            // Insert
+            cout << endl;
+            cout << "testCRUD: try to insert a new DBEObject" << endl;
+            dbeobject = (DBEObject*) objmgr->Insert(dbeobject);
+            cout << "testCRUD: inserted new DBEObject " << dbeobject->toString() << endl;
+            //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+            delete dbeobject;
 
         } else {
             cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
