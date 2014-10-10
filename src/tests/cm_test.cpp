@@ -322,21 +322,73 @@ bool testCRUD(string tablename, string connString, string& loginUser, string& lo
         if(objmgr->isLoggedIn()) {
 
             int counter = 1;
-            // TODO do something here
+            string counter_str = SchemaNS::integer2string(counter);
+
+            DBEObject* search = 0;
+            DBEntityVector* lista = 0;
+
             DBEObject* dbeobject = (DBEObject*) objmgr->getClazz(tablename);
-            dbeobject->setValue("name","Name " + counter);
-            dbeobject->setValue("description","Description " + counter);
+            dbeobject->setValue("name","Name " + counter_str);
+            dbeobject->setValue("description","Description " + counter_str);
 
-            cout << "testCRUD: to insert " << dbeobject->toString() << endl;
+            cout << "testCRUD: to insert " << dbeobject->toString("\n ") << endl;
             //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
 
-            // Insert
-            cout << endl;
+            // Create
             cout << "testCRUD: try to insert a new DBEObject" << endl;
+            objmgr->setVerbose(true);
             dbeobject = (DBEObject*) objmgr->Insert(dbeobject);
-            cout << "testCRUD: inserted new DBEObject " << dbeobject->toString() << endl;
-            //printf("::testCRUD: Field Creati: %d - Distrutti: %d; Schemi Creati: %d - Distrutti: %d\n",   SchemaNS::getFieldCreati() - fieldCreati, SchemaNS::getFieldDistrutti() - fieldDistrutti, SchemaNS::getSchemiCreati() - schemiCreati, SchemaNS::getSchemiDistrutti() - schemiDistrutti );
+            objmgr->setVerbose(false);
+            cout << "testCRUD: inserted new DBEObject " << dbeobject->toString("\n ") << endl;
+
+            counter++; counter_str = SchemaNS::integer2string(counter);
+
+            // Update
+            cout << "testCRUD: try to update the DBEObject" << endl;
+            dbeobject->setValue("name","Name " + counter_str);
+            dbeobject->setValue("description","Description " + counter_str);
+            objmgr->setVerbose(true);
+            dbeobject = (DBEObject*) objmgr->Update(dbeobject);
+            objmgr->setVerbose(false);
+            cout << "testCRUD: updated DBEObject " << dbeobject->toString("\n ") << endl;
+
+            // Read
+            search = (DBEObject*) objmgr->getClazz(tablename);
+            search->setValue("name","Name " + counter_str);
+            lista = objmgr->Search(search,true,true,"name");
+            if ( lista->size()>0 ) {
+                cout << "testCRUD: Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
+                for(const DBEntity* elem : (*lista)) cout << "- " << elem->toString("\n  ") << endl;
+            } else {
+                success = false;
+                cout << "testCRUD: EMPTY LIST!!!" << endl;
+            }
+            objmgr->Destroy(lista);
+            delete search;
+
+//             // Delete
+//             cout << "testCRUD: try to delete the DBEObject" << endl;
+//             objmgr->setVerbose(true);
+//             dbeobject = (DBEObject*) objmgr->Delete(dbeobject);
+//             objmgr->setVerbose(false);
+//             cout << "testCRUD: deleted the DBEObject " << dbeobject->toString("\n ") << endl;
+
             delete dbeobject;
+
+//             // Read
+//             search = (DBEObject*) objmgr->getClazz(tablename);
+//             search->setValue("name","Name " + counter_str);
+//             lista = objmgr->Search(search,true,true,"name");
+//             if ( lista->size()>0 ) {
+//                 success = false;
+//                 cout << "testCRUD: Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
+//                 for(const DBEntity* elem : (*lista)) cout << "- " << elem->toString("\n  ") << endl;
+//             } else {
+//                 success = true;
+//                 cout << "testCRUD: EMPTY LIST!!!" << endl;
+//             }
+//             objmgr->Destroy(lista);
+//             delete search;
 
         } else {
             cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;

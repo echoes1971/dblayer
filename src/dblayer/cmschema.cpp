@@ -404,12 +404,11 @@ DBEObject::DBEObject() {
         _columns["creation_date"] = vector<string> {"datetime","default null"};
         _columns["last_modify"] = vector<string> {"uuid","not null"};
         _columns["last_modify_date"] = vector<string> {"datetime","default null"};
-        _columns["deleted_by"] = vector<string> {"uuid","not null"};
+        _columns["deleted_by"] = vector<string> {"uuid","default null"};
         _columns["deleted_date"] = vector<string> {"datetime","not null default '0000-00-00 00:00:00'"};
-        _columns["deleted_by"] = vector<string> {"uuid","not null"};
         _columns["father_id"] = vector<string> {"uuid","default null"};
         _columns["name"] = vector<string> {"varchar(255)","not null"};
-        _columns["description"] = vector<string> {"text","not null"};
+        _columns["description"] = vector<string> {"text","default null"};
     }
     if(_fkv.size()==0) {
         for(const DBLayer::ForeignKey& fk : DBEntity::getFK()) { _fkv.push_back(fk); }

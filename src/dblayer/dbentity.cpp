@@ -54,7 +54,8 @@ string DBEntity::getTableName() const { return string(tableName); }
 string DBEntity::name() const { return "DBEntity"; }
 
 string DBEntity::toString_nodes(string prefix, bool show_definitions) const {
-    string ret( prefix + "<" );
+//     string ret( prefix + "<" );
+    string ret( "<" );
     ret.append( this->name() ); ret.append( " " );
     // Keys
     StringVector myKeys = this->getKeys();
@@ -83,13 +84,18 @@ string DBEntity::toString_nodes(string prefix, bool show_definitions) const {
 //    }
     ret.append(">");
     // Fields
-    for(unsigned int i=0; i<fields.size(); i++) {
-        ret.append( prefix + " <" + fields[i]->getName() + " " );
-        if( this->isKey( fields[i]->getName() ) ) {
+    StringVector cols = this->getColumnNames();
+    for(const string col : cols) {
+        DBField* field = (DBField*) this->getField(col);
+        if(field==0 || field->isNull()) continue;
+//    for(unsigned int i=0; i<fields.size(); i++) {
+//        DBField* field = fields[i];
+        ret.append( prefix + " <" + field->getName() + " " );
+        if( this->isKey( field->getName() ) ) {
             ret.append( "isKey=\'true\' " );
         }
         ret.append("type=\'");
-        switch(fields[i]->getType()) {
+        switch(field->getType()) {
           case Field::STRING:
             ret.append( "string" );
             break;
@@ -111,24 +117,24 @@ string DBEntity::toString_nodes(string prefix, bool show_definitions) const {
         }
         ret.append("\' ");
         ret.append(">");
-        switch(fields[i]->getType()) {
+        switch(field->getType()) {
           case Field::STRING:
-            ret.append( fields[i]->getStringValue()->c_str() );
+            ret.append( field->getStringValue()->c_str() );
             break;
           case Field::INTEGER:
-            ret.append( DBLayer::integer2string( fields[i]->getIntegerValue() ).c_str() );
+            ret.append( DBLayer::integer2string( field->getIntegerValue() ).c_str() );
             break;
           case Field::FLOAT:
-            ret.append( fields[i]->toString().c_str() );
+            ret.append( field->toString().c_str() );
             break;
           case Field::BOOLEAN:
-            ret.append( fields[i]->toString().c_str() );
+            ret.append( field->toString().c_str() );
             break;
           case Field::DATE:
-            ret.append( fields[i]->toString().c_str() );
+            ret.append( field->toString().c_str() );
             break;
         }
-        ret.append( "</" + fields[i]->getName() + ">" );
+        ret.append( "</" + field->getName() + ">" );
     }
 
     if(prefix.length()>0 && show_definitions) {
@@ -284,24 +290,29 @@ string DBEntity::toString(string prefix, bool valuesAsAttributes, bool show_defi
 //        ret.append("}\' ");
 //    }
     // Fields
-    for(unsigned int i=0; i<fields.size(); i++) {
-        ret.append( fields[i]->getName().c_str() );
+    StringVector cols = this->getColumnNames();
+    for(const string col : cols) {
+        DBField* field = (DBField*) this->getField(col);
+        if(field==0) continue;
+//     for(unsigned int i=0; i<fields.size(); i++) {
+//         DBField* field = fields[i];
+        ret.append( field->getName().c_str() );
         ret.append( "=\'" );
-        switch(fields[i]->getType()) {
+        switch(field->getType()) {
           case DBField::STRING:
-            ret.append( fields[i]->getStringValue()->c_str() );
+            ret.append( field->getStringValue()->c_str() );
             break;
           case DBField::INTEGER:
-            ret.append( DBLayer::integer2string( fields[i]->getIntegerValue() ).c_str() );
+            ret.append( DBLayer::integer2string( field->getIntegerValue() ).c_str() );
             break;
           case DBField::FLOAT:
-            ret.append( fields[i]->toString().c_str() );
+            ret.append( field->toString().c_str() );
             break;
           case DBField::BOOLEAN:
-            ret.append( fields[i]->toString().c_str() );
+            ret.append( field->toString().c_str() );
             break;
           case DBField::DATE:
-            ret.append( fields[i]->toString().c_str() );
+            ret.append( field->toString().c_str() );
             break;
         }
         ret.append( "\' " );
