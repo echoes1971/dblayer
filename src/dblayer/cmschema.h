@@ -19,12 +19,12 @@ class DBELog : public DBEntity {
   public:
   DBELog();
     virtual ~DBELog();
-    virtual string name() const;
+    virtual string &name() const;
     virtual string getTableName() const;
-    virtual StringVector getKeys() const;
+    virtual StringVector& getKeys() const;
     virtual DBELog* createNewInstance() const;
     virtual ColumnDefinitions getColumns() const;
-    virtual StringVector getColumnNames() const;
+    virtual StringVector& getColumnNames() const;
 
     virtual DBLayer::StringVector getOrderBy() const;
   private:
@@ -37,12 +37,12 @@ class DBECountry : public DBEntity {
   public:
     DBECountry();
     virtual ~DBECountry();
-    virtual string name() const;
+    virtual string& name() const;
     virtual string getTableName() const;
-    virtual StringVector getKeys() const;
+    virtual StringVector& getKeys() const;
     virtual DBECountry* createNewInstance() const;
     virtual ColumnDefinitions getColumns() const;
-    virtual StringVector getColumnNames() const;
+    virtual StringVector& getColumnNames() const;
 
     virtual DBLayer::StringVector getOrderBy() const;
 
@@ -59,13 +59,13 @@ class DBEObject : public DBEntity {
   public:
   DBEObject();
     virtual ~DBEObject();
-    virtual string name() const;
+    virtual string& name() const;
     virtual string getTableName() const;
-    virtual StringVector getKeys() const;
+    virtual StringVector& getKeys() const;
     virtual ForeignKeyVector& getFK() const;
     virtual DBEObject* createNewInstance() const;
     virtual ColumnDefinitions getColumns() const;
-    StringVector getColumnNames() const;
+    StringVector& getColumnNames() const;
     virtual DBLayer::StringVector getOrderBy() const;
 
     // Custom methods
@@ -127,12 +127,12 @@ class DBECompany : public DBEObject {
   public:
     DBECompany();
       virtual ~DBECompany();
-      virtual string name() const;
+      virtual string& name() const;
       virtual string getTableName() const;
       virtual ForeignKeyVector& getFK() const;
       virtual DBECompany* createNewInstance() const;
       virtual ColumnDefinitions getColumns() const;
-      virtual StringVector getColumnNames() const;
+      virtual StringVector& getColumnNames() const;
   private:
       static ForeignKeyVector _fkv;
       static StringVector _column_order;
@@ -143,12 +143,12 @@ class DBEPeople : public DBEObject {
   public:
     DBEPeople();
     virtual ~DBEPeople();
-    virtual string name() const;
+    virtual string& name() const;
     virtual string getTableName() const;
     virtual ForeignKeyVector& getFK() const;
     virtual DBEPeople* createNewInstance() const;
     virtual ColumnDefinitions getColumns() const;
-    virtual StringVector getColumnNames() const;
+    virtual StringVector& getColumnNames() const;
   private:
     static ForeignKeyVector _fkv;
     static StringVector _column_order;
@@ -159,7 +159,7 @@ class DBEPeople : public DBEObject {
     public:
     DBEFile();
       virtual ~DBEFile();
-      virtual string name() const;
+      virtual string& name() const;
       virtual string getTableName() const;
       virtual DBEFile* createNewInstance() const;
     private:
@@ -169,7 +169,7 @@ class DBEPeople : public DBEObject {
     public:
     DBEFolder();
       virtual ~DBEFolder();
-      virtual string name() const;
+      virtual string& name() const;
       virtual string getTableName() const;
       virtual DBEFolder* createNewInstance() const;
     private:
@@ -179,7 +179,7 @@ class DBEPeople : public DBEObject {
     public:
     DBELink();
       virtual ~DBELink();
-      virtual string name() const;
+      virtual string& name() const;
       virtual string getTableName() const;
       virtual DBELink* createNewInstance() const;
     private:
@@ -189,7 +189,7 @@ class DBEPeople : public DBEObject {
     public:
     DBENote();
       virtual ~DBENote();
-      virtual string name() const;
+      virtual string& name() const;
       virtual string getTableName() const;
       virtual DBENote* createNewInstance() const;
     private:
@@ -199,13 +199,13 @@ class DBEPeople : public DBEObject {
     public:
     DBEPage();
       virtual ~DBEPage();
-      virtual string name() const;
+      virtual string& name() const;
       virtual string getTableName() const;
       virtual DBEPage* createNewInstance() const;
     private:
   };
 
-  string getSchema();
+  inline const string& getSchema() { static string schema("cm"); return schema; }
   void registerClasses(DBEFactory* dbeFactory);
 
   void checkDB(DBMgr& dbmgr, bool verbose=false);

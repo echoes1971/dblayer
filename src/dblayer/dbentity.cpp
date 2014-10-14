@@ -51,7 +51,7 @@ void DBEntity::setSchemaName(string s) { this->schemaName=s; }
 string DBEntity::getSchemaName() const { return this->schemaName; }
 string DBEntity::getTableName() const { return string(tableName); }
 
-string DBEntity::name() const { return "DBEntity"; }
+string& DBEntity::name() const { static string ret("DBEntity"); return ret; }
 
 string DBEntity::toString_nodes(string prefix, bool show_definitions) const {
 //     string ret( prefix + "<" );
@@ -366,12 +366,12 @@ string DBEntity::getStringValue(const string &fieldName) const {
     return ret==0 ? "" : ret->toString();
 }
 
-StringVector DBEntity::getKeys() const { return StringVector(); }
+StringVector& DBEntity::getKeys() const { static StringVector ret; return ret; }
 //DBFieldVector* DBEntity::getKeys() const {
 //    static DBFieldVector vuoto;
 //    return &vuoto;
 //}
-DBLayer::StringVector DBEntity::getKeyNames() const {
+StringVector &DBEntity::getKeyNames() const {
 //    StringVector ret;
     return this->getKeys();
 //    DBFieldVector* chiavi = this->getKeys();
@@ -383,9 +383,10 @@ DBLayer::StringVector DBEntity::getKeyNames() const {
 //    return ret;
 }
 bool DBEntity::isKey(string fieldName) const {
-    StringVector chiavi = this->getKeyNames();
+    StringVector& chiavi = this->getKeyNames();
     bool found = false;
-    for(unsigned int i=0; i<chiavi.size() && !found; i++) {
+    size_t mysize = chiavi.size();
+    for(unsigned int i=0; i<mysize && !found; i++) {
         found = ( fieldName==chiavi[i] );
     }
     return found;
@@ -511,7 +512,7 @@ string DBEntity::getColumnType(const string& column_name) {
         return "";
     }
 }
-StringVector DBEntity::getColumnNames() const {
+StringVector& DBEntity::getColumnNames() const {
     StringVector ret;
     for(const pair<string,vector<string> > pair : this->getColumns())
         ret.push_back(pair.first);

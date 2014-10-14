@@ -16,7 +16,7 @@ StringVector DBELog::chiavi = {"ip","data"};
 ColumnDefinitions DBELog::_columns;
 StringVector DBELog::_column_order = {"ip","data","ora","count","url","note","note2"};
 ColumnDefinitions DBELog::getColumns() const { return _columns; }
-StringVector DBELog::getColumnNames() const { return _column_order; }
+StringVector& DBELog::getColumnNames() const { return _column_order; }
 DBELog::DBELog() {
     this->tableName.clear();
     this->schemaName = CMSchema::getSchema();
@@ -34,9 +34,9 @@ DBELog::DBELog() {
     }
 }
 DBELog::~DBELog() {}
-string DBELog::name() const { return "DBELog"; }
+string& DBELog::name() const { static string ret("DBELog"); return ret; }
 string DBELog::getTableName() const { return "log"; }
-StringVector DBELog::getKeys() const { return chiavi; }
+StringVector& DBELog::getKeys() const { return chiavi; }
 DBELog* DBELog::createNewInstance() const { return new DBELog(); }
 DBLayer::StringVector DBELog::getOrderBy() const {
     static DBLayer::StringVector ret({"data desc", "ora desc"});
@@ -54,7 +54,7 @@ StringVector DBECountry::_column_order = {
     ,"IANA_Country_Code_TLD"
 };
 ColumnDefinitions DBECountry::getColumns() const { return _columns; }
-StringVector DBECountry::getColumnNames() const { return _column_order; }
+StringVector& DBECountry::getColumnNames() const { return _column_order; }
 DBECountry::DBECountry() {
     this->tableName.clear();
     this->schemaName = CMSchema::getSchema();
@@ -79,9 +79,9 @@ DBECountry::DBECountry() {
     }
 }
 DBECountry::~DBECountry() {}
-string DBECountry::name() const { return "DBECountry"; }
+string& DBECountry::name() const { static string ret("DBECountry"); return ret; }
 string DBECountry::getTableName() const { return "countrylist"; }
-StringVector DBECountry::getKeys() const { return DBECountry::chiavi; }
+StringVector& DBECountry::getKeys() const { return DBECountry::chiavi; }
 DBECountry* DBECountry::createNewInstance() const { return new DBECountry(); }
 DBLayer::StringVector DBECountry::getOrderBy() const {
     static DBLayer::StringVector ret({"id"});
@@ -421,13 +421,13 @@ DBEObject::DBEObject() {
     }
 }
 DBEObject::~DBEObject() {}
-string DBEObject::name() const { return "DBEObject"; }
+string& DBEObject::name() const { static string ret("DBEObject"); return ret; }
 string DBEObject::getTableName() const { return "objects"; }
 DBEObject* DBEObject::createNewInstance() const { return new DBEObject(); }
-StringVector DBEObject::getKeys() const { return chiavi; }
+StringVector& DBEObject::getKeys() const { return chiavi; }
 ForeignKeyVector& DBEObject::getFK() const { return _fkv; }
 ColumnDefinitions DBEObject::getColumns() const { return _columns; }
-StringVector DBEObject::getColumnNames() const { return _column_order; }
+StringVector& DBEObject::getColumnNames() const { return _column_order; }
 DBLayer::StringVector DBEObject::getOrderBy() const {
     static DBLayer::StringVector ret({"name"});
     return ret;
@@ -897,11 +897,11 @@ DBECompany::DBECompany() {
     }
 }
 DBECompany::~DBECompany() {}
-string DBECompany::name() const { return "DBECompany"; }
+string& DBECompany::name() const { static string ret("DBECompany"); return ret; }
 string DBECompany::getTableName() const { return "companies"; }
 ForeignKeyVector& DBECompany::getFK() const { return _fkv; }
 ColumnDefinitions DBECompany::getColumns() const { return _columns; }
-StringVector DBECompany::getColumnNames() const { return _column_order; }
+StringVector& DBECompany::getColumnNames() const { return _column_order; }
 DBECompany* DBECompany::createNewInstance() const { return new DBECompany(); }
 //*********************** DBECompany: end.
 
@@ -946,11 +946,11 @@ DBEPeople::DBEPeople() {
     }
 }
 DBEPeople::~DBEPeople() {}
-string DBEPeople::name() const { return "DBEPeople"; }
+string &DBEPeople::name() const { static string ret("DBEPeople"); return ret; }
 string DBEPeople::getTableName() const { return "people"; }
 ForeignKeyVector& DBEPeople::getFK() const { return _fkv; }
 ColumnDefinitions DBEPeople::getColumns() const { return _columns; }
-StringVector DBEPeople::getColumnNames() const { return _column_order; }
+StringVector& DBEPeople::getColumnNames() const { return _column_order; }
 DBEPeople* DBEPeople::createNewInstance() const { return new DBEPeople(); }
 //*********************** DBEPeople: end.
 
@@ -960,7 +960,7 @@ DBEPeople* DBEPeople::createNewInstance() const { return new DBEPeople(); }
 //*********************** DBEFile: start.
 DBEFile::DBEFile() { this->tableName.clear(); }
 DBEFile::~DBEFile() {}
-string DBEFile::name() const { return "DBEFile"; }
+string &DBEFile::name() const { static string ret("DBEFile"); return ret; }
 string DBEFile::getTableName() const { return "files"; }
 DBEFile* DBEFile::createNewInstance() const { return new DBEFile(); }
 //*********************** DBEFile: end.
@@ -968,7 +968,7 @@ DBEFile* DBEFile::createNewInstance() const { return new DBEFile(); }
 //*********************** DBEFolder: start.
 DBEFolder::DBEFolder() { this->tableName.clear(); }
 DBEFolder::~DBEFolder() {}
-string DBEFolder::name() const { return "DBEFolder"; }
+string &DBEFolder::name() const { static string ret("DBEFolder"); return ret; }
 string DBEFolder::getTableName() const { return "folders"; }
 DBEFolder* DBEFolder::createNewInstance() const { return new DBEFolder(); }
 //*********************** DBEFolder: end.
@@ -976,7 +976,7 @@ DBEFolder* DBEFolder::createNewInstance() const { return new DBEFolder(); }
 //*********************** DBELink: start.
 DBELink::DBELink() { this->tableName.clear(); }
 DBELink::~DBELink() {}
-string DBELink::name() const { return "DBELink"; }
+string &DBELink::name() const { static string ret("DBELink"); return ret; }
 string DBELink::getTableName() const { return "links"; }
 DBELink* DBELink::createNewInstance() const { return new DBELink(); }
 //*********************** DBELink: end.
@@ -984,7 +984,7 @@ DBELink* DBELink::createNewInstance() const { return new DBELink(); }
 //*********************** DBENote: start.
 DBENote::DBENote() { this->tableName.clear(); }
 DBENote::~DBENote() {}
-string DBENote::name() const { return "DBENote"; }
+string &DBENote::name() const { static string ret("DBENote"); return ret; }
 string DBENote::getTableName() const { return "notes"; }
 DBENote* DBENote::createNewInstance() const { return new DBENote(); }
 //*********************** DBENote: end.
@@ -992,12 +992,11 @@ DBENote* DBENote::createNewInstance() const { return new DBENote(); }
 //*********************** DBEPage: start.
 DBEPage::DBEPage() { this->tableName.clear(); }
 DBEPage::~DBEPage() {}
-string DBEPage::name() const { return "DBEPage"; }
+string &DBEPage::name() const { static string ret("DBEPage"); return ret; }
 string DBEPage::getTableName() const { return "pages"; }
 DBEPage* DBEPage::createNewInstance() const { return new DBEPage(); }
 //*********************** DBEPage: end.
 
-string CMSchema::getSchema() { return "cm"; }
 void CMSchema::registerClasses(DBEFactory* dbeFactory) {
     dbeFactory->registerClass("log", new DBELog() );
     dbeFactory->registerClass("objects", new DBEObject() );

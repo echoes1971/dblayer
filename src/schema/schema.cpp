@@ -29,6 +29,8 @@
 ****************************************************************************/
 
 #include <cstdio>
+// for strcmp
+//#include <string.h>
 
 #include "booleanfield.h"
 #include "datefield.h"
@@ -263,6 +265,7 @@ int Schema::getFieldIndex(const string& field) const {
 #endif
 
 #endif
+        //if ( strcmp(fields[i]->getName().c_str(), fieldCstr ) == 0 ) {
         if ( fields[i]->getName().compare( fieldCstr ) == 0 ) {
             ret = (int)i;
         }

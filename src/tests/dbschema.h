@@ -33,8 +33,8 @@ namespace TestSchema {
 
         virtual ColumnDefinitions getColumns() const;
 
-        virtual string name() const;
-        virtual StringVector getKeys() const;
+        virtual string& name() const;
+        virtual StringVector& getKeys() const;
         virtual DBETestDBLayer* createNewInstance() const;
 
         virtual void _before_insert(DBMgr* dbmgr);
@@ -50,8 +50,8 @@ namespace TestSchema {
 
         virtual ColumnDefinitions getColumns() const;
 
-        virtual string name() const;
-        virtual StringVector getKeys() const;
+        virtual string& name() const;
+        virtual StringVector& getKeys() const;
         virtual DBESocieta* createNewInstance() const;
 
         virtual void _before_insert(DBMgr* dbmgr=0);

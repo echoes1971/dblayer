@@ -65,7 +65,7 @@ namespace DBLayer {
         virtual ~DBEntity();
 
         string getColumnType(const string& column_name);
-        virtual StringVector getColumnNames() const;
+        virtual StringVector& getColumnNames() const;
         virtual ColumnDefinitions getColumns() const;
 
         /** Returns the column names of the default orderby */
@@ -80,7 +80,7 @@ namespace DBLayer {
         virtual string getSchemaName() const;
         virtual string getTableName() const;
         /** Class name */
-        virtual string name() const;
+        virtual string& name() const;
         /**
          * @param valuesAsAttributes
          *  if true, values are represented as attributes
@@ -100,10 +100,10 @@ namespace DBLayer {
         string getStringValue(const string& fieldName) const;
 
         /** @return the key fields */
-        virtual StringVector getKeys() const;
+        virtual StringVector& getKeys() const;
         //virtual DBFieldVector* getKeys() const;
         /** @return the key fields NAMES */
-        StringVector getKeyNames() const;
+        StringVector& getKeyNames() const;
         /** @return true if the field name is key */
         bool isKey(string fieldName) const;
         /** @return the foreign keys */

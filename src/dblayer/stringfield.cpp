@@ -30,9 +30,14 @@ StringField::StringField(const string &nome, const string &valore) : DBField(nom
 StringField::~StringField() {}
 
 void StringField::setValue(const string &valore) {
-    if(this->stringValue!=0) { delete this->stringValue; this->stringValue=0; }
-    const char* tmpValore = valore.c_str();
-    this->stringValue = new string(tmpValore);
+    if(this->stringValue!=0) {
+        this->stringValue->assign(valore);
+        delete this->stringValue;
+        this->stringValue=0;
+        nullo = true;
+    }
+//    } else
+        this->stringValue = new string(valore.c_str());
     if(valore.size()>0)
         nullo = false;
 }

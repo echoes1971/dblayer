@@ -50,8 +50,8 @@ DBETestDBLayer::DBETestDBLayer() {
 //    PRIMARY KEY (id)
 }
 DBETestDBLayer::~DBETestDBLayer() {}
-string DBETestDBLayer::name() const { return "DBETestDBLayer"; }
-StringVector DBETestDBLayer::getKeys() const { return DBETestDBLayer::chiavi; }
+string &DBETestDBLayer::name() const { static string ret("DBETestDBLayer"); return ret; }
+StringVector& DBETestDBLayer::getKeys() const { return DBETestDBLayer::chiavi; }
 DBETestDBLayer* DBETestDBLayer::createNewInstance() const { return new DBETestDBLayer(); }
 
 void DBETestDBLayer::_before_insert(DBMgr* dbmgr) {
@@ -109,8 +109,8 @@ DBESocieta::DBESocieta() {
 //    data_creazione text,
 }
 DBESocieta::~DBESocieta() {}
-string DBESocieta::name() const { return "DBESocieta"; }
-StringVector DBESocieta::getKeys() const { return DBESocieta::chiavi; }
+string &DBESocieta::name() const { static string ret("DBESocieta"); return ret; }
+StringVector& DBESocieta::getKeys() const { return DBESocieta::chiavi; }
 DBESocieta* DBESocieta::createNewInstance() const { return new DBESocieta(); }
 
 void DBESocieta::_before_insert(DBMgr* dbmgr) {

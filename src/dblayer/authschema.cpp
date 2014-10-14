@@ -13,7 +13,7 @@ StringVector DBEDBVersion::chiavi = { "model_name" };
 ColumnDefinitions DBEDBVersion::_columns;
 StringVector DBEDBVersion::_column_order = {"model_name","version"};
 ColumnDefinitions DBEDBVersion::getColumns() const { return _columns; }
-StringVector DBEDBVersion::getColumnNames() const { return _column_order; }
+StringVector& DBEDBVersion::getColumnNames() const { return _column_order; }
 DBEDBVersion::DBEDBVersion() {
     this->tableName.clear();
     this->schemaName = "dblayer";
@@ -26,9 +26,9 @@ DBEDBVersion::DBEDBVersion() {
     }
 }
 DBEDBVersion::~DBEDBVersion() {}
-string DBEDBVersion::name() const { return "DBEDBVersion"; }
+string &DBEDBVersion::name() const { static string ret("DBEDBVersion"); return ret; }
 string DBEDBVersion::getTableName() const { return "dbversion"; }
-StringVector DBEDBVersion::getKeys() const { return DBEDBVersion::chiavi; }
+StringVector& DBEDBVersion::getKeys() const { return DBEDBVersion::chiavi; }
 DBEDBVersion* DBEDBVersion::createNewInstance() const { return new DBEDBVersion(); }
 DBLayer::StringVector DBEDBVersion::getOrderBy() const {
     static DBLayer::StringVector ret({"version"});
@@ -65,12 +65,12 @@ DBEUser::DBEUser() {
     }
 }
 DBEUser::~DBEUser() {}
-string DBEUser::name() const { return "DBEUser"; }
+string& DBEUser::name() const { static string ret("DBEUser"); return ret; }
 string DBEUser::getTableName() const { return "users"; }
-StringVector DBEUser::getKeys() const { return DBEUser::chiavi; }
+StringVector& DBEUser::getKeys() const { return DBEUser::chiavi; }
 ForeignKeyVector& DBEUser::getFK() const { return _fkv; }
 ColumnDefinitions DBEUser::getColumns() const { return _columns; }
-StringVector DBEUser::getColumnNames() const { return _column_order; }
+StringVector& DBEUser::getColumnNames() const { return _column_order; }
 DBEUser* DBEUser::createNewInstance() const { return new DBEUser(); }
 DBLayer::StringVector DBEUser::getOrderBy() const {
     static DBLayer::StringVector ret({"fullname"});
@@ -165,12 +165,12 @@ DBEGroup::DBEGroup() {
     }
 }
 DBEGroup::~DBEGroup() {}
-string DBEGroup::name() const { return "DBEGroup"; }
+string& DBEGroup::name() const { static string ret("DBEGroup"); return ret; }
 string DBEGroup::getTableName() const { return "groups"; }
 DBEGroup* DBEGroup::createNewInstance() const { return new DBEGroup(); }
-StringVector DBEGroup::getKeys() const { return chiavi; }
+StringVector& DBEGroup::getKeys() const { return chiavi; }
 ColumnDefinitions DBEGroup::getColumns() const { return _columns; }
-StringVector DBEGroup::getColumnNames() const { return _column_order; }
+StringVector& DBEGroup::getColumnNames() const { return _column_order; }
 DBLayer::StringVector DBEGroup::getOrderBy() const {
     static DBLayer::StringVector ret({"name"});
     return ret;
@@ -251,12 +251,12 @@ DBEUserGroup::DBEUserGroup() {
     }
 }
 DBEUserGroup::~DBEUserGroup() {}
-string DBEUserGroup::name() const { return "DBEUserGroup"; }
+string& DBEUserGroup::name() const { static string ret("DBEUserGroup"); return ret; }
 string DBEUserGroup::getTableName() const { return "users_groups"; }
-StringVector DBEUserGroup::getKeys() const { return chiavi; }
+StringVector& DBEUserGroup::getKeys() const { return chiavi; }
 ForeignKeyVector& DBEUserGroup::getFK() const { return _fkv; }
 ColumnDefinitions DBEUserGroup::getColumns() const { return _columns; }
-StringVector DBEUserGroup::getColumnNames() const { return _column_order; }
+StringVector& DBEUserGroup::getColumnNames() const { return _column_order; }
 DBEUserGroup* DBEUserGroup::createNewInstance() const { return new DBEUserGroup(); }
 DBLayer::StringVector DBEUserGroup::getOrderBy() const {
     static DBLayer::StringVector ret({"user_id","group_id"});
@@ -277,7 +277,6 @@ vector<map<string,string> > DBEUserGroup::getDefaultEntries() const {
 //*********************** DBEUserGroup: end.
 
 
-string AuthSchema::getSchema() { return "auth"; }
 void AuthSchema::registerClasses(DBEFactory* dbeFactory) {
   dbeFactory->registerClass("dbversion", new DBEDBVersion() );
   dbeFactory->registerClass("users", new DBEUser() );
