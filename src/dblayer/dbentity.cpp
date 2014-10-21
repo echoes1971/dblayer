@@ -36,6 +36,7 @@
 using namespace DBLayer;
 
 ColumnDefinitions DBEntity::_columns;
+StringVector DBEntity::_column_order;
 ForeignKeyVector DBEntity::_fkv;
 
 DBEntity::DBEntity() {
@@ -512,12 +513,13 @@ string DBEntity::getColumnType(const string& column_name) {
         return "";
     }
 }
-StringVector& DBEntity::getColumnNames() const {
-    StringVector ret;
-    for(const pair<string,vector<string> > pair : this->getColumns())
-        ret.push_back(pair.first);
-    return ret;
-}
+StringVector& DBEntity::getColumnNames() const { return DBEntity::_column_order; }
+// StringVector& DBEntity::getColumnNames() const {
+//     StringVector ret;
+//     for(const pair<string,vector<string> > pair : this->getColumns())
+//         ret.push_back(pair.first);
+//     return ret;
+// }
 ColumnDefinitions DBEntity::getColumns() const { return DBEntity::_columns; }
 DBLayer::StringVector DBEntity::getOrderBy() const { return this->getKeyNames(); }
 string DBEntity::getOrderByString() const {
