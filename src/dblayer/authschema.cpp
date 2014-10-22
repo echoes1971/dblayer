@@ -18,11 +18,11 @@ DBEDBVersion::DBEDBVersion() {
     this->tableName.clear();
     this->schemaName = "dblayer";
     if(_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEntity::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["model_name"] = vector<string> {"varchar(255)","not null"};
-        _columns["version"] = vector<string> {"int","not null"};
+        _columns["model_name"] = StringVector {"varchar(255)","not null"};
+        _columns["version"] = StringVector {"int","not null"};
     }
 }
 DBEDBVersion::~DBEDBVersion() {}
@@ -49,15 +49,15 @@ DBEUser::DBEUser() {
     this->tableName.clear();
     this->schemaName = AuthSchema::getSchema();
     if(DBEUser::_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEntity::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["id"] = vector<string> {"uuid","not null"};
-        _columns["login"] = vector<string> {"varchar(255)","not null"};
-        _columns["pwd"] = vector<string> {"varchar(255)","not null"};
-        _columns["pwd_salt"] = vector<string> {"varchar(4)","default ''"};
-        _columns["fullname"] = vector<string> {"text","default null"};
-        _columns["group_id"] = vector<string> {"uuid","not null"};
+        _columns["id"] = StringVector {"uuid","not null"};
+        _columns["login"] = StringVector {"varchar(255)","not null"};
+        _columns["pwd"] = StringVector {"varchar(255)","not null"};
+        _columns["pwd_salt"] = StringVector {"varchar(4)","default ''"};
+        _columns["fullname"] = StringVector {"text","default null"};
+        _columns["group_id"] = StringVector {"uuid","not null"};
     }
     if(_fkv.size()==0) {
         for(const auto& fk : DBEntity::getFK()) { _fkv.push_back(fk); }
@@ -156,12 +156,12 @@ DBEGroup::DBEGroup() {
     this->tableName.clear();
     this->schemaName = AuthSchema::getSchema();
     if(_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEntity::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["id"] = vector<string> {"uuid","not null"};
-        _columns["name"] = vector<string> {"varchar(255)","not null"};
-        _columns["description"] = vector<string> {"text","default null"};
+        _columns["id"] = StringVector {"uuid","not null"};
+        _columns["name"] = StringVector {"varchar(255)","not null"};
+        _columns["description"] = StringVector {"text","default null"};
     }
 }
 DBEGroup::~DBEGroup() {}
@@ -236,11 +236,11 @@ DBEUserGroup::DBEUserGroup() {
     this->tableName.clear();
     this->schemaName = AuthSchema::getSchema();
     if(_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEntity::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["user_id"] = vector<string> {"uuid","not null"};
-        _columns["group_id"] = vector<string> {"uuid","not null"};
+        _columns["user_id"] = StringVector {"uuid","not null"};
+        _columns["group_id"] = StringVector {"uuid","not null"};
     }
     if(_fkv.size()==0) {
         for(const auto& fk : DBEntity::getFK()) {

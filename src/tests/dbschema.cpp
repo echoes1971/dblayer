@@ -28,16 +28,16 @@ DBETestDBLayer::DBETestDBLayer() {
 	this->tableName.append( "test_dblayer" );
     this->schemaName = TestSchema::getSchema();
     if(DBETestDBLayer::_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEntity::getColumns()) {
             DBETestDBLayer::_columns[pair.first] = pair.second;
         }
-        DBETestDBLayer::_columns["id"] = vector<string> {"uuid","not null"};
-        DBETestDBLayer::_columns["nome"] = vector<string> {"varchar(255)"};
-        DBETestDBLayer::_columns["descrizione"] = vector<string> {"varchar(2000)"};
-        DBETestDBLayer::_columns["abilitato"] = vector<string> {"bool"};
-        DBETestDBLayer::_columns["data_creazione"] = vector<string> {"datetime"};
-        DBETestDBLayer::_columns["prezzo"] = vector<string> {"float"};
-        DBETestDBLayer::_columns["data_disponibilita"] = vector<string> {"datetime"};
+        DBETestDBLayer::_columns["id"] = StringVector {"uuid","not null"};
+        DBETestDBLayer::_columns["nome"] = StringVector {"varchar(255)"};
+        DBETestDBLayer::_columns["descrizione"] = StringVector {"varchar(2000)"};
+        DBETestDBLayer::_columns["abilitato"] = StringVector {"bool"};
+        DBETestDBLayer::_columns["data_creazione"] = StringVector {"datetime"};
+        DBETestDBLayer::_columns["prezzo"] = StringVector {"float"};
+        DBETestDBLayer::_columns["data_disponibilita"] = StringVector {"datetime"};
     }
 
 //    id int NOT NULL,
@@ -73,24 +73,24 @@ DBESocieta::DBESocieta() {
     this->tableName.append( "societa" );
     this->schemaName = TestSchema::getSchema();
     if(DBESocieta::_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEntity::getColumns()) {
             DBESocieta::_columns[pair.first] = pair.second;
         }
-        DBESocieta::_columns["id"] = vector<string> {"uuid","not null"};
-        DBESocieta::_columns["ragione_sociale"] = vector<string> {"text"};
-        DBESocieta::_columns["indirizzo"] = vector<string> {"text"};
-        DBESocieta::_columns["cap"] = vector<string> {"varchar(6)"};
-        DBESocieta::_columns["nazione"] = vector<string> {"text"};
-        DBESocieta::_columns["telefono"] = vector<string> {"text"};
-        DBESocieta::_columns["fax"] = vector<string> {"text"};
-        DBESocieta::_columns["email"] = vector<string> {"text"};
-        DBESocieta::_columns["note"] = vector<string> {"text"};
-        DBESocieta::_columns["website"] = vector<string> {"text"};
-        DBESocieta::_columns["citta"] = vector<string> {"text"};
-        DBESocieta::_columns["provincia"] = vector<string> {"text"};
-        DBESocieta::_columns["partita_iva"] = vector<string> {"text"};
-        DBESocieta::_columns["tipo"] = vector<string> {"text"};
-        DBESocieta::_columns["data_creazione"] = vector<string> {"datetime"};
+        DBESocieta::_columns["id"] = StringVector {"uuid","not null"};
+        DBESocieta::_columns["ragione_sociale"] = StringVector {"text"};
+        DBESocieta::_columns["indirizzo"] = StringVector {"text"};
+        DBESocieta::_columns["cap"] = StringVector {"varchar(6)"};
+        DBESocieta::_columns["nazione"] = StringVector {"text"};
+        DBESocieta::_columns["telefono"] = StringVector {"text"};
+        DBESocieta::_columns["fax"] = StringVector {"text"};
+        DBESocieta::_columns["email"] = StringVector {"text"};
+        DBESocieta::_columns["note"] = StringVector {"text"};
+        DBESocieta::_columns["website"] = StringVector {"text"};
+        DBESocieta::_columns["citta"] = StringVector {"text"};
+        DBESocieta::_columns["provincia"] = StringVector {"text"};
+        DBESocieta::_columns["partita_iva"] = StringVector {"text"};
+        DBESocieta::_columns["tipo"] = StringVector {"text"};
+        DBESocieta::_columns["data_creazione"] = StringVector {"datetime"};
     }
 //    id integer NOT NULL,
 //    ragione_sociale text,

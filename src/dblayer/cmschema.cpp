@@ -21,16 +21,16 @@ DBELog::DBELog() {
     this->tableName.clear();
     this->schemaName = CMSchema::getSchema();
     if(_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEntity::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["ip"] = vector<string> {"uuid","not null"};
-        _columns["data"] = vector<string> {"date","not null default '0000-00-00'"};
-        _columns["ora"] = vector<string> {"time","not null default '00:00:00'"};
-        _columns["count"] = vector<string> {"int","not null default 0"};
-        _columns["url"] = vector<string> {"varchar(255)","default null"};
-        _columns["note"] = vector<string> {"varchar(255)","not null default ''"};
-        _columns["note2"] = vector<string> {"text","not null"};
+        _columns["ip"] = StringVector {"uuid","not null"};
+        _columns["data"] = StringVector {"date","not null default '0000-00-00'"};
+        _columns["ora"] = StringVector {"time","not null default '00:00:00'"};
+        _columns["count"] = StringVector {"int","not null default 0"};
+        _columns["url"] = StringVector {"varchar(255)","default null"};
+        _columns["note"] = StringVector {"varchar(255)","not null default ''"};
+        _columns["note2"] = StringVector {"text","not null"};
     }
 }
 DBELog::~DBELog() {}
@@ -59,23 +59,23 @@ DBECountry::DBECountry() {
     this->tableName.clear();
     this->schemaName = CMSchema::getSchema();
     if(_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEntity::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["id"] = vector<string> {"uuid","not null"};
-        _columns["Common_Name"] = vector<string> {"varchar(255)","default null"};
-        _columns["Formal_Name"] = vector<string> {"varchar(255)","default null"};
-        _columns["Type"] = vector<string> {"varchar(255)","default null"};
-        _columns["Sub_Type"] = vector<string> {"varchar(255)","default null"};
-        _columns["Sovereignty"] = vector<string> {"varchar(255)","default null"};
-        _columns["Capital"] = vector<string> {"varchar(255)","default null"};
-        _columns["ISO_4217_Currency_Code"] = vector<string> {"varchar(255)","default null"};
-        _columns["ISO_4217_Currency_Name"] = vector<string> {"varchar(255)","default null"};
-        _columns["ITU_T_Telephone_Code"] = vector<string> {"varchar(255)","default null"};
-        _columns["ISO_3166_1_2_Letter_Code"] = vector<string> {"varchar(255)","default null"};
-        _columns["ISO_3166_1_3_Letter_Code"] = vector<string> {"varchar(255)","default null"};
-        _columns["ISO_3166_1_Number"] = vector<string> {"varchar(255)","default null"};
-        _columns["IANA_Country_Code_TLD"] = vector<string> {"varchar(255)","default null"};
+        _columns["id"] = StringVector {"uuid","not null"};
+        _columns["Common_Name"] = StringVector {"varchar(255)","default null"};
+        _columns["Formal_Name"] = StringVector {"varchar(255)","default null"};
+        _columns["Type"] = StringVector {"varchar(255)","default null"};
+        _columns["Sub_Type"] = StringVector {"varchar(255)","default null"};
+        _columns["Sovereignty"] = StringVector {"varchar(255)","default null"};
+        _columns["Capital"] = StringVector {"varchar(255)","default null"};
+        _columns["ISO_4217_Currency_Code"] = StringVector {"varchar(255)","default null"};
+        _columns["ISO_4217_Currency_Name"] = StringVector {"varchar(255)","default null"};
+        _columns["ITU_T_Telephone_Code"] = StringVector {"varchar(255)","default null"};
+        _columns["ISO_3166_1_2_Letter_Code"] = StringVector {"varchar(255)","default null"};
+        _columns["ISO_3166_1_3_Letter_Code"] = StringVector {"varchar(255)","default null"};
+        _columns["ISO_3166_1_Number"] = StringVector {"varchar(255)","default null"};
+        _columns["IANA_Country_Code_TLD"] = StringVector {"varchar(255)","default null"};
     }
 }
 DBECountry::~DBECountry() {}
@@ -392,23 +392,23 @@ DBEObject::DBEObject() {
     this->tableName.clear();
     this->schemaName = CMSchema::getSchema();
     if(_columns.size()==0) {
-        for(const pair<string,vector<string> > pair: DBEntity::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEntity::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["id"] = vector<string> {"uuid","not null"};
-        _columns["owner"] = vector<string> {"uuid","not null"};
-        _columns["group_id"] = vector<string> {"uuid","not null"};
+        _columns["id"] = StringVector {"uuid","not null"};
+        _columns["owner"] = StringVector {"uuid","not null"};
+        _columns["group_id"] = StringVector {"uuid","not null"};
 
-        _columns["permissions"] = vector<string> {"char(9)","not null default 'rwx------'"};
-        _columns["creator"] = vector<string> {"uuid","not null"};
-        _columns["creation_date"] = vector<string> {"datetime","default null"};
-        _columns["last_modify"] = vector<string> {"uuid","not null"};
-        _columns["last_modify_date"] = vector<string> {"datetime","default null"};
-        _columns["deleted_by"] = vector<string> {"uuid","default null"};
-        _columns["deleted_date"] = vector<string> {"datetime","not null default '0000-00-00 00:00:00'"};
-        _columns["father_id"] = vector<string> {"uuid","default null"};
-        _columns["name"] = vector<string> {"varchar(255)","not null"};
-        _columns["description"] = vector<string> {"text","default null"};
+        _columns["permissions"] = StringVector {"char(9)","not null default 'rwx------'"};
+        _columns["creator"] = StringVector {"uuid","not null"};
+        _columns["creation_date"] = StringVector {"datetime","default null"};
+        _columns["last_modify"] = StringVector {"uuid","not null"};
+        _columns["last_modify_date"] = StringVector {"datetime","default null"};
+        _columns["deleted_by"] = StringVector {"uuid","default null"};
+        _columns["deleted_date"] = StringVector {"datetime","not null default '0000-00-00 00:00:00'"};
+        _columns["father_id"] = StringVector {"uuid","default null"};
+        _columns["name"] = StringVector {"varchar(255)","not null"};
+        _columns["description"] = StringVector {"text","default null"};
     }
     if(_fkv.size()==0) {
         for(const DBLayer::ForeignKey& fk : DBEntity::getFK()) { _fkv.push_back(fk); }
@@ -876,19 +876,19 @@ DBECompany::DBECompany() {
         }
 //         for(const string& s : _column_order) column_order.push_back(s);
         _column_order = column_order;
-        for(const pair<string,vector<string> > pair: DBEObject::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEObject::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["street"] = vector<string> {"varchar(255)","default null"};
-        _columns["zip"] = vector<string> {"varchar(255)","default null"};
-        _columns["city"] = vector<string> {"varchar(255)","default null"};
-        _columns["state"] = vector<string> {"varchar(255)","default null"};
-        _columns["fk_countrylist_id"] = vector<string> {"uuid","default null"};
-        _columns["phone"] = vector<string> {"varchar(255)","default null"};
-        _columns["fax"] = vector<string> {"varchar(255)","default null"};
-        _columns["email"] = vector<string> {"varchar(255)","default null"};
-        _columns["url"] = vector<string> {"varchar(255)","default null"};
-        _columns["p_iva"] = vector<string> {"varchar(16)","default null"};
+        _columns["street"] = StringVector {"varchar(255)","default null"};
+        _columns["zip"] = StringVector {"varchar(255)","default null"};
+        _columns["city"] = StringVector {"varchar(255)","default null"};
+        _columns["state"] = StringVector {"varchar(255)","default null"};
+        _columns["fk_countrylist_id"] = StringVector {"uuid","default null"};
+        _columns["phone"] = StringVector {"varchar(255)","default null"};
+        _columns["fax"] = StringVector {"varchar(255)","default null"};
+        _columns["email"] = StringVector {"varchar(255)","default null"};
+        _columns["url"] = StringVector {"varchar(255)","default null"};
+        _columns["p_iva"] = StringVector {"varchar(16)","default null"};
     }
     if(_fkv.size()==0) {
         for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
@@ -919,24 +919,24 @@ DBEPeople::DBEPeople() {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
         _column_order = column_order;
-        for(const pair<string,vector<string> > pair: DBEObject::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEObject::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["street"] = vector<string> {"varchar(255)","default null"};
-        _columns["zip"] = vector<string> {"varchar(255)","default null"};
-        _columns["city"] = vector<string> {"varchar(255)","default null"};
-        _columns["state"] = vector<string> {"varchar(255)","default null"};
-        _columns["fk_countrylist_id"] = vector<string> {"uuid","default null"};
-        _columns["fk_companies_id"] = vector<string> {"uuid","default null"};
-        _columns["fk_users_id"] = vector<string> {"uuid","default null"};
-        _columns["phone"] = vector<string> {"varchar(255)","default null"};
-        _columns["office_phone"] = vector<string> {"varchar(255)","default null"};
-        _columns["mobile"] = vector<string> {"varchar(255)","default null"};
-        _columns["fax"] = vector<string> {"varchar(255)","default null"};
-        _columns["email"] = vector<string> {"varchar(255)","default null"};
-        _columns["url"] = vector<string> {"varchar(255)","default null"};
-        _columns["codice_fiscale"] = vector<string> {"varchar(20)","default null"};
-        _columns["p_iva"] = vector<string> {"varchar(16)","default null"};
+        _columns["street"] = StringVector {"varchar(255)","default null"};
+        _columns["zip"] = StringVector {"varchar(255)","default null"};
+        _columns["city"] = StringVector {"varchar(255)","default null"};
+        _columns["state"] = StringVector {"varchar(255)","default null"};
+        _columns["fk_countrylist_id"] = StringVector {"uuid","default null"};
+        _columns["fk_companies_id"] = StringVector {"uuid","default null"};
+        _columns["fk_users_id"] = StringVector {"uuid","default null"};
+        _columns["phone"] = StringVector {"varchar(255)","default null"};
+        _columns["office_phone"] = StringVector {"varchar(255)","default null"};
+        _columns["mobile"] = StringVector {"varchar(255)","default null"};
+        _columns["fax"] = StringVector {"varchar(255)","default null"};
+        _columns["email"] = StringVector {"varchar(255)","default null"};
+        _columns["url"] = StringVector {"varchar(255)","default null"};
+        _columns["codice_fiscale"] = StringVector {"varchar(20)","default null"};
+        _columns["p_iva"] = StringVector {"varchar(16)","default null"};
     }
     if(_fkv.size()==0) {
         for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
@@ -985,53 +985,53 @@ DBEEvent::DBEEvent() {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
         _column_order = column_order;
-        for(const pair<string,vector<string> > pair: DBEObject::getColumns()) {
+        for(const pair<string,StringVector > pair: DBEObject::getColumns()) {
             _columns[pair.first] = pair.second;
         }
-        _columns["fk_obj_id"] = vector<string> {"uuid","default null"};
+        _columns["fk_obj_id"] = StringVector {"uuid","default null"};
 
-        _columns["start_date"] = vector<string> {"datetime","not null default '0000-00-00 00:00:00'"};
-        _columns["end_date"] = vector<string> {"datetime","not null default '0000-00-00 00:00:00'"};
-        _columns["all_day"] = vector<string> {"char(1)","not null default '1'"}; // Bool - An all day event?
+        _columns["start_date"] = StringVector {"datetime","not null default '0000-00-00 00:00:00'"};
+        _columns["end_date"] = StringVector {"datetime","not null default '0000-00-00 00:00:00'"};
+        _columns["all_day"] = StringVector {"char(1)","not null default '1'"}; // Bool - An all day event?
 
-        _columns["url"] = vector<string> {"varchar(255)","default null"}; // A url
+        _columns["url"] = StringVector {"varchar(255)","default null"}; // A url
 
-        _columns["alarm"] = vector<string> {"char(1)","default '0'"}; // Bool - Signal an alarm before?
-        _columns["alarm_minute"] = vector<string> {"int","default 0"}; // Num. time unit
-        _columns["alarm_unit"] = vector<string> {"char(1)","default '0'"}; // Time unit 0-2 => minutes, hours, days
-        _columns["before_event"] = vector<string> {"char(1)","default '0'"}; // 0=before event starts 1=after
+        _columns["alarm"] = StringVector {"char(1)","default '0'"}; // Bool - Signal an alarm before?
+        _columns["alarm_minute"] = StringVector {"int","default 0"}; // Num. time unit
+        _columns["alarm_unit"] = StringVector {"char(1)","default '0'"}; // Time unit 0-2 => minutes, hours, days
+        _columns["before_event"] = StringVector {"char(1)","default '0'"}; // 0=before event starts 1=after
 
-        _columns["category"] = vector<string> {"varchar(255)","default ''"}; // Event category
+        _columns["category"] = StringVector {"varchar(255)","default ''"}; // Event category
 
         // Recurrence
-        _columns["recurrence"] = vector<string> {"char(1)","default '0'"}; // Bool - Recurrence active?
-        _columns["recurrence_type"] = vector<string> {"char(1)","default '0'"}; // 0=Daily, 1=Weekly, 2=monthly, 3=yearly
+        _columns["recurrence"] = StringVector {"char(1)","default '0'"}; // Bool - Recurrence active?
+        _columns["recurrence_type"] = StringVector {"char(1)","default '0'"}; // 0=Daily, 1=Weekly, 2=monthly, 3=yearly
         // 0: daily
-        _columns["daily_every_x"] = vector<string> {"int","default 0"}; // every_x_days
+        _columns["daily_every_x"] = StringVector {"int","default 0"}; // every_x_days
         // 1: weekly
-        _columns["weekly_every_x"] = vector<string> {"int","default 0"};
-        _columns["weekly_day_of_the_week"] = vector<string> {"char(1)","default '0'"}; // 0=monday ... 6=sunday
+        _columns["weekly_every_x"] = StringVector {"int","default 0"};
+        _columns["weekly_day_of_the_week"] = StringVector {"char(1)","default '0'"}; // 0=monday ... 6=sunday
         // 2: monthly
-        _columns["monthly_every_x"] = vector<string> {"int","default 0"}; // every x months
+        _columns["monthly_every_x"] = StringVector {"int","default 0"}; // every x months
         //  1) n-th day of the month
-        _columns["monthly_day_of_the_month"] = vector<string> {"int","default 0"}; // 0=do not, -5...-1,1 ... 31
+        _columns["monthly_day_of_the_month"] = StringVector {"int","default 0"}; // 0=do not, -5...-1,1 ... 31
         //  2) n-th week on monday
-        _columns["monthly_week_number"] = vector<string> {"int","default 0"}; // 0=do not, 1...5
-        _columns["monthly_week_day"] = vector<string> {"char(1)","default '0'"}; // 0=monday ... 6=sunday
+        _columns["monthly_week_number"] = StringVector {"int","default 0"}; // 0=do not, 1...5
+        _columns["monthly_week_day"] = StringVector {"char(1)","default '0'"}; // 0=monday ... 6=sunday
         // 3: Yearly
         //  1) every day XX of month MM
-        _columns["yearly_month_number"] = vector<string> {"int","default 0"}; // 0=do not, 1...12
-        _columns["yearly_month_day"] = vector<string> {"int","default 0"}; // 0=do not, 1...31
+        _columns["yearly_month_number"] = StringVector {"int","default 0"}; // 0=do not, 1...12
+        _columns["yearly_month_day"] = StringVector {"int","default 0"}; // 0=do not, 1...31
         //  2) every first monday of june
-        //_columns["yearly_month_number"] = vector<string> {"int","default 0"}; // 0=do not, 1...12
-        _columns["yearly_week_number"] = vector<string> {"int","default 0"}; // 0=do not 1...5
-        _columns["yearly_week_day"] = vector<string> {"char(1)","default '0'"}; // 0=monday ... 6=sunday
+        //_columns["yearly_month_number"] = StringVector {"int","default 0"}; // 0=do not, 1...12
+        _columns["yearly_week_number"] = StringVector {"int","default 0"}; // 0=do not 1...5
+        _columns["yearly_week_day"] = StringVector {"char(1)","default '0'"}; // 0=monday ... 6=sunday
         //  3) every n-th day of the year
-        _columns["yearly_day_of_the_year"] = vector<string> {"int","default 0"}; // 0=do not, 1...366
+        _columns["yearly_day_of_the_year"] = StringVector {"int","default 0"}; // 0=do not, 1...366
         // Recurrence range
-        _columns["recurrence_times"] = vector<string> {"int","default 0"}; // 0=always 1...N times
+        _columns["recurrence_times"] = StringVector {"int","default 0"}; // 0=always 1...N times
         // Recurrence until <date>
-        _columns["recurrence_end_date"] = vector<string> {"datetime","not null default '0000-00-00 00:00:00'"};
+        _columns["recurrence_end_date"] = StringVector {"datetime","not null default '0000-00-00 00:00:00'"};
     }
     if(_fkv.size()==0) {
         for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
