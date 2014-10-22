@@ -109,6 +109,7 @@ class DECLSPECIFIER DBEntity : public Schema {
     /** @return the foreign keys */
     virtual ForeignKeyVector& getFK() const;
     ForeignKeyVector getFKForTable(string tablename);
+    ForeignKeyVector getFKForColumn(string column_name);
     /**	Reads the content of the referenced columns in the referenced table
     mapped in the given dbe	*/
     void readFKFrom(DBEntity* dbe);

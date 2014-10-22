@@ -137,7 +137,7 @@ bool testSchemas(string connString, string& loginUser, string& loginPwd) {
     AuthSchema::registerClasses(dbeFactory);
     AuthSchema::checkDB(*objmgr,false);
     CMSchema::registerClasses(dbeFactory);
-    CMSchema::checkDB(*objmgr,false);
+    CMSchema::checkDB(*objmgr,true);
 
     if(objmgr->connect()) {
 

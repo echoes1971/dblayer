@@ -210,6 +210,12 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, std:
             }
             // Foreign Key
             if(use_fk) {
+                ForeignKeyVector fks = this->getFKForColumn(colname);
+                if(fks.size()==1) {
+                    ForeignKey& f = fks.at(0);
+                    ret.append("REFERENCES ").append(lambda_getClazzSchema(f.tabella_riferita)).append("_").append(f.tabella_riferita).append(" (").append(f.colonna_riferita).append(") ");
+                }
+                /*
                 ForeignKeyVector& fks = this->getFK();
                 for(unsigned int i=0; i<fks.size(); i++) {
                     ForeignKey& f = fks.at(i);
@@ -218,6 +224,7 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, std:
                         break;
                     }
                 }
+                */
             }
             if(cols_counter<(cols_length-1)) {
                 ret.append(",");
@@ -413,6 +420,19 @@ ForeignKeyVector DBEntity::getFKForTable(string tablename) {
     }
     return ret;
 }
+ForeignKeyVector DBEntity::getFKForColumn(string column_name) {
+    ForeignKeyVector& fks = this->getFK();
+    ForeignKeyVector ret;
+    for(unsigned int i=0; i<fks.size(); i++) {
+        ForeignKey& f = fks.at(i);
+        string column_fk = f.colonna_fk;
+        if( column_fk == column_name ) {
+            ret.push_back( f );
+        }
+    }
+    return ret;
+}
+
 void DBEntity::readFKFrom(DBEntity* dbe) {
     ForeignKeyVector fks = this->getFKForTable( dbe->getTableName() );
     for(unsigned int i=0; i<fks.size(); i++) {

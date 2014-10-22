@@ -1,5 +1,6 @@
 #include <cstdio>
 
+#include <QtSql/QSqlError>
 #include <QtSql/QSqlField>
 #include <QtSql/QSqlIndex>
 #include <QtSql/QSqlQuery>
@@ -93,6 +94,9 @@ ResultSet* QSqliteConnection::exec(const string s) {
     QSqlQuery query(db);
     query.exec(QString(s.c_str()));
 
+    if(query.lastError().text().trimmed().length()>0)
+        this->errorMessage.append( query.lastError().text().trimmed().toStdString() );
+//cerr << "QSqliteConnection::exec: query.lastError()=" << query.lastError().text().toStdString() << endl;
     QSqlRecord record = query.record();
 
     // Preparing metadata

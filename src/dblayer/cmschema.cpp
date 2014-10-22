@@ -954,6 +954,102 @@ StringVector& DBEPeople::getColumnNames() const { return _column_order; }
 DBEPeople* DBEPeople::createNewInstance() const { return new DBEPeople(); }
 //*********************** DBEPeople: end.
 
+//*********************** DBEEvent: start.
+ForeignKeyVector DBEEvent::_fkv;
+ColumnDefinitions DBEEvent::_columns;
+StringVector DBEEvent::_column_order = {
+    "fk_obj_id"
+    ,"start_date","end_date","all_day"
+    ,"url"
+    ,"alarm","alarm_minute","alarm_unit","before_event"
+    ,"category"
+    ,"recurrence","recurrence_type"
+    ,"daily_every_x"
+    ,"weekly_every_x","weekly_day_of_the_week"
+    ,"monthly_every_x"
+        ,"monthly_day_of_the_month"
+        ,"monthly_week_number","monthly_week_day"
+
+        ,"yearly_month_number","yearly_month_day"
+        ,"yearly_week_number","yearly_week_day"
+        ,"yearly_day_of_the_year"
+    ,"recurrence_times","recurrence_end_date"
+};
+DBEEvent::DBEEvent() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        StringVector column_order = DBEEvent::getColumnNames();
+        StringVector parentColumns = DBEObject::getColumnNames();
+        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+            column_order.insert(column_order.begin(),parentColumns.at(i));
+        }
+        _column_order = column_order;
+        for(const pair<string,vector<string> > pair: DBEObject::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _columns["fk_obj_id"] = vector<string> {"uuid","default null"};
+
+        _columns["start_date"] = vector<string> {"datetime","not null default '0000-00-00 00:00:00'"};
+        _columns["end_date"] = vector<string> {"datetime","not null default '0000-00-00 00:00:00'"};
+        _columns["all_day"] = vector<string> {"char(1)","not null default '1'"}; // Bool - An all day event?
+
+        _columns["url"] = vector<string> {"varchar(255)","default null"}; // A url
+
+        _columns["alarm"] = vector<string> {"char(1)","default '0'"}; // Bool - Signal an alarm before?
+        _columns["alarm_minute"] = vector<string> {"int","default 0"}; // Num. time unit
+        _columns["alarm_unit"] = vector<string> {"char(1)","default '0'"}; // Time unit 0-2 => minutes, hours, days
+        _columns["before_event"] = vector<string> {"char(1)","default '0'"}; // 0=before event starts 1=after
+
+        _columns["category"] = vector<string> {"varchar(255)","default ''"}; // Event category
+
+        // Recurrence
+        _columns["recurrence"] = vector<string> {"char(1)","default '0'"}; // Bool - Recurrence active?
+        _columns["recurrence_type"] = vector<string> {"char(1)","default '0'"}; // 0=Daily, 1=Weekly, 2=monthly, 3=yearly
+        // 0: daily
+        _columns["daily_every_x"] = vector<string> {"int","default 0"}; // every_x_days
+        // 1: weekly
+        _columns["weekly_every_x"] = vector<string> {"int","default 0"};
+        _columns["weekly_day_of_the_week"] = vector<string> {"char(1)","default '0'"}; // 0=monday ... 6=sunday
+        // 2: monthly
+        _columns["monthly_every_x"] = vector<string> {"int","default 0"}; // every x months
+        //  1) n-th day of the month
+        _columns["monthly_day_of_the_month"] = vector<string> {"int","default 0"}; // 0=do not, -5...-1,1 ... 31
+        //  2) n-th week on monday
+        _columns["monthly_week_number"] = vector<string> {"int","default 0"}; // 0=do not, 1...5
+        _columns["monthly_week_day"] = vector<string> {"char(1)","default '0'"}; // 0=monday ... 6=sunday
+        // 3: Yearly
+        //  1) every day XX of month MM
+        _columns["yearly_month_number"] = vector<string> {"int","default 0"}; // 0=do not, 1...12
+        _columns["yearly_month_day"] = vector<string> {"int","default 0"}; // 0=do not, 1...31
+        //  2) every first monday of june
+        //_columns["yearly_month_number"] = vector<string> {"int","default 0"}; // 0=do not, 1...12
+        _columns["yearly_week_number"] = vector<string> {"int","default 0"}; // 0=do not 1...5
+        _columns["yearly_week_day"] = vector<string> {"char(1)","default '0'"}; // 0=monday ... 6=sunday
+        //  3) every n-th day of the year
+        _columns["yearly_day_of_the_year"] = vector<string> {"int","default 0"}; // 0=do not, 1...366
+        // Recurrence range
+        _columns["recurrence_times"] = vector<string> {"int","default 0"}; // 0=always 1...N times
+        // Recurrence until <date>
+        _columns["recurrence_end_date"] = vector<string> {"datetime","not null default '0000-00-00 00:00:00'"};
+    }
+    if(_fkv.size()==0) {
+        for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
+        _fkv.push_back(ForeignKey("fk_obj_id","companies","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","folders","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","people","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","projects","id"));
+    }
+}
+DBEEvent::~DBEEvent() {}
+string &DBEEvent::name() const { static string ret("DBEEvent"); return ret; }
+string DBEEvent::getTableName() const { return "events"; }
+ForeignKeyVector& DBEEvent::getFK() const { return _fkv; }
+ColumnDefinitions DBEEvent::getColumns() const { return _columns; }
+StringVector& DBEEvent::getColumnNames() const { return _column_order; }
+DBEEvent* DBEEvent::createNewInstance() const { return new DBEEvent(); }
+//*********************** DBEEvent: end.
+
 
 
 
@@ -1003,6 +1099,7 @@ void CMSchema::registerClasses(DBEFactory* dbeFactory) {
     dbeFactory->registerClass("countrylist", new DBECountry() );
     dbeFactory->registerClass("companies", new DBECompany() );
     dbeFactory->registerClass("people", new DBEPeople() );
+    dbeFactory->registerClass("events", new DBEEvent() );
     dbeFactory->registerClass("files", new DBEFile() );
     dbeFactory->registerClass("folders", new DBEFolder() );
     dbeFactory->registerClass("links", new DBELink() );
@@ -1019,6 +1116,7 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
     }
     if(!dbmgr.connect()) {
         cerr << "CMSchema::checkDB: ERROR - UNABLE TO CONNECT TO DB!!!" << endl;
+        cerr << dbmgr.getConnection()->getErrorMessage() << endl;
         return;
     }
 
@@ -1082,16 +1180,25 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
         dbmgr.getConnection()->exec(sql);
         if(verbose) cout << sql << endl;
 
-        StringVector classes = {"log","objects","countrylist","companies",
-                                "people","files","folders","links",
-                                "notes","pages"};
+        StringVector classes = {"log","objects","countrylist","companies","people"
+                                ,"events"
+                                ,"files","folders","links"
+                                ,"notes","pages"};
         for(const string clazz : classes) {
             DBEntity* dbe = dbmgr.getClazz(clazz);
             sql = dbe->toSql(lambda_dbeType2dbType,lambda_getClazzSchema,"\n",use_fk);
             dbmgr.getConnection()->exec(sql);
             if(verbose) cout << sql << endl;
             //dbmgr.Delete(dbe);
+            if(dbmgr.getConnection()->hasErrors()) {
+                cerr << "CMSchema::checkDB: ERROR=" << dbmgr.getConnection()->getErrorMessage() << endl;
+                cerr << "   sql = " << sql << endl;
+                cerr << "   dbe = " << dbe->toString("   \n") << endl;
+            }
             delete dbe;
+            if(dbmgr.getConnection()->hasErrors()) {
+                break;
+            }
             //if(clazz=="companies") break;
         }
 

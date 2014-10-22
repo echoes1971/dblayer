@@ -155,6 +155,26 @@ class DBEPeople : public DBEObject {
     static ColumnDefinitions _columns;
 };
 
+/**
+ * Represents an event in a calendar
+ * TODO to be developed further and tested
+ */
+class DBEEvent : public DBEObject {
+  public:
+    DBEEvent();
+    virtual ~DBEEvent();
+    virtual string& name() const;
+    virtual string getTableName() const;
+    virtual ForeignKeyVector& getFK() const;
+    virtual DBEEvent* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector& getColumnNames() const;
+  private:
+    static ForeignKeyVector _fkv;
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
+};
+
   class DBEFile : public DBEObject {
     public:
     DBEFile();
