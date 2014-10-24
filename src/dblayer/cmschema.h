@@ -169,21 +169,47 @@ class DBEEvent : public DBEObject {
     virtual DBEEvent* createNewInstance() const;
     virtual ColumnDefinitions getColumns() const;
     virtual StringVector& getColumnNames() const;
+
+    // Custom methods
+
   private:
     static ForeignKeyVector _fkv;
     static StringVector _column_order;
     static ColumnDefinitions _columns;
 };
 
-  class DBEFile : public DBEObject {
-    public:
+class DBEFile : public DBEObject {
+  public:
     DBEFile();
-      virtual ~DBEFile();
-      virtual string& name() const;
-      virtual string getTableName() const;
-      virtual DBEFile* createNewInstance() const;
-    private:
-  };
+    virtual ~DBEFile();
+    virtual string& name() const;
+    virtual string getTableName() const;
+    virtual ForeignKeyVector& getFK() const;
+    virtual DBEFile* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector& getColumnNames() const;
+
+    // Custom methods
+    void setRootDirectory(const string& dir);
+    string getRootDirectory() const;
+
+    DBEFile* setFilename(const string& f);
+    string getFilename() const;
+
+    string createFilename(const string& aId="", const string& aFilename="") const;
+    string createObjectPath(DBEFile* an_obj=0);
+    string getFullpath(DBEFile* an_obj=0);
+
+  protected:
+    /**
+     * root directory where to store files
+     */
+    static string _root_directory;
+  private:
+    static ForeignKeyVector _fkv;
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
+};
 
   class DBEFolder : public DBEObject {
     public:

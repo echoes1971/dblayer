@@ -293,6 +293,22 @@ bool testDBES() {
 
     success = success && SchemaNS::getCreatedSchema().size()==0;
 
+    cout << endl;
+    DBEFile* dbefile = new DBEFile();
+    dbefile->setRootDirectory("/home/roberto/tmp");
+    dbefile->setValue("id","id0001");
+    dbefile->setValue("father_id","id0002");
+    dbefile->setValue("path","my/path/to/object");
+    dbefile->setFilename("myfile.txt");
+
+    cout << dbefile->toString("\n") << endl;
+    cout << "createFilename: " << dbefile->createFilename() << endl;
+    cout << "createFilename: " << dbefile->createFilename("myid","myfilename") << endl;
+    cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
+    cout << "getFullpath: " << dbefile->getFullpath() << endl;
+    delete dbefile;
+    success = false;
+
     return success;
 }
 

@@ -1054,11 +1054,79 @@ DBEEvent* DBEEvent::createNewInstance() const { return new DBEEvent(); }
 
 
 //*********************** DBEFile: start.
-DBEFile::DBEFile() { this->tableName.clear(); }
+ForeignKeyVector DBEFile::_fkv;
+ColumnDefinitions DBEFile::_columns;
+StringVector DBEFile::_column_order = {"fk_obj_id","path","filename","checksum","mime","alt_link"};
+DBEFile::DBEFile() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        StringVector column_order = DBEFile::getColumnNames();
+        StringVector parentColumns = DBEObject::getColumnNames();
+        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+            column_order.insert(column_order.begin(),parentColumns.at(i));
+        }
+        _column_order = column_order;
+        for(const pair<string,StringVector > pair: DBEObject::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _columns["fk_obj_id"] = StringVector {"uuid","default null"};
+        _columns["path"] = StringVector {"text","default null"};
+        _columns["filename"] = StringVector {"text","not null"};
+        _columns["checksum"] = StringVector {"char(40)","default null"};
+        _columns["mime"] = StringVector {"varchar(255)","default null"};
+        _columns["alt_link"] = StringVector {"varchar(255)","not null default ''"};
+    }
+    if(_fkv.size()==0) {
+        for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
+        _fkv.push_back(ForeignKey("father_id","folders","id"));
+        _fkv.push_back(ForeignKey("father_id","pages","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","pages","id"));
+    }
+}
 DBEFile::~DBEFile() {}
 string &DBEFile::name() const { static string ret("DBEFile"); return ret; }
 string DBEFile::getTableName() const { return "files"; }
+ForeignKeyVector& DBEFile::getFK() const { return _fkv; }
+ColumnDefinitions DBEFile::getColumns() const { return _columns; }
+StringVector& DBEFile::getColumnNames() const { return _column_order; }
 DBEFile* DBEFile::createNewInstance() const { return new DBEFile(); }
+
+string DBEFile::_root_directory;
+void DBEFile::setRootDirectory(const string& dir) { _root_directory = dir; }
+string DBEFile::getRootDirectory() const { return _root_directory; }
+DBEFile* DBEFile::setFilename(const string& f) {
+    this->setValue("filename",f);
+}
+string DBEFile::getFilename() const { return this->getField("filename")==0 || this->getField("filename")->isNull() ? "" : *(this->getField("filename")->getStringValue()); }
+string DBEFile::createFilename(const string& aId, const string& aFilename) const {
+    string filename = aFilename.size()==0 ? this->getFilename() : aFilename;
+    string id = aId.size()==0 ? this->getId() : aId;
+    string prefix = "r_" + id + "_";
+    if(filename.find(prefix)!=filename.npos)
+        filename = replaceAll(filename, prefix, "");
+    return filename.insert(0,prefix);
+}
+string DBEFile::createObjectPath(DBEFile* an_obj) {
+    DBEFile* obj = an_obj!=0 ? an_obj : this;
+    string dest_path = obj->getStringValue("path");
+    string father_id = obj->getStringValue("father_id");
+
+    if(father_id.length()>0) {
+        if(dest_path.length()>0) father_id.append("/");
+        dest_path.insert(0,father_id);
+    }
+    return dest_path;
+}
+string DBEFile::getFullpath(DBEFile* an_obj) {
+    DBEFile* obj = an_obj!=0 ? an_obj : this;
+    string dest_path = obj->createObjectPath();
+    string dest_dir(DBEFile::_root_directory.c_str());
+    if(dest_path.length()>0)
+        dest_dir.append("/").append(dest_path.c_str());
+    dest_dir.append("/").append(obj->getFilename().c_str());
+    return dest_dir;
+}
 //*********************** DBEFile: end.
 
 //*********************** DBEFolder: start.
