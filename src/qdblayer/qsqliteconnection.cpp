@@ -125,8 +125,8 @@ ResultSet* QSqliteConnection::exec(const string s) {
                 rs->columnType.push_back( DBLayer::type_datetime );
                 break;
             default:
-                cerr << "QSqliteConnection::exec: fieldType \'" << fieldType
-                     << "\' Unknown!" << endl;
+                cerr << "QSqliteConnection::exec: \'" << record.fieldName(i).toStdString() << "\' "
+                     <<"fieldType \'" << fieldType << "\' Unknown!" << endl;
                 rs->columnType.push_back( DBLayer::type_blob );
                 break;
         }

@@ -484,6 +484,7 @@ DBEntityVector* DBMgr::Select(const string& tableName, const string& searchStrin
     }
     DBEntityVector* ret = new DBEntityVector;
     ResultSet* res = this->con->exec(searchString);
+//     if( this->verbose ) cout << "DBMgr::Select: res=" << res->toString() << endl;
     string nomeTabella = tableName;
 
     if (!con->hasErrors() ) {

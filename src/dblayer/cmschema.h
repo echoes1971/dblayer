@@ -219,6 +219,8 @@ class DBEFile : public DBEObject {
     static ForeignKeyVector _fkv;
     static StringVector _column_order;
     static ColumnDefinitions _columns;
+
+    void _inherith_father_root(ObjectMgr* objmgr);
 };
 
 class DBEFolder : public DBEObject {
@@ -234,15 +236,15 @@ class DBEFolder : public DBEObject {
 
     // Custom methods
     virtual DBEObject* setDefaultValues(ObjectMgr* objmgr);
-    virtual void _before_insert(DBMgr* dbmgr=0);
+//     virtual void _before_insert(DBMgr* dbmgr=0);
     virtual void _before_update(DBMgr* dbmgr=0);
 
   private:
-    void _inherith_father_root(DBMgr* dbmgr);
-
     static ForeignKeyVector _fkv;
     static StringVector _column_order;
     static ColumnDefinitions _columns;
+
+    void _inherith_father_root(ObjectMgr* objmgr);
 };
 
 class DBELink : public DBEObject {

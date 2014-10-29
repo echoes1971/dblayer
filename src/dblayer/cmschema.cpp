@@ -499,6 +499,7 @@ bool DBEObject::canExecute(const string kind) const {
     }
 }
 DBEObject* DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
+    cout << "DBEObject::setDefaultValues: start." << endl;
     DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
     if(myuser!=0) {
         if(this->getField("owner")==0 || this->getField("owner")->isNull() || this->getField("owner")->getStringValue()->length()==0)
@@ -533,6 +534,7 @@ DBEObject* DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
             delete father;
         }
     }
+    cout << "DBEObject::setDefaultValues: end." << endl;
     return this;
 }
 void DBEObject::_before_insert(DBMgr* dbmgr) {
@@ -611,6 +613,7 @@ bool ObjectMgr::canExecute(const DBEObject& obj) const {
 }
 DBEntityVector* ObjectMgr::Select(const string &tableName, const string &searchString) {
     DBEntityVector* tmp = DBMgr::Select(tableName, searchString);
+    if( this->verbose ) cout << "ObjectMgr::Select: tmp.size=" << tmp->size() << endl;
     DBEUser* myuser = (DBEUser*) this->getDBEUser();
     if(myuser!=0 && myuser->isRoot())
         return tmp;
@@ -620,6 +623,7 @@ DBEntityVector* ObjectMgr::Select(const string &tableName, const string &searchS
         bool append = false;
         DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
         if( obj!=0 ) {
+            if( this->verbose ) cout << "ObjectMgr::Select: obj=" << obj->toString() << endl;
             if(myuser!=0 && myuser->getId()==obj->getStringValue("creator")) {
                 append = true;
             } else if( obj->isDeleted() ) {
@@ -639,13 +643,11 @@ DBEntityVector* ObjectMgr::Select(const string &tableName, const string &searchS
     return ret;
 }
 DBEntity* ObjectMgr::Insert(DBEntity *dbe) {
-    cout << "ObjectMgr::Insert: start." << endl;
     bool have_permission = true;
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
     if( obj!=0 ) {
         have_permission = this->canWrite(*obj);
     }
-    cout << "ObjectMgr::Insert: end." << endl;
     return have_permission ? DBMgr::Insert(dbe) : 0;
 }
 DBEntity* ObjectMgr::Update(DBEntity *dbe) {
@@ -767,12 +769,14 @@ DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) {
     if( this->verbose ) cout << "ObjectMgr::objectById: searchString=" << searchString << endl;
     DBEntityVector* mylist = this->Select("objects", searchString);
     DBEObject* ret = 0;
+    if( this->verbose ) cout << "ObjectMgr::objectById: mylist=" << mylist->size() << endl;
     if(mylist->size()==1) {
         DBEntity* tmpret = mylist->at(0);
         ret = dynamic_cast<DBEObject*>(tmpret);
         if(ret==0) {
             delete tmpret;
         }
+        if( this->verbose ) cout << "ObjectMgr::objectById: ret=" << ret->toString("\n") << endl;
         delete mylist;
     } else {
         this->Destroy(mylist);
@@ -1140,18 +1144,7 @@ void DBEFile::_before_insert(DBMgr* dbmgr) {
     DBEObject::_before_insert(dbmgr);
 
     // Inherit the father's root
-    string father_id = this->getStringValue("father_id");
-    if(father_id.size()>0) {
-        // TODO
-        string mytablename = dbmgr->buildTableName(this);
-        string query = "select fk_obj_id from " + mytablename + " where id='" + this->getId() + "'";
-        DBEntityVector* tmp = dbmgr->Select(this->getTableName(),query);
-        if(tmp->size()==1) {
-            DBEntity* tmpret = tmp->at(0);
-            this->setValue("fk_obj_id", tmpret->getStringValue("fk_obj_id"));
-        }
-        dbmgr->Destroy(tmp);
-    }
+    this->_inherith_father_root(dynamic_cast<ObjectMgr*>(dbmgr));
 
 //     // Aggiungo il prefisso al nome del file
 //     if( $this->getValue('filename')>'' ) {
@@ -1198,6 +1191,31 @@ void DBEFile::_before_insert(DBMgr* dbmgr) {
 //     if($this->isImage())
 //         $this->createThumbnail($_fullpath);
 }
+void DBEFile::_inherith_father_root(ObjectMgr* objmgr) {
+//     cout << "DBEFile::_inherith_father_root: start." << endl;
+    string father_id = this->getStringValue("father_id");
+//     cout << "DBEFile::_inherith_father_root: father_id=" << father_id << endl;
+    if(father_id.size()>0) {
+        ForeignKeyVector fkv = this->getFKForColumn("father_id");
+        for(const ForeignKey& fk : fkv) {
+            DBEntity* clazz = objmgr->getClazz(fk.tabella_riferita);
+            string mytablename = objmgr->buildTableName(clazz);
+            delete clazz;
+            string query = "select fk_obj_id from " + mytablename + " where id='" + father_id + "'";
+//             cout << "DBEFile::_inherith_father_root: query=" << query << endl;
+            DBEntityVector* tmp = objmgr->Select(fk.tabella_riferita,query);
+            if(tmp->size()==1) {
+                DBEntity* tmpret = tmp->at(0);
+                this->setValue("fk_obj_id", tmpret->getStringValue("fk_obj_id"));
+//                 cout << "DBEFile::_inherith_father_root: fk_obj_id=" << this->getStringValue("fk_obj_id") << endl;
+            }
+            objmgr->Destroy(tmp);
+            if(tmp->size()==1)
+                break;
+        }
+    }
+//     cout << "DBEFile::_inherith_father_root: end." << endl;
+}
 //*********************** DBEFile: end.
 
 //*********************** DBEFolder: start.
@@ -1234,31 +1252,50 @@ ForeignKeyVector& DBEFolder::getFK() const { return _fkv; }
 ColumnDefinitions DBEFolder::getColumns() const { return _columns; }
 StringVector& DBEFolder::getColumnNames() const { return _column_order; }
 DBEFolder* DBEFolder::createNewInstance() const { return new DBEFolder(); }
-void DBEFolder::_inherith_father_root(DBMgr* dbmgr) {
+void DBEFolder::_inherith_father_root(ObjectMgr* objmgr) {
+//     cout << "DBEFolder::_inherith_father_root: start." << endl;
     string father_id = this->getStringValue("father_id");
+//     cout << "DBEFolder::_inherith_father_root: father_id=" << father_id << endl;
     if(father_id.size()>0) {
-        string mytablename = dbmgr->buildTableName(this);
-        string query = "select fk_obj_id from " + mytablename + " where id='" + this->getId() + "'";
-        DBEntityVector* tmp = dbmgr->Select(this->getTableName(),query);
-        if(tmp->size()==1) {
-            DBEntity* tmpret = tmp->at(0);
-            this->setValue("fk_obj_id", tmpret->getStringValue("fk_obj_id"));
+        ForeignKeyVector fkv = this->getFKForColumn("father_id");
+        for(const ForeignKey& fk : fkv) {
+            DBEntity* clazz = objmgr->getClazz(fk.tabella_riferita);
+            string mytablename = objmgr->buildTableName(clazz);
+            delete clazz;
+            string query = "select fk_obj_id from " + mytablename + " where id='" + father_id + "'";
+//             cout << "DBEFolder::_inherith_father_root: query=" << query << endl;
+            DBEntityVector* tmp = objmgr->Select(fk.tabella_riferita,query);
+            if(tmp->size()==1) {
+                DBEntity* tmpret = tmp->at(0);
+                this->setValue("fk_obj_id", tmpret->getStringValue("fk_obj_id"));
+//                 cout << "DBEFolder::_inherith_father_root: fk_obj_id=" << this->getStringValue("fk_obj_id") << endl;
+            }
+            objmgr->Destroy(tmp);
+            if(tmp->size()==1)
+                break;
         }
-        dbmgr->Destroy(tmp);
     }
+//     cout << "DBEFolder::_inherith_father_root: end." << endl;
 }
 DBEObject* DBEFolder::setDefaultValues(ObjectMgr* objmgr) {
+//     cout << "DBEFolder::setDefaultValues: start." << endl;
     DBEObject::setDefaultValues(objmgr);
     this->_inherith_father_root(objmgr);
+//     cout << "DBEFolder::setDefaultValues: end." << endl;
     return this;
 }
-void DBEFolder::_before_insert(DBMgr* dbmgr) {
-    DBEObject::_before_insert(dbmgr);
-    this->_inherith_father_root(dbmgr);
-}
+// void DBEFolder::_before_insert(DBMgr* dbmgr) {
+//     cout << "DBEFolder::_before_insert: start." << endl;
+//     DBEObject::_before_insert(dbmgr);
+//     cout << "DBEFolder::_before_insert: ===========================" << endl;
+//     this->_inherith_father_root(dynamic_cast<ObjectMgr*>(dbmgr));
+//     cout << "DBEFolder::_before_insert: end." << endl;
+// }
 void DBEFolder::_before_update(DBMgr* dbmgr) {
+    cout << "DBEFolder::_before_update: start." << endl;
     DBEObject::_before_update(dbmgr);
-    this->_inherith_father_root(dbmgr);
+    this->_inherith_father_root(dynamic_cast<ObjectMgr*>(dbmgr));
+    cout << "DBEFolder::_before_update: end." << endl;
 }
 //*********************** DBEFolder: end.
 
@@ -1340,7 +1377,7 @@ StringVector& DBENote::getColumnNames() const { return _column_order; }
 //*********************** DBEPage: start.
 ForeignKeyVector DBEPage::_fkv;
 ColumnDefinitions DBEPage::_columns;
-StringVector DBEPage::_column_order = {"fk_obj_id","childs_sort_order"};
+StringVector DBEPage::_column_order = {"fk_obj_id","html","language"};
 DBEPage::DBEPage() {
     this->tableName.clear();
     this->schemaName = CMSchema::getSchema();
@@ -1480,7 +1517,6 @@ void CMSchema::checkDB(DBMgr& dbmgr, bool verbose) {
             if(dbmgr.getConnection()->hasErrors()) {
                 break;
             }
-            //if(clazz=="companies") break;
         }
 
         if(verbose) cout << "CMSchema::checkDB: init countries..." << endl;
