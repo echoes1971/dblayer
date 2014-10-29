@@ -492,7 +492,7 @@ bool DBEObject::canExecute(const string kind) const {
         return perms.at(2+6)=='x';
     }
 }
-void DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
+DBEObject* DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
     DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
     if(myuser!=0) {
         if(this->getField("owner")==0 || this->getField("owner")->isNull() || this->getField("owner")->getStringValue()->length()==0)
@@ -527,6 +527,7 @@ void DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
             delete father;
         }
     }
+    return this;
 }
 void DBEObject::_before_insert(DBMgr* dbmgr) {
     string myid = dbmgr->getNextUuid(this);
@@ -1038,7 +1039,7 @@ DBEEvent::DBEEvent() {
         _fkv.push_back(ForeignKey("fk_obj_id","companies","id"));
         _fkv.push_back(ForeignKey("fk_obj_id","folders","id"));
         _fkv.push_back(ForeignKey("fk_obj_id","people","id"));
-        _fkv.push_back(ForeignKey("fk_obj_id","projects","id"));
+//         _fkv.push_back(ForeignKey("fk_obj_id","projects","id"));
     }
 }
 DBEEvent::~DBEEvent() {}
@@ -1127,38 +1128,242 @@ string DBEFile::getFullpath(DBEFile* an_obj) {
     dest_dir.append("/").append(obj->getFilename().c_str());
     return dest_dir;
 }
+void DBEFile::_before_insert(DBMgr* dbmgr) {
+    DBEObject::_before_insert(dbmgr);
+
+    // Inherit the father's root
+    string father_id = this->getStringValue("father_id");
+    if(father_id.size()>0) {
+        // TODO
+        string mytablename = dbmgr->buildTableName(this);
+        string query = "select fk_obj_id from " + mytablename + " where id='" + this->getId() + "'";
+        DBEntityVector* tmp = dbmgr->Select(this->getTableName(),query);
+        if(tmp->size()==1) {
+            DBEntity* tmpret = tmp->at(0);
+            this->setValue("fk_obj_id", tmpret->getStringValue("fk_obj_id"));
+        }
+        dbmgr->Destroy(tmp);
+    }
+
+//     // Aggiungo il prefisso al nome del file
+//     if( $this->getValue('filename')>'' ) {
+//         $dest_path = $this->generaObjectPath();
+//         $from_dir=realpath($GLOBALS['root_directory'].'/'.$this->dest_directory);
+//         $dest_dir=realpath($GLOBALS['root_directory'].'/'.$this->dest_directory);
+//         if($dest_path>'') $dest_dir.="/$dest_path";
+//         if(!file_exists($dest_dir)) mkdir($dest_dir, 0755 );
+//         // con basename() ottengo solo il nome del file senza il path relativo nel quale e' stato caricato
+//         $nuovo_filename = $this->generaFilename($this->getValue('id'), basename($this->getValue('filename')));
+//         rename( $from_dir."/".$this->getValue('filename'), $dest_dir."/".$nuovo_filename );
+//         if( !($this->getValue('name')>'') ) $this->setValue('name',basename($this->getValue('filename')) );
+//         $this->setValue('filename', $nuovo_filename);
+//     }
+//     // Checksum
+//     $_fullpath = $this->getFullpath();
+//     if(file_exists($_fullpath)) {
+//         $newchecksum = sha1_file( $_fullpath );
+//         $this->setValue('checksum',$newchecksum);
+//     } else {
+//         $this->setValue('checksum',"File '".$this->getValue('filename')."' not found!");
+//     }
+//     // Mime type
+//     if(file_exists($_fullpath)) {
+//         if(function_exists('finfo_open')) {
+//             $finfo = finfo_open(FILEINFO_MIME);
+//             if (!$finfo) {
+//                 if(function_exists('mime_content_type'))
+//                     $this->setValue('mime',mime_content_type($_fullpath));
+//                 else
+//                     $this->setValue('mime','text/plain');
+//                 return;
+//             }
+//             $this->setValue('mime',finfo_file($finfo,$_fullpath));
+//             finfo_close($finfo);
+//         } elseif(function_exists('mime_content_type'))
+//             $this->setValue('mime',mime_content_type($_fullpath));
+//         else
+//             $this->setValue('mime','text/plain');
+//     } else {
+//         $this->setValue('mime','text/plain');
+//     }
+//     // Image
+//     if($this->isImage())
+//         $this->createThumbnail($_fullpath);
+}
 //*********************** DBEFile: end.
 
 //*********************** DBEFolder: start.
-DBEFolder::DBEFolder() { this->tableName.clear(); }
+ForeignKeyVector DBEFolder::_fkv;
+ColumnDefinitions DBEFolder::_columns;
+StringVector DBEFolder::_column_order = {"fk_obj_id","childs_sort_order"};
+DBEFolder::DBEFolder() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        StringVector column_order = DBEFolder::getColumnNames();
+        StringVector parentColumns = DBEObject::getColumnNames();
+        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+            column_order.insert(column_order.begin(),parentColumns.at(i));
+        }
+        _column_order = column_order;
+        for(const pair<string,StringVector > pair: DBEObject::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _columns["fk_obj_id"] = StringVector {"uuid","default null"};
+        _columns["childs_sort_order"] = StringVector {"text","default null"};
+    }
+    if(_fkv.size()==0) {
+        for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
+        _fkv.push_back(ForeignKey("fk_obj_id","companies","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","people","id"));
+//         _fkv.push_back(ForeignKey("fk_obj_id","projects","id"));
+    }
+}
 DBEFolder::~DBEFolder() {}
 string &DBEFolder::name() const { static string ret("DBEFolder"); return ret; }
 string DBEFolder::getTableName() const { return "folders"; }
+ForeignKeyVector& DBEFolder::getFK() const { return _fkv; }
+ColumnDefinitions DBEFolder::getColumns() const { return _columns; }
+StringVector& DBEFolder::getColumnNames() const { return _column_order; }
 DBEFolder* DBEFolder::createNewInstance() const { return new DBEFolder(); }
+void DBEFolder::_inherith_father_root(DBMgr* dbmgr) {
+    string father_id = this->getStringValue("father_id");
+    if(father_id.size()>0) {
+        string mytablename = dbmgr->buildTableName(this);
+        string query = "select fk_obj_id from " + mytablename + " where id='" + this->getId() + "'";
+        DBEntityVector* tmp = dbmgr->Select(this->getTableName(),query);
+        if(tmp->size()==1) {
+            DBEntity* tmpret = tmp->at(0);
+            this->setValue("fk_obj_id", tmpret->getStringValue("fk_obj_id"));
+        }
+        dbmgr->Destroy(tmp);
+    }
+}
+DBEObject* DBEFolder::setDefaultValues(ObjectMgr* objmgr) {
+    DBEObject::setDefaultValues(objmgr);
+    this->_inherith_father_root(objmgr);
+    return this;
+}
+void DBEFolder::_before_insert(DBMgr* dbmgr) {
+    DBEObject::_before_insert(dbmgr);
+    this->_inherith_father_root(dbmgr);
+}
+void DBEFolder::_before_update(DBMgr* dbmgr) {
+    DBEObject::_before_update(dbmgr);
+    this->_inherith_father_root(dbmgr);
+}
 //*********************** DBEFolder: end.
 
 //*********************** DBELink: start.
-DBELink::DBELink() { this->tableName.clear(); }
+ForeignKeyVector DBELink::_fkv;
+ColumnDefinitions DBELink::_columns;
+StringVector DBELink::_column_order = {"fk_obj_id","href","target"};
+DBELink::DBELink() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        StringVector column_order = DBELink::getColumnNames();
+        StringVector parentColumns = DBEObject::getColumnNames();
+        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+            column_order.insert(column_order.begin(),parentColumns.at(i));
+        }
+        _column_order = column_order;
+        for(const pair<string,StringVector > pair: DBEObject::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _columns["fk_obj_id"] = StringVector {"uuid","default null"};
+        _columns["href"] = StringVector {"varchar(255)","not null"};
+        _columns["target"] = StringVector {"varchar(255)","default '_blank'"};
+    }
+    if(_fkv.size()==0) {
+        for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
+        _fkv.push_back(ForeignKey("fk_obj_id","companies","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","folders","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","pages","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","people","id"));
+
+        _fkv.push_back(ForeignKey("father_id","pages","id"));
+    }
+}
 DBELink::~DBELink() {}
 string &DBELink::name() const { static string ret("DBELink"); return ret; }
 string DBELink::getTableName() const { return "links"; }
 DBELink* DBELink::createNewInstance() const { return new DBELink(); }
+ForeignKeyVector& DBELink::getFK() const { return _fkv; }
+ColumnDefinitions DBELink::getColumns() const { return _columns; }
+StringVector& DBELink::getColumnNames() const { return _column_order; }
 //*********************** DBELink: end.
 
 //*********************** DBENote: start.
-DBENote::DBENote() { this->tableName.clear(); }
+ForeignKeyVector DBENote::_fkv;
+ColumnDefinitions DBENote::_columns;
+StringVector DBENote::_column_order = {"fk_obj_id"};
+DBENote::DBENote() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        StringVector column_order = DBENote::getColumnNames();
+        StringVector parentColumns = DBEObject::getColumnNames();
+        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+            column_order.insert(column_order.begin(),parentColumns.at(i));
+        }
+        _column_order = column_order;
+        for(const pair<string,StringVector > pair: DBEObject::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _columns["fk_obj_id"] = StringVector {"uuid","default null"};
+    }
+    if(_fkv.size()==0) {
+        for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
+        _fkv.push_back(ForeignKey("fk_obj_id","companies","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","folders","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","people","id"));
+    }
+}
 DBENote::~DBENote() {}
 string &DBENote::name() const { static string ret("DBENote"); return ret; }
 string DBENote::getTableName() const { return "notes"; }
 DBENote* DBENote::createNewInstance() const { return new DBENote(); }
+ForeignKeyVector& DBENote::getFK() const { return _fkv; }
+ColumnDefinitions DBENote::getColumns() const { return _columns; }
+StringVector& DBENote::getColumnNames() const { return _column_order; }
 //*********************** DBENote: end.
 
 //*********************** DBEPage: start.
-DBEPage::DBEPage() { this->tableName.clear(); }
+ForeignKeyVector DBEPage::_fkv;
+ColumnDefinitions DBEPage::_columns;
+StringVector DBEPage::_column_order = {"fk_obj_id","childs_sort_order"};
+DBEPage::DBEPage() {
+    this->tableName.clear();
+    this->schemaName = CMSchema::getSchema();
+    if(_columns.size()==0) {
+        StringVector column_order = DBEPage::getColumnNames();
+        StringVector parentColumns = DBEObject::getColumnNames();
+        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+            column_order.insert(column_order.begin(),parentColumns.at(i));
+        }
+        _column_order = column_order;
+        for(const pair<string,StringVector > pair: DBEObject::getColumns()) {
+            _columns[pair.first] = pair.second;
+        }
+        _columns["fk_obj_id"] = StringVector {"uuid","default null"};
+        _columns["html"] = StringVector {"text","default null"};
+        _columns["language"] = StringVector {"varchar(5)","default 'en_us'"};
+    }
+    if(_fkv.size()==0) {
+        for(const DBLayer::ForeignKey& fk : DBEObject::getFK()) { _fkv.push_back(fk); }
+        _fkv.push_back(ForeignKey("fk_obj_id","companies","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","folders","id"));
+        _fkv.push_back(ForeignKey("fk_obj_id","people","id"));
+    }
+}
 DBEPage::~DBEPage() {}
 string &DBEPage::name() const { static string ret("DBEPage"); return ret; }
 string DBEPage::getTableName() const { return "pages"; }
 DBEPage* DBEPage::createNewInstance() const { return new DBEPage(); }
+ForeignKeyVector& DBEPage::getFK() const { return _fkv; }
+ColumnDefinitions DBEPage::getColumns() const { return _columns; }
+StringVector& DBEPage::getColumnNames() const { return _column_order; }
 //*********************** DBEPage: end.
 
 void CMSchema::registerClasses(DBEFactory* dbeFactory) {

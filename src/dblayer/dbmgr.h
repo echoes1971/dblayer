@@ -49,42 +49,42 @@
 namespace DBLayer {
 
 class DECLSPECIFIER DBMgr {
-    public:
-        static const int MAX_ENTITY = 100;
+  public:
+    static const int MAX_ENTITY = 100;
 
-        DBMgr();
-        DBMgr(Connection* con, bool verbose=false);
-        virtual ~DBMgr();
+    DBMgr();
+    DBMgr(Connection* con, bool verbose=false);
+    virtual ~DBMgr();
 
-        bool connect();
-        bool disconnect();
+    bool connect();
+    bool disconnect();
 
-        string getErrorMessage() const;
+    string getErrorMessage() const;
 
-        void setDBEFactory(DBEFactory* dbeFactory);
-        void setVerbose(bool b);
-        DBEFactory* getDBEFactory() const;
-        DBEntityVector getRegisteredTypes() const;
-        /** get clazz by table name */
-        DBEntity* getClazz(const string &typeName) const;
-        DBEntity* getClazzByTypeName(const string& typeName) const;
+    void setDBEFactory(DBEFactory* dbeFactory);
+    void setVerbose(bool b);
+    DBEFactory* getDBEFactory() const;
+    DBEntityVector getRegisteredTypes() const;
+    /** get clazz by table name */
+    DBEntity* getClazz(const string &typeName) const;
+    DBEntity* getClazzByTypeName(const string& typeName) const;
 
-        DBEntity* getDBEUser() const;
-        void setDBEUser(DBEntity* dbe);
+    DBEntity* getDBEUser() const;
+    void setDBEUser(DBEntity* dbe);
 
-        ColumnDefinitions getColumnsForTable(const string& tablename);
+    ColumnDefinitions getColumnsForTable(const string& tablename);
 
-        DBEntity* Insert(DBEntity* dbe);
-        DBEntity* Update(DBEntity* dbe);
-        DBEntity* Delete(DBEntity* dbe);
-        DBEntity* Copy(DBEntity* dbe);
+    DBEntity* Insert(DBEntity* dbe);
+    DBEntity* Update(DBEntity* dbe);
+    DBEntity* Delete(DBEntity* dbe);
+    DBEntity* Copy(DBEntity* dbe);
 
-        DBEntityVector* Select(const string &tableName, const string &searchString) const;
+    DBEntityVector* Select(const string &tableName, const string &searchString) const;
 
-        DBEntityVector* Search(DBEntity *dbe, bool uselike=true,
-                                bool caseSensitive=true, const string& orderBy="" );
-        DBEntityVector* searchByKeys(DBEntity* dbe);
-        bool exists(DBEntity* dbe);
+    DBEntityVector* Search(DBEntity *dbe, bool uselike=true,
+                            bool caseSensitive=true, const string& orderBy="" );
+    DBEntityVector* searchByKeys(DBEntity* dbe);
+    bool exists(DBEntity* dbe);
 
 //        def getNextId(self, dbe):
 //            nomeTabella = "%s_seq_id" % ( self._schema )
@@ -96,32 +96,34 @@ class DECLSPECIFIER DBMgr {
 //            else:
 //                self.select(nomeTabella, "update %s set id=%s where name=''" % (nomeTabella,myid) )
 //            return myid
-        string getNextUuid(DBEntity* dbe);
+    string getNextUuid(DBEntity* dbe);
 
-        string ping();
+    string ping();
 
-        DBEntity* login(const string user,const string pwd);
-        DBEntity* relogin();
-        bool isLoggedIn() const;
+    DBEntity* login(const string user,const string pwd);
+    DBEntity* relogin();
+    bool isLoggedIn() const;
 
-        /** Returns a string uniquely identifying the user and the connection */
-        string getServerIDString() const;
+    /** Returns a string uniquely identifying the user and the connection */
+    string getServerIDString() const;
 
 //        def getUserGroupsList(self):
 //            return self.user_groups_list
 //        def setUserGroupsList(self,user_groups_list):
 //            self.user_groups_list = user_groups_list
-        bool hasGroup(const string& group_id) const;
-        void addGroup(const string& group_id);
+    bool hasGroup(const string& group_id) const;
+    void addGroup(const string& group_id);
 
-        /** Destroy the DBEntity of the list and the list itself! */
-        static void Destroy(DBEntityVector* lista);
+    /** Destroy the DBEntity of the list and the list itself! */
+    static void Destroy(DBEntityVector* lista);
 
-        void setConnection(Connection* _newVal);
-        Connection* getConnection() const;
+    void setConnection(Connection* _newVal);
+    Connection* getConnection() const;
 
-        void setSchema(const string schema);
-        string getSchema() const;
+    void setSchema(const string schema);
+    string getSchema() const;
+
+    string buildTableName(const DBEntity* dbe) const;
 
   protected:
     string name;

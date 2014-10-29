@@ -79,7 +79,7 @@ class DBEObject : public DBEntity {
     bool canWrite(const string kind="") const;
     bool canExecute(const string kind="") const;
 
-    void setDefaultValues(ObjectMgr* dbmgr=0);
+    virtual DBEObject* setDefaultValues(ObjectMgr* dbmgr=0);
 
     virtual void _before_insert(DBMgr* dbmgr=0);
     virtual void _before_update(DBMgr* dbmgr=0);
@@ -200,6 +200,10 @@ class DBEFile : public DBEObject {
     string createObjectPath(DBEFile* an_obj=0);
     string getFullpath(DBEFile* an_obj=0);
 
+    virtual void _before_insert(DBMgr* dbmgr=0);
+//     virtual void _before_update(DBMgr* dbmgr=0);
+//     virtual void _before_delete(DBMgr* dbmgr=0);
+
   protected:
     /**
      * root directory where to store files
@@ -211,45 +215,77 @@ class DBEFile : public DBEObject {
     static ColumnDefinitions _columns;
 };
 
-  class DBEFolder : public DBEObject {
-    public:
+class DBEFolder : public DBEObject {
+  public:
     DBEFolder();
-      virtual ~DBEFolder();
-      virtual string& name() const;
-      virtual string getTableName() const;
-      virtual DBEFolder* createNewInstance() const;
-    private:
-  };
+    virtual ~DBEFolder();
+    virtual string& name() const;
+    virtual string getTableName() const;
+    virtual ForeignKeyVector& getFK() const;
+    virtual DBEFolder* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector& getColumnNames() const;
 
-  class DBELink : public DBEObject {
-    public:
+    // Custom methods
+    virtual DBEObject* setDefaultValues(ObjectMgr* objmgr);
+    virtual void _before_insert(DBMgr* dbmgr=0);
+    virtual void _before_update(DBMgr* dbmgr=0);
+
+  private:
+    void _inherith_father_root(DBMgr* dbmgr);
+
+    static ForeignKeyVector _fkv;
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
+};
+
+class DBELink : public DBEObject {
+  public:
     DBELink();
-      virtual ~DBELink();
-      virtual string& name() const;
-      virtual string getTableName() const;
-      virtual DBELink* createNewInstance() const;
-    private:
-  };
+    virtual ~DBELink();
+    virtual string& name() const;
+    virtual string getTableName() const;
+    virtual ForeignKeyVector& getFK() const;
+    virtual DBELink* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector& getColumnNames() const;
+  private:
+    static ForeignKeyVector _fkv;
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
+};
 
-  class DBENote : public DBEObject {
-    public:
+class DBENote : public DBEObject {
+  public:
     DBENote();
-      virtual ~DBENote();
-      virtual string& name() const;
-      virtual string getTableName() const;
-      virtual DBENote* createNewInstance() const;
-    private:
-  };
+    virtual ~DBENote();
+    virtual string& name() const;
+    virtual string getTableName() const;
+    virtual ForeignKeyVector& getFK() const;
+    virtual DBENote* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector& getColumnNames() const;
+  private:
+    static ForeignKeyVector _fkv;
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
+};
 
-  class DBEPage : public DBEObject {
-    public:
+class DBEPage : public DBEObject {
+  public:
     DBEPage();
-      virtual ~DBEPage();
-      virtual string& name() const;
-      virtual string getTableName() const;
-      virtual DBEPage* createNewInstance() const;
-    private:
-  };
+    virtual ~DBEPage();
+    virtual string& name() const;
+    virtual string getTableName() const;
+    virtual ForeignKeyVector& getFK() const;
+    virtual DBEPage* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector& getColumnNames() const;
+  private:
+    static ForeignKeyVector _fkv;
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
+};
 
   inline const string& getSchema() { static string schema("cm"); return schema; }
   void registerClasses(DBEFactory* dbeFactory);

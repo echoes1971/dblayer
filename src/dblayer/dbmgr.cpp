@@ -282,6 +282,7 @@ string DBMgr::_buildTableName(const DBEntity* dbe) const {
     ret.append( dbe->getTableName() );
     return ret;
 }
+string DBMgr::buildTableName(const DBEntity* dbe) const { return this->_buildTableName(dbe); }
 string DBMgr::_buildKeysCondition(const DBEntity *dbe) const {
     string ret;
     StringVector clausole;

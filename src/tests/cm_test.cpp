@@ -293,25 +293,8 @@ bool testDBES() {
 
     success = success && SchemaNS::getCreatedSchema().size()==0;
 
-    cout << endl;
-    DBEFile* dbefile = new DBEFile();
-    dbefile->setRootDirectory("/home/roberto/tmp");
-    dbefile->setValue("id","id0001");
-    dbefile->setValue("father_id","id0002");
-    dbefile->setValue("path","my/path/to/object");
-    dbefile->setFilename("myfile.txt");
-
-    cout << dbefile->toString("\n") << endl;
-    cout << "createFilename: " << dbefile->createFilename() << endl;
-    cout << "createFilename: " << dbefile->createFilename("myid","myfilename") << endl;
-    cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
-    cout << "getFullpath: " << dbefile->getFullpath() << endl;
-    delete dbefile;
-    success = false;
-
     return success;
 }
-
 
 bool testCRUD(string tablename, string connString, string& loginUser, string& loginPwd) {
     bool success = true;
@@ -425,6 +408,67 @@ bool testCRUD(string tablename, string host,string dbname,string usr,string pwd,
     return testCRUD(tablename, connString, loginUser, loginPwd );
 }
 
+bool testDBEFile(string connString, string& loginUser, string& loginPwd) {
+    bool success = true;
+    DBLayer::Connection* con;
+    ObjectMgr* objmgr;
+
+    con = DBLayer::createConnection( connString.c_str() );
+    //con->setVerbose(true);
+    objmgr = new ObjectMgr(con, false);
+
+    DBEFactory* dbeFactory = new DBEFactory(false);
+    objmgr->setDBEFactory(dbeFactory);
+    AuthSchema::registerClasses(dbeFactory);
+    AuthSchema::checkDB(*objmgr,false);
+    CMSchema::registerClasses(dbeFactory);
+    CMSchema::checkDB(*objmgr,false);
+
+    if(objmgr->connect()) {
+
+        if(loginUser.length()>0 && loginPwd.length()>0) {
+            objmgr->login(loginUser,loginPwd);
+        }
+
+        if(objmgr->isLoggedIn()) {
+
+            // TODO do something here
+            cout << endl;
+            DBEFile* dbefile = new DBEFile();
+            dbefile->setRootDirectory("/home/roberto/tmp");
+            dbefile->setValue("id","id0001");
+            dbefile->setValue("father_id","id0002");
+            dbefile->setValue("path","my/path/to/object");
+            dbefile->setFilename("myfile.txt");
+
+            cout << dbefile->toString("\n") << endl;
+            cout << "createFilename: " << dbefile->createFilename() << endl;
+            cout << "createFilename: " << dbefile->createFilename("myid","myfilename") << endl;
+            cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
+            cout << "getFullpath: " << dbefile->getFullpath() << endl;
+            delete dbefile;
+            //success = false;
+
+
+        } else {
+            cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
+            success = false;
+        }
+    } else {
+        cout << "Connection Error: " << objmgr->getErrorMessage() << endl;
+        success = false;
+    }
+    delete dbeFactory;
+    delete objmgr;
+    delete con;
+    success = success && SchemaNS::getCreatedSchema().size()==0;
+    return success;
+}
+bool testDBEFile(string host,string dbname,string usr,string pwd, string& loginUser, string& loginPwd) {
+    string connString = string( "host="+host+" dbname="+dbname+" user="+usr+" password="+pwd );
+    return testDBEFile( connString, loginUser, loginPwd );
+}
+
 
 int main(int argc, char *argv[]) {
     string host,dbname,usr,pwd,login_user,login_password;
@@ -533,6 +577,31 @@ int main(int argc, char *argv[]) {
         }
     }
     cout << "---------------->>  testCRUD: end." << endl;
+    cout << endl;
+    if(!success) {
+        cerr << "TEST FAILED!!!" << endl;
+        return 1;
+    }
+
+    cout << "---------------->>  testDBEFile: start." << endl;
+    if ( argc==5 ) {
+        success = testDBEFile( host, dbname, usr, pwd, login_user, login_password );
+    } else {
+        success = testDBEFile( connString, login_user, login_password );
+    }
+    printf("\n");
+    printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
+    printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
+    printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
+    printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
+    if(SchemaNS::getCreatedSchema().size()>0) {
+        printf("Schemas left:\n");
+        for(const Schema* schema : SchemaNS::getCreatedSchema()) {
+            printf("%ld", (unsigned long) schema );
+            cout << schema->toString(" \n") << endl;
+        }
+    }
+    cout << "---------------->>  testDBEFile: end." << endl;
     cout << endl;
     if(!success) {
         cerr << "TEST FAILED!!!" << endl;
