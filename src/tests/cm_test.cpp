@@ -432,7 +432,13 @@ bool testDBEFile(string connString, string& loginUser, string& loginPwd) {
 
         if(objmgr->isLoggedIn()) {
 
-            // TODO do something here
+            // Create folder
+            DBEFolder* folder = new DBEFolder();
+            folder->setName("new folder");
+            folder = (DBEFolder*) objmgr->Insert(folder);
+            cout << folder->toString("\n") << endl;
+
+            // Create a file
             cout << endl;
             DBEFile* dbefile = new DBEFile();
             dbefile->setRootDirectory("/home/roberto/tmp");
@@ -449,6 +455,7 @@ bool testDBEFile(string connString, string& loginUser, string& loginPwd) {
             delete dbefile;
             //success = false;
 
+            delete folder;
 
         } else {
             cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;

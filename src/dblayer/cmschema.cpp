@@ -455,9 +455,15 @@ string DBEObject::_getTodayString() {
     return ret;
 }
 string DBEObject::getId() const { return this->getField("id")==0 || this->getField("id")->isNull() ? "" : *(this->getField("id")->getStringValue()); }
+DBEObject* DBEObject::setId(const string s) { this->setValue("id",s); return this; }
 string DBEObject::getName() const { return this->getField("name")==0 || this->getField("name")->isNull() ? "" : *(this->getField("name")->getStringValue()); }
+DBEObject* DBEObject::setName(const string s) { this->setValue("name",s); return this; }
+string DBEObject::getDescription() const { return this->getField("description")==0 || this->getField("description")->isNull() ? "" : *(this->getField("description")->getStringValue()); }
+DBEObject* DBEObject::setDescription(const string s) { this->setValue("description",s); return this; }
 string DBEObject::getOwnerId() const { return this->getField("owner")==0 || this->getField("owner")->isNull() ? "" : *(this->getField("owner")->getStringValue()); }
+DBEObject* DBEObject::setOwnerId(const string s) { this->setValue("owner",s); return this; }
 string DBEObject::getGroupId() const { return this->getField("group_id")==0 || this->getField("group_id")->isNull() ? "" : *(this->getField("group_id")->getStringValue()); }
+DBEObject* DBEObject::setGroupId(const string s) { this->setValue("group_id",s); return this; }
 bool DBEObject::isDeleted() const { return this->getField("deleted_date")==0 || this->getField("deleted_date")->isNull() || *(this->getField("deleted_date")->getStringValue())=="0000-00-00 00:00:00" ? false : true; }
 bool DBEObject::canRead(const string kind) const {
     string perms = this->getField("permissions")==0 || this->getField("permissions")->isNull() ? "" : *(this->getField("permissions")->getStringValue());
@@ -633,11 +639,13 @@ DBEntityVector* ObjectMgr::Select(const string &tableName, const string &searchS
     return ret;
 }
 DBEntity* ObjectMgr::Insert(DBEntity *dbe) {
+    cout << "ObjectMgr::Insert: start." << endl;
     bool have_permission = true;
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
     if( obj!=0 ) {
         have_permission = this->canWrite(*obj);
     }
+    cout << "ObjectMgr::Insert: end." << endl;
     return have_permission ? DBMgr::Insert(dbe) : 0;
 }
 DBEntity* ObjectMgr::Update(DBEntity *dbe) {

@@ -70,9 +70,15 @@ class DBEObject : public DBEntity {
 
     // Custom methods
     string getId() const;
+    DBEObject* setId(const string s);
     string getName() const;
+    DBEObject* setName(const string s);
+    string getDescription() const;
+    DBEObject* setDescription(const string s);
     string getOwnerId() const;
+    DBEObject* setOwnerId(const string s);
     string getGroupId() const;
+    DBEObject* setGroupId(const string s);
     bool isDeleted() const;
 
     bool canRead(const string kind="") const;
