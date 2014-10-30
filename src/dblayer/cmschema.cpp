@@ -661,22 +661,24 @@ DBEntity* ObjectMgr::Update(DBEntity *dbe) {
 DBEntity* ObjectMgr::Delete(DBEntity *dbe) {
     bool have_permission = true;
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
+    DBEObject* full_obj = 0;
     if( obj!=0 ) {
-        obj = this->fullObjectById( obj->getId(), false );
-        have_permission = this->canWrite(*obj);
+        full_obj = this->fullObjectById( obj->getId(), false );
+        have_permission = this->canWrite(*full_obj);
+        delete full_obj;
     }
     if( have_permission ) {
         if( obj==0 || obj->isDeleted() ) {
             return DBMgr::Delete(dbe);
         } else {
             //this->connect();
-            dbe->_before_delete( this );
-            string sqlString = this->_buildUpdateString( dbe );
+            obj->_before_delete( this );
+            string sqlString = this->_buildUpdateString( obj );
             if( this->verbose ) cout << "ObjectMgr.delete: sqlString = " << sqlString << endl;
             ResultSet* rs = this->getConnection()->exec( sqlString );
             delete rs;
-            dbe->_after_delete( this );
-            return dbe;
+            obj->_after_delete( this );
+            return obj;
         }
     } else {
         return dbe;
@@ -795,6 +797,8 @@ DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted)
     search->setValue("id",myobj->getId());
     // FIXME this looks like a bit redundant, maybe there is a smarter way to do it
     DBEntityVector* mylist = this->Search(search,false,false,"",ignore_deleted);
+    delete search;
+    delete myobj;
     DBEObject* ret = 0;
     if(mylist->size()==1) {
         DBEntity* tmpret = mylist->at(0);
@@ -855,6 +859,8 @@ DBEObject* ObjectMgr::fullObjectByName(const string name, const bool ignore_dele
     search->setValue("id",myobj->getId());
     // FIXME this looks like a bit redundant, maybe there is a smarter way to do it
     DBEntityVector* mylist = this->Search(search,false,false,"",ignore_deleted);
+    delete search;
+    delete myobj;
     DBEObject* ret = 0;
     if(mylist->size()==1) {
         DBEntity* tmpret = mylist->at(0);
@@ -1110,6 +1116,8 @@ void DBEFile::setRootDirectory(const string& dir) { _root_directory = dir; }
 string DBEFile::getRootDirectory() const { return _root_directory; }
 DBEFile* DBEFile::setFilename(const string& f) {
     this->setValue("filename",f);
+    if(this->getName().length()==0)
+        this->setName(f);
 }
 string DBEFile::getFilename() const { return this->getField("filename")==0 || this->getField("filename")->isNull() ? "" : *(this->getField("filename")->getStringValue()); }
 string DBEFile::createFilename(const string& aId, const string& aFilename) const {

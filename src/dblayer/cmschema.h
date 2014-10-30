@@ -17,7 +17,7 @@ namespace CMSchema {
 
 class DBELog : public DBEntity {
   public:
-  DBELog();
+    DBELog();
     virtual ~DBELog();
     virtual string &name() const;
     virtual string getTableName() const;
@@ -57,7 +57,7 @@ class DBECountry : public DBEntity {
 class ObjectMgr;
 class DBEObject : public DBEntity {
   public:
-  DBEObject();
+    DBEObject();
     virtual ~DBEObject();
     virtual string& name() const;
     virtual string getTableName() const;
@@ -132,17 +132,17 @@ class ObjectMgr : public DBMgr {
 class DBECompany : public DBEObject {
   public:
     DBECompany();
-      virtual ~DBECompany();
-      virtual string& name() const;
-      virtual string getTableName() const;
-      virtual ForeignKeyVector& getFK() const;
-      virtual DBECompany* createNewInstance() const;
-      virtual ColumnDefinitions getColumns() const;
-      virtual StringVector& getColumnNames() const;
+    virtual ~DBECompany();
+    virtual string& name() const;
+    virtual string getTableName() const;
+    virtual ForeignKeyVector& getFK() const;
+    virtual DBECompany* createNewInstance() const;
+    virtual ColumnDefinitions getColumns() const;
+    virtual StringVector& getColumnNames() const;
   private:
-      static ForeignKeyVector _fkv;
-      static StringVector _column_order;
-      static ColumnDefinitions _columns;
+    static ForeignKeyVector _fkv;
+    static StringVector _column_order;
+    static ColumnDefinitions _columns;
 };
 
 class DBEPeople : public DBEObject {

@@ -438,35 +438,46 @@ bool testDBEFile(string connString, string& loginUser, string& loginPwd) {
             people = (DBEPeople*) objmgr->Insert(people);
             cout << people->toString("\n") << endl;
 
-            // Create folder
-            DBEFolder* folder = new DBEFolder();
-            folder->setName("new folder");
-            folder->setValue("fk_obj_id",people->getId());
+//             // Create folder
+//             DBEFolder* folder = new DBEFolder();
+//             folder->setName("Test Folder");
+//             folder->setValue("fk_obj_id",people->getId());
+// //             objmgr->setVerbose(true);
+//             folder = (DBEFolder*) objmgr->Insert(folder);
+//             objmgr->setVerbose(false);
+//             cout << folder->toString("\n") << endl;
+// 
+//             // Create a file
+//             cout << endl;
+//             DBEFile* dbefile = new DBEFile();
+//             dbefile->setRootDirectory("/home/roberto/tmp");
+//             dbefile->setValue("father_id",folder->getId());
+//             dbefile->setValue("path","my/path/to/object");
+//             dbefile->setFilename("myfile.txt");
 //             objmgr->setVerbose(true);
-            folder = (DBEFolder*) objmgr->Insert(folder);
-            objmgr->setVerbose(false);
-            cout << folder->toString("\n") << endl;
-
-            // Create a file
-            cout << endl;
-            DBEFile* dbefile = new DBEFile();
-            dbefile->setRootDirectory("/home/roberto/tmp");
-            dbefile->setValue("father_id",folder->getId());
-            dbefile->setValue("path","my/path/to/object");
-            dbefile->setFilename("myfile.txt");
-            dbefile = (DBEFile*) objmgr->Insert(dbefile);
-
-            cout << dbefile->toString("\n") << endl;
-            cout << "createFilename: " << dbefile->createFilename() << endl;
-            cout << "createFilename: " << dbefile->createFilename("myid","myfilename") << endl;
-            cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
-            cout << "getFullpath: " << dbefile->getFullpath() << endl;
-            objmgr->Delete(dbefile);
-            delete dbefile;
-            //success = false;
-
-            objmgr->Delete(folder);
-            delete folder;
+//             dbefile = (DBEFile*) objmgr->Insert(dbefile);
+//             objmgr->setVerbose(false);
+//             string err = objmgr->getErrorMessage();
+//             if(err.size()>0) {
+//                 cerr << "Insert file error: " << err << endl;
+//                 success = false;
+//             }
+// 
+//             if(success) {
+//                 cout << dbefile->toString("\n") << endl;
+//                 cout << "createFilename: " << dbefile->createFilename() << endl;
+//                 cout << "createFilename: " << dbefile->createFilename("myid","myfilename") << endl;
+//                 cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
+//                 cout << "getFullpath: " << dbefile->getFullpath() << endl;
+// //               objmgr->setVerbose(true);
+//                 objmgr->Delete(dbefile);
+//                 objmgr->setVerbose(false);
+//                 delete dbefile;
+//                 //success = false;
+//             }
+// 
+//             objmgr->Delete(folder);
+//             delete folder;
 
             objmgr->Delete(people);
             delete people;
