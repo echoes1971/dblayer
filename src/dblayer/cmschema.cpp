@@ -1157,22 +1157,22 @@ bool DBEFile::readFile(const string& src_file, bool move) {
     bool ret = false;
     boost::filesystem::path src_path(src_file);
     if(!exists(src_path)) {
-        cerr << "DBEFile::readFile: source does not exists " << src_path << endl;
+        cerr << "DBEFile::readFile: source file does not exists " << src_path << endl;
         return ret;
     }
     this->setFilename(src_path.filename().string());
     string fullpath = this->getFullpath();
     boost::filesystem::path dst_path(fullpath);
-    cout << "DBEFile::readFile: parent path '" << dst_path.parent_path() << "'" << endl;
+//     cout << "DBEFile::readFile: parent path '" << dst_path.parent_path() << "'" << endl;
     if(!boost::filesystem::create_directories( dst_path.parent_path() )) {
         cerr << "DBEFile::readFile: unable to create path " << dst_path.parent_path() << endl;
-        return false;
+        return ret;
     }
     if(move) {
-        cout << "DBEFile::readFile: moving '" << src_file << "' to '" << fullpath << "'" << endl;
+//         cout << "DBEFile::readFile: moving '" << src_file << "' to '" << fullpath << "'" << endl;
         boost::filesystem::rename(src_path, dst_path);
     } else {
-        cout << "DBEFile::readFile: copying '" << src_file << "' to '" << fullpath << "'" << endl;
+//         cout << "DBEFile::readFile: copying '" << src_file << "' to '" << fullpath << "'" << endl;
         boost::filesystem::copy(src_path, dst_path);
     }
     ret = true;
