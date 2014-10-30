@@ -137,7 +137,7 @@ bool testSchemas(string connString, string& loginUser, string& loginPwd) {
     AuthSchema::registerClasses(dbeFactory);
     AuthSchema::checkDB(*objmgr,false);
     CMSchema::registerClasses(dbeFactory);
-    CMSchema::checkDB(*objmgr,true);
+    CMSchema::checkDB(*objmgr,false);
 
     if(objmgr->connect()) {
 
@@ -335,7 +335,7 @@ bool testCRUD(string tablename, string connString, string& loginUser, string& lo
 
             // Create
             cout << "testCRUD: try to insert a new DBEObject" << endl;
-            objmgr->setVerbose(true);
+//             objmgr->setVerbose(true);
             dbeobject = (DBEObject*) objmgr->Insert(dbeobject);
             objmgr->setVerbose(false);
             cout << "testCRUD: inserted new DBEObject " << dbeobject->toString("\n ") << endl;
@@ -346,7 +346,7 @@ bool testCRUD(string tablename, string connString, string& loginUser, string& lo
             cout << "testCRUD: try to update the DBEObject" << endl;
             dbeobject->setValue("name","Name " + counter_str);
             dbeobject->setValue("description","Description " + counter_str);
-            objmgr->setVerbose(true);
+//             objmgr->setVerbose(true);
             dbeobject = (DBEObject*) objmgr->Update(dbeobject);
             objmgr->setVerbose(false);
             cout << "testCRUD: updated DBEObject " << dbeobject->toString("\n ") << endl;
@@ -365,29 +365,32 @@ bool testCRUD(string tablename, string connString, string& loginUser, string& lo
             objmgr->Destroy(lista);
             delete search;
 
-//             // Delete
-//             cout << "testCRUD: try to delete the DBEObject" << endl;
+            // Delete
+            cout << "testCRUD: try to delete the DBEObject" << endl;
 //             objmgr->setVerbose(true);
-//             dbeobject = (DBEObject*) objmgr->Delete(dbeobject);
-//             objmgr->setVerbose(false);
-//             cout << "testCRUD: deleted the DBEObject " << dbeobject->toString("\n ") << endl;
+            dbeobject = (DBEObject*) objmgr->Delete(dbeobject);
+            objmgr->setVerbose(false);
+            success = success && dbeobject->isDeleted();
+            if(dbeobject->isDeleted())
+                dbeobject = (DBEObject*) objmgr->Delete(dbeobject);
+            cout << "testCRUD: deleted the DBEObject " << dbeobject->toString("\n ") << endl;
 
             delete dbeobject;
 
-//             // Read
-//             search = (DBEObject*) objmgr->getClazz(tablename);
-//             search->setValue("name","Name " + counter_str);
-//             lista = objmgr->Search(search,true,true,"name");
-//             if ( lista->size()>0 ) {
-//                 success = false;
-//                 cout << "testCRUD: Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
-//                 for(const DBEntity* elem : (*lista)) cout << "- " << elem->toString("\n  ") << endl;
-//             } else {
-//                 success = true;
-//                 cout << "testCRUD: EMPTY LIST!!!" << endl;
-//             }
-//             objmgr->Destroy(lista);
-//             delete search;
+            // Read
+            search = (DBEObject*) objmgr->getClazz(tablename);
+            search->setValue("name","Name " + counter_str);
+            lista = objmgr->Search(search,true,true,"name");
+            if ( lista->size()>0 ) {
+                success = false;
+                cout << "testCRUD: Lista (" << DBLayer::integer2string((long)lista->size()) << "):" << endl;
+                for(const DBEntity* elem : (*lista)) cout << "- " << elem->toString("\n  ") << endl;
+            } else {
+                success = true;
+                cout << "testCRUD: EMPTY LIST!!!" << endl;
+            }
+            objmgr->Destroy(lista);
+            delete search;
 
         } else {
             cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
@@ -438,46 +441,42 @@ bool testDBEFile(string connString, string& loginUser, string& loginPwd) {
             people = (DBEPeople*) objmgr->Insert(people);
             cout << people->toString("\n") << endl;
 
-//             // Create folder
-//             DBEFolder* folder = new DBEFolder();
-//             folder->setName("Test Folder");
-//             folder->setValue("fk_obj_id",people->getId());
-// //             objmgr->setVerbose(true);
-//             folder = (DBEFolder*) objmgr->Insert(folder);
-//             objmgr->setVerbose(false);
-//             cout << folder->toString("\n") << endl;
-// 
-//             // Create a file
-//             cout << endl;
-//             DBEFile* dbefile = new DBEFile();
-//             dbefile->setRootDirectory("/home/roberto/tmp");
-//             dbefile->setValue("father_id",folder->getId());
-//             dbefile->setValue("path","my/path/to/object");
-//             dbefile->setFilename("myfile.txt");
+            // Create folder
+            DBEFolder* folder = new DBEFolder();
+            folder->setName("Test Folder");
+            folder->setValue("fk_obj_id",people->getId());
 //             objmgr->setVerbose(true);
-//             dbefile = (DBEFile*) objmgr->Insert(dbefile);
-//             objmgr->setVerbose(false);
-//             string err = objmgr->getErrorMessage();
-//             if(err.size()>0) {
-//                 cerr << "Insert file error: " << err << endl;
-//                 success = false;
-//             }
-// 
-//             if(success) {
-//                 cout << dbefile->toString("\n") << endl;
-//                 cout << "createFilename: " << dbefile->createFilename() << endl;
-//                 cout << "createFilename: " << dbefile->createFilename("myid","myfilename") << endl;
-//                 cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
-//                 cout << "getFullpath: " << dbefile->getFullpath() << endl;
-// //               objmgr->setVerbose(true);
-//                 objmgr->Delete(dbefile);
-//                 objmgr->setVerbose(false);
-//                 delete dbefile;
-//                 //success = false;
-//             }
-// 
-//             objmgr->Delete(folder);
-//             delete folder;
+            folder = (DBEFolder*) objmgr->Insert(folder);
+            objmgr->setVerbose(false);
+            cout << folder->toString("\n") << endl;
+
+            // Create a file
+            cout << endl;
+            DBEFile* dbefile = new DBEFile();
+            dbefile->setRootDirectory("/home/roberto/tmp");
+            dbefile->setValue("father_id",folder->getId());
+            dbefile->setValue("path","my/path/to/object");
+            dbefile->setFilename("myfile.txt");
+            success = success && dbefile->readFile("../examples/test.db",false);
+            //success = success && dbefile->readFile("../examples/test2.db",true);
+            dbefile = (DBEFile*) objmgr->Insert(dbefile);
+            string err = objmgr->getErrorMessage();
+            if(err.size()==0) {
+                cout << dbefile->toString("\n") << endl;
+                cout << "createFilename: " << dbefile->createFilename() << endl;
+                cout << "createFilename: " << dbefile->createFilename("myid","myfilename") << endl;
+                cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
+                cout << "getFullpath: " << dbefile->getFullpath() << endl;
+                objmgr->Delete(dbefile);
+                delete dbefile;
+                //success = false;
+            } else {
+                cerr << "Insert file error: " << err << endl;
+                success = false;
+            }
+
+            objmgr->Delete(folder);
+            delete folder;
 
             objmgr->Delete(people);
             delete people;

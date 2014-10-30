@@ -196,7 +196,7 @@ class DBEFile : public DBEObject {
     virtual StringVector& getColumnNames() const;
 
     // Custom methods
-    void setRootDirectory(const string& dir);
+    DBEFile* setRootDirectory(const string& dir);
     string getRootDirectory() const;
 
     DBEFile* setFilename(const string& f);
@@ -205,6 +205,9 @@ class DBEFile : public DBEObject {
     string createFilename(const string& aId="", const string& aFilename="") const;
     string createObjectPath(DBEFile* an_obj=0);
     string getFullpath(DBEFile* an_obj=0);
+
+    /** Copy the source file to the destination fullpath */
+    bool readFile(const string& src_file, bool move=false);
 
     virtual void _before_insert(DBMgr* dbmgr=0);
 //     virtual void _before_update(DBMgr* dbmgr=0);

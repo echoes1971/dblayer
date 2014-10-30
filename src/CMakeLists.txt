@@ -137,6 +137,9 @@ if(USE_LIBXMLRPC)
  set(EXTRA_LIBS ${EXTRA_LIBS} xmlrpc_client++ xmlrpc_client xmlrpc++ xmlrpc xmlrpc_util xmlrpc_xmlparse xmlrpc_xmltok)
 endif()
 
+# For CM Schema::DBEFile
+set(EXTRA_LIBS ${EXTRA_LIBS} boost_filesystem boost_system)
+
 message("EXTRA_LIBS: ${EXTRA_LIBS}")
 
 #include_directories ("${PROJECT_SOURCE_DIR}/dblayer")

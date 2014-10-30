@@ -8,8 +8,12 @@ using namespace AuthSchema;
 using namespace CMSchema;
 
 #include <ctime>
+#include <fstream>
+#include <iostream>
 #include <string>
 using namespace std;
+
+#include <boost/filesystem.hpp>
 
 //*********************** DBELog: start.
 StringVector DBELog::chiavi = {"ip","data"};
@@ -663,6 +667,7 @@ DBEntity* ObjectMgr::Delete(DBEntity *dbe) {
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
     DBEObject* full_obj = 0;
     if( obj!=0 ) {
+        // FIXME do we really need to retrieve again the object?
         full_obj = this->fullObjectById( obj->getId(), false );
         have_permission = this->canWrite(*full_obj);
         delete full_obj;
@@ -787,10 +792,10 @@ DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) {
     return ret;
 }
 DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted) {
-    cout << "ObjectMgr::fullObjectById: start." << endl;
+//     cout << "ObjectMgr::fullObjectById: start." << endl;
     DBEObject* myobj = this->objectById(id,ignore_deleted);
     if(myobj==0) {
-        cout << "ObjectMgr::fullObjectById: end." << endl;
+//         cout << "ObjectMgr::fullObjectById: end." << endl;
         return 0;
     }
     DBEntity* search = this->getClazzByTypeName(myobj->getStringValue("classname"));
@@ -810,7 +815,7 @@ DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted)
     } else {
         this->Destroy(mylist);
     }
-    cout << "ObjectMgr::fullObjectById: end." << endl;
+//     cout << "ObjectMgr::fullObjectById: end." << endl;
     return ret;
 }
 DBEObject* ObjectMgr::objectByName(const string name, const bool ignore_deleted) {
@@ -1112,7 +1117,7 @@ StringVector& DBEFile::getColumnNames() const { return _column_order; }
 DBEFile* DBEFile::createNewInstance() const { return new DBEFile(); }
 
 string DBEFile::_root_directory;
-void DBEFile::setRootDirectory(const string& dir) { _root_directory = dir; }
+DBEFile* DBEFile::setRootDirectory(const string& dir) { _root_directory = dir; return this; }
 string DBEFile::getRootDirectory() const { return _root_directory; }
 DBEFile* DBEFile::setFilename(const string& f) {
     this->setValue("filename",f);
@@ -1147,6 +1152,31 @@ string DBEFile::getFullpath(DBEFile* an_obj) {
         dest_dir.append("/").append(dest_path.c_str());
     dest_dir.append("/").append(obj->getFilename().c_str());
     return dest_dir;
+}
+bool DBEFile::readFile(const string& src_file, bool move) {
+    bool ret = false;
+    boost::filesystem::path src_path(src_file);
+    if(!exists(src_path)) {
+        cerr << "DBEFile::readFile: source does not exists " << src_path << endl;
+        return ret;
+    }
+    this->setFilename(src_path.filename().string());
+    string fullpath = this->getFullpath();
+    boost::filesystem::path dst_path(fullpath);
+    cout << "DBEFile::readFile: parent path '" << dst_path.parent_path() << "'" << endl;
+    if(!boost::filesystem::create_directories( dst_path.parent_path() )) {
+        cerr << "DBEFile::readFile: unable to create path " << dst_path.parent_path() << endl;
+        return false;
+    }
+    if(move) {
+        cout << "DBEFile::readFile: moving '" << src_file << "' to '" << fullpath << "'" << endl;
+        boost::filesystem::rename(src_path, dst_path);
+    } else {
+        cout << "DBEFile::readFile: copying '" << src_file << "' to '" << fullpath << "'" << endl;
+        boost::filesystem::copy(src_path, dst_path);
+    }
+    ret = true;
+    return ret;
 }
 void DBEFile::_before_insert(DBMgr* dbmgr) {
     DBEObject::_before_insert(dbmgr);
