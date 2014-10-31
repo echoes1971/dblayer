@@ -151,7 +151,7 @@ bool testSchemas(string connString, string& loginUser, string& loginPwd) {
             DBEntityVector* lista = 0;
 
             search = objmgr->getClazz("dbversion");
-            objmgr->setVerbose(true);
+//             objmgr->setVerbose(true);
             lista = objmgr->Search(search,true,true,"model_name");
             objmgr->setVerbose(false);
             if ( lista->size()>0 ) {
@@ -167,7 +167,7 @@ bool testSchemas(string connString, string& loginUser, string& loginPwd) {
             delete search;
 
             search = objmgr->getClazz("users");
-            objmgr->setVerbose(true);
+//             objmgr->setVerbose(true);
             lista = objmgr->Search(search,true,true,"login");
             objmgr->setVerbose(false);
             if ( lista->size()>0 ) {
@@ -183,7 +183,7 @@ bool testSchemas(string connString, string& loginUser, string& loginPwd) {
             delete search;
 
             search = objmgr->getClazz("groups");
-            objmgr->setVerbose(true);
+//             objmgr->setVerbose(true);
             lista = objmgr->Search(search,true,true,"name");
             objmgr->setVerbose(false);
             if ( lista->size()>0 ) {
@@ -200,25 +200,19 @@ bool testSchemas(string connString, string& loginUser, string& loginPwd) {
 
 //             // Let's create an object instance
 //             DBEObject* obj = (DBEObject*) objmgr->getClazz("objects");
-// 
+//
 //             obj->setDefaultValues(objmgr);
 //             cout << "Object: " << obj->toString("\n") << endl;
-// 
+//
 //             cout << "Has group " << obj->getGroupId() << ": " << objmgr->hasGroup(obj->getGroupId()) << endl;
 //             cout << "Can read: " << objmgr->canRead(*obj) << endl;
 //             cout << "Can write: " << objmgr->canWrite(*obj) << endl;
 //             cout << "Can execute: " << objmgr->canExecute(*obj) << endl;
-//             
+//
 //             cout << "objmgr.Select: TODO" << endl;
-// 
+//
 //             delete obj;
-// 
-//             printf("\n");
-//             printf("Field Creati: %d\n",   SchemaNS::getFieldCreati() );
-//             printf("Field Distrutti: %d\n",SchemaNS::getFieldDistrutti() );
-//             printf("Schemi Creati: %d\n",   SchemaNS::getSchemiCreati() );
-//             printf("Schemi Distrutti: %d\n",SchemaNS::getSchemiDistrutti() );
-//             printf("\n");
+//
         } else {
             cout << "Login Error: " << objmgr->getErrorMessage() << "." << endl;
             success = false;

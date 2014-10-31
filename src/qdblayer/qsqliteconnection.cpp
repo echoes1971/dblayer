@@ -101,10 +101,10 @@ ResultSet* QSqliteConnection::exec(const string s) {
 
     // Preparing metadata
     int nColonne = record.count();
+    bool unknown_type = false;
     for( int i=0; i<nColonne; i++) {
-        rs->columnName.push_back(record.fieldName(i).toStdString());
-        rs->columnSize.push_back(record.field(i).length());
         QVariant::Type fieldType = record.field(i).type();
+        bool add_column = true;
         switch(fieldType) {
             case QVariant::Int:
             case QVariant::LongLong:
@@ -124,11 +124,20 @@ ResultSet* QSqliteConnection::exec(const string s) {
             case QVariant::DateTime:
                 rs->columnType.push_back( DBLayer::type_datetime );
                 break;
+            case 0:
+                // If the type is 0 means that the column is empty for all the rows
+                add_column = false;
+                break;
             default:
                 cerr << "QSqliteConnection::exec: \'" << record.fieldName(i).toStdString() << "\' "
-                     <<"fieldType \'" << fieldType << "\' Unknown!" << endl;
+                     << "fieldType \'" << fieldType << "\' Unknown!" << endl;
                 rs->columnType.push_back( DBLayer::type_blob );
+                unknown_type = true;
                 break;
+        }
+        if(add_column) {
+            rs->columnName.push_back(record.fieldName(i).toStdString());
+            rs->columnSize.push_back(record.field(i).length());
         }
     }
 
@@ -137,6 +146,9 @@ ResultSet* QSqliteConnection::exec(const string s) {
         for(int i = 0; i < record.count(); i++) {
             QVariant val =  query.value(i);
             rs->righe.push_back( val.toString().toStdString() );
+            if(unknown_type) {
+                cout << rs->columnName.at(i) << "::" << rs->columnType.at(i) << "::" << val.toString().toStdString() << endl;
+            }
         }
     }
     if(this->verbose) printf("QSqliteConnection::exec: end.\n");

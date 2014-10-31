@@ -40,5 +40,8 @@
 /* Enables QXmlrpc driver */
 #cmakedefine USE_QXMLRPC
 
+/* Enables Boost for file system operations (DBEFile) */
+#cmakedefine USE_BOOST
+
 /* Version number of package */
 #define VERSION "0.@DBLayer_VERSION_MAJOR@.@DBLayer_VERSION_MINOR@"

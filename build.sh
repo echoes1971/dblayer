@@ -33,6 +33,7 @@ echo "cd build ; make -j 12 && ./tests/dbmgr_test \"$CONNECTION_STRING\" $TEST_U
 mkdir -p $BUILD_DIR
 cd ${BUILD_DIR}
 cmake ${cmake_params} ${SRC_DIR}
+#exit 1
 
 #make -j 12 && ./apps/dbshell dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php
 #make -j 12 && ./apps/dbshell "dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;" adm adm

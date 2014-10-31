@@ -1,6 +1,7 @@
 /**
  * dbschema.cpp
  */
+#include <config.h>
 
 #include "authschema.h"
 using namespace AuthSchema;
@@ -503,7 +504,7 @@ bool DBEObject::canExecute(const string kind) const {
     }
 }
 DBEObject* DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
-    cout << "DBEObject::setDefaultValues: start." << endl;
+//     cout << "DBEObject::setDefaultValues: start." << endl;
     DBEUser* myuser = (DBEUser*) dbmgr->getDBEUser();
     if(myuser!=0) {
         if(this->getField("owner")==0 || this->getField("owner")->isNull() || this->getField("owner")->getStringValue()->length()==0)
@@ -538,7 +539,7 @@ DBEObject* DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
             delete father;
         }
     }
-    cout << "DBEObject::setDefaultValues: end." << endl;
+//     cout << "DBEObject::setDefaultValues: end." << endl;
     return this;
 }
 void DBEObject::_before_insert(DBMgr* dbmgr) {
@@ -1154,6 +1155,7 @@ string DBEFile::getFullpath(DBEFile* an_obj) {
     return dest_dir;
 }
 bool DBEFile::readFile(const string& src_file, bool move) {
+#ifdef USE_BOOST
     bool ret = false;
     boost::filesystem::path src_path(src_file);
     if(!exists(src_path)) {
@@ -1177,6 +1179,10 @@ bool DBEFile::readFile(const string& src_file, bool move) {
     }
     ret = true;
     return ret;
+#else
+    cerr << "DBEFile::readFile: Boost not found!!! " << endl;
+    return false;
+#endif
 }
 void DBEFile::_before_insert(DBMgr* dbmgr) {
     DBEObject::_before_insert(dbmgr);

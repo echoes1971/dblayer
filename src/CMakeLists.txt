@@ -34,6 +34,8 @@ find_package(PostgreSQL)
 find_package(SQLite3)
 find_package(XmlrpcC)
 
+find_package(Boost)
+
 find_package(Qt5Widgets PATHS ~/Qt/)
 
 if(MYSQL_FOUND)
@@ -86,6 +88,9 @@ if(Qt5Widgets_FOUND)
  set(CMAKE_AUTOMOC ON)
 
 endif()
+if(Boost_FOUND)
+ set(USE_BOOST TRUE)
+endif()
 
 message("Configuration")
 message("=============")
@@ -97,6 +102,8 @@ message("SQLite3: ${SQLITE3_FOUND}")
 message("Xmlrpc-C: ${XMLRPCC_FOUND}")
 message("")
 message("Qt5: ${Qt5Widgets_FOUND}")
+message("")
+message("Boost: ${Boost_FOUND}")
 message("")
 
 configure_file(
@@ -138,7 +145,9 @@ if(USE_LIBXMLRPC)
 endif()
 
 # For CM Schema::DBEFile
-set(EXTRA_LIBS ${EXTRA_LIBS} boost_filesystem boost_system)
+if(Boost_FOUND)
+ set(EXTRA_LIBS ${EXTRA_LIBS} boost_filesystem boost_system)
+endif()
 
 message("EXTRA_LIBS: ${EXTRA_LIBS}")
 
