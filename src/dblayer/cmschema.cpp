@@ -1158,7 +1158,7 @@ bool DBEFile::readFile(const string& src_file, bool move) {
 #ifdef USE_BOOST
     bool ret = false;
     boost::filesystem::path src_path(src_file);
-    if(!exists(src_path)) {
+    if(!boost::filesystem::exists(src_path)) {
         cerr << "DBEFile::readFile: source file does not exists " << src_path << endl;
         return ret;
     }
@@ -1190,19 +1190,33 @@ void DBEFile::_before_insert(DBMgr* dbmgr) {
     // Inherit the father's root
     this->_inherith_father_root(dynamic_cast<ObjectMgr*>(dbmgr));
 
-//     // Aggiungo il prefisso al nome del file
-//     if( $this->getValue('filename')>'' ) {
-//         $dest_path = $this->generaObjectPath();
-//         $from_dir=realpath($GLOBALS['root_directory'].'/'.$this->dest_directory);
-//         $dest_dir=realpath($GLOBALS['root_directory'].'/'.$this->dest_directory);
-//         if($dest_path>'') $dest_dir.="/$dest_path";
-//         if(!file_exists($dest_dir)) mkdir($dest_dir, 0755 );
-//         // con basename() ottengo solo il nome del file senza il path relativo nel quale e' stato caricato
-//         $nuovo_filename = $this->generaFilename($this->getValue('id'), basename($this->getValue('filename')));
-//         rename( $from_dir."/".$this->getValue('filename'), $dest_dir."/".$nuovo_filename );
-//         if( !($this->getValue('name')>'') ) $this->setValue('name',basename($this->getValue('filename')) );
-//         $this->setValue('filename', $nuovo_filename);
-//     }
+    // Adding prefix to the filename
+#ifdef USE_BOOST
+    string filename = this->getFilename();
+    if(filename.size()>0) {
+        string dest_path(this->createObjectPath());
+        string from_dir(this->_root_directory);
+        string dest_dir(this->_root_directory);
+        if(dest_path.size()>0) {
+            from_dir.append("/").append(dest_path);
+            dest_dir.append("/").append(dest_path);
+        }
+        boost::filesystem::path my_dest_dir(dest_dir);
+        if(!boost::filesystem::exists(my_dest_dir)) {
+            //if(!file_exists($dest_dir)) mkdir($dest_dir, 0755 );
+            if(!boost::filesystem::create_directories( my_dest_dir )) {
+                cerr << "DBEFile::_before_insert: unable to create path " << my_dest_dir << endl;
+                return;
+            }
+        }
+        string new_filename( this->createFilename(this->getId(),this->getFilename()) );
+        boost::filesystem::path path_from(from_dir + "/" + filename);
+        boost::filesystem::path path_to(dest_dir + "/" + new_filename);
+        boost::filesystem::rename(path_from,path_to);
+        if(this->getName().size()==0) this->setName(this->getFilename());
+        this->setFilename(new_filename);
+    }
+#endif
 //     // Checksum
 //     $_fullpath = $this->getFullpath();
 //     if(file_exists($_fullpath)) {
