@@ -450,7 +450,7 @@ bool testDBEFile(string connString, string& loginUser, string& loginPwd) {
             dbefile->setRootDirectory("/home/roberto/tmp");
             dbefile->setValue("father_id",folder->getId());
             dbefile->setValue("path","my/path/to/object");
-            dbefile->setFilename("myfile.txt");
+//             dbefile->setFilename("myfile.txt");
             success = success && dbefile->readFile("../examples/test.db",false);
             //success = success && dbefile->readFile("../examples/test2.db",true);
             dbefile = (DBEFile*) objmgr->Insert(dbefile);
