@@ -14,7 +14,9 @@ using namespace CMSchema;
 #include <string>
 using namespace std;
 
+#ifdef USE_BOOST
 #include <boost/filesystem.hpp>
+#endif
 
 //*********************** DBELog: start.
 StringVector DBELog::chiavi = {"ip","data"};
@@ -1217,6 +1219,9 @@ void DBEFile::_before_insert(DBMgr* dbmgr) {
         this->setFilename(new_filename);
     }
 #endif
+
+    // NOTE http://stackoverflow.com/questions/10324611/how-to-calculate-the-md5-hash-of-a-large-file-in-c
+
 //     // Checksum
 //     $_fullpath = $this->getFullpath();
 //     if(file_exists($_fullpath)) {
