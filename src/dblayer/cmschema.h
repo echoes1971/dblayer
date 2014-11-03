@@ -202,6 +202,14 @@ class DBEFile : public DBEObject {
     DBEFile* setFilename(const string& f);
     string getFilename() const;
 
+    DBEFile* setChecksum(const string& f);
+    string getChecksum() const;
+
+    DBEFile* setMimetype(const string& f);
+    string getMimetype() const;
+
+    bool isImage() const;
+
     string createFilename(const string& aId="", const string& aFilename="") const;
     string createObjectPath(DBEFile* an_obj=0);
     string getFullpath(DBEFile* an_obj=0);

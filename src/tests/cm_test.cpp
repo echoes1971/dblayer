@@ -462,6 +462,7 @@ bool testDBEFile(string connString, string& loginUser, string& loginPwd) {
                 cout << "createFilename: " << dbefile->createFilename("myid","myfilename") << endl;
                 cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
                 cout << "getFullpath: " << dbefile->getFullpath() << endl;
+                cout << "isImage: " << dbefile->isImage() << endl;
                 objmgr->Delete(dbefile);
                 delete dbefile;
                 //success = false;

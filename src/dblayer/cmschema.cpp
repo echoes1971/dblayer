@@ -1134,6 +1134,14 @@ DBEFile* DBEFile::setFilename(const string& f) {
         this->setName(f);
 }
 string DBEFile::getFilename() const { return this->getField("filename")==0 || this->getField("filename")->isNull() ? "" : *(this->getField("filename")->getStringValue()); }
+DBEFile* DBEFile::setMimetype(const string& f) { this->setValue("mime",f);; return this; }
+string DBEFile::getMimetype() const { return this->getField("mime")==0 || this->getField("mime")->isNull() ? "" : *(this->getField("mime")->getStringValue()); }
+DBEFile* DBEFile::setChecksum(const string& f) { this->setValue("checksum",f);; return this; }
+string DBEFile::getChecksum() const { return this->getField("checksum")==0 || this->getField("checksum")->isNull() ? "" : *(this->getField("checksum")->getStringValue()); }
+bool DBEFile::isImage() const {
+    string s = this->getMimetype();
+    return s.substr(0,5)=="image";
+}
 string DBEFile::createFilename(const string& aId, const string& aFilename) const {
     string filename = aFilename.size()==0 ? this->getFilename() : aFilename;
     string id = aId.size()==0 ? this->getId() : aId;
@@ -1230,11 +1238,11 @@ void DBEFile::_before_insert(DBMgr* dbmgr) {
 
     // Checksum
     string checksum = this->_file_checksum(fullpath);
-    this->setValue("checksum",checksum);
+    this->setChecksum(checksum);
 
     // Mime type
     string mimetype = this->_mimetype(fullpath);
-    this->setValue("mime",mimetype);
+    this->setMimetype(mimetype);
 
 //     // Image
 //     if($this->isImage())
