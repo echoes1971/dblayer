@@ -1265,7 +1265,7 @@ void DBEFile::_before_update(DBMgr* dbmgr) {
         if(!boost::filesystem::exists(my_dest_dir)) {
             //if(!file_exists($dest_dir)) mkdir($dest_dir, 0755 );
             if(!boost::filesystem::create_directories( my_dest_dir )) {
-                cerr << "DBEFile::_before_insert: unable to create path " << my_dest_dir << endl;
+                cerr << "DBEFile::_before_update: unable to create path " << my_dest_dir << endl;
                 return;
             }
         }
@@ -1285,7 +1285,7 @@ void DBEFile::_before_update(DBMgr* dbmgr) {
         boost::filesystem::path my_dest_dir(dest_dir);
         if(!boost::filesystem::exists(my_dest_dir)) {
            if(!boost::filesystem::create_directories( my_dest_dir )) {
-                cerr << "DBEFile::_before_insert: unable to create path " << my_dest_dir << endl;
+                cerr << "DBEFile::_before_update: unable to create path " << my_dest_dir << endl;
                 return;
             }
         }
