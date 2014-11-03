@@ -35,6 +35,8 @@ find_package(SQLite3)
 find_package(XmlrpcC)
 
 find_package(Boost)
+find_package(LibMagic)
+find_package(OpenSSL)
 
 find_package(Qt5Widgets PATHS ~/Qt/)
 
@@ -91,6 +93,12 @@ endif()
 if(Boost_FOUND)
  set(USE_BOOST TRUE)
 endif()
+if(MAGIC_FOUND)
+ set(USE_LIBMAGIC TRUE)
+endif()
+if(OPENSSL_VERSION)
+ set(USE_OPENSSL TRUE)
+endif()
 
 message("Configuration")
 message("=============")
@@ -104,6 +112,8 @@ message("")
 message("Qt5: ${Qt5Widgets_FOUND}")
 message("")
 message("Boost: ${Boost_FOUND}")
+message("LibMagic: ${MAGIC_FOUND}")
+message("OpenSSL: ${OPENSSL_VERSION}")
 message("")
 
 configure_file(
@@ -147,6 +157,12 @@ endif()
 # For CM Schema::DBEFile
 if(Boost_FOUND)
  set(EXTRA_LIBS ${EXTRA_LIBS} boost_filesystem boost_system)
+endif()
+if(MAGIC_FOUND)
+ set(EXTRA_LIBS ${EXTRA_LIBS} ${MAGIC_LIBRARY})
+endif()
+if(OPENSSL_VERSION)
+ set(EXTRA_LIBS ${EXTRA_LIBS} ${OPENSSL_LIBRARIES})
 endif()
 
 message("EXTRA_LIBS: ${EXTRA_LIBS}")

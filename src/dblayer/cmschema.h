@@ -224,6 +224,8 @@ class DBEFile : public DBEObject {
     static ColumnDefinitions _columns;
 
     void _inherith_father_root(ObjectMgr* objmgr);
+    string _file_checksum(const string fullpath) const;
+    string _mimetype(const string fullpath) const;
 };
 
 class DBEFolder : public DBEObject {

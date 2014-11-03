@@ -17,6 +17,12 @@ using namespace std;
 #ifdef USE_BOOST
 #include <boost/filesystem.hpp>
 #endif
+#ifdef USE_LIBMAGIC
+#include <magic.h>
+#endif
+#ifdef USE_OPENSSL
+#include <openssl/md5.h>
+#endif
 
 //*********************** DBELog: start.
 StringVector DBELog::chiavi = {"ip","data"};
@@ -1220,39 +1226,71 @@ void DBEFile::_before_insert(DBMgr* dbmgr) {
     }
 #endif
 
-    // NOTE http://stackoverflow.com/questions/10324611/how-to-calculate-the-md5-hash-of-a-large-file-in-c
+    string fullpath(this->getFullpath());
 
-//     // Checksum
-//     $_fullpath = $this->getFullpath();
-//     if(file_exists($_fullpath)) {
-//         $newchecksum = sha1_file( $_fullpath );
-//         $this->setValue('checksum',$newchecksum);
-//     } else {
-//         $this->setValue('checksum',"File '".$this->getValue('filename')."' not found!");
-//     }
-//     // Mime type
-//     if(file_exists($_fullpath)) {
-//         if(function_exists('finfo_open')) {
-//             $finfo = finfo_open(FILEINFO_MIME);
-//             if (!$finfo) {
-//                 if(function_exists('mime_content_type'))
-//                     $this->setValue('mime',mime_content_type($_fullpath));
-//                 else
-//                     $this->setValue('mime','text/plain');
-//                 return;
-//             }
-//             $this->setValue('mime',finfo_file($finfo,$_fullpath));
-//             finfo_close($finfo);
-//         } elseif(function_exists('mime_content_type'))
-//             $this->setValue('mime',mime_content_type($_fullpath));
-//         else
-//             $this->setValue('mime','text/plain');
-//     } else {
-//         $this->setValue('mime','text/plain');
-//     }
+    // Checksum
+    string checksum = this->_file_checksum(fullpath);
+    this->setValue("checksum",checksum);
+
+    // Mime type
+    string mimetype = this->_mimetype(fullpath);
+    this->setValue("mime",mimetype);
+
 //     // Image
 //     if($this->isImage())
 //         $this->createThumbnail($_fullpath);
+}
+string DBEFile::_mimetype(const string fullpath) const {
+#ifdef USE_LIBMAGIC
+    // sudo aptitude install libmagic-dev
+//     cout << "DBEFile::_mimetype: =================================" << endl;
+    magic_t myt = magic_open(MAGIC_CONTINUE|MAGIC_ERROR|MAGIC_MIME);
+    magic_load(myt,NULL);
+    const char* descr = magic_file(myt,fullpath.c_str());
+    string ret(descr);
+//     cout << "DBEFile::_mimetype: descr=" << descr << endl;
+    magic_close(myt);
+//     cout << "DBEFile::_mimetype: ret=" << ret << endl;
+//     cout << "DBEFile::_mimetype: =================================" << endl;
+    return ret;
+#else
+    return "application/octet-stream";
+#endif
+}
+string DBEFile::_file_checksum(const string fullpath) const {
+#ifdef USE_OPENSSL
+    unsigned char c[MD5_DIGEST_LENGTH];
+    FILE *inFile = fopen(fullpath.c_str(), "rb");
+    MD5_CTX mdContext;
+    int bytes;
+    unsigned char data[1024];
+    if (inFile == NULL) {
+        cerr << "DBEFile::_file_checksum: can't open " << fullpath << endl;
+        return "error: can't open file";
+    }
+    char tmp[MD5_DIGEST_LENGTH*2+2];
+    for(int i=0; i<MD5_DIGEST_LENGTH*2; i++) tmp[i]='=';
+    tmp[MD5_DIGEST_LENGTH*2+0]='-'; tmp[MD5_DIGEST_LENGTH*2+1]='\0';
+    MD5_Init (&mdContext);
+    while((bytes=fread(data, 1, 1024, inFile)) != 0)
+        MD5_Update(&mdContext, data, bytes);
+    MD5_Final(c,&mdContext);
+//     printf("%i ",MD5_DIGEST_LENGTH);
+    for(int i=0; i<MD5_DIGEST_LENGTH; i++) {
+//         printf("%02x", c[i]);
+#if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
+        sprintf_s( &(tmp[i*2]),"%02x",c[i]);
+#else
+        sprintf( &(tmp[i*2]),"%02x",c[i]);
+#endif
+    }
+//     printf (" %s\n", fullpath.c_str());
+//     printf ("tmp: %s\n", (char*) &tmp);
+    fclose (inFile);
+    return string(tmp);
+#else
+    return "undefined";
+#endif
 }
 void DBEFile::_inherith_father_root(ObjectMgr* objmgr) {
 //     cout << "DBEFile::_inherith_father_root: start." << endl;
