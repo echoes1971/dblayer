@@ -1207,6 +1207,125 @@ void DBEFile::_before_insert(DBMgr* dbmgr) {
     this->_inherith_father_root(dynamic_cast<ObjectMgr*>(dbmgr));
 
     // Adding prefix to the filename
+    this->_add_prefix_to_filename();
+
+    string fullpath(this->getFullpath());
+
+    // Checksum
+    string checksum = this->_file_checksum(fullpath);
+    this->setChecksum(checksum);
+
+    // Mime type
+    string mimetype = this->_mimetype(fullpath);
+    this->setMimetype(mimetype);
+
+    // Image
+    if(this->isImage())
+        this->_createThumbnail(fullpath);
+}
+void DBEFile::_before_update(DBMgr* dbmgr) {
+    DBEObject::_before_update(dbmgr);
+    // Inherit the father's root
+    this->_inherith_father_root(dynamic_cast<ObjectMgr*>(dbmgr));
+
+#ifdef USE_BOOST
+    // Check if there is a file saved
+    DBEFile* search = this->createNewInstance();
+    search->setId(this->getId());
+    DBEntityVector* tmp = dbmgr->Search(search,false);
+    delete search;
+    DBEFile* myself = (DBEFile*) tmp->at(0);
+    string this_filename(this->getFilename());
+    string myself_filename(myself->getFilename());
+    if( this_filename.size()>0 && myself_filename!=this_filename ) {
+        // Different filenames ==> removing the old
+        string dest_path(myself->createObjectPath());
+        string dest_file(this->_root_directory);
+        if(dest_path.size()>0) dest_file.append("/").append(dest_path);
+        dest_file.append("/").append(myself->createFilename());
+        boost::filesystem::path my_dest_file(dest_file);
+        if(boost::filesystem::exists(my_dest_file)) {
+            boost::filesystem::remove(my_dest_file);
+            // Image
+            if(this->isImage())
+                this->_deleteThumbnail(dest_file);
+        }
+    }
+
+    // Adding prefix to file name
+    if( this_filename.size()>0 ) {
+        string dest_path(this->createObjectPath());
+        string from_dir(this->_root_directory);
+        string dest_dir(this->_root_directory);
+        if(dest_path.size()>0) {
+            from_dir.append("/").append(dest_path);
+            dest_dir.append("/").append(dest_path);
+        }
+        boost::filesystem::path my_dest_dir(dest_dir);
+        if(!boost::filesystem::exists(my_dest_dir)) {
+            //if(!file_exists($dest_dir)) mkdir($dest_dir, 0755 );
+            if(!boost::filesystem::create_directories( my_dest_dir )) {
+                cerr << "DBEFile::_before_insert: unable to create path " << my_dest_dir << endl;
+                return;
+            }
+        }
+        string new_filename( this->createFilename(this->getId(),this->getFilename()) );
+        boost::filesystem::path path_from(from_dir + "/" + this_filename);
+        boost::filesystem::path path_to(dest_dir + "/" + new_filename);
+        boost::filesystem::rename(path_from,path_to);
+        //if(this->getName().size()==0) this->setName(this->getFilename());
+        this->setFilename(new_filename);
+    } else if(myself->getStringValue("path")!=this->getStringValue("path")) {
+        string from_path(myself->createObjectPath());
+        string dest_path(this->createObjectPath());
+        string from_dir(this->_root_directory);
+        string dest_dir(this->_root_directory);
+        if(from_path.size()>0) from_dir.append("/").append(from_path);
+        if(dest_path.size()>0) dest_dir.append("/").append(dest_path);
+        boost::filesystem::path my_dest_dir(dest_dir);
+        if(!boost::filesystem::exists(my_dest_dir)) {
+           if(!boost::filesystem::create_directories( my_dest_dir )) {
+                cerr << "DBEFile::_before_insert: unable to create path " << my_dest_dir << endl;
+                return;
+            }
+        }
+        boost::filesystem::path path_from(from_dir + "/" + myself_filename);
+        boost::filesystem::path path_to(dest_dir + "/" + myself_filename);
+        boost::filesystem::rename(path_from,path_to);
+        this->setFilename(myself_filename);
+    } else {
+        this->setFilename(myself_filename);
+    }
+
+    // This destroy myself object too
+    dbmgr->Destroy(tmp);
+
+#else
+    cerr << "DBEFile::_before_update: Boost not available!!!" << endl;
+    return;
+#endif
+
+    string fullpath(this->getFullpath());
+
+    // Checksum
+    string checksum = this->_file_checksum(fullpath);
+    this->setChecksum(checksum);
+
+    // Mime type
+    string mimetype = this->_mimetype(fullpath);
+    this->setMimetype(mimetype);
+
+    // Image
+    if(this->isImage())
+        this->_createThumbnail(fullpath);
+}
+void DBEFile::_createThumbnail(const string fullpath) const {
+    cerr << "DBEFile::_createThumbnail: TODO - " << fullpath << endl;
+}
+void DBEFile::_deleteThumbnail(const string fullpath) const {
+    cerr << "DBEFile::_deleteThumbnail: TODO - " << fullpath << endl;
+}
+void DBEFile::_add_prefix_to_filename() {
 #ifdef USE_BOOST
     string filename = this->getFilename();
     if(filename.size()>0) {
@@ -1233,20 +1352,6 @@ void DBEFile::_before_insert(DBMgr* dbmgr) {
         this->setFilename(new_filename);
     }
 #endif
-
-    string fullpath(this->getFullpath());
-
-    // Checksum
-    string checksum = this->_file_checksum(fullpath);
-    this->setChecksum(checksum);
-
-    // Mime type
-    string mimetype = this->_mimetype(fullpath);
-    this->setMimetype(mimetype);
-
-//     // Image
-//     if($this->isImage())
-//         $this->createThumbnail($_fullpath);
 }
 string DBEFile::_mimetype(const string fullpath) const {
 #ifdef USE_LIBMAGIC

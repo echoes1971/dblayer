@@ -218,7 +218,7 @@ class DBEFile : public DBEObject {
     bool readFile(const string& src_file, bool move=false);
 
     virtual void _before_insert(DBMgr* dbmgr=0);
-//     virtual void _before_update(DBMgr* dbmgr=0);
+    virtual void _before_update(DBMgr* dbmgr=0);
 //     virtual void _before_delete(DBMgr* dbmgr=0);
 
   protected:
@@ -232,8 +232,11 @@ class DBEFile : public DBEObject {
     static ColumnDefinitions _columns;
 
     void _inherith_father_root(ObjectMgr* objmgr);
+    void _add_prefix_to_filename();
     string _file_checksum(const string fullpath) const;
     string _mimetype(const string fullpath) const;
+    void _createThumbnail(const string fullpath) const;
+    void _deleteThumbnail(const string fullpath) const;
 };
 
 class DBEFolder : public DBEObject {
