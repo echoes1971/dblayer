@@ -457,14 +457,42 @@ bool testDBEFile(string connString, string& loginUser, string& loginPwd) {
             dbefile = (DBEFile*) objmgr->Insert(dbefile);
             string err = objmgr->getErrorMessage();
             if(err.size()==0) {
+                cout << "= Created =============================" << endl;
                 cout << dbefile->toString("\n") << endl;
                 cout << "createFilename: " << dbefile->createFilename() << endl;
-                cout << "createFilename: " << dbefile->createFilename("myid","myfilename") << endl;
                 cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
                 cout << "getFullpath: " << dbefile->getFullpath() << endl;
                 cout << "isImage: " << dbefile->isImage() << endl;
+                
+                // Update with other content
+                dbefile->readFile("../examples/33_a.pdf",false);
+                dbefile = (DBEFile*) objmgr->Update(dbefile);
+                err = objmgr->getErrorMessage();
+                if(err.size()==0) {
+                    cout << "= Updated =============================" << endl;
+                    cout << dbefile->toString("\n") << endl;
+                    cout << "createFilename: " << dbefile->createFilename() << endl;
+                    cout << "createObjectPath: " << dbefile->createObjectPath() << endl;
+                    cout << "getFullpath: " << dbefile->getFullpath() << endl;
+                    cout << "isImage: " << dbefile->isImage() << endl;
+                } else {
+                    cerr << "Update file error: " << err << endl;
+                    success = false;
+                }
                 objmgr->Delete(dbefile);
+                err = objmgr->getErrorMessage();
+                if(err.size()>0) {
+                    cerr << "Delete file error: " << err << endl;
+                    success = false;
+                }
+                objmgr->Delete(dbefile);
+                err = objmgr->getErrorMessage();
+                if(err.size()>0) {
+                    cerr << "Delete file error: " << err << endl;
+                    success = false;
+                }
                 delete dbefile;
+                cout << "= Deleted =============================" << endl;
                 //success = false;
             } else {
                 cerr << "Insert file error: " << err << endl;

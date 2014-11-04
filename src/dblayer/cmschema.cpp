@@ -1182,9 +1182,11 @@ bool DBEFile::readFile(const string& src_file, bool move) {
     string fullpath = this->getFullpath();
     boost::filesystem::path dst_path(fullpath);
 //     cout << "DBEFile::readFile: parent path '" << dst_path.parent_path() << "'" << endl;
-    if(!boost::filesystem::create_directories( dst_path.parent_path() )) {
-        cerr << "DBEFile::readFile: unable to create path " << dst_path.parent_path() << endl;
-        return ret;
+    if(!boost::filesystem::exists(dst_path.parent_path())) {
+        if(!boost::filesystem::create_directories( dst_path.parent_path() )) {
+            cerr << "DBEFile::readFile: unable to create path " << dst_path.parent_path() << endl;
+            return ret;
+        }
     }
     if(move) {
 //         cout << "DBEFile::readFile: moving '" << src_file << "' to '" << fullpath << "'" << endl;
@@ -1243,13 +1245,10 @@ void DBEFile::_before_update(DBMgr* dbmgr) {
         string dest_file(this->_root_directory);
         if(dest_path.size()>0) dest_file.append("/").append(dest_path);
         dest_file.append("/").append(myself->createFilename());
-        boost::filesystem::path my_dest_file(dest_file);
-        if(boost::filesystem::exists(my_dest_file)) {
-            boost::filesystem::remove(my_dest_file);
-            // Image
-            if(this->isImage())
-                this->_deleteThumbnail(dest_file);
-        }
+        this->_delete_file(dest_file);
+        // Image
+        if(this->isImage())
+            this->_deleteThumbnail(dest_file);
     }
 
     // Adding prefix to file name
@@ -1318,6 +1317,61 @@ void DBEFile::_before_update(DBMgr* dbmgr) {
     // Image
     if(this->isImage())
         this->_createThumbnail(fullpath);
+}
+void DBEFile::_before_delete(DBMgr* dbmgr) {
+    // Has it been marked deleted before?
+    bool is_deleted = this->isDeleted();
+    DBEObject::_before_delete(dbmgr);
+    // If it has been marked deleted, then now is a REAL delete, so remove the file
+    if(is_deleted) {
+        // Check if there is a file saved
+        DBEFile* search = this->createNewInstance();
+        search->setId(this->getId());
+        DBEntityVector* tmp = dbmgr->Search(search,false);
+        delete search;
+        if(tmp->size()>0) {
+            DBEFile* myself = (DBEFile*) tmp->at(0);
+            string myself_filename(myself->getFilename());
+            if( myself_filename.size()>0 ) {
+                // Removing file
+                string dest_path(myself->createObjectPath());
+                string dest_file(this->_root_directory);
+                if(dest_path.size()>0) dest_file.append("/").append(dest_path);
+                dest_file.append("/").append(myself->createFilename());
+//                 cout << "DBEFile::_before_delete: deleting file " << dest_file << endl;
+                myself->_delete_file(dest_file);
+                // Image
+                if(myself->isImage())
+                    myself->_deleteThumbnail(dest_file);
+            }
+        }
+        dbmgr->Destroy(tmp);
+    }
+}
+bool DBEFile::_delete_file(const string fullpath, bool purge_empty_directories) const {
+#ifdef USE_BOOST
+    boost::filesystem::path root_path(this->_root_directory);
+    boost::filesystem::path my_dest_file(fullpath);
+    if(boost::filesystem::exists(my_dest_file)) {
+        boost::filesystem::remove(my_dest_file);
+    }
+    // Removing empty parent directories
+    if(purge_empty_directories) {
+        boost::filesystem::path parent = my_dest_file.parent_path();
+        bool is_empty = boost::filesystem::is_empty(parent);
+//         cout << "DBEFile::_delete_file: parent " << is_empty << " " << parent << endl;
+        while(parent!=root_path && is_empty) {
+            boost::filesystem::remove(parent);
+            parent = parent.parent_path();
+            is_empty = boost::filesystem::is_empty(parent);
+//             cout << "DBEFile::_delete_file: parent " << boost::filesystem::is_empty(parent) << " " << parent << endl;
+        }
+    }
+    return true;
+#else
+    cerr << "DBEFile::_delete_file: Boost not available!!!" << endl;
+    return false;
+#endif
 }
 void DBEFile::_createThumbnail(const string fullpath) const {
     cerr << "DBEFile::_createThumbnail: TODO - " << fullpath << endl;

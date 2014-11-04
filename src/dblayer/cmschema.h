@@ -219,7 +219,7 @@ class DBEFile : public DBEObject {
 
     virtual void _before_insert(DBMgr* dbmgr=0);
     virtual void _before_update(DBMgr* dbmgr=0);
-//     virtual void _before_delete(DBMgr* dbmgr=0);
+    virtual void _before_delete(DBMgr* dbmgr=0);
 
   protected:
     /**
@@ -235,6 +235,7 @@ class DBEFile : public DBEObject {
     void _add_prefix_to_filename();
     string _file_checksum(const string fullpath) const;
     string _mimetype(const string fullpath) const;
+    bool _delete_file(const string fullpath, bool purge_empty_directories=true) const;
     void _createThumbnail(const string fullpath) const;
     void _deleteThumbnail(const string fullpath) const;
 };
