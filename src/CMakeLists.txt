@@ -131,12 +131,12 @@ include_directories(
         ${PROJECT_BINARY_DIR}             # config.h
         ${PROJECT_SOURCE_DIR})
 
-message("INCLUDE_DIRECTORIES: ${INCLUDE_DIRECTORIES}")
 
 set(EXTRA_LIBS ${EXTRA_LIBS} schema)
 set(EXTRA_LIBS ${EXTRA_LIBS} dblayer)
 
 if(MYSQL_FOUND)
+ include_directories(${MYSQL_INCLUDE_DIR})
  set(EXTRA_LIBS ${EXTRA_LIBS} mysqlclient)
 endif()
 if(ODBC_FOUND)
@@ -165,6 +165,8 @@ if(OPENSSL_VERSION)
  set(EXTRA_LIBS ${EXTRA_LIBS} ${OPENSSL_LIBRARIES})
 endif()
 
+
+message("INCLUDE_DIRECTORIES: ${INCLUDE_DIRECTORIES}")
 message("EXTRA_LIBS: ${EXTRA_LIBS}")
 
 #include_directories ("${PROJECT_SOURCE_DIR}/dblayer")
