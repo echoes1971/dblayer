@@ -11,7 +11,7 @@
 **        v0.0.1 - 2002.10.20    First Old Version
 **        v0.1.0 - 2006.05.04 Rewritten for the new framework
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbentity.cpp $
 ** @package rproject::dblayer
@@ -266,12 +266,12 @@ string DBEntity::toSql(std::function<string(const string&)> dbeType2dbType, std:
     return ret;
 }
 
-string DBEntity::toString(string prefix, bool valuesAsAttributes, bool show_definitions) const {
-    if ( !valuesAsAttributes) {
-        return toString_nodes(prefix,show_definitions);
+string DBEntity::toString(string prefix, bool valuesAsAttributes) const {
+    if(!valuesAsAttributes) {
+        return toString_nodes(prefix,false);
     }
-    string ret( prefix + "<" );
-    ret.append( this->name() ); ret.append( " " );
+    string ret(prefix + "<");
+    ret.append( this->name() ); ret.append(" ");
     // Keys
     StringVector myKeys = this->getKeys();
     if( myKeys.size()>0 ) {
@@ -433,7 +433,7 @@ ForeignKeyVector DBEntity::getFKForColumn(string column_name) {
     return ret;
 }
 
-void DBEntity::readFKFrom(DBEntity* dbe) {
+void DBEntity::readFKFrom(const DBEntity* dbe) {
     ForeignKeyVector fks = this->getFKForTable( dbe->getTableName() );
     for(unsigned int i=0; i<fks.size(); i++) {
         ForeignKey& f = fks.at(i);

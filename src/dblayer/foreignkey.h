@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	foreignkey  v0.0.1 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v1.0 - 2006.03.31	...
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: foreignkey.h $
 ** @package rproject::dblayer
@@ -28,14 +29,11 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef FOREIGNKEY_H
-#define FOREIGNKEY_H
-
 #include "importedPackages.h"
 
 namespace DBLayer {
 
-    class DECLSPECIFIER ForeignKey {
+    class ForeignKey {
       public:
         ForeignKey(string colonna_fk, string tabella_riferita, string colonna_riferita);
         virtual ~ForeignKey();
@@ -46,5 +44,3 @@ namespace DBLayer {
     };
 
 }
-
-#endif

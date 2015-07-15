@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	floatfield.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: floatfield.h $
 ** @package rproject::schema
@@ -28,14 +29,11 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef SCHEMA_FLOATFIELD_H
-#define SCHEMA_FLOATFIELD_H
-
 #include "field.h"
 
 namespace SchemaNS {
 
-    class DECLSPECIFIER FloatField : public Field  {
+    class FloatField : public Field  {
       public:
         FloatField(const string &nome);
         FloatField(const string &nome, float valore);
@@ -46,11 +44,8 @@ namespace SchemaNS {
         float getValue() const;
         void setValue(float valore);
 
-        string toString();
+        virtual string toString() const;
       private:
-        bool validRepr;
         string stringRepr;
     };
 }
-
-#endif

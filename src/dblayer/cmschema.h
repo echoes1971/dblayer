@@ -1,9 +1,7 @@
+#pragma once
 /**
  * cmschema.h
  */
-
-#ifndef CM_SCHEMA_H
-#define CM_SCHEMA_H
 
 #include "dblayer/dblayer.h"
 #include "dblayer/dbentity.h"
@@ -111,9 +109,9 @@ class ObjectMgr : public DBMgr {
     bool canExecute(const DBEObject& obj) const;
 
     DBEntityVector* Select(const string &tableName, const string &searchString);
-    DBEntity* Insert(DBEntity *dbe);
-    DBEntity* Update(DBEntity *dbe);
-    DBEntity* Delete(DBEntity *dbe);
+    DBEntity* Insert(DBEntity *dbe, bool check_permissions=true);
+    DBEntity* Update(DBEntity *dbe, bool check_permissions=true);
+    DBEntity* Delete(DBEntity *dbe, bool check_permissions=true);
     //DBEntity* Copy(DBEntity *dbe);
 
     virtual string _buildSelectString(DBEntity *dbe, bool uselike=false, bool caseSensitive=true);
@@ -317,5 +315,3 @@ class DBEPage : public DBEObject {
 
   void checkDB(DBMgr& dbmgr, bool verbose=false);
 }
-
-#endif

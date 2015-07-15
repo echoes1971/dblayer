@@ -94,9 +94,11 @@ ResultSet* QSqliteConnection::exec(const string s) {
     QSqlQuery query(db);
     query.exec(QString(s.c_str()));
 
-    if(query.lastError().text().trimmed().length()>0)
+    if(query.lastError().text().trimmed().length()>0) {
         this->errorMessage.append( query.lastError().text().trimmed().toStdString() );
-//cerr << "QSqliteConnection::exec: query.lastError()=" << query.lastError().text().toStdString() << endl;
+        if(this->verbose) cerr << "QSqliteConnection::exec: errorMessage=" << errorMessage << endl;
+        if(this->verbose) cerr << "QSqliteConnection::exec: s=" << s << endl;
+    }
     QSqlRecord record = query.record();
 
     // Preparing metadata
@@ -126,7 +128,11 @@ ResultSet* QSqliteConnection::exec(const string s) {
                 break;
             case 0:
                 // If the type is 0 means that the column is empty for all the rows
-                add_column = false;
+                //cout << "QSqliteConnection::exec: type=0 for column " << record.fieldName(i).toStdString() << endl;
+                // Add it anyway, otherwise we have wrong results
+                //add_column = false;
+                rs->columnType.push_back( DBLayer::type_blob );
+                unknown_type = true;
                 break;
             default:
                 cerr << "QSqliteConnection::exec: \'" << record.fieldName(i).toStdString() << "\' "
@@ -159,6 +165,7 @@ string QSqliteConnection::escapeString(string s) const {
     static string   toQuote("\'\'");
     return DBLayer::replaceAll(s, fromQuote, toQuote);
 }
+string QSqliteConnection::quoteDate(string s) const { return "'"+s+"'"; }
 int QSqliteConnection::getColumnSize(string* relname) {
     int ret = -1;
     this->errorMessage.clear();

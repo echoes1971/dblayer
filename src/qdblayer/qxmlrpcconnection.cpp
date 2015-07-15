@@ -31,10 +31,14 @@ QXmlrpcConnection::~QXmlrpcConnection() {
 
 XmlRpcClient* QXmlrpcConnection::getXmlrpcClient() { return this->myClient; }
 
+
+void QXmlrpcConnection::log(const QString& s) { Connection::log(s.toStdString()); }
+
 bool QXmlrpcConnection::connect() {
-    //printf("%0x::QXmlrpcConnection::connect: start.\n",(int) QThread::currentThread());
+    if(this->verbose) this->log(QString("%1::QXmlrpcConnection::connect: start.").arg((unsigned long) QThread::currentThread()));
     if(this->myClient==0) {
         this->myClient = new XmlRpcClient(QUrl(QString(this->myUrl.c_str())),0,this->verbose);
+        this->myClient->setLogger(this->_logger);
         this->myClient->acceptCompressed(false);
     }
 
@@ -46,25 +50,27 @@ bool QXmlrpcConnection::connect() {
     QString method = "ping";
 
     this->connected=false;
-    QVariant resp = this->myClient->syncCall(method,params);
-    //printf("%0lx::QXmlrpcConnection::connect: resp=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(resp,"\n").toStdString().c_str());
+    QVariant resp = this->myClient->syncCall(method,params,5);
+    if(this->verbose) this->log(QString("%1::QXmlrpcConnection::connect: resp=%2").arg((unsigned long) QThread::currentThread()).arg(this->variant2string(resp,"\n")));
     QString s_resp;
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         QList<QVariant> lista = resp.toList().at(1).toList();
-        //printf("%0lx::QXmlrpcConnection::login: lista=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(lista,"\n").toStdString().c_str());
+        if(this->verbose) this->log(QString("%1::QXmlrpcConnection::connect: lista=%2").arg((unsigned long) QThread::currentThread()).arg(this->variant2string(lista,"\n")));
         if(lista.size()>0) {
-            //printf("%0lx::QXmlrpcConnection::login: lista[0]=%s\n",(unsigned long) QThread::currentThread(),this->variant2string(lista.at(0).toByteArray().data(),"\n").toStdString().c_str());
+            if(this->verbose) this->log(QString("%1::QXmlrpcConnection::connect: lista[0]=%2").arg((unsigned long) QThread::currentThread()).arg(this->variant2string(lista.at(0).toByteArray().data(),"\n")));
             s_resp = QString( lista.at(0).toByteArray().data() );
             //ret = QXmlrpcConnection::list2resultset( &lista, new QResultSet() );
         } else {
-            //this->errorMessage = "Authentication failed!";
+            this->errorMessage = "Connection failed!";
         }
     }
-    //printf("%0lx::QXmlrpcConnection::connect: s_resp=%s\n",(unsigned long) QThread::currentThread(), s_resp.toStdString().c_str());
+    if(this->verbose) this->log(QString("%1::QXmlrpcConnection::connect: s_resp=%2").arg((unsigned long) QThread::currentThread()).arg(s_resp));
     this->connected = s_resp=="pong"; //true;
+    if(!this->connected)
+        this->errorMessage = "Connection failed!";
 
-    //printf("%0x::QXmlrpcConnection::connect: end.\n",(int) QThread::currentThread());
-    return true;
+    if(this->verbose) this->log(QString("%1::QXmlrpcConnection::connect: end.").arg((unsigned long) QThread::currentThread()));
+    return this->connected;
 }
 bool QXmlrpcConnection::disconnect() {
     if(!this->connected)
@@ -87,9 +93,9 @@ bool QXmlrpcConnection::reconnect() {
 bool debugQXmlrpcExec = false;
 
 ResultSet* QXmlrpcConnection::login(string user, string pwd) {
-    //printf("%0x::QXmlrpcConnection::login: start.\n",(int) QThread::currentThread());
+    if(this->verbose) this->log(QString("%1::QXmlrpcConnection::login: start.").arg((unsigned long) QThread::currentThread()));
 
-    ResultSet* ret=0;
+    ResultSet* ret = 0;
 
     //printf("%0x::QXmlrpcConnection::login: this->errorMessage.clear()...\n",(int) QThread::currentThread());
     this->errorMessage.clear();
@@ -100,27 +106,27 @@ ResultSet* QXmlrpcConnection::login(string user, string pwd) {
     params.push_back(QString(user.c_str()));
     params.push_back(QString(pwd.c_str()));
 
-    //printf("%0x::QXmlrpcConnection::login: calling myClient %0x...\n",(int) QThread::currentThread(), (int) this->myClient);
-    QVariant resp = this->myClient->syncCall(method,params);
-    //printf("%0lx::QXmlrpcConnection::login: resp=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(resp,"\n").toStdString().c_str());
+    //if(this->verbose) printf("%0x::QXmlrpcConnection::login: calling myClient %0x...\n",(int) QThread::currentThread(), (int) this->myClient);
+    QVariant resp = this->myClient->syncCall(method,params,5);
+    if(this->verbose) this->log(QString("%1::QXmlrpcConnection::login: resp=%2").arg((unsigned long) QThread::currentThread()).arg(this->variant2string( resp, "\n")));
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         QList<QVariant> lista = resp.toList().at(1).toList();
         if(lista.size()>0) {
             ret = QXmlrpcConnection::list2resultset( &lista, new QResultSet() );
-            if(this->verbose) printf("%0lx::QXmlrpcConnection::login: ret=%s\n",(unsigned long) QThread::currentThread(), ret->toString("\n").c_str());
+            if(this->verbose) this->log(QString("%1::QXmlrpcConnection::login: ret=%2").arg((unsigned long) QThread::currentThread()).arg(ret->toString("\n").c_str()));
         } else {
             this->errorMessage = "Authentication failed!";
-            //printf("%0lx::QXmlrpcConnection::login: lista=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(lista,"\n").toStdString().c_str());
+            if(this->verbose) this->log(QString("%1::QXmlrpcConnection::login: lista=%2").arg((unsigned long) QThread::currentThread()).arg(this->variant2string(lista,"\n")));
         }
     } else {
         this->errorMessage = "Authentication failed!";
-        //printf("%0lx::QXmlrpcConnection::login: %s\n",(unsigned long) QThread::currentThread(), this->variant2string( resp, "\n").toStdString().c_str());
+        //if(this->verbose) this->log(QString("%1::QXmlrpcConnection::login: resp=%2").arg((unsigned long) QThread::currentThread()).arg(this->variant2string( resp, "\n")));
     }
     if(this->errorMessage.length()>0)
-        printf("%0lx::QXmlrpcConnection::login: errorMessage=%s\n",(unsigned long) QThread::currentThread(), this->errorMessage.c_str());
+        this->log(QString("%1::QXmlrpcConnection::login: errorMessage=%2").arg((unsigned long) QThread::currentThread()).arg(this->errorMessage.c_str()));
 
-    //printf("%0lx::QXmlrpcConnection::login: end.\n",(unsigned long) QThread::currentThread());
+    if(this->verbose) this->log(QString("%1::QXmlrpcConnection::login: end.").arg((unsigned long) QThread::currentThread()));
     return ret;
 }
 string QXmlrpcConnection::getFormSchema(string language) {
@@ -161,10 +167,10 @@ string QXmlrpcConnection::getDBSchema(string language) {
 
     return ret;
 }
-string QXmlrpcConnection::getSchemaName() {
+string QXmlrpcConnection::getSchemaName() const {
     string ret;
 
-    this->errorMessage.clear();
+    //this->errorMessage.clear();
 
     QList<QVariant> params;
     QString method = "getSchemaName";
@@ -374,6 +380,8 @@ QResultSet* QXmlrpcConnection::list2resultset(QList<QVariant>* iLista, QResultSe
         chiavi = map.keys();
         unsigned int colonna=0;
         for(int i=0; i<chiavi.size(); i++) {
+            QString qkey = chiavi[i];
+            if(qkey=="_typeName" || qkey=="_typename") continue;
             // Metadati
             if(ioResultSet->columnName.size()<=colonna) {
                 ioResultSet->columnName.push_back( chiavi.at(i).toStdString() );
@@ -499,7 +507,7 @@ DBEntityVector* QXmlrpcConnection::Select(const DBEntity *dbe, const string& tab
         if(this->verbose) printf("QXmlrpcConnection::Select: %s\n", resp.toList().at(0).toString().toStdString().c_str());
         QList<QVariant> lista = resp.toList().at(1).toList(); //.at(0).toList();
         for(int i=0; i<lista.size(); i++) {
-            ret->push_back( this->_variantToDBE( &(lista[i]), dbe->createNewInstance() ) );
+            ret->push_back( this->_variantToDBE( &(lista[i]) ) );//, dbe->createNewInstance() ) );
         }
     } else
         printf("QXmlrpcConnection::Select: cannot convert this %s\n", this->variant2string( resp, "\n").toStdString().c_str());
@@ -507,7 +515,8 @@ DBEntityVector* QXmlrpcConnection::Select(const DBEntity *dbe, const string& tab
     return ret;
 }
 DBEntityVector* QXmlrpcConnection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string& orderBy ) {
-    //printf("%0x::QXmlrpcConnection::Search: start.\n",(int) QThread::currentThread());
+    if(this->verbose) this->log("QXmlrpcConnection::Search: start.");
+    if(this->verbose) this->log(QString("QXmlrpcConnection::Search: dbe=%1").arg(dbe->toString("\n").c_str()));
     this->errorMessage.clear();
     QList<QVariant> cerca;
     this->_dbeToVariant(dbe,&cerca);
@@ -520,18 +529,21 @@ DBEntityVector* QXmlrpcConnection::Search(DBEntity* dbe, bool uselike, bool case
     QString method = "search";
 
     //printf("%0x::QXmlrpcConnection::Search: invoking remote method...\n",(int) QThread::currentThread());
-    QVariant resp = this->myClient->syncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params,30);
     DBEntityVector* ret = new DBEntityVector;
+    //if(this->verbose) this->log(QString("QXmlrpcConnection::Search: resp=%1").arg(this->variant2string( resp, "\n")));
 
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
         QList<QVariant> lista = resp.toList().at(1).toList();
+        if(this->verbose) this->log(QString("QXmlrpcConnection::Search: list with %1 elements").arg(lista.size()));
         for(int i=0; i<lista.size(); i++) {
-            ret->push_back( this->_variantToDBE( &(lista[i]), dbe->createNewInstance() ) );
+            ret->push_back( this->_variantToDBE( &(lista[i]) ) );//, dbe->createNewInstance() ) );
         }
     } else
-        printf("%0lx::QXmlrpcConnection::Search: %s\n",(unsigned long) QThread::currentThread(), this->variant2string( resp, "\n").toStdString().c_str());
+        this->log(QString("QXmlrpcConnection::Search: ERROR - resp=%1").arg(this->variant2string( resp, "\n")));
 
-    //printf("%0x::QXmlrpcConnection::Search: end.\n",(int) QThread::currentThread());
+    if(this->verbose) this->log(QString("QXmlrpcConnection::Search: ret.size=%1").arg(ret->size()));
+    if(this->verbose) this->log("QXmlrpcConnection::Search: end.");
     return ret;
 }
 string QXmlrpcConnection::ping() {
@@ -543,7 +555,7 @@ string QXmlrpcConnection::ping() {
     QString method = "ping";
 
     this->connected=false;
-    QVariant resp = this->myClient->syncCall(method,params);
+    QVariant resp = this->myClient->syncCall(method,params,2);
     //printf("%0lx::QXmlrpcConnection::connect: resp=%s\n",(unsigned long) QThread::currentThread(), this->variant2string(resp,"\n").toStdString().c_str());
     QString ret;
     if(resp.canConvert(QVariant::List) && resp.toList().size()>1) {
@@ -584,10 +596,15 @@ QList<QVariant>* QXmlrpcConnection::_dbeToVariant(DBEntity* dbe, QList<QVariant>
 }
 DBEntity* QXmlrpcConnection::_variantToDBE(QVariant* v, DBEntity* ioDbe) {
     QString typeName = v->toMap()["_typeName"].toString();
-    //printf("QXmlrpcConnection::_variantToDBE: ioDbe->name()=%s\n", ioDbe->name().c_str());
-    //printf("QXmlrpcConnection::_variantToDBE: typeName=%s\n", typeName.toStdString().c_str());
+//    if(this->verbose) this->log("QXmlrpcConnection::_variantToDBE: typeName=" + typeName);
+    if(ioDbe==0) {
+        ioDbe = this->factory->getClazzByTypeName(typeName.toStdString());
+    }
+//    if(this->verbose) this->log(QString("QXmlrpcConnection::_variantToDBE: ioDbe->name()=%1").arg(ioDbe->name().c_str()));
+//    if(this->verbose) this->log(QString("QXmlrpcConnection::_variantToDBE: ioDbe=%1").arg(ioDbe->toString().c_str()));
     // NOTE se il tipo tornato non coincide => abortisce :-( questo causava 34 entry vuote x l'auto fill di mylog
-    if( strcmp(ioDbe->name().c_str(),typeName.toStdString() .c_str())!=0 ) {
+    if( ioDbe->name()!="DBEObject" && strcmp(ioDbe->name().c_str(),typeName.toStdString() .c_str())!=0 ) {
+//        if(this->verbose) this->log("QXmlrpcConnection::_variantToDBE: return ioDbe");
         return ioDbe;
     }
     QList<QString> chiavi = v->toMap().keys();
@@ -618,8 +635,9 @@ DBEntity* QXmlrpcConnection::_variantToDBE(QVariant* v, DBEntity* ioDbe) {
                 ioDbe->setValue(key, value);
                 break;
         }
-        //printf("QXmlrpcConnection::_variantToDBE: %s=>%s (%d::%s)\n", key.c_str(), value.c_str(), v->toMap()[ qkey ].type(), v->toMap()[ qkey ].typeName());
+//        if(this->verbose) this->log(QString("QXmlrpcConnection::_variantToDBE: %1=>%2 (%3::%4)").arg(key.c_str()).arg(value.c_str()).arg(v->toMap()[ qkey ].type()).arg(v->toMap()[ qkey ].typeName()));
     }
+//    if(this->verbose) this->log(QString("QXmlrpcConnection::_variantToDBE: returning %1").arg(ioDbe->toString().c_str()));
     return ioDbe;
 }
 // **************** Proxy Connections: end. *********************

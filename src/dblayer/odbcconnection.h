@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	odbcconnection.h  v0.1.2 - 2012.03.19
 **	-----------------------------------
@@ -17,7 +18,7 @@
 **				<b>quoteDate</b> mette la data tra <b>#</b> piuttosto che tra <b>'</b>
 **		v0.1.2 - 2006.05.23 Adattato per Linux
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: odbcconnection.h $
 ** @package rproject::dblayer
@@ -35,9 +36,6 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef DBLAYER_ODBCCONNECTION_H
-#define DBLAYER_ODBCCONNECTION_H
-
 #include "importedPackages.h"
 #include "dblayer.h"
 #include "dbconnection.h"
@@ -49,7 +47,7 @@ namespace DBLayer {
 
 #ifdef USE_ODBCPP
 
-	class DECLSPECIFIER ODBCConnection : public Connection {
+	class ODBCConnection : public Connection {
 	  public:
 		ODBCConnection(string s);
 		virtual ~ODBCConnection();
@@ -83,7 +81,7 @@ namespace DBLayer {
 	};
 
 
-	class DECLSPECIFIER ODBCResultSet : public ResultSet {
+	class ODBCResultSet : public ResultSet {
 		friend class ODBCConnection;
       private:
 		public:
@@ -94,5 +92,3 @@ namespace DBLayer {
 #endif
 
 }
-
-#endif

@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	stringfield.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: stringfield.h $
 ** @package rproject::schema
@@ -28,14 +29,11 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef SCHEMA_STRINGFIELD_H
-#define SCHEMA_STRINGFIELD_H
-
 #include "field.h"
 
 namespace SchemaNS {
 
-    class DECLSPECIFIER StringField : public Field  {
+    class StringField : public Field  {
       public:
         StringField(const string& nome);
         StringField(const string& nome,const string& valore );
@@ -49,5 +47,3 @@ namespace SchemaNS {
         string toString() const;
     };
 }
-
-#endif

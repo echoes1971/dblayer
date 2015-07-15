@@ -17,7 +17,7 @@
 **		v0.1.2 - 2006.05.22 Implementato ResultSet come SQLiteResultSet, ovvero con
 **					l'utilizzo di vettori di stringhe per memorizzare i risultati
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbconnection.cpp $
 ** @package rproject::dblayer
@@ -112,6 +112,11 @@ Connection::Connection(string s) {
     this->errorMessage.clear();
     this->connected = false;
     this->verbose = false;
+
+    this->_logger =  [] (const string& s, const bool newline) -> void {
+        cout << s;
+        if(newline) cout << endl;
+    };
 }
 
 Connection::~Connection() { this->disconnect(); }
@@ -188,6 +193,9 @@ bool Connection::hasErrors() const { return this->getErrorMessage().length() > 0
 void Connection::setVerbose(bool b) { this->verbose=b; }
 bool Connection::isVerbose() const { return this->verbose; }
 
+void Connection::setLogger(std::function<void(const string&,bool)> logger) { this->_logger = logger; }
+void Connection::log(const string& s, const bool newline) const { this->_logger(s,newline); }
+
 bool Connection::flush() { return true; }
 
 bool Connection::reconnect() { return false; }
@@ -230,6 +238,8 @@ DBEntity* Connection::Delete(DBEntity *dbe) { return dbe; }
 DBEntityVector* Connection::Select(const DBEntity *dbe, const string &tableName, const string& searchString) { return (DBEntityVector*) (0 & (long)dbe & (long)tableName.size() & (long)searchString.size()); }
 DBEntityVector* Connection::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string& orderBy ) { return (DBEntityVector*) (0 & (long)dbe & (long)uselike & (long)caseSensitive & (long)orderBy.size()); }
 string Connection::ping() { return "pong"; }
+
+void Connection::setDBEFactory(DBEFactory* factory) { this->factory = factory; }
 // **************** Proxy Connections: end. *********************
 
 
@@ -460,7 +470,7 @@ string ResultSet::getValue(int row, int column) const { return this->righe.at( r
 string ResultSet::getValue(int row, string* columnName) const { return this->getValue(row, this->getColumnIndex(columnName)); }
 string ResultSet::getColumnName(int i) const { return this->columnName[i]; }
 string ResultSet::getColumnType(int i) const { return this->columnType[i]; }
-int ResultSet::getColumnSize(int i) const { return this->columnSize.size()>=(i+1) ? this->columnSize[i] : -1; }
+int ResultSet::getColumnSize(int i) const { return ((long)this->columnSize.size())>=(((long)i)+1) ? this->columnSize[i] : -1; }
 
 int ResultSet::getLength(int row, int column) const { return (int) this->righe.at( row * this->columnName.size() + column ).size(); }
 bool ResultSet::isNull(int row, int column) const {

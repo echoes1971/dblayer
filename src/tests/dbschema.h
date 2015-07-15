@@ -26,7 +26,7 @@ using namespace std;
 
 namespace TestSchema {
 
-	class DECLSPECIFIER DBETestDBLayer : public DBEntity {
+	class DBETestDBLayer : public DBEntity {
 	  public:
 		DBETestDBLayer();
 		virtual ~DBETestDBLayer();
@@ -43,7 +43,7 @@ namespace TestSchema {
         static StringVector chiavi;
     };
 
-	class DECLSPECIFIER DBESocieta : public DBEntity {
+	class DBESocieta : public DBEntity {
 	  public:
 		DBESocieta();
 		virtual ~DBESocieta();

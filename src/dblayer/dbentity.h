@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	dbentity.h  v0.1.2 - 2012.03.19
 **	-----------------------------------
@@ -19,7 +20,7 @@
 **		v0.1.2 - 2006.05.11 Implemented:
 **					getKeyNames, isKey, cleanKeyFields
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbentity.h $
 ** @package rproject::dblayer
@@ -37,10 +38,6 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-
-#ifndef DBENTITY_H
-#define DBENTITY_H
-
 #include "importedPackages.h"
 #include "dblayer.h"
 #include "dbfield.h"
@@ -55,9 +52,9 @@
 using namespace SchemaNS;
 
 namespace DBLayer {
-class DECLSPECIFIER DBMgr;
+class DBMgr;
 
-class DECLSPECIFIER DBEntity : public Schema {
+class DBEntity : public Schema {
     friend class DBMgr;
   public:
     DBEntity();
@@ -82,11 +79,11 @@ class DECLSPECIFIER DBEntity : public Schema {
     /** Class name */
     virtual string& name() const;
     /**
-        * @param valuesAsAttributes
-        *  if true, values are represented as attributes
-        *  if false, values are represented as nodes
-        */
-    virtual string toString(string prefix="", bool valuesAsAttributes=false, bool show_definitions=false) const;
+      * @param valuesAsAttributes
+      *  if true, values are represented as attributes
+      *  if false, values are represented as nodes
+      */
+    virtual string toString(string prefix="", bool valuesAsAttributes=false) const;
 
     string toSql(std::function<string(const string&)> dbeType2dbType, std::function<string(const string&)> lambda_getClazzSchema, string prefix="", bool use_fk=true);
 
@@ -112,7 +109,7 @@ class DECLSPECIFIER DBEntity : public Schema {
     ForeignKeyVector getFKForColumn(string column_name);
     /**	Reads the content of the referenced columns in the referenced table
     mapped in the given dbe	*/
-    void readFKFrom(DBEntity* dbe);
+    void readFKFrom(const DBEntity* dbe);
     /**	Writes the content of the referenced columns in the referenced table
     mapped in the given dbe	and returns it	*/
     DBEntity* writeFKTo(DBEntity* dbemaster);
@@ -162,5 +159,3 @@ class DECLSPECIFIER DBEntity : public Schema {
 };
 
 }
-
-#endif

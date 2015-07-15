@@ -10,7 +10,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: booleanfield.cpp $
 ** @package rproject::schema
@@ -33,21 +33,23 @@
 using namespace SchemaNS;
 
 BooleanField::BooleanField() : Field() {
-    this->type = Field::BOOLEAN;
-    this->nullo = true;
+  this->type = Field::BOOLEAN;
+  this->nullo = true;
 }
 BooleanField::BooleanField(const string& nome) : Field(nome) {
-    this->type = Field::BOOLEAN;
+  this->type = Field::BOOLEAN;
 }
 BooleanField::BooleanField(const string& nome, bool valore) : Field(nome) {
-    this->type = Field::BOOLEAN;
-    this->setBooleanValue(valore);
+  this->type = Field::BOOLEAN;
+  this->setBooleanValue(valore);
 }
-BooleanField::~BooleanField(){}
+BooleanField::~BooleanField() {}
 
 Field* BooleanField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
-    return new BooleanField(myName);
+    Field* ret=0;
+    ret = (Field*) new BooleanField(myName);
+    return ret;
 }
 
 string BooleanField::toString() const { return this->boolValue ? "true" : "false"; }

@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **    dbconnection.h  v0.1.2 - 2012.03.19
 **    -----------------------------------
@@ -19,7 +20,7 @@
 **                    Aggiunto -quoteDate-
 **        v0.1.3 - 2007.04.20 Implementato MySQLResultSet e MySQLConnection
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbconnection.h $
 ** @package rproject::dblayer
@@ -36,9 +37,6 @@
 ** ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
-
-#ifndef DBLAYER_DBCONNECTION_H
-#define DBLAYER_DBCONNECTION_H
 
 #include "importedPackages.h"
 #include "dblayer.h"
@@ -59,7 +57,7 @@ namespace DBLayer {
     static string db_xmlrpc = string("xmlrpc");
     static string db_type = db_pg;
 
-    class DECLSPECIFIER ResultSet {
+    class ResultSet {
         protected:
             StringVector  columnName;
             StringVector  columnType;
@@ -87,7 +85,7 @@ namespace DBLayer {
     };
 
 #ifdef USE_LIBPQ
-    class DECLSPECIFIER PGResultSet : public ResultSet {
+    class PGResultSet : public ResultSet {
         private:
             PGresult* res;
         public:
@@ -108,17 +106,18 @@ namespace DBLayer {
     };
 #endif
 
-    class DECLSPECIFIER Connection;
+    class Connection;
     typedef map<string,Connection* (*)(string s)> ConnectionBuildersMap; // 20090811
 
-    class DECLSPECIFIER Connection {
+    class Connection {
         private:
-            // Nothing upto now
+            // Nothing private upto now
         protected:
             bool connected;
             bool verbose;
             string connectionString;
             string errorMessage;
+            std::function<void(const string&, bool)> _logger;
         public:
             Connection(string s);
             virtual ~Connection();
@@ -128,6 +127,9 @@ namespace DBLayer {
 
             void setVerbose(bool b);
             bool isVerbose() const;
+
+            void setLogger(std::function<void(const string&, bool)> logger);
+            void log(const string& s, const bool newline=true) const;
 
             virtual bool connect();
             virtual bool disconnect();
@@ -178,12 +180,14 @@ namespace DBLayer {
             virtual DBEntityVector* Search(DBEntity* dbe, bool uselike=true,
                                     bool caseSensitive=true, const string& orderBy="" );
             virtual string ping();
+            void setDBEFactory(DBEFactory* factory);
             // **************** Proxy Connections: end. *********************
-
+protected:
+            DBEFactory* factory;
     };
 
 #ifdef USE_LIBPQ
-    class DECLSPECIFIER PGConnection : public Connection {
+    class PGConnection : public Connection {
             private:
                 PGconn* conn;
             public:
@@ -231,10 +235,8 @@ namespace DBLayer {
      *        "dblayer:sqlite3:c:\tmp\test.db"
      *        "dblayer:pg:host=localhost dbname=roberto user=roberto password="
      */
-    DECLSPECIFIER Connection* createConnection(string s);
+    Connection* createConnection(string s);
 
     extern ConnectionBuildersMap connectionBuilders;
     void registerConnectionType(string prefix, Connection* (*myBuilder)(string s));
 }
-
-#endif

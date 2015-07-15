@@ -11,7 +11,7 @@ add_library(dblayer
     odbcconnection.cpp
     stringfield.cpp
     datefield.cpp
-    dbefactory.cpp
+#    dbefactory.cpp
     dbfield.cpp
     dbmgr.cpp
     foreignkey.cpp

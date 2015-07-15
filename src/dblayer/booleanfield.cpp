@@ -10,7 +10,7 @@
 **	History:
 **		v1.0 - 2006.03.31	...
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: booleanfield.cpp $
 ** @package rproject::dblayer
@@ -36,25 +36,25 @@ BooleanField::BooleanField() : DBField() {
   this->type = DBField::BOOLEAN;
   this->nullo = true;
 }
-BooleanField::BooleanField(const string &nome) : DBField(nome) {
+BooleanField::BooleanField(const string& nome) : DBField(nome) {
   this->type = DBField::BOOLEAN;
 }
-BooleanField::BooleanField(const string &nome, bool valore) : DBField(nome) {
+BooleanField::BooleanField(const string& nome, bool valore) : DBField(nome) {
   this->type = DBField::BOOLEAN;
   this->setBooleanValue(valore);
 }
 BooleanField::~BooleanField() {}
 
 Field* BooleanField::createNewInstance(const char* aName) const {
-    Field* ret=0;
     string myName;
     if( aName==0 ) {
         myName.append( this->name ); //this->getName() );
     } else {
         myName.append( aName );
     }
+    Field* ret=0;
     ret = (Field*) new BooleanField(myName);
     return ret;
 }
 
-string BooleanField::toString() const { return this->boolValue ? string("true") : string("false"); }
+string BooleanField::toString() const { return this->boolValue ? "true" : "false"; }

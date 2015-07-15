@@ -1,5 +1,6 @@
+#pragma once
 /***************************************************************************
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: importedPackages.h $
 ** @package rproject::dblayer
@@ -17,10 +18,7 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef IMPORTED_PACKAGES_H
-#define IMPORTED_PACKAGES_H
-
-#ifndef DECLSPECIFIER
+/*#ifndef DECLSPECIFIER
 # if defined(_WIN32) || defined(__CYGWIN__)
 #  ifdef _WINDLL
 #    define DECLSPECIFIER __declspec(dllexport)
@@ -33,6 +31,7 @@
 #  define DECLSPECIFIER
 # endif
 #endif
+*/
 
 #ifdef USE_MYSQL
  #ifdef WIN32
@@ -93,10 +92,9 @@
 #include <iostream>
 #include <map>
 #include <cstring>
+#include <functional>
 #include <string>
 #include <sstream>
 //#include <unordered_map>
 #include <vector>
 using namespace std;
-
-#endif

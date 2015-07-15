@@ -10,7 +10,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: field.cpp $
 ** @package rproject::schema
@@ -82,22 +82,22 @@ Field* Field::clone() const {
     return ret;
 }
 
-bool Field::equals(const Field *field) const {
+bool Field::equals(const Field& field) const {
     bool ret=true;
-    ret = ret && (field->getName() == this->getName());
-    ret = ret && (field->getType() == this->getType());
+    ret = ret && (field.getName() == this->getName());
+    ret = ret && (field.getType() == this->getType());
     switch( this->getType() ) {
     case Field::BOOLEAN:
-        ret = ret && (field->getBooleanValue() == this->getBooleanValue());
+        ret = ret && (field.getBooleanValue() == this->getBooleanValue());
         break;
     case Field::INTEGER:
-        ret = ret && (field->getIntegerValue() == this->getIntegerValue());
+        ret = ret && (field.getIntegerValue() == this->getIntegerValue());
         break;
     case Field::STRING:
-        ret = ret && (strcmp(field->getStringValue()->c_str(),this->getStringValue()->c_str())==0);
+        ret = ret && (strcmp(field.getStringValue()->c_str(),this->getStringValue()->c_str())==0);
         break;
     case Field::FLOAT:
-        ret = ret && (field->getFloatValue() == this->getFloatValue());
+        ret = ret && (field.getFloatValue() == this->getFloatValue());
         break;
     }
     return ret;
@@ -352,11 +352,12 @@ long Field::to_seconds(long hour, long minutes, long seconds, long days) {
 
 
 bool SchemaNS::operator==(const Field& left, const Field& right) {
-    Field* left_pointer = (Field*) &left;
-    Field* right_pointer = (Field*) &right;
-    return left_pointer->equals( right_pointer );
+    return left.equals(right);
+//    Field* left_pointer = (Field*) &left;
+//    Field* right_pointer = (Field*) &right;
+//    return left_pointer->equals( *right_pointer );
 }
-DECLSPECIFIER int SchemaNS::getFieldCreati() { return Field::getFieldCreati(); }
-DECLSPECIFIER int SchemaNS::getFieldDistrutti() { return Field::getFieldDistrutti(); }
-DECLSPECIFIER int Field::getFieldCreati() { return Field::fieldCreati; }
-DECLSPECIFIER int Field::getFieldDistrutti() { return Field::fieldDistrutti; }
+int SchemaNS::getFieldCreati() { return Field::getFieldCreati(); }
+int SchemaNS::getFieldDistrutti() { return Field::getFieldDistrutti(); }
+int Field::getFieldCreati() { return Field::fieldCreati; }
+int Field::getFieldDistrutti() { return Field::fieldDistrutti; }

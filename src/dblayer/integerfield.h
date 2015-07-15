@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	integerfield.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: integerfield.h $
 ** @package rproject::dblayer
@@ -28,9 +29,6 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef DBLAYER_INTEGERFIELD_H
-#define DBLAYER_INTEGERFIELD_H
-
 #include "importedPackages.h"
 
 #include "dbfield.h"
@@ -41,7 +39,7 @@
 
 namespace DBLayer {
 
-	class DECLSPECIFIER IntegerField : public DBField  {
+	class IntegerField : public DBField  {
       public:
         IntegerField(const string& nome);
         IntegerField(const string& nome, long valore);
@@ -54,5 +52,3 @@ namespace DBLayer {
     };
 
 }
-
-#endif

@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	booleanfield.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: booleanfield.h $
 ** @package rproject::schema
@@ -28,14 +29,11 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef SCHEMA_BOOLEANFIELD_H
-#define SCHEMA_BOOLEANFIELD_H
-
 #include "field.h"
 
 namespace SchemaNS {
 
-    class DECLSPECIFIER BooleanField : public Field {
+    class BooleanField : public Field {
       public:
         BooleanField();
         BooleanField(const string& nome);
@@ -47,6 +45,3 @@ namespace SchemaNS {
         string toString() const;
     };
 }
-
-#endif
-

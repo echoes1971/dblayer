@@ -34,6 +34,7 @@ class QSqliteConnection : public Connection {
     virtual bool reconnect();
 
     virtual string escapeString(string s) const;
+    virtual string quoteDate(string s) const;
 
     virtual ColumnDefinitions getColumnsForTable(const string& tablename);
     virtual int getColumnSize(string* relname);

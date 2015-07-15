@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	dblayer.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -11,7 +12,7 @@
 **		v0.0.1 - 2002.11.05	First Old Version
 **		v0.1.0 - 2006.05.04 Rewritten for the new framework
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dblayer.h $
 ** @package rproject::dblayer
@@ -29,49 +30,46 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-
-#ifndef DBLAYER_H
-#define DBLAYER_H
-
 #include "importedPackages.h"
 
+#include "schema/classfactory.h"
 
 /**
-  *@author Roberto Rocco Angeloni
-  */
+ * @author Roberto Rocco Angeloni
+ */
 namespace DBLayer {
     using namespace std;
 
-    class DECLSPECIFIER DBField;
-    class DECLSPECIFIER DBEntity;
-    class DECLSPECIFIER ForeignKey;
-    typedef DECLSPECIFIER vector<DBField*>      DBFieldVector;
-    typedef DECLSPECIFIER map<string,DBField*>  DBFieldMap;
-    typedef DECLSPECIFIER vector<DBEntity*>     DBEntityVector;
-    typedef DECLSPECIFIER map<string,DBEntity*> DBEntityMap;
-    typedef DECLSPECIFIER vector<ForeignKey>   ForeignKeyVector;
+    class DBField;
+    class DBEntity;
+    class ForeignKey;
+    typedef vector<DBField*>      DBFieldVector;
+    typedef map<string,DBField*>  DBFieldMap;
+    typedef vector<DBEntity*>     DBEntityVector;
+    typedef map<string,DBEntity*> DBEntityMap;
+    typedef vector<ForeignKey>   ForeignKeyVector;
 
-    typedef DECLSPECIFIER vector<int>    IntegerVector;
-    typedef DECLSPECIFIER vector<string> StringVector;
+    typedef Factory<DBEntity> DBEFactory;
+
+    typedef vector<int>    IntegerVector;
+    typedef vector<string> StringVector;
 
     /* Name, type, null, key (PRI,MUL), default */
-    typedef DECLSPECIFIER map<string,StringVector> ColumnDefinitions;
+    typedef map<string,StringVector> ColumnDefinitions;
 
-    DECLSPECIFIER string lowerCase(string& s);
-    DECLSPECIFIER string upperCase(string& s);
-    DECLSPECIFIER string capitalizeCase(string& s);
-    DECLSPECIFIER string joinString( StringVector* vs, const string glue );
-    DECLSPECIFIER string joinString( StringVector* vs, const string* glue );
-    DECLSPECIFIER StringVector& splitString(const string& s, char delim, StringVector& elems);
+    string lowerCase(string& s);
+    string upperCase(string& s);
+    string capitalizeCase(string& s);
+    string joinString( StringVector* vs, const string glue );
+    string joinString( StringVector* vs, const string* glue );
+    StringVector& splitString(const string& s, char delim, StringVector& elems);
     /** trim from start */
-    DECLSPECIFIER string& string_ltrim(string& s);
+    string& string_ltrim(string& s);
     /** trim from end */
-    DECLSPECIFIER string& string_rtrim(string& s);
+    string& string_rtrim(string& s);
     /** trim from both ends */
-    DECLSPECIFIER string& string_trim(string& s);
-    DECLSPECIFIER string integer2string(long longValue);
+    string& string_trim(string& s);
+    string integer2string(long longValue);
     /**	Rimpiazza tutte le occorrenze di <b>f</b> con <b>r</b> in <b>s</b>. */
-    DECLSPECIFIER string replaceAll(string s, string f, string r);
+    string replaceAll(string s, string f, string r);
 }
-
-#endif

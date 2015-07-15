@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	xmlrpcconnection.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v0.1.0 - 2006.05.11 Iniziato lo sviluppo
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: xmlrpcconnection.h $
 ** @package rproject::dblayer
@@ -28,9 +29,6 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef DBLAYER_XMLRPCCONNECTION_H
-#define DBLAYER_XMLRPCCONNECTION_H
-
 #include "importedPackages.h"
 #include "dblayer.h"
 #include "dbconnection.h"
@@ -43,7 +41,7 @@ namespace DBLayer {
 
 class XmlrpcResultSet;
 
-class DECLSPECIFIER XmlrpcConnection : public Connection {
+class XmlrpcConnection : public Connection {
   public:
     XmlrpcConnection(string s);
     virtual ~XmlrpcConnection();
@@ -73,7 +71,7 @@ class DECLSPECIFIER XmlrpcConnection : public Connection {
 };
 
 
-class DECLSPECIFIER XmlrpcResultSet : public ResultSet {
+class XmlrpcResultSet : public ResultSet {
     friend class XmlrpcConnection;
   private:
     static void valueToString(xmlrpc_c::value* v, std::string* out_string);
@@ -91,5 +89,3 @@ class DECLSPECIFIER XmlrpcResultSet : public ResultSet {
 };
 #endif
 }
-
-#endif

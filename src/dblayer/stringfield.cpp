@@ -1,5 +1,5 @@
 /***************************************************************************
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: stringfield.cpp $
 ** @package rproject::dblayer
@@ -21,10 +21,10 @@
 using namespace DBLayer;
 
 StringField::StringField(const string &nome) : DBField(nome) {
-  type = DBField::STRING;
+  type = Field::STRING;
 }
 StringField::StringField(const string &nome, const string &valore) : DBField(nome) {
-  type = DBField::STRING;
+  type = Field::STRING;
   this->setValue(valore);
 }
 StringField::~StringField() {}

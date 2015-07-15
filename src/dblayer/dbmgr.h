@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	dbmgr.h  v0.1.4 - 2012.03.19
 **	-----------------------------------
@@ -19,7 +20,7 @@
 **					Copy
 **		v0.1.4 - 2006.05.22 Aggiunto e usato <b>quoteDate</b>
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbmgr.h $
 ** @package rproject::dblayer
@@ -37,18 +38,14 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef DBMGR_H
-#define DBMGR_H
-
 #include "importedPackages.h"
 
 #include "dbconnection.h"
 #include "dbentity.h"
-#include "dbefactory.h"
 
 namespace DBLayer {
 
-class DECLSPECIFIER DBMgr {
+class DBMgr {
   public:
     static const int MAX_ENTITY = 100;
 
@@ -58,6 +55,9 @@ class DECLSPECIFIER DBMgr {
 
     bool connect();
     bool disconnect();
+
+    void setLogger(std::function<void(const string&, bool)> logger);
+    void log(const string& s, const bool newline=true) const;
 
     string getErrorMessage() const;
 
@@ -96,7 +96,7 @@ class DECLSPECIFIER DBMgr {
 //            else:
 //                self.select(nomeTabella, "update %s set id=%s where name=''" % (nomeTabella,myid) )
 //            return myid
-    string getNextUuid(DBEntity* dbe);
+    string getNextUuid();
 
     string ping();
 
@@ -107,6 +107,8 @@ class DECLSPECIFIER DBMgr {
     /** Returns a string uniquely identifying the user and the connection */
     string getServerIDString() const;
 
+    DBEntityVector* getListUserGroup() const;
+    DBEntityVector* getListGroups() const;
 //        def getUserGroupsList(self):
 //            return self.user_groups_list
 //        def setUserGroupsList(self,user_groups_list):
@@ -151,7 +153,14 @@ class DECLSPECIFIER DBMgr {
     DBEFactory* dbeFactory;
     string _schema;
     DBEntity* _dbeuser;
+    /** This keeps only the IDs */
     StringVector _user_groups_list;
+    /** This keeps the DBEUserGroup */
+    DBEntityVector* _list_usergroups;
+    /** This keeps the DBEGroups */
+    DBEntityVector* _list_groups;
+
+    std::function<void(const string&, bool)> _logger;
 
     void _loadUserGroups();
 
@@ -165,4 +174,3 @@ class DECLSPECIFIER DBMgr {
 };
 
 }
-#endif

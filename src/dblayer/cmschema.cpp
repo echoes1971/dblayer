@@ -16,12 +16,20 @@ using namespace std;
 
 #ifdef USE_BOOST
 #include <boost/filesystem.hpp>
+#elif QT_CORE_LIB
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #endif
 #ifdef USE_LIBMAGIC
 #include <magic.h>
+#elif QT_CORE_LIB
+#include <QMimeDatabase>
 #endif
 #ifdef USE_OPENSSL
 #include <openssl/md5.h>
+#elif QT_CORE_LIB
+#include <QCryptographicHash>
 #endif
 
 //*********************** DBELog: start.
@@ -551,7 +559,9 @@ DBEObject* DBEObject::setDefaultValues(ObjectMgr* dbmgr) {
     return this;
 }
 void DBEObject::_before_insert(DBMgr* dbmgr) {
-    string myid = dbmgr->getNextUuid(this);
+    if(this->getId().size()>0)
+        return;
+    string myid = dbmgr->getNextUuid();
     this->setValue("id",myid);
     this->setDefaultValues((ObjectMgr*) dbmgr);
 }
@@ -626,7 +636,7 @@ bool ObjectMgr::canExecute(const DBEObject& obj) const {
 }
 DBEntityVector* ObjectMgr::Select(const string &tableName, const string &searchString) {
     DBEntityVector* tmp = DBMgr::Select(tableName, searchString);
-    if( this->verbose ) cout << "ObjectMgr::Select: tmp.size=" << tmp->size() << endl;
+    if( this->verbose )  this->log("ObjectMgr::Select: tmp.size=" + DBLayer::integer2string(tmp->size()));
     DBEUser* myuser = (DBEUser*) this->getDBEUser();
     if(myuser!=0 && myuser->isRoot())
         return tmp;
@@ -636,7 +646,7 @@ DBEntityVector* ObjectMgr::Select(const string &tableName, const string &searchS
         bool append = false;
         DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
         if( obj!=0 ) {
-            if( this->verbose ) cout << "ObjectMgr::Select: obj=" << obj->toString() << endl;
+            if( this->verbose )  this->log("ObjectMgr::Select: obj=" + obj->toString());
             if(myuser!=0 && myuser->getId()==obj->getStringValue("creator")) {
                 append = true;
             } else if( obj->isDeleted() ) {
@@ -655,27 +665,33 @@ DBEntityVector* ObjectMgr::Select(const string &tableName, const string &searchS
     delete tmp;
     return ret;
 }
-DBEntity* ObjectMgr::Insert(DBEntity *dbe) {
+DBEntity* ObjectMgr::Insert(DBEntity *dbe, bool check_permissions) {
     bool have_permission = true;
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
-    if( obj!=0 ) {
+    if( check_permissions && obj!=0 ) {
         have_permission = this->canWrite(*obj);
+    }
+    if(!have_permission) {
+        this->errorMessage = "Unable to insert the new object, user does not have permissions";
     }
     return have_permission ? DBMgr::Insert(dbe) : 0;
 }
-DBEntity* ObjectMgr::Update(DBEntity *dbe) {
+DBEntity* ObjectMgr::Update(DBEntity *dbe, bool check_permissions) {
     bool have_permission = true;
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
-    if( obj!=0 ) {
+    if( check_permissions && obj!=0 ) {
         have_permission = this->canWrite(*obj);
+    }
+    if(!have_permission) {
+        this->errorMessage = "Unable to update the object, user does not have permissions";
     }
     return have_permission ? DBMgr::Update(dbe) : 0;
 }
-DBEntity* ObjectMgr::Delete(DBEntity *dbe) {
+DBEntity* ObjectMgr::Delete(DBEntity *dbe, bool check_permissions) {
     bool have_permission = true;
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
     DBEObject* full_obj = 0;
-    if( obj!=0 ) {
+    if( check_permissions && obj!=0 ) {
         // FIXME do we really need to retrieve again the object?
         full_obj = this->fullObjectById( obj->getId(), false );
         have_permission = this->canWrite(*full_obj);
@@ -688,7 +704,7 @@ DBEntity* ObjectMgr::Delete(DBEntity *dbe) {
             //this->connect();
             obj->_before_delete( this );
             string sqlString = this->_buildUpdateString( obj );
-            if( this->verbose ) cout << "ObjectMgr.delete: sqlString = " << sqlString << endl;
+            if( this->verbose ) this->log("ObjectMgr.delete: sqlString = " + sqlString);
             ResultSet* rs = this->getConnection()->exec( sqlString );
             delete rs;
             obj->_after_delete( this );
@@ -699,15 +715,12 @@ DBEntity* ObjectMgr::Delete(DBEntity *dbe) {
     }
 }
 string ObjectMgr::_buildSelectString(DBEntity *dbe, bool uselike, bool caseSensitive) {
-    if( this->verbose ) cout << "ObjectMgr::_buildSelectString: start." << endl;
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
     if(obj==0 || obj->name()!="DBEObject") {
-        if( this->verbose ) cout << "ObjectMgr::_buildSelectString: dbe is not a DBEObject" << endl;
-        if( this->verbose ) cout << "ObjectMgr::_buildSelectString: end." << endl;
+        if( this->verbose )  this->log("ObjectMgr::_buildSelectString: dbe is not a DBEObject");
+        if( this->verbose )  this->log("ObjectMgr::_buildSelectString: end.");
         return DBMgr::_buildSelectString(dbe, uselike, caseSensitive);
     }
-    if( this->verbose ) cout << "ObjectMgr::_buildSelectString: TODO" << endl;
-    //string searchString = DBMgr::_buildSelectString(dbe, uselike, caseSensitive);
     DBEntityVector types = this->getRegisteredTypes();
     StringVector q;
     for(const DBEntity* mytype : types) {
@@ -726,25 +739,26 @@ string ObjectMgr::_buildSelectString(DBEntity *dbe, bool uselike, bool caseSensi
         delete mydbe;
     }
     string searchString = joinString(&q,string(" union "));
-    if( this->verbose ) cout << "ObjectMgr::_buildSelectString: searchString=" << searchString << endl;
-    if( this->verbose ) cout << "ObjectMgr::_buildSelectString: end." << endl;
+//    if( this->verbose )  this->log("ObjectMgr::_buildSelectString: searchString=" + searchString);
+//    if( this->verbose )  this->log("ObjectMgr::_buildSelectString: end.");
     return searchString;
 }
 
 DBEntityVector* ObjectMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitive, const string& orderBy,bool ignore_deleted, bool full_object) {
-    if( this->verbose ) cout << "ObjectMgr::Search: start." << endl;
+    if( this->verbose )  this->log("ObjectMgr::Search: start.");
+    if( this->verbose )  this->log("ObjectMgr::Search: dbe="+dbe->toString());
     DBEObject* obj = dynamic_cast<DBEObject*>(dbe);
     if(obj==0 || obj->name()!="DBEObject") {
-        if( this->verbose ) cout << "ObjectMgr::Search: dbe is not a DBEObject" << endl;
-        if( this->verbose ) cout << "ObjectMgr::Search: end." << endl;
+        if( this->verbose )  this->log("ObjectMgr::Search: dbe is not a DBEObject");
+        if( this->verbose )  this->log("ObjectMgr::Search: end.");
         return DBMgr::Search(dbe, uselike, caseSensitive,orderBy);
     }
-    if( this->verbose ) cout << "ObjectMgr::Search: TODO" << endl;
+    if( this->verbose )  this->log("ObjectMgr::Search: TODO");
     if( ignore_deleted==true ) obj->setDateValue("deleted_date","0000-00-00 00:00:00");
     DBEntityVector* tmp = DBMgr::Search(dbe,uselike,caseSensitive,orderBy);
     if(!full_object) {
-        if( this->verbose ) cout << "ObjectMgr::Search: not full object." << endl;
-        if( this->verbose ) cout << "ObjectMgr::Search: end." << endl;
+        if( this->verbose )  this->log("ObjectMgr::Search: not full object.");
+        if( this->verbose )  this->log("ObjectMgr::Search: end.");
         return tmp;
     }
     DBEntityVector* ret = new DBEntityVector();
@@ -764,7 +778,7 @@ DBEntityVector* ObjectMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitiv
     return ret;
 }
 DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) {
-    if( this->verbose ) cout << "ObjectMgr::objectById: start." << endl;
+    if( this->verbose )  this->log("ObjectMgr::objectById: start.");
     DBEntityVector types = this->getRegisteredTypes();
     StringVector q;
     for(const DBEntity* mytype : types) {
@@ -782,29 +796,29 @@ DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) {
         delete mydbe;
     }
     string searchString = joinString(&q,string(" union "));
-    if( this->verbose ) cout << "ObjectMgr::objectById: searchString=" << searchString << endl;
+    if( this->verbose )  this->log("ObjectMgr::objectById: searchString=" + searchString);
     DBEntityVector* mylist = this->Select("objects", searchString);
     DBEObject* ret = 0;
-    if( this->verbose ) cout << "ObjectMgr::objectById: mylist=" << mylist->size() << endl;
+    if( this->verbose )  this->log("ObjectMgr::objectById: mylist=" + DBLayer::integer2string(mylist->size()));
     if(mylist->size()==1) {
         DBEntity* tmpret = mylist->at(0);
         ret = dynamic_cast<DBEObject*>(tmpret);
         if(ret==0) {
             delete tmpret;
         }
-        if( this->verbose ) cout << "ObjectMgr::objectById: ret=" << ret->toString("\n") << endl;
+        if( this->verbose )  this->log("ObjectMgr::objectById: ret=" + ret->toString("\n"));
         delete mylist;
     } else {
         this->Destroy(mylist);
     }
-    if( this->verbose ) cout << "ObjectMgr::objectById: end." << endl;
+    if( this->verbose )  this->log("ObjectMgr::objectById: end.");
     return ret;
 }
 DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted) {
-//     cout << "ObjectMgr::fullObjectById: start." << endl;
+//      this->log("ObjectMgr::fullObjectById: start.");
     DBEObject* myobj = this->objectById(id,ignore_deleted);
     if(myobj==0) {
-//         cout << "ObjectMgr::fullObjectById: end." << endl;
+//          this->log("ObjectMgr::fullObjectById: end.");
         return 0;
     }
     DBEntity* search = this->getClazzByTypeName(myobj->getStringValue("classname"));
@@ -824,11 +838,11 @@ DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted)
     } else {
         this->Destroy(mylist);
     }
-//     cout << "ObjectMgr::fullObjectById: end." << endl;
+//      this->log("ObjectMgr::fullObjectById: end.");
     return ret;
 }
 DBEObject* ObjectMgr::objectByName(const string name, const bool ignore_deleted) {
-    if( this->verbose ) cout << "ObjectMgr::objectByName: start." << endl;
+    if( this->verbose )  this->log("ObjectMgr::objectByName: start.");
     DBEntityVector types = this->getRegisteredTypes();
     StringVector q;
     for(const DBEntity* mytype : types) {
@@ -846,7 +860,7 @@ DBEObject* ObjectMgr::objectByName(const string name, const bool ignore_deleted)
         delete mydbe;
     }
     string searchString = joinString(&q,string(" union "));
-    if( this->verbose ) cout << "ObjectMgr::objectByName: searchString=" << searchString << endl;
+    if( this->verbose )  this->log("ObjectMgr::objectByName: searchString=" + searchString);
     DBEntityVector* mylist = this->Select("objects", searchString);
     DBEObject* ret = 0;
     if(mylist->size()==1) {
@@ -859,14 +873,14 @@ DBEObject* ObjectMgr::objectByName(const string name, const bool ignore_deleted)
     } else {
         this->Destroy(mylist);
     }
-    if( this->verbose ) cout << "ObjectMgr::objectByName: end." << endl;
+    if( this->verbose )  this->log("ObjectMgr::objectByName: end.");
     return ret;
 }
 DBEObject* ObjectMgr::fullObjectByName(const string name, const bool ignore_deleted) {
-    cout << "ObjectMgr::fullObjectByName: start." << endl;
+    this->log("ObjectMgr::fullObjectByName: start.");
     DBEObject* myobj = this->objectByName(name,ignore_deleted);
     if(myobj==0) {
-        cout << "ObjectMgr::fullObjectByName: end." << endl;
+        this->log("ObjectMgr::fullObjectByName: end.");
         return 0;
     }
     DBEntity* search = this->getClazzByTypeName(myobj->getStringValue("classname"));
@@ -886,7 +900,7 @@ DBEObject* ObjectMgr::fullObjectByName(const string name, const bool ignore_dele
     } else {
         this->Destroy(mylist);
     }
-    cout << "ObjectMgr::fullObjectByName: end." << endl;
+    this->log("ObjectMgr::fullObjectByName: end.");
     return ret;
 }
 //*********************** ObjectManager: end.
@@ -904,7 +918,7 @@ DBECompany::DBECompany() {
     if(_columns.size()==0) {
         StringVector column_order = DBECompany::getColumnNames();
         StringVector parentColumns = DBEObject::getColumnNames();
-        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+        for(size_t i=(parentColumns.size()-1); i<parentColumns.size(); i--) {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
 //         for(const string& s : _column_order) column_order.push_back(s);
@@ -948,7 +962,7 @@ DBEPeople::DBEPeople() {
     if(_columns.size()==0) {
         StringVector column_order = DBEPeople::getColumnNames();
         StringVector parentColumns = DBEObject::getColumnNames();
-        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+        for(long i=(parentColumns.size()-1); i>=0 && i<((long)parentColumns.size()); i--) {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
         _column_order = column_order;
@@ -1014,7 +1028,7 @@ DBEEvent::DBEEvent() {
     if(_columns.size()==0) {
         StringVector column_order = DBEEvent::getColumnNames();
         StringVector parentColumns = DBEObject::getColumnNames();
-        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+        for(long i=(parentColumns.size()-1); i>=0 && i<((long)parentColumns.size()); i--) {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
         _column_order = column_order;
@@ -1096,7 +1110,7 @@ DBEFile::DBEFile() {
     if(_columns.size()==0) {
         StringVector column_order = DBEFile::getColumnNames();
         StringVector parentColumns = DBEObject::getColumnNames();
-        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+        for(long i=(parentColumns.size()-1); i>=0 && i<((long)parentColumns.size()); i--) {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
         _column_order = column_order;
@@ -1132,6 +1146,7 @@ DBEFile* DBEFile::setFilename(const string& f) {
     this->setValue("filename",f);
     if(this->getName().length()==0)
         this->setName(f);
+    return this;
 }
 string DBEFile::getFilename() const { return this->getField("filename")==0 || this->getField("filename")->isNull() ? "" : *(this->getField("filename")->getStringValue()); }
 DBEFile* DBEFile::setMimetype(const string& f) { this->setValue("mime",f);; return this; }
@@ -1181,7 +1196,7 @@ bool DBEFile::readFile(const string& src_file, bool move) {
     this->setFilename(src_path.filename().string());
     string fullpath = this->getFullpath();
     boost::filesystem::path dst_path(fullpath);
-//     cout << "DBEFile::readFile: parent path '" << dst_path.parent_path() << "'" << endl;
+    //cout << "DBEFile::readFile: parent path '" << dst_path.parent_path() << "'" << endl;
     if(!boost::filesystem::exists(dst_path.parent_path())) {
         if(!boost::filesystem::create_directories( dst_path.parent_path() )) {
             cerr << "DBEFile::readFile: unable to create path " << dst_path.parent_path() << endl;
@@ -1189,14 +1204,44 @@ bool DBEFile::readFile(const string& src_file, bool move) {
         }
     }
     if(move) {
-//         cout << "DBEFile::readFile: moving '" << src_file << "' to '" << fullpath << "'" << endl;
+        //cout << "DBEFile::readFile: moving '" << src_file << "' to '" << fullpath << "'" << endl;
         boost::filesystem::rename(src_path, dst_path);
     } else {
-//         cout << "DBEFile::readFile: copying '" << src_file << "' to '" << fullpath << "'" << endl;
+        //cout << "DBEFile::readFile: copying '" << src_file << "' to '" << fullpath << "'" << endl;
         boost::filesystem::copy(src_path, dst_path);
     }
     ret = true;
     return ret;
+#elif QT_CORE_LIB
+    bool ret = false;
+    QFile src_path;
+    src_path.setFileName(QString(src_file.c_str()));
+    if(!src_path.exists()) {
+        cerr << "DBEFile::readFile: source file does not exists " << src_file << endl;
+        return ret;
+    }
+    this->setFilename(QFileInfo(src_path).fileName().toStdString());
+    string fullpath = this->getFullpath();
+    QFile dst_path;
+    dst_path.setFileName(QString(fullpath.c_str()));
+    QDir dst_dir = QFileInfo(QString(fullpath.c_str())).dir();
+//     cout << "DBEFile::readFile: parent path '" << dst_path.parent_path() << "'" << endl;
+    if(!dst_dir.exists()) {
+        if(!dst_dir.mkpath(dst_dir.path())) {
+            cerr << "DBEFile::readFile: unable to create path " << dst_dir.path().toStdString() << endl;
+            return ret;
+        }
+    }
+    if(move) {
+//         cout << "DBEFile::readFile: moving '" << src_file << "' to '" << fullpath << "'" << endl;
+        src_path.rename(dst_path.fileName());
+    } else {
+//         cout << "DBEFile::readFile: copying '" << src_file << "' to '" << fullpath << "'" << endl;
+        src_path.copy(dst_path.fileName());
+    }
+    ret = true;
+    return ret;
+
 #else
     cerr << "DBEFile::readFile: Boost not found!!! " << endl;
     return false;
@@ -1230,7 +1275,7 @@ void DBEFile::_before_update(DBMgr* dbmgr) {
     // Inherit the father's root
     this->_inherith_father_root(dynamic_cast<ObjectMgr*>(dbmgr));
 
-#ifdef USE_BOOST
+#if defined(USE_BOOST) || defined(QT_CORE_LIB)
     // Check if there is a file saved
     DBEFile* search = this->createNewInstance();
     search->setId(this->getId());
@@ -1260,18 +1305,30 @@ void DBEFile::_before_update(DBMgr* dbmgr) {
             from_dir.append("/").append(dest_path);
             dest_dir.append("/").append(dest_path);
         }
+        string new_filename( this->createFilename(this->getId(),this->getFilename()) );
+#ifdef USE_BOOST
         boost::filesystem::path my_dest_dir(dest_dir);
         if(!boost::filesystem::exists(my_dest_dir)) {
-            //if(!file_exists($dest_dir)) mkdir($dest_dir, 0755 );
             if(!boost::filesystem::create_directories( my_dest_dir )) {
                 cerr << "DBEFile::_before_update: unable to create path " << my_dest_dir << endl;
                 return;
             }
         }
-        string new_filename( this->createFilename(this->getId(),this->getFilename()) );
         boost::filesystem::path path_from(from_dir + "/" + this_filename);
         boost::filesystem::path path_to(dest_dir + "/" + new_filename);
         boost::filesystem::rename(path_from,path_to);
+#elif QT_CORE_LIB
+        QDir my_dest_dir; my_dest_dir.setPath(dest_dir.c_str());
+        if(!my_dest_dir.exists()) {
+            if(!my_dest_dir.mkpath(my_dest_dir.path())) {
+                cerr << "DBEFile::_before_update: unable to create path " << my_dest_dir.path().toStdString() << endl;
+                return;
+            }
+        }
+        QFile path_from; path_from.setFileName(QString(from_dir.c_str())+"/"+QString(this_filename.c_str()));
+        QString path_to(QString(dest_dir.c_str())+"/"+QString(new_filename.c_str()));
+        path_from.rename(path_to);
+#endif
         //if(this->getName().size()==0) this->setName(this->getFilename());
         this->setFilename(new_filename);
     } else if(myself->getStringValue("path")!=this->getStringValue("path")) {
@@ -1281,6 +1338,7 @@ void DBEFile::_before_update(DBMgr* dbmgr) {
         string dest_dir(this->_root_directory);
         if(from_path.size()>0) from_dir.append("/").append(from_path);
         if(dest_path.size()>0) dest_dir.append("/").append(dest_path);
+#ifdef USE_BOOST
         boost::filesystem::path my_dest_dir(dest_dir);
         if(!boost::filesystem::exists(my_dest_dir)) {
            if(!boost::filesystem::create_directories( my_dest_dir )) {
@@ -1291,6 +1349,18 @@ void DBEFile::_before_update(DBMgr* dbmgr) {
         boost::filesystem::path path_from(from_dir + "/" + myself_filename);
         boost::filesystem::path path_to(dest_dir + "/" + myself_filename);
         boost::filesystem::rename(path_from,path_to);
+#elif QT_CORE_LIB
+        QDir my_dest_dir; my_dest_dir.setPath(dest_dir.c_str());
+        if(!my_dest_dir.exists()) {
+            if(!my_dest_dir.mkpath(my_dest_dir.path())) {
+                cerr << "DBEFile::_before_update: unable to create path " << my_dest_dir.path().toStdString() << endl;
+                return;
+            }
+        }
+        QFile path_from; path_from.setFileName(QString(from_dir.c_str())+"/"+QString(myself_filename.c_str()));
+        QString path_to(QString(dest_dir.c_str())+"/"+QString(myself_filename.c_str()));
+        path_from.rename(path_to);
+#endif
         this->setFilename(myself_filename);
     } else {
         this->setFilename(myself_filename);
@@ -1338,7 +1408,7 @@ void DBEFile::_before_delete(DBMgr* dbmgr) {
                 string dest_file(this->_root_directory);
                 if(dest_path.size()>0) dest_file.append("/").append(dest_path);
                 dest_file.append("/").append(myself->createFilename());
-//                 cout << "DBEFile::_before_delete: deleting file " << dest_file << endl;
+                //cout << "DBEFile::_before_delete: deleting file " << dest_file << endl;
                 myself->_delete_file(dest_file);
                 // Image
                 if(myself->isImage())
@@ -1368,6 +1438,28 @@ bool DBEFile::_delete_file(const string fullpath, bool purge_empty_directories) 
         }
     }
     return true;
+#elif QT_CORE_LIB
+    QDir root_path;
+    root_path.setPath(QString(this->_root_directory.c_str()));
+    //cout << "DBEFile::_delete_file: root_path=" << this->_root_directory << endl;
+    QFile my_dest_file;
+    my_dest_file.setFileName(QString(fullpath.c_str()));
+    if(my_dest_file.exists()) {
+        my_dest_file.remove();
+    }
+    // Removing empty parent directories
+    if(purge_empty_directories) {
+        QDir parent = QFileInfo(my_dest_file).dir();
+        bool is_empty = parent.count()==2;
+        //cout << "DBEFile::_delete_file: parent " << is_empty << " " << parent.path().toStdString() << endl;
+        while(parent!=root_path && is_empty) {
+            parent.rmdir(parent.absolutePath());
+            parent = QFileInfo(parent.absolutePath()).dir();
+            is_empty = parent.count()==2;
+            //cout << "DBEFile::_delete_file: parent " << is_empty << " " << parent.path().toStdString() << endl;
+        }
+    }
+    return true;
 #else
     cerr << "DBEFile::_delete_file: Boost not available!!!" << endl;
     return false;
@@ -1380,7 +1472,7 @@ void DBEFile::_deleteThumbnail(const string fullpath) const {
     cerr << "DBEFile::_deleteThumbnail: TODO - " << fullpath << endl;
 }
 void DBEFile::_add_prefix_to_filename() {
-#ifdef USE_BOOST
+#if defined(USE_BOOST) || defined(QT_CORE_LIB)
     string filename = this->getFilename();
     if(filename.size()>0) {
         string dest_path(this->createObjectPath());
@@ -1390,18 +1482,31 @@ void DBEFile::_add_prefix_to_filename() {
             from_dir.append("/").append(dest_path);
             dest_dir.append("/").append(dest_path);
         }
+        string new_filename( this->createFilename(this->getId(),this->getFilename()) );
+#ifdef USE_BOOST
         boost::filesystem::path my_dest_dir(dest_dir);
         if(!boost::filesystem::exists(my_dest_dir)) {
-            //if(!file_exists($dest_dir)) mkdir($dest_dir, 0755 );
             if(!boost::filesystem::create_directories( my_dest_dir )) {
                 cerr << "DBEFile::_before_insert: unable to create path " << my_dest_dir << endl;
                 return;
             }
         }
-        string new_filename( this->createFilename(this->getId(),this->getFilename()) );
         boost::filesystem::path path_from(from_dir + "/" + filename);
         boost::filesystem::path path_to(dest_dir + "/" + new_filename);
         boost::filesystem::rename(path_from,path_to);
+#elif QT_CORE_LIB
+        QDir my_dest_dir; my_dest_dir.setPath(dest_dir.c_str());
+        if(!my_dest_dir.exists()) {
+            if(!my_dest_dir.mkpath(my_dest_dir.path())) {
+                cerr << "DBEFile::_before_update: unable to create path " << my_dest_dir.path().toStdString() << endl;
+                return;
+            }
+        }
+        QFile path_from;
+        path_from.setFileName(QString(from_dir.c_str())+"/"+QString(filename.c_str()));
+        QString path_to(QString(dest_dir.c_str())+"/"+QString(new_filename.c_str()));
+        path_from.rename(path_to);
+#endif
         if(this->getName().size()==0) this->setName(this->getFilename());
         this->setFilename(new_filename);
     }
@@ -1420,6 +1525,10 @@ string DBEFile::_mimetype(const string fullpath) const {
 //     cout << "DBEFile::_mimetype: ret=" << ret << endl;
 //     cout << "DBEFile::_mimetype: =================================" << endl;
     return ret;
+#elif QT_CORE_LIB
+    QMimeDatabase db;
+    QMimeType mime = db.mimeTypeForFile(QString(fullpath.c_str()));
+    return mime.name().toStdString();
 #else
     return "application/octet-stream";
 #endif
@@ -1455,6 +1564,15 @@ string DBEFile::_file_checksum(const string fullpath) const {
 //     printf ("tmp: %s\n", (char*) &tmp);
     fclose (inFile);
     return string(tmp);
+#elif QT_CORE_LIB
+    QCryptographicHash crypto(QCryptographicHash::Md5);
+    QFile file(QString(fullpath.c_str()));
+    file.open(QFile::ReadOnly);
+    while(!file.atEnd()){
+      crypto.addData(file.read(8192));
+    }
+    QByteArray hash = crypto.result();
+    return QString(hash).toStdString();
 #else
     return "undefined";
 #endif
@@ -1496,7 +1614,7 @@ DBEFolder::DBEFolder() {
     if(_columns.size()==0) {
         StringVector column_order = DBEFolder::getColumnNames();
         StringVector parentColumns = DBEObject::getColumnNames();
-        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+        for(long i=(parentColumns.size()-1); i>=0 && i<((long)parentColumns.size()); i--) {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
         _column_order = column_order;
@@ -1560,10 +1678,8 @@ DBEObject* DBEFolder::setDefaultValues(ObjectMgr* objmgr) {
 //     cout << "DBEFolder::_before_insert: end." << endl;
 // }
 void DBEFolder::_before_update(DBMgr* dbmgr) {
-    cout << "DBEFolder::_before_update: start." << endl;
     DBEObject::_before_update(dbmgr);
     this->_inherith_father_root(dynamic_cast<ObjectMgr*>(dbmgr));
-    cout << "DBEFolder::_before_update: end." << endl;
 }
 //*********************** DBEFolder: end.
 
@@ -1577,7 +1693,7 @@ DBELink::DBELink() {
     if(_columns.size()==0) {
         StringVector column_order = DBELink::getColumnNames();
         StringVector parentColumns = DBEObject::getColumnNames();
-        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+        for(long i=(parentColumns.size()-1); i>=0 && i<((long)parentColumns.size()); i--) {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
         _column_order = column_order;
@@ -1617,7 +1733,7 @@ DBENote::DBENote() {
     if(_columns.size()==0) {
         StringVector column_order = DBENote::getColumnNames();
         StringVector parentColumns = DBEObject::getColumnNames();
-        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+        for(long i=(parentColumns.size()-1); i>=0 && i<((long)parentColumns.size()); i--) {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
         _column_order = column_order;
@@ -1652,7 +1768,7 @@ DBEPage::DBEPage() {
     if(_columns.size()==0) {
         StringVector column_order = DBEPage::getColumnNames();
         StringVector parentColumns = DBEObject::getColumnNames();
-        for(size_t i=(parentColumns.size()-1); i>=0 && i<parentColumns.size(); i--) {
+        for(long i=(parentColumns.size()-1); i>=0 && i<((long)parentColumns.size()); i--) {
             column_order.insert(column_order.begin(),parentColumns.at(i));
         }
         _column_order = column_order;

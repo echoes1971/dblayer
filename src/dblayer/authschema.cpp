@@ -94,7 +94,7 @@ bool DBEUser::isRoot() {
 
 void DBEUser::_before_insert(DBMgr* dbmgr) {
     if(this->isNull("id")) {
-        this->setValue("id",dbmgr->getNextUuid(this));
+        this->setValue("id",dbmgr->getNextUuid());
     }
     if(this->checkNewPassword()) {
         this->_createGroup(dbmgr);
@@ -197,7 +197,7 @@ vector<map<string,string> > DBEGroup::getDefaultEntries() const {
 void DBEGroup::_before_insert(DBMgr* dbmgr) {
     Field* id_field = this->getField("id");
     if(id_field->isNull()) {
-        string uuid = dbmgr->getNextUuid(this);
+        string uuid = dbmgr->getNextUuid();
         id_field->setStringValue(uuid);
     }
 }

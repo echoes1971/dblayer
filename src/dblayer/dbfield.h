@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	dbfield.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v0.1.0 - 2006.05.25 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbfield.h $
 ** @package rproject::dblayer
@@ -28,9 +29,6 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef DBLAYER_DBFIELD_H
-#define DBLAYER_DBFIELD_H
-
 #include "importedPackages.h"
 
 #include <schema/field.h>
@@ -38,7 +36,7 @@ using namespace SchemaNS;
 
 namespace DBLayer {
 
-class DECLSPECIFIER DBField : public Field {
+class DBField : public Field {
   public:
     DBField();
     DBField(const string &nome);
@@ -46,5 +44,3 @@ class DECLSPECIFIER DBField : public Field {
 };
 
 }
-
-#endif

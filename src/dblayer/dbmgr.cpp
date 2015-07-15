@@ -11,7 +11,7 @@
 **		v0.0.1 - 2002.10.23	First Old Version
 **		v0.1.0 - 2006.05.04 Rewritten for the new framework
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: dbmgr.cpp $
 ** @package rproject::dblayer
@@ -35,15 +35,28 @@
 using namespace DBLayer;
 
 // for DBMgr.getNextUuid
+#ifdef USE_BOOST
 #include <boost/uuid/uuid.hpp>            // uuid class
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
+#else
+// We assume we have Qt instead
+#include <QUuid>
+#endif
+
 
 DBLayer::DBMgr::DBMgr() {
     this->setConnection(0);
     this->dbeFactory = 0;
     this->_schema="";
     this->_dbeuser=0;
+    this->_list_usergroups=0;
+    this->_list_groups=0;
+
+    this->_logger =  [] (const string& s, const bool newline) -> void {
+        cout << s;
+        if(newline) cout << endl;
+    };
 }
 
 DBMgr::DBMgr(Connection* con, bool verbose) {
@@ -53,12 +66,25 @@ DBMgr::DBMgr(Connection* con, bool verbose) {
     this->dbeFactory = 0;
     this->_schema="";
     this->_dbeuser=0;
+    this->_list_usergroups=0;
+    this->_list_groups=0;
+
+    this->_logger =  [] (const string& s, const bool newline) -> void {
+        cout << s;
+        if(newline) cout << endl;
+    };
 }
 
 DBMgr::~DBMgr() {
     if( this->verbose ) { cout << "DBMgr::~DBMgr: start." << endl; }
     if(this->_dbeuser!=0) {
         delete this->_dbeuser;
+    }
+    if(this->_list_usergroups!=0) {
+        this->Destroy(this->_list_usergroups);
+    }
+    if(this->_list_groups!=0) {
+        this->Destroy(this->_list_groups);
     }
     this->disconnect();
     if( this->verbose ) { cout << "DBMgr::~DBMgr: end." << endl; }
@@ -77,6 +103,13 @@ bool DBMgr::connect() {
 }
 
 bool DBMgr::disconnect() { return this->con==0 ? false : this->con->disconnect(); }
+
+void DBMgr::setLogger(std::function<void(const string&,bool)> logger) {
+    this->_logger = logger;
+}
+void DBMgr::log(const string& s, const bool newline) const {
+    this->_logger(s,newline);
+}
 
 string DBMgr::getErrorMessage() const { return this->errorMessage; }
 
@@ -113,13 +146,15 @@ DBLayer::StringVector DBMgr::_buildWhereCondition(const DBEntity* dbe, const boo
     int fieldSize = dbe->getFieldSize();
     for(int i=0; i<fieldSize; i++) {
         DBField* field = (DBField*) dbe->getField(i);
-//         if(this->verbose) {
-//             cout << "DBMgr::_buildWhereCondition: field->name=" << field->getName().c_str() << endl;
-//             cout << "DBMgr::_buildWhereCondition: field->isNull=" << field->isNull() << endl;
-//         }
+        /*
+        if(this->verbose) {
+            this->log("DBMgr::_buildWhereCondition: field->name=" + field->getName());
+            this->log("DBMgr::_buildWhereCondition: field->type=" + field->getTypeName());
+            this->log("DBMgr::_buildWhereCondition: field->isNull=" + field->isNull());
+        }
+        */
         if( field==0 || field->isNull() )
             continue;
-//        cout << "DBMgr::_buildWhereCondition: field=" << valore << endl;
 
         string clausola;
         string nome = field->getName();
@@ -202,7 +237,7 @@ string DBMgr::_buildInsertString(const DBEntity *dbe) const {
     for(unsigned int i=0; i<nomiCampi.size(); i++) {
         string nomeCampo = nomiCampi[i];
         DBField* valore = (DBField*) dbe->getField( nomeCampo );
-//         cout << "DBMgr::_buildInsertString: nomeCampo=" << nomeCampo << " null=" << valore->isNull() << endl;
+//         this->log("DBMgr::_buildInsertString: nomeCampo=" + nomeCampo + " null=" + valore->isNull());
         if( valore==0 || valore->isNull() )
             continue;
         tmpNomi.push_back( nomeCampo );
@@ -336,17 +371,18 @@ DBEntity* DBMgr::Insert(DBEntity* dbe) {
     dbe->_before_insert(this);
     dbe = this->_before_insert(dbe);
     if(this->con->isProxy()) {
+        this->con->setDBEFactory(this->dbeFactory);
         dbe = this->con->Insert(dbe);
         this->errorMessage.clear();
         this->errorMessage.append(this->con->getErrorMessage());
     } else {
-        if( this->verbose ) cout << "DBMgr::Insert: dbe before insert = " << dbe->toString() << endl;
+        if( this->verbose ) this->log("DBMgr::Insert: dbe before insert = " + dbe->toString() );
         // Insert
         string query = this->_buildInsertString(dbe);
-        if( this->verbose ) cout << "DBMgr::Insert: query = " << query << endl;
+        if( this->verbose ) this->log("DBMgr::Insert: query = " + query);
         // Eseguo
         ResultSet* rs = this->con->exec( query );
-        if( this->verbose ) cout << "DBMgr::Insert: status = " << rs->getStatus() << endl;
+        if( this->verbose ) this->log("DBMgr::Insert: status = " + rs->getStatus());
         delete rs;
     }
     // After Insert
@@ -359,17 +395,18 @@ DBEntity* DBMgr::Update(DBEntity* dbe) {
     dbe->_before_update(this);
     dbe = this->_before_update(dbe);
     if(this->con->isProxy()) {
+        this->con->setDBEFactory(this->dbeFactory);
         dbe = this->con->Update(dbe);
         this->errorMessage.clear();
         this->errorMessage.append(this->con->getErrorMessage());
     } else {
-        if( this->verbose ) cout << "DBMgr::Update: dbe before update = " << dbe->toString() << endl;
+        if( this->verbose ) this->log("DBMgr::Update: dbe before update = " + dbe->toString());
         // Update
         string query = this->_buildUpdateString(dbe);
-        if( this->verbose ) cout << "DBMgr::Update: query = " << query << endl;
+        if( this->verbose ) this->log("DBMgr::Update: query = " + query);
         // Eseguo
         ResultSet* rs = this->con->exec( query );
-        if( this->verbose ) cout << "DBMgr::Update: status = " << rs->getStatus() << endl;
+        if( this->verbose ) this->log("DBMgr::Update: status = " + rs->getStatus());
         delete rs;
     }
     // After Update
@@ -382,17 +419,18 @@ DBEntity* DBMgr::Delete(DBEntity* dbe) {
     dbe->_before_delete(this);
     dbe = this->_before_delete(dbe);
     if(this->con->isProxy()) {
+        this->con->setDBEFactory(this->dbeFactory);
         dbe = this->con->Delete(dbe);
         this->errorMessage.clear();
         this->errorMessage.append(this->con->getErrorMessage());
     } else {
-        if( this->verbose ) cout << "DBMgr::Delete: dbe before delete = " << dbe->toString() << endl;
+        if( this->verbose ) this->log("DBMgr::Delete: dbe before delete = " + dbe->toString());
         // Delete
         string query = this->_buildDeleteString(dbe);
-        if( this->verbose ) cout << "DBMgr::Delete: query = " << query << endl;
+        if( this->verbose ) this->log("DBMgr::Delete: query = " + query);
         // Eseguo
         ResultSet* rs = this->con->exec( query );
-        if( this->verbose ) cout << "DBMgr::Delete: status = " << rs->getStatus() << endl;
+        if( this->verbose ) this->log("DBMgr::Delete: status = " + rs->getStatus());
         delete rs;
     }
     // After Delete
@@ -416,7 +454,7 @@ DBEntity* DBMgr::Copy(DBEntity* dbe) {
     // Before Copy
     mydbe->_before_copy(this);
     mydbe = this->_before_copy(mydbe);
-    if( this->verbose ) { cout << "DBMgr::Copy: mydbe before copy = " << mydbe->toString() << endl; }
+    if( this->verbose ) { this->log("DBMgr::Copy: mydbe before copy = " + mydbe->toString()); }
     // Copy (Insert)
     mydbe = this->Insert(mydbe);
     // After Copy
@@ -430,6 +468,8 @@ void DBMgr::rs2dbelist(const ResultSet* res, const string &nomeTabella, DBEntity
     int nColonne = res->getNumColumns();
     int nRighe = res->getNumRows();
     for(int r=0; r<nRighe; r++) {
+        //this->log("DBMgr::rs2dbelist: nomeTabella="+nomeTabella);
+        string classname = "";
         DBEntity* dbe = this->getClazz(nomeTabella);
         for(int c=0; c<nColonne; c++) {
             DBField* dbfield = 0;
@@ -437,6 +477,11 @@ void DBMgr::rs2dbelist(const ResultSet* res, const string &nomeTabella, DBEntity
                 continue;
             }
             string columnName = res->getColumnName(c);
+            if(columnName=="classname") {
+                classname = res->getValue( r, c );
+                //if(this->verbose) this->log("DBMgr::rs2dbelist: found classname="+classname);
+                continue;
+            }
             if ( res->getColumnType(c)==DBLayer::type_boolean ) {
                 bool valore = false;
                 valore = res->getValue( r, c ) == string("t");
@@ -464,19 +509,27 @@ void DBMgr::rs2dbelist(const ResultSet* res, const string &nomeTabella, DBEntity
                 dbe->addField(dbfield);
             }
         }
+        if(classname.size()>0) {
+            DBEntity* tmp = this->getClazzByTypeName(classname);
+            tmp->setValuesDictionary( dbe->getValuesDictionary() );
+            //if(this->verbose) this->log("DBMgr::rs2dbelist: tmp="+tmp->toString());
+            delete dbe;
+            dbe = tmp;
+        }
         ret->push_back( dbe );
     }
 }
 
 DBEntityVector* DBMgr::Select(const string& tableName, const string& searchString) const {
     if(this->con->isProxy()) {
+        this->con->setDBEFactory(this->dbeFactory);
         DBEntityVector* ret = 0;
         string nomeTabella = tableName;
-        if( this->verbose ) cout << "DBMgr::Select: nomeTabella=" << nomeTabella << endl;
+        if( this->verbose ) this->log("DBMgr::Select: nomeTabella=" + nomeTabella);
         DBEntity* dbe = this->getClazz(nomeTabella);
-        if( this->verbose ) cout << "DBMgr::Select: dbe=" << dbe->toString() << endl;
+        if( this->verbose ) this->log("DBMgr::Select: dbe=" + dbe->toString());
         string myTableName = tableName;//this->_buildTableName(dbe);
-        if( this->verbose ) cout << "DBMgr::Select: myTableName=" << myTableName << endl;
+        if( this->verbose ) this->log("DBMgr::Select: myTableName=" + myTableName);
         ret = this->con->Select(dbe,myTableName,searchString);
         delete dbe;
         if(ret==0) ret = new DBEntityVector();
@@ -484,13 +537,13 @@ DBEntityVector* DBMgr::Select(const string& tableName, const string& searchStrin
     }
     DBEntityVector* ret = new DBEntityVector;
     ResultSet* res = this->con->exec(searchString);
-//     if( this->verbose ) cout << "DBMgr::Select: res=" << res->toString() << endl;
+    //if( this->verbose ) this->log("DBMgr::Select: res=" + res->toString());
     string nomeTabella = tableName;
 
     if (!con->hasErrors() ) {
         rs2dbelist(res, nomeTabella, ret);
     } else {
-        if( this->verbose ) cout << "DBMgr::Select: error = " << con->getErrorMessage() << endl;
+        if( this->verbose ) this->log("DBMgr::Select: error = " + con->getErrorMessage());
     }
 
     delete res;
@@ -498,10 +551,12 @@ DBEntityVector* DBMgr::Select(const string& tableName, const string& searchStrin
 }
 
 DBEntityVector* DBMgr::Search(DBEntity *dbe, bool uselike, bool caseSensitive, const string &orderBy ) {
-    if(this->verbose) cout << "DBMgr::Search: start." << endl;
+    if(this->verbose) this->log("DBMgr::Search: start.");
+    if(this->verbose) this->log("DBMgr::Search: dbe=" + dbe->toString());
     if(this->con->isProxy()) {
-        if( this->verbose ) cout << "DBMgr::Search: calling con->Search()" << endl;
-        //if( this->verbose ) cout << "DBMgr::Search: dbe=" << dbe->toString() << endl;
+        this->con->setDBEFactory(this->dbeFactory);
+        if( this->verbose ) this->log("DBMgr::Search: calling con->Search()");
+        //if( this->verbose ) this->log("DBMgr::Search: dbe=" + dbe->toString());
         DBEntityVector* ret = this->con->Search(dbe, uselike, caseSensitive, orderBy);
         if(ret==0) ret = new DBEntityVector();
         return ret;
@@ -512,9 +567,10 @@ DBEntityVector* DBMgr::Search(DBEntity *dbe, bool uselike, bool caseSensitive, c
         myquery.append( orderBy.c_str() );
     }
     myquery.append(";");
-    if( this->verbose ) cout << "DBMgr::Search: myquery = " << myquery << endl;
+    if(this->verbose) this->log("DBMgr::Search: myquery = " + myquery);
     string tableName = dbe->getTableName();
-    if(this->verbose) cout << "DBMgr::Search: end." << endl;
+    if(this->verbose) this->log("DBMgr::Search: tableName = " + tableName);
+    if(this->verbose) this->log("DBMgr::Search: end.");
     return this->Select(tableName,myquery);
 }
 
@@ -543,9 +599,13 @@ bool DBMgr::exists(DBEntity* dbe) {
     return count>0;
 }
 
-string DBMgr::getNextUuid(DBEntity* dbe) {
+string DBMgr::getNextUuid() {
+#ifdef USE_BOOST
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
     string ret = boost::uuids::to_string(uuid);
+#else
+    string ret = QUuid::createUuid().toString().toStdString();
+#endif
     replaceAll(ret,"-","");
 //        def getNextUuid(self, dbe, length=16):
 //            return ( ("%s" % uuid.uuid4()).replace('-','') )[:16]
@@ -553,15 +613,16 @@ string DBMgr::getNextUuid(DBEntity* dbe) {
 }
 
 string DBMgr::ping() {
-    if(this->con->isProxy())
+    if(this->con->isProxy()) {
         return this->con->ping();
+    }
     return "pong";
 }
 
 void DBMgr::_loadUserGroups() {
     if(this->_dbeuser==0)
         return;
-    if(this->verbose) cout << "DBMgr::_loadUserGroups: start." << endl;
+    if(this->verbose) this->log("DBMgr::_loadUserGroups: start.");
     DBEntity* cerca = this->getClazzByTypeName("DBEUserGroup");
     cerca->readFKFrom(this->_dbeuser);
 
@@ -578,36 +639,55 @@ void DBMgr::_loadUserGroups() {
         this->_user_groups_list.push_back(user_group_id);
     }
 
-    if(this->verbose) cout << "DBMgr::_loadUserGroups: loaded " << this->_user_groups_list.size() << " groups." << endl;
+    if(this->verbose) this->log("DBMgr::_loadUserGroups: loaded " + DBLayer::integer2string(this->_user_groups_list.size()) + " groups.");
 
-    this->Destroy(lista);
+    _list_usergroups = lista;
+    //this->Destroy(lista);
+
+    _list_groups = new DBEntityVector();
+    for(const DBEntity* ug : *_list_usergroups) {
+        DBEntity* searchGroup = this->getClazzByTypeName("DBEGroup");
+        searchGroup->setValue("id",ug->getStringValue("group_id"));
+        if(this->verbose) this->log("DBMgr::_loadUserGroups: searchGroup=" + searchGroup->toString("\n"));
+        DBEntityVector* listaGroup = this->Search(searchGroup,false);
+        if(listaGroup->size()==1) {
+            _list_groups->push_back( listaGroup->at(0) );
+            listaGroup->clear();
+        }
+        this->Destroy(listaGroup);
+        delete searchGroup;
+    }
+
     delete cerca;
-    if(this->verbose) cout << "DBMgr::_loadUserGroups: end." << endl;
+    if(this->verbose) this->log("DBMgr::_loadUserGroups: end.");
 }
 
 DBEntity* DBMgr::login(const string user, const string pwd) {
     this->errorMessage.clear();
 
     if(this->con->isProxy()) {
+        this->con->setDBEFactory(this->dbeFactory);
         ResultSet* userRs = this->con->login(user,pwd);
         this->errorMessage = this->con->getErrorMessage();
-        string nome_tabella("users");
-        DBEntityVector list;
+        if(userRs!=0) {
+            string nome_tabella("users");
+            DBEntityVector list;
 
-        this->rs2dbelist(userRs,nome_tabella,&list);
+            this->rs2dbelist(userRs,nome_tabella,&list);
 
-        if(list.size()!=1) {
-            if( this->verbose ) { cout << "DBMgr::login: ERROR - list.size=" << list.size() << endl; }
-            return 0;
+            if(list.size()!=1) {
+                if( this->verbose ) { this->log("DBMgr::login: ERROR - list.size=" + integer2string(list.size())); }
+                return 0;
+            }
+            this->_dbeuser = list.at(0);
+            list.clear();
+
+            this->_loadUserGroups();
         }
-        this->_dbeuser = list.at(0);
-        list.clear();
-
-        this->_loadUserGroups();
         return this->_dbeuser;
     }
     if(pwd.length()==0 || user.length()==0) {
-        if( this->verbose ) { cout << "DBMgr::login: ERROR - Missing username or password" << endl; }
+        if( this->verbose ) { this->log("DBMgr::login: ERROR - Missing username or password"); }
         this->errorMessage = "Missing username or password";
         return this->_dbeuser;
     }
@@ -641,7 +721,7 @@ DBEntity* DBMgr::login(const string user, const string pwd) {
 
     if(lista->size()!=1) {
         this->errorMessage = "Wrong user or password";
-        if( this->verbose ) { cout << "DBMgr::login: ERROR - lista.size=" << lista->size() << endl; }
+        if( this->verbose ) { this->log("DBMgr::login: ERROR - lista.size=" + integer2string(lista->size())); }
         return 0;
     }
     this->_dbeuser = lista->at(0);
@@ -659,6 +739,14 @@ DBEntity* DBMgr::relogin() {
     string pwd(this->_dbeuser->getField("pwd")->getStringValue()->c_str());
     delete this->_dbeuser;
     this->_dbeuser=0;
+    if(this->_list_usergroups!=0) {
+        this->Destroy(this->_list_usergroups);
+        this->_list_usergroups = 0;
+    }
+    if(this->_list_groups!=0) {
+        this->Destroy(this->_list_groups);
+        this->_list_groups = 0;
+    }
     return this->login(login,pwd);
 }
 
@@ -681,6 +769,13 @@ string DBMgr::getServerIDString() const {
     string ret("");
     ret.append(u.c_str()); ret.append("@"); ret.append(h.c_str());
     return ret;
+}
+
+DBEntityVector* DBMgr::getListUserGroup() const {
+    return this->_list_usergroups;
+}
+DBEntityVector* DBMgr::getListGroups() const {
+    return this->_list_groups;
 }
 
 bool DBMgr::hasGroup(const string& group_id) const {

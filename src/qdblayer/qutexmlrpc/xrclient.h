@@ -22,6 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef xrclient
 #define xrclient
 
+#include <functional>
+#include <string>
+using namespace std;
+
 #include <qurl.h>
 #include <qvariant.h>
 #include <QDomDocument>
@@ -62,9 +66,9 @@ class XmlRpcClient : public QObject {
      * @param params a list of the parameters
      * @return the identifier for this response
      */
-    QVariant syncCall(const QString& method, const QList<QVariant>& params, const char* codecName="UTF-8");
+    QVariant syncCall(const QString& method, const QList<QVariant>& params, int wait_seconds=120, const char* codecName="UTF-8");
 
-    static QVariant staticCall(const QUrl& server_url, const QString& method, const QList<QVariant>& params, bool debug = false, const char* codecName="UTF-8");
+    static QVariant staticCall(const QUrl& server_url, const QString& method, const QList<QVariant>& params, bool debug = false, int wait_seconds=120, const char* codecName="UTF-8");
 
     static QString variant2string(const QVariant& v, QString prefix="");
 
@@ -74,6 +78,11 @@ class XmlRpcClient : public QObject {
     void setDebug(bool b);
     bool isDebug();
     QNetworkReply *waitForNetworkReply(QNetworkReply* reply, int secs);
+
+    void setLogger(std::function<void(const string&, bool)> logger);
+    void log(const string& s, const bool newline=true) const;
+    void log(const QString& s);
+
     // RRA: end.
 
   private:
@@ -116,6 +125,8 @@ class XmlRpcClient : public QObject {
     bool debug;
     bool use_cookies;
     QVariant syncResp;
+
+    std::function<void(const string&, bool)> _logger;
     // RRA: fine.
 };
 

@@ -1,3 +1,5 @@
+#pragma once
+
 /***************************************************************************
 **	schema.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +12,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: schema.h $
 ** @package rproject::schema
@@ -27,10 +29,6 @@
 ** ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
-
-#ifndef SCHEMA_SCHEMA_H
-#define SCHEMA_SCHEMA_H
-
 
 #include <map>
 #include <string>
@@ -55,35 +53,38 @@ namespace SchemaNS {
     typedef map<string,Field*>  FieldMap;
     typedef map<string,int>  FieldIndex;
 
-    DECLSPECIFIER int getSchemiCreati();
-    DECLSPECIFIER int getSchemiDistrutti();
+    int getSchemiCreati();
+    int getSchemiDistrutti();
 
 
     /**
      * Contenitore di field
      */
-    class DECLSPECIFIER Schema {
+    class Schema {
 
       public:
         Schema();
         Schema(const string* nome);
         virtual ~Schema();
 
+        /** compatibility */
+        string name() const;
         string getName() const;
 
         virtual string toString(string prefix="", bool valuesAsAttributes=false) const;
 
         /** Returns a new instance */
-        virtual Schema* createNewInstance(const char* aName=0) const;
+        virtual Schema* createNewInstance() const;
+        virtual Schema* createNewInstance(const char* aName) const;
         /** Create a copy of current schema */
         Schema* clone(Schema* newSchema=0) const;
 
-        virtual bool equals(Schema* right) const;
-        friend DECLSPECIFIER bool operator==(const Schema& left, const Schema& right);
+        virtual bool equals(const Schema* right) const;
+        friend bool operator==(const Schema& left, const Schema& right);
 
-        Schema* addField( Field* field );
+        Schema* addField(Field* field );
         Field* getField(string& field) const;
-        Field* getField(const string &field) const;
+        Field* getField(const string& field) const;
         Field* getField(int i) const;
         /** Ritorna la posizione del field nel vettore */
         int getFieldIndex(const string& field) const;
@@ -144,7 +145,7 @@ namespace SchemaNS {
         virtual Field* createNewDateField(const string& fieldName, const string& valore) const;
 
         /** Schema name */
-        string name;
+        string _name;
         /** Schema fields */
         FieldVector fields;
 
@@ -161,10 +162,8 @@ namespace SchemaNS {
     typedef vector<Schema*>     SchemaVector;
     typedef map<string,Schema*> SchemaMap;
 
-	DECLSPECIFIER bool operator==(const Schema& left, const Schema& right);
+    bool operator==(const Schema& left, const Schema& right);
 
     string integer2string(long longValue);
     string float2string(float f);
 }
-
-#endif

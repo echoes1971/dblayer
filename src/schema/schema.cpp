@@ -10,7 +10,7 @@
 **    History:
 **        v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: schema.cpp $
 ** @package rproject::schema
@@ -45,7 +45,7 @@ int Schema::schemiCreati = 0;
 int Schema::schemiDistrutti = 0;
 
 Schema::Schema() {
-    this->name.clear();
+    this->_name.clear();
     schemiCreati++;
     bool found = false;
     for(const Schema* schema : createdSchema){
@@ -59,8 +59,8 @@ Schema::Schema() {
     }
 }
 Schema::Schema(const string* nome) {
-    this->name.clear();
-    this->name.append( nome->c_str() );
+    this->_name.clear();
+    this->_name.append( nome->c_str() );
 
     schemiCreati++;
     bool found = false;
@@ -79,7 +79,7 @@ Schema::~Schema() {
         delete this->fields.at(i);
     }
     schemiDistrutti++;
-    for(auto it=createdSchema.begin(); it!=createdSchema.end(); it++) {
+    for(vector<Schema*>::iterator it=createdSchema.begin(); it!=createdSchema.end(); it++) {
         if(*it==this) {
             createdSchema.erase(it);
             break;
@@ -87,7 +87,9 @@ Schema::~Schema() {
     }
 }
 
-string Schema::getName() const { return this->name; }
+
+string Schema::name() const { return this->_name; }
+string Schema::getName() const { return this->_name; }
 
 string Schema::toString_nodes(string prefix) const {
     string ret=prefix;
@@ -173,8 +175,9 @@ string Schema::toString(string prefix, bool valuesAsAttributes) const {
     return ret.append( "/>" );
 }
 
+Schema* Schema::createNewInstance() const { return new Schema(&this->_name); }
 Schema* Schema::createNewInstance(const char* aName) const {
-    string myName = aName==0 ? this->name : aName;
+    string myName = aName==0 ? this->_name : aName;
     return new Schema(&myName);
 }
 Schema* Schema::clone(Schema* newSchema) const {
@@ -187,14 +190,14 @@ Schema* Schema::clone(Schema* newSchema) const {
     return ret;
 }
 
-bool Schema::equals(Schema* right) const {
+bool Schema::equals(const Schema* right) const {
     bool ret=true;
     ret = ret && (this->getName() == right->getName());
     ret = ret && (this->getFieldSize() == right->getFieldSize());
     StringVector nomi = this->getNames();
 #ifdef WIN32
     size_t nomiSize = nomi.size();
-    for(size_t i=0; i<nomiSize; i++) {
+    for(size_t i=0; ret && i<nomiSize; i++) {
 #else
 
 #ifdef __i386__
@@ -221,7 +224,7 @@ bool Schema::equals(Schema* right) const {
     return ret;
 }
 
-DECLSPECIFIER bool SchemaNS::operator==(const Schema& left, const Schema& right) {
+bool SchemaNS::operator==(const Schema& left, const Schema& right) {
     Schema* left_pointer = (Schema*) &left;
     Schema* right_pointer = (Schema*) &right;
     return left_pointer->equals( right_pointer );
@@ -319,7 +322,7 @@ Schema* Schema::setValuesDictionary(FieldMap fields) {
     for(const pair<string,Field*> fieldpair : fields) {
         Field* field = fieldpair.second;
         if(field->isString()) {
-            this->setValue(field->getName(),field->getStringValue());
+            this->setValue(field->getName(), *(field->getStringValue()));
         } else if(field->isInteger()) {
             this->setValue(field->getName(),field->getIntegerValue());
         } else if(field->isFloat() || field->isDouble()) {
@@ -330,6 +333,7 @@ Schema* Schema::setValuesDictionary(FieldMap fields) {
             this->setValue(field->getName(),field->getBooleanValue());
         }
     }
+    return this;
 }
 
 Schema *Schema::setDateValue(const string& fieldName, const string& valore) {

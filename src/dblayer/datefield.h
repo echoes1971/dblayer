@@ -1,5 +1,6 @@
+#pragma once
 /***************************************************************************
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: datefield.h $
 ** @package rproject::dblayer
@@ -17,9 +18,6 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ***************************************************************************/
 
-#ifndef DBLAYER_DATEFIELD_H
-#define DBLAYER_DATEFIELD_H
-
 #include "importedPackages.h"
 
 #include "dbfield.h"
@@ -30,7 +28,7 @@
 
 namespace DBLayer {
 
-    class DECLSPECIFIER DateField : public DBField  {
+    class DateField : public DBField  {
       public:
 		/** YYYY-MM-DD HH:MM:SS mmm */
         DateField(const string& nome, const string& valore);
@@ -54,9 +52,7 @@ namespace DBLayer {
         virtual Field* createNewInstance(const char* aName=0) const;
       private:
         long year,month,day,hour,minute,seconds, millis;
-        bool isValidDate(long y, long m, long d);
-        bool isValidHour(long h, long m, long s, long millis);
+        bool isValidDate(long y, long m, long d) const;
+        bool isValidHour(long h, long m, long s, long millis) const;
     };
 }
-
-#endif

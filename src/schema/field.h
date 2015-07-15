@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	field.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: field.h $
 ** @package rproject::schema
@@ -28,10 +29,7 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef SCHEMA_FIELD_H
-#define SCHEMA_FIELD_H
-
-#ifndef DECLSPECIFIER
+/*#ifndef DECLSPECIFIER
 # if defined(_WIN32) || defined(__CYGWIN__)
 #  ifdef _WINDLL
 #    define DECLSPECIFIER __declspec(dllexport)
@@ -44,7 +42,7 @@
 #  define DECLSPECIFIER
 # endif
 #endif
-
+*/
 
 #include <string>
 using namespace std;
@@ -54,10 +52,10 @@ namespace SchemaNS {
 	extern string integer2string(long longValue);
     extern string float2string(float f);
 
-	DECLSPECIFIER int getFieldCreati();
-	DECLSPECIFIER int getFieldDistrutti();
+	int getFieldCreati();
+	int getFieldDistrutti();
 
-    class DECLSPECIFIER Field {
+    class Field {
       public:
         Field();
         Field(const string& nome);
@@ -68,7 +66,7 @@ namespace SchemaNS {
         virtual Field* clone() const;
 
         /** L'implementazione di default va bene per i tipi normali, eccetto le <b>date</b> */
-        virtual bool equals(const Field* field) const;
+        virtual bool equals(const Field& field) const;
 
         inline string getName() const { return this->name; }
         inline int getType() const { return type; }
@@ -145,7 +143,5 @@ namespace SchemaNS {
         static string nullString;
     };
 
-    DECLSPECIFIER bool operator==(const Field& left, const Field& right);
+    bool operator==(const Field& left, const Field& right);
 }
-
-#endif

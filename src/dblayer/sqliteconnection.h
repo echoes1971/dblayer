@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	sqliteconnection.h  v0.1.2 - 2012.03.19
 **	-----------------------------------
@@ -12,7 +13,7 @@
 **		v0.1.1 - 2006.05.14 Completato SQLiteResultSet e SQLiteConnection ad
 **				 eccezione di alcuni metodi che non sono supportati in sqlite3
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: sqliteconnection.h $
 ** @package rproject::dblayer
@@ -30,9 +31,6 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef DBLAYER_SQLITECONNECTION_H
-#define DBLAYER_SQLITECONNECTION_H
-
 #include "importedPackages.h"
 #include "dblayer.h"
 #include "dbconnection.h"
@@ -41,7 +39,7 @@ using namespace DBLayer;
 namespace DBLayer {
 
 #ifdef USE_LIBSQLITE3
-	class DECLSPECIFIER SQLiteConnection : public Connection {
+	class SQLiteConnection : public Connection {
 	  public:
 		SQLiteConnection(string s);
 		virtual ~SQLiteConnection();
@@ -73,7 +71,7 @@ namespace DBLayer {
 	};
 
 
-	class DECLSPECIFIER SQLiteResultSet : public ResultSet {
+	class SQLiteResultSet : public ResultSet {
 		friend class SQLiteConnection;
 		private:
 		public:
@@ -85,5 +83,3 @@ namespace DBLayer {
 	};
 #endif
 }
-
-#endif

@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	booleanfield  v0.0.1 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v1.0 - 2006.03.31	...
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: booleanfield.h $
 ** @package rproject::dblayer
@@ -28,15 +29,12 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef DBLAYER_BOOLEANFIELD_H
-#define DBLAYER_BOOLEANFIELD_H
-
 #include "importedPackages.h"
 #include "dbfield.h"
 
 namespace DBLayer {
-	class DECLSPECIFIER BooleanField : public DBField {
-	  public:
+    class BooleanField : public DBField {
+      public:
         BooleanField();
         BooleanField(const string& nome);
         BooleanField(const string& nome, bool valore);
@@ -45,7 +43,5 @@ namespace DBLayer {
         virtual Field* createNewInstance(const char* aName=0) const;
 
         string toString() const;
-	};
+    };
 }
-
-#endif

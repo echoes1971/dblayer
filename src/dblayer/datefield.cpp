@@ -1,5 +1,5 @@
 /***************************************************************************
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: datefield.cpp $
 ** @package rproject::dblayer
@@ -23,115 +23,125 @@
 
 using namespace DBLayer;
 
-DateField::DateField(const string &nome, const string &valore) : DBField(nome) {
-	type = DBField::DATE;
-	this->setValue( valore );
-	this->setNull(false);
+DateField::DateField(const string& nome, const string& valore) : DBField(nome) {
+    type = DBField::DATE;
+    this->setValue( valore );
+    this->setNull(false);
 }
-DateField::DateField(const string &nome, long seconds) : DBField(nome) {
-	type = DBField::DATE;
-	this->setValue(seconds);
-	this->setNull(false);
+DateField::DateField(const string& nome, long seconds) : DBField(nome) {
+    type = DBField::DATE;
+    this->setValue(seconds);
+    this->setNull(false);
 }
 DateField::DateField(const string &nome,
                 long year, long month, long day,
                 long hour, long minute, long seconds, long millis) : DBField(nome) {
-	type = DBField::DATE;
-	this->year    = year;
-	this->month   = month;
-	this->day     = day;
-	this->hour    = hour;
-	this->minute  = minute;
-	this->seconds = seconds;
-	this->millis  = millis;
-	this->setNull(false);
+    type = DBField::DATE;
+    this->year    = year;
+    this->month   = month;
+    this->day     = day;
+    this->hour    = hour;
+    this->minute  = minute;
+    this->seconds = seconds;
+    this->millis  = millis;
+    this->setNull(false);
 }
-DateField::~DateField() {
-}
+DateField::~DateField() {}
 
 Field* DateField::createNewInstance(const char* aName) const {
-    Field* ret=0;
-    string myName=string();
+    string myName = string();
     if( aName==0 ) {
         myName.append( this->getName() );
     } else {
         myName.append( aName );
     }
+    Field* ret=0;
     ret = new DateField(myName,0L);
     return ret;
 }
 
 // YYYY-MM-DD HH:MM:SS mmm
-void DateField::setValue(const string &valore) {
-	// TODO: controllare che la stringa sia nel formato YYYY-MM-DD hh:mm:ss mmm"
+void DateField::setValue(const string& valore) {
+    // TODO: controllare che la stringa sia nel formato YYYY-MM-DD hh:mm:ss mmm"
 
-	this->year = 0;	this->month = 0;	this->day = 0;
-	this->hour = 0;	this->minute = 0;	this->seconds = 0;
-	this->millis = 0;
+    //const char* tmpValore = valore.c_str();
+#ifdef WIN32
+    size_t tmpSize = valore.size();
+#else
+ #ifdef __i386__
+    unsigned int tmpSize = valore.size();
+ #else
+    unsigned long tmpSize = valore.size();
+ #endif
+#endif
 
-    if ( valore.size() >= 10 ) {
+    this->year = 0; this->month = 0;    this->day = 0;
+    this->hour = 0; this->minute = 0;   this->seconds = 0;
+    this->millis = 0;
+
+    if ( tmpSize >= 10 ) {
         this->year  = atoi( valore.substr(0,4).c_str() );
         this->month = atoi( valore.substr(5,2).c_str() );
         this->day   = atoi( valore.substr(8,2).c_str() );
-	}
-    if ( valore.size() >=19 ) {
+    }
+    if ( tmpSize >= 19 ) {
         this->hour    = atoi( valore.substr(11,2).c_str() );
         this->minute  = atoi( valore.substr(14,2).c_str() );
         this->seconds = atoi( valore.substr(17,2).c_str() );
-	}
-    if ( valore.size() >=23 ) {
+    }
+    if ( tmpSize >= 23 ) {
         this->millis = atoi( valore.substr(20,3).c_str() );
-	}
+    }
 
-	this->setNull(false);
+    this->setNull(false);
 }
 
 void DateField::setValue(long seconds) {
-	this->year = 0;	this->month = 0;	this->day = 0;
-	this->hour = 0;	this->minute = 0;	this->seconds = 0;
-	this->millis = 0;
+    this->year = 0; this->month = 0;    this->day = 0;
+    this->hour = 0; this->minute = 0;   this->seconds = 0;
+    this->millis = 0;
 
-	this->seconds = seconds%60;
-	long minuti = (long)seconds/60;
+    this->seconds = seconds%60;
+    long minuti = (long)seconds/60;
 
-	this->minute=minuti%60;
-	long ore = (long)minuti/60;
+    this->minute=minuti%60;
+    long ore = (long)minuti/60;
 
-	this->hour=ore%24;
-	long giorni = (long)ore/24 + 1;
+    this->hour=ore%24;
+    long giorni = (long)ore/24 + 1;
 
     // Year
-	int y=1970;
-	long mygiorni = this->getDaysFor(y);
-	while( (giorni - mygiorni) > 0 ) {
-		y++;
-		giorni -= mygiorni;
-		mygiorni = this->getDaysFor(y);
-	}
-	this->year=y;
+    int y=1970;
+    long mygiorni = this->getDaysFor(y);
+    while( (giorni - mygiorni) > 0 ) {
+        y++;
+        giorni -= mygiorni;
+        mygiorni = this->getDaysFor(y);
+    }
+    this->year=y;
 
     // Month
-	int m=1;
-	mygiorni = this->getDaysFor(this->year,m);
-	while( (giorni - mygiorni) > 0 && m<13 ) {
-		m++;
-		giorni -= mygiorni;
-		mygiorni = this->getDaysFor(this->year,m);
-	}
-	this->month=m;
+    int m=1;
+    mygiorni = this->getDaysFor(this->year,m);
+    while( (giorni - mygiorni) > 0 && m<13 ) {
+        m++;
+        giorni -= mygiorni;
+        mygiorni = this->getDaysFor(this->year,m);
+    }
+    this->month=m;
 
-	this->day = giorni;
+    this->day = giorni;
 
-	this->setNull(false);
+    this->setNull(false);
 }
 
-bool DateField::isValidDate(long y, long m, long d) {
-	return m>=1 && m<13 && d>=1 && d<=this->getDaysFor(y,m);
+bool DateField::isValidDate(long y, long m, long d) const {
+    return m>=1 && m<13 && d>=1 && d<=this->getDaysFor(y,m);
 }
 
-bool DateField::isValidHour(long h, long m, long s, long millis) {
-	return h>=0 && h<=23 && m>=0 && m<=59 && s>=0 && s<=59
-			&& millis>=0 && millis<=999;
+bool DateField::isValidHour(long h, long m, long s, long millis) const {
+    return h>=0 && h<=23 && m>=0 && m<=59 && s>=0 && s<=59
+            && millis>=0 && millis<=999;
 }
 
 long DateField::getDaysFor(long y, long m) const {
@@ -167,7 +177,7 @@ long DateField::getDaysFor(long y) const {
 }
 
 string DateField::toString() const {
-    char tmp[30];
+    char tmp[50];
 #if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
     sprintf_s(
 #else

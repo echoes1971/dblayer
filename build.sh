@@ -3,8 +3,8 @@
 
 BUILD_DIR=./build
 SRC_DIR=../src
-PATH=/home/roberto/Qt/5.3/gcc_64/bin/:${PATH}
-PATH=~/Qt/5.3/clang_64/bin/:~/Qt/5.3/gcc_64/bin/:${PATH}
+PATH=/home/roberto/Qt/5.4/gcc_64/bin/:${PATH}
+PATH=~/Qt/5.4/clang_64/bin/:~/Qt/5.4/gcc_64/bin/:${PATH}
 
 
 #CONNECTION_STRING="dblayer:sqlite:../examples/test.db"
@@ -25,8 +25,8 @@ cmake_params="${cmake_params} -DCMAKE_VERBOSE_MAKEFILE=ON "
 #cmake_params="${cmake_params} -DHAVE_CONFIG_H=true "
 
 echo "cmake ${cmake_params} ${SRC_DIR}"
-echo "cd build ; make -j 12 && ./tests/connection_test \"$CONNECTION_STRING\" $TEST_USER $TEST_PWD ; cd .."
-echo "cd build ; make -j 12 && ./tests/dbmgr_test \"$CONNECTION_STRING\" $TEST_USER $TEST_PWD ; cd .."
+echo "cd build ; make && ./tests/connection_test \"$CONNECTION_STRING\" $TEST_USER $TEST_PWD ; cd .."
+echo "cd build ; make && ./tests/dbmgr_test \"$CONNECTION_STRING\" $TEST_USER $TEST_PWD ; cd .."
 #exit 1
 
 #rm -rf $BUILD_DIR
@@ -38,7 +38,7 @@ cmake ${cmake_params} ${SRC_DIR}
 #make -j 12 && ./apps/dbshell dblayer:qxmlrpc:http://127.0.0.1/~roberto/rp/xmlrpc_server.php
 #make -j 12 && ./apps/dbshell "dblayer:mysql:host=localhost;dbname=rproject;user=root;password=;" adm adm
 
-make -j 12 \
+make \
     && ./tests/cm_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \
 #    && ./apps/dbshell "$CONNECTION_STRING" \
 #    &&./tests/connection_test "$CONNECTION_STRING" $TEST_USER $TEST_PWD \

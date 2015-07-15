@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
 **	datefield.h  v0.1.0 - 2012.03.19
 **	-----------------------------------
@@ -10,7 +11,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: datefield.h $
 ** @package rproject::schema
@@ -28,10 +29,6 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-
-#ifndef SCHEMA_DATEFIELD_H
-#define SCHEMA_DATEFIELD_H
-
 #include <string>
 using namespace std;
 
@@ -39,25 +36,19 @@ using namespace std;
 
 namespace SchemaNS {
 
-    class DECLSPECIFIER DateField : public Field  {
-      private:
-        bool isValidDate(long y, long m, long d) const;
-        bool isValidHour(long h, long m, long s, long millis) const;
-      protected:
-        long year,month,day,hour,minute,seconds, millis;
+    class DateField : public Field  {
       public:
-        /** YYYY-MM-DD HH:MM:SS mmm */
-        DateField(const string &nome, const string &valore);
-        DateField(const string &nome, long seconds);
+		/** YYYY-MM-DD HH:MM:SS mmm */
+        DateField(const string& nome, const string& valore);
+        DateField(const string& nome, long seconds);
         DateField(const string& nome,
                 long year, long month, long day,
                 long hour, long minute, long seconds, long millis
             );
         virtual ~DateField();
 
-        virtual Field* createNewInstance(const char* aName=0) const;
         virtual Field* clone() const;
-        virtual bool equals(Field* field) const;
+        virtual bool equals(const Field& field) const;
 
         void setValue(const string& valore);
         /** Since 01/01/1970 */
@@ -66,12 +57,15 @@ namespace SchemaNS {
         //long getDaysFor(long year);
         //long getDaysFor(long year, long month);
         virtual string toString() const;
-        /** Convert to seconds since 01/01/1970 */
+		/** Convert to seconds since 01/01/1970 */
         long to_seconds() const;
-        /** Convert to days since 01/01/1970 */
+		/** Convert to days since 01/01/1970 */
         long to_days() const;
+        virtual Field* createNewInstance(const char* aName=0) const;
+      protected:
+        long year,month,day,hour,minute,seconds, millis;
+      private:
+        bool isValidDate(long y, long m, long d) const;
+        bool isValidHour(long h, long m, long s, long millis) const;
     };
-
 }
-
-#endif

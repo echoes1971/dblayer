@@ -56,7 +56,7 @@ DBETestDBLayer* DBETestDBLayer::createNewInstance() const { return new DBETestDB
 
 void DBETestDBLayer::_before_insert(DBMgr* dbmgr) {
     if(this->isNull("id")) {
-        this->setValue("id",dbmgr->getNextUuid(this));
+        this->setValue("id",dbmgr->getNextUuid());
     }
 }
 
@@ -115,7 +115,7 @@ DBESocieta* DBESocieta::createNewInstance() const { return new DBESocieta(); }
 
 void DBESocieta::_before_insert(DBMgr* dbmgr) {
     if(this->isNull("id")) {
-        this->setValue("id",dbmgr->getNextUuid(this));
+        this->setValue("id",dbmgr->getNextUuid());
     }
 }
 void DBESocieta::_before_copy(DBMgr* dbmgr) {

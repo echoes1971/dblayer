@@ -10,7 +10,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: floatfield.cpp $
 ** @package rproject::schema
@@ -35,11 +35,9 @@ using namespace SchemaNS;
 
 FloatField::FloatField(const string& nome) : Field(nome) {
     this->type = Field::FLOAT;
-    this->validRepr=false;
 }
 FloatField::FloatField(const string& nome, float valore) : Field(nome) {
     this->type = Field::FLOAT;
-    this->validRepr=false;
     this->setValue(valore);
 }
 FloatField::~FloatField() {}
@@ -53,19 +51,7 @@ float FloatField::getValue() const { return floatValue; }
 void FloatField::setValue(float valore){
     floatValue = valore;
     nullo = false;
-    this->validRepr=false;
+    this->stringRepr = float2string(this->floatValue);
 }
 
-string FloatField::toString() {
-    if(this->validRepr) return this->stringRepr;
-
-    char tmp[50];
-#if defined( WIN32 ) && ! defined( USING_GCC_ON_WIN32 )
-    sprintf_s(tmp,"%f",this->floatValue);
-#else
-    sprintf(tmp,"%f",this->floatValue);
-#endif
-    this->stringRepr=(char*)&tmp;
-    this->validRepr=true;
-    return this->stringRepr;
-}
+string FloatField::toString() const  { return this->stringRepr; }

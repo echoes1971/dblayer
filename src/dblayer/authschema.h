@@ -1,9 +1,7 @@
+#pragma once
 /**
  * authschema.h
  */
-
-#ifndef AUTH_SCHEMA_H
-#define AUTH_SCHEMA_H
 
 #include "dblayer/dblayer.h"
 #include "dblayer/dbentity.h"
@@ -123,5 +121,3 @@ namespace AuthSchema {
 
   void checkDB(DBMgr& dbmgr, bool verbose=false);
 }
-
-#endif

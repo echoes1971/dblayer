@@ -10,7 +10,7 @@
 **	History:
 **		v0.1.0 - 2006.05.26 Versione iniziale
 **
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: datefield.cpp $
 ** @package rproject::schema
@@ -46,8 +46,8 @@ DateField::DateField(const string& nome, long seconds) : Field(nome){
     this->setNull(false);
 }
 DateField::DateField(const string &nome,
-                     long year, long month, long day,
-                     long hour, long minute, long seconds, long millis) : Field(nome) {
+                long year, long month, long day,
+                long hour, long minute, long seconds, long millis) : Field(nome) {
     type = Field::DATE;
     this->year    = year;
     this->month   = month;
@@ -62,7 +62,9 @@ DateField::~DateField(){}
 
 Field* DateField::createNewInstance(const char* aName) const {
     string myName = aName==0 ? this->name : aName;
-    return new DateField(myName,0L);
+    Field* ret=0;
+    ret = new DateField(myName,0L);
+    return ret;
 }
 
 Field* DateField::clone() const {
@@ -77,17 +79,17 @@ Field* DateField::clone() const {
     return ret;
 }
 
-bool DateField::equals(Field* field) const {
+bool DateField::equals(const Field& field) const {
     bool ret=true;
-    ret = ret && (field->getName() == this->getName());
-    ret = ret && (field->getType() == this->getType());
-    ret = ret && (((DateField*)field)->year == this->year);
-    ret = ret && (((DateField*)field)->month == this->month);
-    ret = ret && (((DateField*)field)->day == this->day);
-    ret = ret && (((DateField*)field)->hour == this->hour);
-    ret = ret && (((DateField*)field)->minute == this->minute);
-    ret = ret && (((DateField*)field)->seconds == this->seconds);
-    ret = ret && (((DateField*)field)->millis == this->millis);
+    ret = ret && (field.getName() == this->getName());
+    ret = ret && (field.getType() == this->getType());
+    ret = ret && (((DateField&)field).year == this->year);
+    ret = ret && (((DateField&)field).month == this->month);
+    ret = ret && (((DateField&)field).day == this->day);
+    ret = ret && (((DateField&)field).hour == this->hour);
+    ret = ret && (((DateField&)field).minute == this->minute);
+    ret = ret && (((DateField&)field).seconds == this->seconds);
+    ret = ret && (((DateField&)field).millis == this->millis);
     return ret;
 }
 
@@ -108,8 +110,8 @@ void DateField::setValue(const string& valore) {
  #endif
 #endif
 
-    this->year = 0;	this->month = 0;	this->day = 0;
-    this->hour = 0;	this->minute = 0;	this->seconds = 0;
+    this->year = 0; this->month = 0;    this->day = 0;
+    this->hour = 0; this->minute = 0;   this->seconds = 0;
     this->millis = 0;
 
     if ( tmpSize >= 10 ) {
@@ -142,9 +144,10 @@ void DateField::setValue(const string& valore) {
 
     this->setNull(false);
 }
+
 void DateField::setValue(long seconds) {
-    this->year = 0;	this->month = 0;	this->day = 0;
-    this->hour = 0;	this->minute = 0;	this->seconds = 0;
+    this->year = 0; this->month = 0;    this->day = 0;
+    this->hour = 0; this->minute = 0;   this->seconds = 0;
     this->millis = 0;
 
     this->seconds = seconds%60;
@@ -184,6 +187,7 @@ void DateField::setValue(long seconds) {
 bool DateField::isValidDate(long y, long m, long d) const {
     return m>=1 && m<13 && d>=1 && d<=this->getDaysFor(y,m);
 }
+
 bool DateField::isValidHour(long h, long m, long s, long millis) const {
     return h>=0 && h<=23 && m>=0 && m<=59 && s>=0 && s<=59
             && millis>=0 && millis<=999;

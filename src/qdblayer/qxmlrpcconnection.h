@@ -24,6 +24,8 @@ class QXmlrpcConnection : public QObject , public Connection {
     QXmlrpcConnection(string s,QObject* parent=0);
     virtual ~QXmlrpcConnection();
 
+    void log(const QString& s);
+
     virtual bool connect();
     virtual bool disconnect();
 
@@ -43,7 +45,7 @@ class QXmlrpcConnection : public QObject , public Connection {
 
     virtual string getFormSchema(string language="python");
     virtual string getDBSchema(string language="python");
-    virtual string getSchemaName();
+    virtual string getSchemaName() const;
     inline string getDBType() const { return "QXmlrpc"; }
 
     static QString variant2string(const QVariant& v, QString prefix="");
@@ -65,7 +67,7 @@ class QXmlrpcConnection : public QObject , public Connection {
     virtual string ping();
   private:
     QList<QVariant>* _dbeToVariant(DBEntity* dbe, QList<QVariant>* ioVariant);
-    DBEntity* _variantToDBE(QVariant* v, DBEntity* ioDbe);
+    DBEntity* _variantToDBE(QVariant* v, DBEntity* ioDbe=0);
     // **************** Proxy Connections :: 20091015: end. *********************
 
   public slots:

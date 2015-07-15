@@ -1,5 +1,6 @@
+#pragma once
 /***************************************************************************
-** @copyright &copy; 2011-2014 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
+** @copyright &copy; 2011-2015 by Roberto Rocco Angeloni <roberto@roccoangeloni.it>
 ** @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License, version 3.0 (LGPLv3)
 ** @version $Id: floatfield.h $
 ** @package rproject::dblayer
@@ -17,9 +18,6 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ****************************************************************************/
 
-#ifndef DBLAYER_FLOATFIELD_H
-#define DBLAYER_FLOATFIELD_H
-
 #include "importedPackages.h"
 
 #include "dbfield.h"
@@ -30,7 +28,7 @@
 
 namespace DBLayer {
 
-class DECLSPECIFIER FloatField : public DBField  {
+class FloatField : public DBField  {
 public:
     FloatField(const string& nome);
     FloatField(const string& nome, float valore);
@@ -42,5 +40,3 @@ public:
 };
 
 }
-
-#endif
