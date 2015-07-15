@@ -383,9 +383,12 @@ int main(int argc, char *argv[]) {
         success = testGetKeys( connString, login_user, login_password, "test_test_dblayer" );
         success = success && testGetKeys( connString, login_user, login_password, "test_societa" );
     }
-    cout << "---------------->>  testGetKeys: end." << endl;
     if(!success) {
         cerr << "TEST FAILED!!!" << endl;
+    }
+    cout << "---------------->>  testGetKeys: end." << endl;
+    if(!success) {
+        return 1;
     }
     cout << endl;
 
@@ -397,10 +400,10 @@ int main(int argc, char *argv[]) {
         success = testGetForeignKeys( connString, login_user, login_password, "test_test_dblayer" );
         success = success && testGetForeignKeys( connString, login_user, login_password, "test_societa" );
     }
-    cout << "---------------->>  testGetForeignKeys: end." << endl;
     if(!success) {
         cerr << "TEST FAILED!!!" << endl;
     }
+    cout << "---------------->>  testGetForeignKeys: end." << endl;
     cout << endl;
 
     cout << "---------------->>  testGetColumnsForTable: start." << endl;
@@ -413,10 +416,10 @@ int main(int argc, char *argv[]) {
         success = success && testGetColumnsForTable( connString, login_user, login_password, "test_societa" );
         success = success && testGetColumnsForTable( connString, login_user, login_password, "auth_users" );
     }
-    cout << "---------------->>  testGetColumnsForTable: end." << endl;
     if(!success) {
         cerr << "TEST FAILED!!!" << endl;
     }
+    cout << "---------------->>  testGetColumnsForTable: end." << endl;
     cout << endl;
 
     return EXIT_SUCCESS;

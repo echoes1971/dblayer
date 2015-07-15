@@ -132,7 +132,7 @@ ResultSet* QSqliteConnection::exec(const string s) {
                 // Add it anyway, otherwise we have wrong results
                 //add_column = false;
                 rs->columnType.push_back( DBLayer::type_blob );
-                unknown_type = true;
+                //unknown_type = true;
                 break;
             default:
                 cerr << "QSqliteConnection::exec: \'" << record.fieldName(i).toStdString() << "\' "

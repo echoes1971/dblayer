@@ -778,7 +778,7 @@ DBEntityVector* ObjectMgr::Search(DBEntity* dbe, bool uselike, bool caseSensitiv
     return ret;
 }
 DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) {
-    if( this->verbose )  this->log("ObjectMgr::objectById: start.");
+    if(this->verbose)  this->log("ObjectMgr::objectById: start.");
     DBEntityVector types = this->getRegisteredTypes();
     StringVector q;
     for(const DBEntity* mytype : types) {
@@ -796,22 +796,22 @@ DBEObject* ObjectMgr::objectById(const string id, const bool ignore_deleted) {
         delete mydbe;
     }
     string searchString = joinString(&q,string(" union "));
-    if( this->verbose )  this->log("ObjectMgr::objectById: searchString=" + searchString);
+    if(this->verbose)  this->log("ObjectMgr::objectById: searchString=" + searchString);
     DBEntityVector* mylist = this->Select("objects", searchString);
     DBEObject* ret = 0;
-    if( this->verbose )  this->log("ObjectMgr::objectById: mylist=" + DBLayer::integer2string(mylist->size()));
+    if(this->verbose)  this->log("ObjectMgr::objectById: mylist=" + DBLayer::integer2string(mylist->size()));
     if(mylist->size()==1) {
         DBEntity* tmpret = mylist->at(0);
         ret = dynamic_cast<DBEObject*>(tmpret);
         if(ret==0) {
             delete tmpret;
         }
-        if( this->verbose )  this->log("ObjectMgr::objectById: ret=" + ret->toString("\n"));
+        if(this->verbose) this->log("ObjectMgr::objectById: ret=" + ret->toString("\n"));
         delete mylist;
     } else {
         this->Destroy(mylist);
     }
-    if( this->verbose )  this->log("ObjectMgr::objectById: end.");
+    if(this->verbose) this->log("ObjectMgr::objectById: end.");
     return ret;
 }
 DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted) {
@@ -821,7 +821,7 @@ DBEObject* ObjectMgr::fullObjectById(const string id, const bool ignore_deleted)
 //          this->log("ObjectMgr::fullObjectById: end.");
         return 0;
     }
-    DBEntity* search = this->getClazzByTypeName(myobj->getStringValue("classname"));
+    DBEntity* search = this->getClazzByTypeName(myobj->name());//->getStringValue("classname"));
     search->setValue("id",myobj->getId());
     // FIXME this looks like a bit redundant, maybe there is a smarter way to do it
     DBEntityVector* mylist = this->Search(search,false,false,"",ignore_deleted);

@@ -361,8 +361,10 @@ bool testCRUD(string tablename, string connString, string& loginUser, string& lo
 
             // Delete
             cout << "testCRUD: try to delete the DBEObject" << endl;
-//             objmgr->setVerbose(true);
+            //objmgr->setVerbose(true);
+            con->setVerbose(true);
             dbeobject = (DBEObject*) objmgr->Delete(dbeobject);
+            con->setVerbose(false);
             objmgr->setVerbose(false);
             success = success && dbeobject->isDeleted();
             if(dbeobject->isDeleted())
