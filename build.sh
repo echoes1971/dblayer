@@ -3,8 +3,8 @@
 
 BUILD_DIR=./build
 SRC_DIR=../src
-PATH=/home/roberto/Qt/5.4/gcc_64/bin/:${PATH}
-PATH=~/Qt/5.4/clang_64/bin/:~/Qt/5.4/gcc_64/bin/:${PATH}
+#PATH=/home/roberto/Qt/5.4/gcc_64/bin/:${PATH}
+#PATH=~/Qt/5.4/clang_64/bin/:~/Qt/5.4/gcc_64/bin/:${PATH}
 
 
 #CONNECTION_STRING="dblayer:sqlite:../examples/test.db"
