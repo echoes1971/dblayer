@@ -1,6 +1,10 @@
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch_all.hpp>
 #include "../dblayer/dbfield.h"
+#include "../dblayer/booleanfield.h"
+#include "../dblayer/integerfield.h"
+#include "../dblayer/floatfield.h"
+#include "../dblayer/stringfield.h"
+#include "../dblayer/datefield.h"
 using namespace DBLayer;
 
 TEST_CASE("Field::isFloat returns correct type", "[field]") {
@@ -31,7 +35,7 @@ TEST_CASE("Field::isFloat returns correct type", "[field]") {
     
     SECTION("Default Field type ANY is not float") {
         Field f("test");
-        f.setType(Field::ANY);
+        REQUIRE(f.getType() == Field::ANY);
         REQUIRE_FALSE(f.isFloat());
     }
     

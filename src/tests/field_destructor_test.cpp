@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch_all.hpp>
 #include "../dblayer/dbfield.h"
 #include "../dblayer/booleanfield.h"
@@ -28,7 +27,7 @@ TEST_CASE("Field destructors clean up stringValue", "[memory]") {
         sf->setValue("hello world");
         // Verify value is set before delete
         REQUIRE(sf->getStringValue() != nullptr);
-        REQUIRE(sf->getStringValue()->c_str() == "hello world");
+        REQUIRE(*sf->getStringValue() == "hello world");
         delete sf;
         // After delete, accessing would be dangling - but we just verify no crash
     }
@@ -52,22 +51,18 @@ TEST_CASE("Field::getStringValue returns valid pointer before delete", "[memory]
         sf.setValue("test value");
         const string* val = sf.getStringValue();
         REQUIRE(val != nullptr);
-        REQUIRE(val->c_str() == "test value");
+        REQUIRE(*val == "test value");
     }
     
     SECTION("IntegerField getIntegerValue works") {
         IntegerField ifield("test");
         ifield.setValue(99);
-        // getIntegerValue returns pointer to internal longValue
-        // Just verify it doesn't crash
-        long v = *ifield.getIntegerValue();  // will implicitly convert
-        (void)v;  // suppress unused warning
+        REQUIRE(ifield.getIntegerValue() == 99);
     }
     
     SECTION("FloatField getFloatValue works") {
         FloatField ffl("test");
         ffl.setValue(2.71f);
-        float v = *ffl.getFloatValue();
-        (void)v;
+        REQUIRE(ffl.getFloatValue() == 2.71f);
     }
 }

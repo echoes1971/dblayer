@@ -40,13 +40,21 @@ int Field::fieldDistrutti = 0;
 string Field::nullString = "";
 
 Field::Field() {
+  this->type = Field::ANY;
   this->nullo = true;
+  this->boolValue = false;
+  this->longValue = 0;
+  this->floatValue = 0.0f;
   this->stringValue=0;
   fieldCreati++;
 }
 Field::Field(const string& nome) {
     this->name=nome;
+    this->type = Field::ANY;
     this->nullo = true;
+    this->boolValue = false;
+    this->longValue = 0;
+    this->floatValue = 0.0f;
     this->stringValue=0;
     fieldCreati++;
 }

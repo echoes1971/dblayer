@@ -25,6 +25,6 @@ inline std::string integer2string(long longValue) {
  *  @deprecated Use std::to_string() directly or the DBLayer::integer2string below.
  */
 [[deprecated("Use std::to_string() or DBLayer::integer2string instead")]]
-std::string legacy_integer2string(long longValue) {
+inline std::string legacy_integer2string(long longValue) {
     return integer2string(longValue);
 }

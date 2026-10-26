@@ -1,13 +1,12 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.16)
 
-project(DBLayer)
+project(DBLayer LANGUAGES CXX)
 
 # https://bitbucket.org/catanasoaei/nanocv/src/fd9713422b20f1129b211c88d77151d8f7b38377/CMakeLists.txt?at=dev
 
-ADD_DEFINITIONS(
-    -std=c++11 # Or -std=c++0x
-    # Other flags
-)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # The version number.
 set(DBLayer_VERSION_MAJOR 5)
@@ -156,7 +155,7 @@ endif()
 
 # For CM Schema::DBEFile
 if(Boost_FOUND)
- set(EXTRA_LIBS ${EXTRA_LIBS} boost_filesystem boost_system)
+ set(EXTRA_LIBS ${EXTRA_LIBS} boost_filesystem)
 endif()
 if(MAGIC_FOUND)
  set(EXTRA_LIBS ${EXTRA_LIBS} ${MAGIC_LIBRARY})
@@ -177,6 +176,7 @@ if(Qt5Widgets_FOUND)
  add_subdirectory (qdblayer)
 endif()
 
+enable_testing()
 add_subdirectory(tests)
 
 add_subdirectory(apps)

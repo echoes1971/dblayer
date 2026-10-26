@@ -62,15 +62,17 @@
   #include <libpq-fe.h>
   #include <sql3types.h>
  #else
-  #ifdef HAVE_LIBPQ_FE_H
+  #ifdef __APPLE__
    #include <libpq-fe.h>
-  #else
-   #ifdef __APPLE__
+   #include <sql3types.h>
+  #elif defined(__has_include)
+   #if __has_include(<libpq-fe.h>)
     #include <libpq-fe.h>
-    #include <sql3types.h>
-   #else
+   #elif __has_include(<postgresql/libpq-fe.h>)
     #include <postgresql/libpq-fe.h>
    #endif
+  #else
+   #include <postgresql/libpq-fe.h>
   #endif
  #endif
 # endif
