@@ -1,34 +1,15 @@
 cmake_minimum_required(VERSION 2.8)
+project(dblayer_tests)
 
+# Use system-installed Catch2
+find_package(Catch2)
 
-add_executable(cm_test
-    cm_test.cpp
-    )
+# Add test executables for the 3 P0 fixes
+add_executable(integer2string_test tests/integer2string_test.cpp)
+target_link_libraries(integer2string_test Catch2::Catch2 schema dblayer)
 
-add_executable(dbmgr_test
-    dbmgr_test.cpp
-    dbschema.cpp
-#    dbshell.cpp
-    )
+add_executable(isFloat_test tests/isFloat_test.cpp)
+target_link_libraries(isFloat_test Catch2::Catch2 schema dblayer)
 
-add_executable(connection_test
-    connection_test.cpp
-    dbschema.cpp
-#    dbshell.cpp
-    )
-
-if(Qt5Widgets_FOUND)
- target_link_libraries(connection_test qdblayer ${EXTRA_LIBS})
- qt5_use_modules(connection_test Core Network Sql Widgets Xml)
-
- target_link_libraries(dbmgr_test qdblayer ${EXTRA_LIBS})
- qt5_use_modules(dbmgr_test Core Network Sql Widgets Xml)
-
- target_link_libraries(cm_test qdblayer ${EXTRA_LIBS})
- qt5_use_modules(cm_test Core Network Sql Widgets Xml)
-else()
- target_link_libraries(connection_test ${EXTRA_LIBS})
- target_link_libraries(dbmgr_test ${EXTRA_LIBS})
- target_link_libraries(cm_test ${EXTRA_LIBS})
-endif()
-
+add_executable(field_destructor_test tests/field_destructor_test.cpp)
+target_link_libraries(field_destructor_test Catch2::Catch2 schema dblayer)

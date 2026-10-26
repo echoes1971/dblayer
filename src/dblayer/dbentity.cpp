@@ -444,7 +444,7 @@ void DBEntity::readFKFrom(const DBEntity* dbe) {
                 this->setValue( nomeField, myfield->getBooleanValue() );
             } else if ( myfield->isInteger() ) {
                 this->setValue( nomeField, myfield->getIntegerValue() );
-            } else if ( myfield->isFloat() || myfield->isDouble() )  {
+            } else if ( myfield->isFloat() ) {
                 this->setValue( nomeField, myfield->getFloatValue() );
             } else if ( myfield->isString() ) {
                 this->setValue( nomeField, myfield->getStringValue()->c_str() );
@@ -465,7 +465,7 @@ DBEntity* DBEntity::writeFKTo(DBEntity* dbemaster) {
                 dbemaster->setValue( nomeField, myfield->getBooleanValue() );
             } else if ( myfield->isInteger() ) {
                 dbemaster->setValue( nomeField, myfield->getIntegerValue() );
-            } else if ( myfield->isFloat() || myfield->isDouble() )  {
+            } else if ( myfield->isFloat() ) {
                 dbemaster->setValue( nomeField, myfield->getFloatValue() );
             } else if ( myfield->isString() ) {
                 dbemaster->setValue( nomeField, myfield->getStringValue() );

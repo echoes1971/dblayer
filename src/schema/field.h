@@ -74,7 +74,6 @@ namespace SchemaNS {
         bool isBoolean() const;
         bool isInteger() const;
         bool isFloat() const;
-        bool isDouble() const;
         bool isDate() const;
         bool isString() const;
 

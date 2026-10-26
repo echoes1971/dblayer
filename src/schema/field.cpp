@@ -126,7 +126,6 @@ bool Field::isInteger() const { return type==Field::INTEGER; }
 bool Field::isString() const { return type==Field::STRING; }
 bool Field::isDate() const { return type==Field::DATE; }
 bool Field::isFloat() const { return type==Field::FLOAT; }
-bool Field::isDouble() const { return type==Field::FLOAT; }
 
 long Field::getIntegerValue() const { return this->longValue; }
 float Field::getFloatValue() const { return this->floatValue; }

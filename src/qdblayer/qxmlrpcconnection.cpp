@@ -585,7 +585,7 @@ QList<QVariant>* QXmlrpcConnection::_dbeToVariant(DBEntity* dbe, QList<QVariant>
         if(field->isBoolean()) d->insert(QString( (*it).c_str() ), field->getBooleanValue());
         else if(field->isInteger()) d->insert(QString( (*it).c_str() ), (qlonglong) field->getIntegerValue());
         else if(field->isFloat()) d->insert(QString( (*it).c_str() ), field->getFloatValue());
-        else if(field->isDouble()) d->insert(QString( (*it).c_str() ), field->getFloatValue());
+        else if(field->isFloat()) d->insert(QString( (*it).c_str() ), field->getFloatValue());
         else if(field->isDate()) {
             //printf("QXmlrpcConnection::_dbeToVariant: %s=>%s\n", (*it).c_str(), field->toString().c_str());
             d->insert(QString( (*it).c_str() ), field->toString().c_str());

@@ -35,6 +35,7 @@ using namespace System;
 #endif
 
 #include "dblayer.h"
+#include "support/integer2string.h"
 using namespace DBLayer;
 
 string DBLayer::lowerCase(string& s) {
@@ -101,22 +102,9 @@ string& DBLayer::string_rtrim(std::string& s) {
 }
 string& DBLayer::string_trim(string& s) { return string_ltrim(string_rtrim(s)); }
 string DBLayer::integer2string(long longValue) {
-    int i = 50-2;
-    char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
-    if ( longValue<0 ) {
-        string tmpString = "-";
-        return tmpString.append( DBLayer::integer2string( -1 * longValue ) );
-    }
-    if (longValue>=0 && longValue<10) {
-        tmp[i] = (char) ((int)longValue%10)+'0';
-        i--;
-    } else {
-        for (i=50-2; i>=0 && longValue>0 ; i--) {
-            tmp[i] = (char) ((int)longValue%10)+'0';
-            longValue = longValue / 10;
-        }
-    }
-    return (char*)&tmp[i+1];
+    // Use the utility version which fixes the off-by-one bug
+    // original had: int i = 50-2 with char tmp[50] - ambiguous buffer indexing
+    return ::integer2string(longValue);
 }
 string DBLayer::replaceAll(string s, string f, string r) {
 #ifdef __i386__

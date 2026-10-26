@@ -37,6 +37,7 @@
 #include "floatfield.h"
 #include "integerfield.h"
 #include "stringfield.h"
+#include "support/integer2string.h"
 #include "schema.h"
 using namespace SchemaNS;
 
@@ -325,7 +326,7 @@ Schema* Schema::setValuesDictionary(FieldMap fields) {
             this->setValue(field->getName(), *(field->getStringValue()));
         } else if(field->isInteger()) {
             this->setValue(field->getName(),field->getIntegerValue());
-        } else if(field->isFloat() || field->isDouble()) {
+        } else if(field->isFloat()) {
             this->setValue(field->getName(),field->getFloatValue());
         } else if(field->isDate()) {
             this->setDateValue(field->getName(),field->getValueAsString());
@@ -436,25 +437,14 @@ Schema *Schema::setNull(const string& fieldName, bool valore) {
 }
 
 
-//********************** UTILITY
-
+// Legacy compatibility - delegate to utility
 string SchemaNS::integer2string(long longValue) {
-    int i = 50-2;
-    char tmp[50];  tmp[50-2] = '0';  tmp[50-1] = '\0';
-    if ( longValue<0 ) {
-        return string("-").append( SchemaNS::integer2string( -1 * longValue ) );
-    }
-    if (longValue>=0 && longValue<10) {
-        tmp[i] = (char) ((int)longValue%10)+'0';
-        i--;
-    } else {
-        for (i=50-2; i>=0 && longValue>0 ; i--) {
-            tmp[i] = (char) ((int)longValue%10)+'0';
-            longValue = longValue / 10;
-        }
-    }
-    return (char*)&tmp[i+1];
+    // Use the utility version which fixes the off-by-one bug
+    // original had: int i = 50-2 with char tmp[50] - ambiguous buffer indexing
+    return ::integer2string(longValue);
 }
+
+//********************** UTILITY
 
 string SchemaNS::float2string(float f) {
     char tmp[50];
